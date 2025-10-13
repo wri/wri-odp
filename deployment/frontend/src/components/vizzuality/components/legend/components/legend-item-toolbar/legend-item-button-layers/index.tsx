@@ -1,9 +1,9 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import sortBy from 'lodash/sortBy'
-import Tooltip from '../../../../tooltip'
-import LegendLayersTooltip from './legend-item-button-layers-tooltip'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import sortBy from 'lodash/sortBy';
+import Tooltip from '../../../../tooltip';
+import LegendLayersTooltip from './legend-item-button-layers-tooltip';
 
 class LegendItemButtonLayers extends PureComponent {
     static propTypes = {
@@ -18,7 +18,7 @@ class LegendItemButtonLayers extends PureComponent {
 
         onChangeLayer: PropTypes.func,
         onTooltipVisibilityChange: PropTypes.func,
-    }
+    };
 
     static defaultProps = {
         layers: [],
@@ -32,26 +32,26 @@ class LegendItemButtonLayers extends PureComponent {
 
         onChangeLayer: () => {},
         onTooltipVisibilityChange: () => {},
-    }
+    };
 
     state = {
         visibilityHover: false,
         visibilityClick: false,
         multiLayersActive: this.props.i === 0 && this.props.layers.length > 1,
-    }
+    };
 
     componentWillReceiveProps(nextProps) {
-        const { scrolling, i: prevIndex } = this.props
-        const { i: nextIndex } = nextProps
+        const { scrolling, i: prevIndex } = this.props;
+        const { i: nextIndex } = nextProps;
 
         if (scrolling || prevIndex !== nextIndex) {
-            this.onTooltipVisibilityChange(false)
+            this.onTooltipVisibilityChange(false);
         }
     }
 
     onTooltipVisibilityChange = (visibility) => {
-        const { onTooltipVisibilityChange } = this.props
-        const { multiLayersActive } = this.state
+        const { onTooltipVisibilityChange } = this.props;
+        const { multiLayersActive } = this.state;
 
         this.setState({
             visibilityHover: false,
@@ -59,23 +59,23 @@ class LegendItemButtonLayers extends PureComponent {
             ...(multiLayersActive && {
                 multiLayersActive: false,
             }),
-        })
+        });
 
-        onTooltipVisibilityChange(visibility)
-    }
+        onTooltipVisibilityChange(visibility);
+    };
 
     /**
      * HELPERS
      * - getTimelineLayers
      */
     getTimelineLayers = () => {
-        const { layers } = this.props
+        const { layers } = this.props;
 
         return sortBy(
             layers.filter((l) => l.layerConfig.timeline),
             (l) => l.layerConfig.order
-        )
-    }
+        );
+    };
 
     render() {
         const {
@@ -87,13 +87,13 @@ class LegendItemButtonLayers extends PureComponent {
             tooltipText,
             onChangeLayer,
             tooltipOpened,
-        } = this.props
+        } = this.props;
         const { visibilityClick, visibilityHover, multiLayersActive } =
-            this.state
-        const timelineLayers = this.getTimelineLayers()
+            this.state;
+        const timelineLayers = this.getTimelineLayers();
 
         if (layers.length === 1 || timelineLayers.length) {
-            return null
+            return null;
         }
 
         return (
@@ -147,8 +147,8 @@ class LegendItemButtonLayers extends PureComponent {
                     </button>
                 </Tooltip>
             </Tooltip>
-        )
+        );
     }
 }
 
-export default LegendItemButtonLayers
+export default LegendItemButtonLayers;

@@ -1,5 +1,5 @@
-import React from 'react'
-import { SortableHandle } from '../../../../react-sortable-hoc/src'
+import React from 'react';
+import { SortableHandle } from '../../../../react-sortable-hoc/src';
 
 const LegendItemDrag = () => (
     <span className="absolute cursor-move top-[19px] left-[8px]">
@@ -19,6 +19,6 @@ const LegendItemDrag = () => (
             <path d="M16 25.6c1.767 0 3.2 1.433 3.2 3.2s-1.433 3.2-3.2 3.2c-1.767 0-3.2-1.433-3.2-3.2s1.433-3.2 3.2-3.2z"></path>
         </svg>
     </span>
-)
+);
 
-export default SortableHandle(LegendItemDrag)
+export default SortableHandle(LegendItemDrag);

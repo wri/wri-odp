@@ -1,14 +1,14 @@
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
-import { env } from '@/env.mjs'
-import type { CkanResponse, WriDataset } from '@/schema/ckan.schema'
+import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc';
+import { env } from '@/env.mjs';
+import type { CkanResponse, WriDataset } from '@/schema/ckan.schema';
 
-import { NotificationInput } from '@/schema/notification.schema'
-import type { NotificationType } from '@/schema/notification.schema'
-import { timeAgo } from '@/utils/apiUtils'
-import { replaceNames } from '@/utils/replaceNames'
-import type Team from '@/interfaces/team.interface'
-import type Topic from '@/interfaces/topic.interface'
-import { z } from 'zod'
+import { NotificationInput } from '@/schema/notification.schema';
+import type { NotificationType } from '@/schema/notification.schema';
+import { timeAgo } from '@/utils/apiUtils';
+import { replaceNames } from '@/utils/replaceNames';
+import type Team from '@/interfaces/team.interface';
+import type Topic from '@/interfaces/topic.interface';
+import { z } from 'zod';
 
 export const notificationRouter = createTRPCRouter({
     getAllNotifications: protectedProcedure
@@ -21,121 +21,121 @@ export const notificationRouter = createTRPCRouter({
                         Authorization: env.SYS_ADMIN_API_KEY,
                     },
                 }
-            )
+            );
 
             const data = (await response.json()) as CkanResponse<
                 NotificationType[]
-            >
+            >;
 
             if (!input.returnLength) {
                 return {
                     count: data.result.filter(
                         (x) => x.is_unread && x.state !== 'deleted'
                     ).length,
-                }
+                };
             }
 
-            const activities: NotificationType[] = []
+            const activities: NotificationType[] = [];
 
             // Used to fix object capitalization
             const titleCase = (str: string) =>
                 str
                     .split(' ')
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ')
+                    .join(' ');
 
             for (const notification of data.result) {
-                if (notification.state === 'deleted') continue
+                if (notification.state === 'deleted') continue;
 
-                const user_data = notification.sender_obj!
+                const user_data = notification.sender_obj!;
 
-                let objectName = ''
-                let objectIdName = ''
-                let msg = ''
+                let objectName = '';
+                let objectIdName = '';
+                let msg = '';
                 if (notification.object_type === 'dataset') {
-                    const dataset = notification.object_data as WriDataset
-                    objectName = dataset?.title ?? dataset?.name ?? ''
-                    objectIdName = dataset?.name
+                    const dataset = notification.object_data as WriDataset;
+                    objectName = dataset?.title ?? dataset?.name ?? '';
+                    objectIdName = dataset?.name;
 
-                    const actionType = notification.activity_type.split('_')
+                    const actionType = notification.activity_type.split('_');
 
                     if (actionType[0] === 'collaborator') {
-                        const role = actionType[2]
-                        const action = actionType[1]
+                        const role = actionType[2];
+                        const action = actionType[1];
                         if (action === 'removed') {
-                            msg = ` ${action} you as a collaborator (${role}) from the Dataset`
+                            msg = ` ${action} you as a collaborator (${role}) from the Dataset`;
                         } else if (action === 'added') {
-                            msg = ` ${action} you as a collaborator (${role}) for the Dataset`
+                            msg = ` ${action} you as a collaborator (${role}) for the Dataset`;
                         } else if (action === 'updated') {
-                            msg = ` ${action} your collaborator status to "${role}" for the Dataset`
+                            msg = ` ${action} your collaborator status to "${role}" for the Dataset`;
                         }
                     } else if (actionType[0] === 'issue') {
-                        const action = actionType[1]
+                        const action = actionType[1];
                         if (action === 'created') {
                             msg = ` ${action} an issue (${actionType[2]
                                 ?.split('nbsp;')
-                                ?.join(' ')} ) for the Dataset`
+                                ?.join(' ')} ) for the Dataset`;
                         } else if (action === 'commented') {
                             msg = ` ${action} on an issue (${actionType[2]
                                 ?.split('nbsp;')
-                                ?.join(' ')} ) for the Dataset`
+                                ?.join(' ')} ) for the Dataset`;
                         } else if (action === 'closed') {
                             msg = ` ${action} an issue (${actionType[2]
                                 ?.split('nbsp;')
-                                ?.join(' ')} ) for the Dataset`
+                                ?.join(' ')} ) for the Dataset`;
                         } else if (action === 'open') {
                             msg = ` re-${action} an issue (${actionType[2]
                                 ?.split('nbsp;')
-                                ?.join(' ')} ) for the Dataset`
+                                ?.join(' ')} ) for the Dataset`;
                         } else if (action === 'deleted') {
                             msg = ` ${action} an issue (${actionType[2]
                                 ?.split('nbsp;')
-                                ?.join(' ')} ) for the Dataset`
+                                ?.join(' ')} ) for the Dataset`;
                         }
                     } else if (actionType[0] === 'pending') {
-                        msg = ` created ${actionType[0]}  ${titleCase(actionType[1] ?? '')} `
+                        msg = ` created ${actionType[0]}  ${titleCase(actionType[1] ?? '')} `;
                     } else {
                         if (notification.activity_type.includes(' ')) {
-                            const parts = notification.activity_type.split(' ')
+                            const parts = notification.activity_type.split(' ');
                             // Fixes object capitalization
                             const objectTypeFixed = parts[1]
                                 ? parts[1].charAt(0).toUpperCase() +
                                   parts[1].slice(1)
-                                : ''
-                            msg = ` ${parts[0]} ${objectTypeFixed} `
+                                : '';
+                            msg = ` ${parts[0]} ${objectTypeFixed} `;
                         } else {
-                            msg = ` ${actionType[0]}  ${titleCase(actionType[1] ?? '')} `
+                            msg = ` ${actionType[0]}  ${titleCase(actionType[1] ?? '')} `;
                         }
                     }
                 } else if (
                     notification.object_type === 'team' ||
                     notification.object_type === 'topic'
                 ) {
-                    const objectType = notification.object_type
-                    let teamOrTopic = null
+                    const objectType = notification.object_type;
+                    let teamOrTopic = null;
 
                     if (objectType === 'team') {
-                        teamOrTopic = notification.object_data as Team
+                        teamOrTopic = notification.object_data as Team;
                     } else {
-                        teamOrTopic = notification.object_data as Topic
+                        teamOrTopic = notification.object_data as Topic;
                     }
 
-                    objectName = teamOrTopic?.title ?? teamOrTopic?.name ?? ''
-                    objectIdName = teamOrTopic?.name ?? ''
+                    objectName = teamOrTopic?.title ?? teamOrTopic?.name ?? '';
+                    objectIdName = teamOrTopic?.name ?? '';
 
-                    const actionType = notification.activity_type.split('_')
+                    const actionType = notification.activity_type.split('_');
 
                     if (actionType[0] === 'member') {
-                        const role = actionType[2]
-                        const action = actionType[1]
+                        const role = actionType[2];
+                        const action = actionType[1];
                         if (action === 'removed') {
-                            msg = ` ${action} you as a member (${role}) from the ${titleCase(notification.object_type ?? '')}`
+                            msg = ` ${action} you as a member (${role}) from the ${titleCase(notification.object_type ?? '')}`;
                         } else if (action === 'added') {
                             msg = ` ${action} you as a member${
                                 role !== 'member' ? ` (${role})` : ''
-                            } in the ${titleCase(notification.object_type ?? '')}`
+                            } in the ${titleCase(notification.object_type ?? '')}`;
                         } else if (action === 'updated') {
-                            msg = ` ${action} your member status to "${role}" in the ${titleCase(notification.object_type ?? '')}`
+                            msg = ` ${action} your member status to "${role}" in the ${titleCase(notification.object_type ?? '')}`;
                         }
                     }
                 }
@@ -150,11 +150,11 @@ export const notificationRouter = createTRPCRouter({
                     time_text: timeAgo(notification.time_sent!),
                     objectIdName: objectIdName,
                     msg: msg ?? '',
-                }
-                activities.push(resultNotification)
+                };
+                activities.push(resultNotification);
             }
 
-            return activities
+            return activities;
         }),
     updateNotification: protectedProcedure
         .input(NotificationInput)
@@ -162,12 +162,12 @@ export const notificationRouter = createTRPCRouter({
             try {
                 const notificationPayload: NotificationType[] =
                     input.notifications.map((notification) => {
-                        if (input.state) notification.state = input.state
+                        if (input.state) notification.state = input.state;
                         if (input.is_unread !== undefined) {
-                            notification.is_unread = input.is_unread
+                            notification.is_unread = input.is_unread;
                         }
-                        return notification
-                    })
+                        return notification;
+                    });
 
                 const response = await fetch(
                     `${env.CKAN_URL}/api/3/action/notification_bulk_update`,
@@ -179,21 +179,21 @@ export const notificationRouter = createTRPCRouter({
                         },
                         body: JSON.stringify({ payload: notificationPayload }),
                     }
-                )
+                );
 
-                const data = (await response.json()) as CkanResponse<number>
+                const data = (await response.json()) as CkanResponse<number>;
                 if (!data.success && data.error) {
                     if (data.error.message)
-                        throw Error(replaceNames(data.error.message, true))
-                    throw Error(replaceNames(JSON.stringify(data.error), true))
+                        throw Error(replaceNames(data.error.message, true));
+                    throw Error(replaceNames(JSON.stringify(data.error), true));
                 }
 
-                return data.result
+                return data.result;
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(replaceNames(error, true))
+                    'Something went wrong please contact the system administrator';
+                if (e instanceof Error) error = e.message;
+                throw Error(replaceNames(error, true));
             }
         }),
-})
+});

@@ -1,19 +1,19 @@
-import { useForm } from 'react-hook-form'
-import { useEffect, useState } from 'react'
-import { slugify } from '@/utils/slugify'
-import ApplicationForm from './ApplicationForm'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import Container from '@/components/_shared/Container'
+import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { slugify } from '@/utils/slugify';
+import ApplicationForm from './ApplicationForm';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import Container from '@/components/_shared/Container';
 import {
     type ApplicationFormType,
     ApplicationSchema,
-} from '@/schema/application.schema'
-import { LoaderButton } from '@/components/_shared/Button'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { api } from '@/utils/api'
-import notify from '@/utils/notify'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { useRouter } from 'next/router'
+} from '@/schema/application.schema';
+import { LoaderButton } from '@/components/_shared/Button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { api } from '@/utils/api';
+import notify from '@/utils/notify';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { useRouter } from 'next/router';
 
 const links = [
     { label: 'Applications', url: '/dashboard/applications', current: false },
@@ -22,48 +22,48 @@ const links = [
         url: '/dashboard/applications/new',
         current: true,
     },
-]
+];
 
 export default function CreateApplicationForm() {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const router = useRouter()
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const router = useRouter();
     const formObj = useForm<ApplicationFormType>({
         resolver: zodResolver(ApplicationSchema),
-    })
+    });
 
     const createApplication = api.applications.createApplication.useMutation({
         onSuccess: async ({ name, title }) => {
             notify(
                 `Successfully created the ${title ?? name} Application`,
                 'success'
-            )
-            router.push('/dashboard/applications')
-            formObj.reset()
+            );
+            router.push('/dashboard/applications');
+            formObj.reset();
         },
         onError: (error) => {
-            let errorMessage = error.message
+            let errorMessage = error.message;
             if (
                 error.message.includes(
                     'Application name already exists in database'
                 )
             ) {
                 errorMessage =
-                    'Application name already exists in database or there is a Team/Topic with this name'
+                    'Application name already exists in database or there is a Team/Topic with this name';
             }
 
-            setErrorMessage(errorMessage)
+            setErrorMessage(errorMessage);
         },
-    })
+    });
 
     const {
         setValue,
         watch,
         formState: { dirtyFields },
-    } = formObj
+    } = formObj;
 
     useEffect(() => {
-        if (!dirtyFields.name) setValue('name', slugify(watch('title')))
-    }, [watch('title')])
+        if (!dirtyFields.name) setValue('name', slugify(watch('title')));
+    }, [watch('title')]);
 
     return (
         <>
@@ -75,7 +75,7 @@ export default function CreateApplicationForm() {
 
                 <form
                     onSubmit={formObj.handleSubmit((data) => {
-                        createApplication.mutate(data)
+                        createApplication.mutate(data);
                     })}
                 >
                     <div className="w-full py-8 border-b border-blue-800 shadow">
@@ -99,5 +99,5 @@ export default function CreateApplicationForm() {
                 </form>
             </Container>
         </>
-    )
+    );
 }

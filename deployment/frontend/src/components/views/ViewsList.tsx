@@ -1,53 +1,53 @@
-import { Button } from '@/components/_shared/Button'
+import { Button } from '@/components/_shared/Button';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
+} from '@/components/_shared/Popover';
 import {
     type Resource,
     type View,
     type ViewState,
-} from '@/interfaces/dataset.interface'
-import { PopoverClose } from '@radix-ui/react-popover'
-import { useState } from 'react'
-import { DatastoreViewCard } from './DatastoreViewCard'
-import { RwViewCard } from './RwViewCard'
-import { type WriDataset } from '@/schema/ckan.schema'
-import { DefaultTooltip } from '../_shared/Tooltip'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
+} from '@/interfaces/dataset.interface';
+import { PopoverClose } from '@radix-ui/react-popover';
+import { useState } from 'react';
+import { DatastoreViewCard } from './DatastoreViewCard';
+import { RwViewCard } from './RwViewCard';
+import { type WriDataset } from '@/schema/ckan.schema';
+import { DefaultTooltip } from '../_shared/Tooltip';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
-let uniqueId = 0
+let uniqueId = 0;
 const getUniqueInternalId = () => {
-    return uniqueId++
-}
+    return uniqueId++;
+};
 
 type DatastoreViewsListProps = {
-    provider: 'datastore'
-    datafile: Resource
-    dataset: WriDataset
-}
+    provider: 'datastore';
+    datafile: Resource;
+    dataset: WriDataset;
+};
 
 type RwViewsListProps = {
-    provider: 'rw'
-    rwDatasetId: string
-    views: View[]
-    dataset: WriDataset
-}
+    provider: 'rw';
+    rwDatasetId: string;
+    views: View[];
+    dataset: WriDataset;
+};
 
-type ViewsListProps = DatastoreViewsListProps | RwViewsListProps
+type ViewsListProps = DatastoreViewsListProps | RwViewsListProps;
 
 export default function ViewsList(props: ViewsListProps) {
-    let ogViews: View[]
-    let datafile: Resource | null = null
-    let rwDatasetId: string | null = null
+    let ogViews: View[];
+    let datafile: Resource | null = null;
+    let rwDatasetId: string | null = null;
 
     if (props?.provider == 'datastore') {
-        datafile = props?.datafile
-        ogViews = datafile._views ?? []
+        datafile = props?.datafile;
+        ogViews = datafile._views ?? [];
     } else {
-        ogViews = props?.views ?? []
-        rwDatasetId = props?.rwDatasetId
+        ogViews = props?.views ?? [];
+        rwDatasetId = props?.rwDatasetId;
     }
 
     const [views, setViews] = useState<ViewState[]>(
@@ -58,7 +58,7 @@ export default function ViewsList(props: ViewsListProps) {
                   _id: getUniqueInternalId(),
               }))
             : []
-    )
+    );
 
     const addNewChartView = () => {
         setViews((prev) => [
@@ -85,10 +85,10 @@ export default function ViewsList(props: ViewsListProps) {
                 _state: 'new',
                 _id: getUniqueInternalId(),
             },
-        ])
-    }
+        ]);
+    };
 
-    const isCanCreateChartview = !!(datafile?.datastore_active || rwDatasetId)
+    const isCanCreateChartview = !!(datafile?.datastore_active || rwDatasetId);
 
     return (
         <div>
@@ -147,24 +147,24 @@ export default function ViewsList(props: ViewsListProps) {
                             onCancelOrDelete={(mode) => {
                                 if (mode == 'new') {
                                     setViews((prev) => {
-                                        let newViews = [...prev]
+                                        let newViews = [...prev];
 
                                         newViews = newViews.filter(
                                             (v) => v._id != view._id
-                                        )
+                                        );
 
-                                        return newViews
-                                    })
+                                        return newViews;
+                                    });
                                 } else if (mode == 'edit') {
                                     setViews((prev) => {
-                                        let newViews = [...prev]
+                                        let newViews = [...prev];
 
                                         newViews = newViews.filter(
                                             (v) => v._id != view._id
-                                        )
+                                        );
 
-                                        return newViews
-                                    })
+                                        return newViews;
+                                    });
                                 }
                             }}
                         />
@@ -176,30 +176,30 @@ export default function ViewsList(props: ViewsListProps) {
                             onCancelOrDelete={(mode) => {
                                 if (mode == 'new') {
                                     setViews((prev) => {
-                                        let newViews = [...prev]
+                                        let newViews = [...prev];
 
                                         newViews = newViews.filter(
                                             (v) => v._id != view._id
-                                        )
+                                        );
 
-                                        return newViews
-                                    })
+                                        return newViews;
+                                    });
                                 } else if (mode == 'edit') {
                                     setViews((prev) => {
-                                        let newViews = [...prev]
+                                        let newViews = [...prev];
 
                                         newViews = newViews.filter(
                                             (v) => v._id != view._id
-                                        )
+                                        );
 
-                                        return newViews
-                                    })
+                                        return newViews;
+                                    });
                                 }
                             }}
                         />
-                    )
+                    );
                 })}
             </div>
         </div>
-    )
+    );
 }

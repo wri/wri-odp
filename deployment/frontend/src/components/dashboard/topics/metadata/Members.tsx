@@ -2,36 +2,36 @@ import {
     type UseFieldArrayRemove,
     type UseFormReturn,
     useFieldArray,
-} from 'react-hook-form'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { api } from '@/utils/api'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { MinusCircleIcon } from '@heroicons/react/24/outline'
-import { InputGroup } from '../../datasets/admin/metadata/InputGroup'
-import { match, P } from 'ts-pattern'
-import Spinner from '@/components/_shared/Spinner'
-import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { capacityOptions } from '../../datasets/admin/formOptions'
-import notify from '@/utils/notify'
-import { type RouterOutput } from '@/server/api/root'
-import { type TopicFormType } from '@/schema/topic.schema'
-import { watch } from 'fs'
+} from 'react-hook-form';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { api } from '@/utils/api';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { MinusCircleIcon } from '@heroicons/react/24/outline';
+import { InputGroup } from '../../datasets/admin/metadata/InputGroup';
+import { match, P } from 'ts-pattern';
+import Spinner from '@/components/_shared/Spinner';
+import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { capacityOptions } from '../../datasets/admin/formOptions';
+import notify from '@/utils/notify';
+import { type RouterOutput } from '@/server/api/root';
+import { type TopicFormType } from '@/schema/topic.schema';
+import { watch } from 'fs';
 
-type TopicOutput = RouterOutput['topics']['getTopic']
+type TopicOutput = RouterOutput['topics']['getTopic'];
 
 export function Members({
     topic,
     formObj,
 }: {
-    topic: TopicOutput
-    formObj: UseFormReturn<TopicFormType>
+    topic: TopicOutput;
+    formObj: UseFormReturn<TopicFormType>;
 }) {
-    const { control } = formObj
+    const { control } = formObj;
     const { fields, append, remove } = useFieldArray({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: 'members',
-    })
+    });
 
     return (
         <div className="mx-auto w-full max-w-[1380px] sm:px-6 xxl:px-0">
@@ -80,7 +80,7 @@ export function Members({
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 function MemberForm({
@@ -89,12 +89,12 @@ function MemberForm({
     remove,
     topic,
 }: {
-    formObj: UseFormReturn<TopicFormType>
-    index: number
-    remove: UseFieldArrayRemove
-    topic: any
+    formObj: UseFormReturn<TopicFormType>;
+    index: number;
+    remove: UseFieldArrayRemove;
+    topic: any;
 }) {
-    const allUsers = api.topics.getPossibleMembers.useQuery(topic)
+    const allUsers = api.topics.getPossibleMembers.useQuery(topic);
 
     return (
         <div className="flex items-center gap-x-2">
@@ -145,5 +145,5 @@ function MemberForm({
                 />
             </DefaultTooltip>
         </div>
-    )
+    );
 }

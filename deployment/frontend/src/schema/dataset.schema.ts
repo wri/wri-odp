@@ -1,8 +1,8 @@
-import { layerSchema } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/layer.schema'
-import z from 'zod'
+import { layerSchema } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/layer.schema';
+import z from 'zod';
 
-const emptyStringToUndefined = z.literal('').transform(() => undefined)
-const nanToUndefined = z.literal(NaN).transform(() => undefined)
+const emptyStringToUndefined = z.literal('').transform(() => undefined);
+const nanToUndefined = z.literal(NaN).transform(() => undefined);
 
 const updateFrequencySchema = z.enum([
     'annually',
@@ -14,11 +14,11 @@ const updateFrequencySchema = z.enum([
     'monthly',
     'quarterly',
     'daily',
-])
+]);
 
-const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal'])
+const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal']);
 
-const capacitySchema = z.enum(['admin', 'editor', 'member'])
+const capacitySchema = z.enum(['admin', 'editor', 'member']);
 
 const DataDictionarySchema = z.array(
     z.object({
@@ -29,7 +29,7 @@ const DataDictionarySchema = z.array(
             default: z.string(),
         }),
     })
-)
+);
 
 const CollaboratorSchema = z.object({
     user: z.object({ value: z.string(), label: z.string() }),
@@ -38,7 +38,7 @@ const CollaboratorSchema = z.object({
         value: capacitySchema,
         label: z.string(),
     }),
-})
+});
 
 export const ResourceSchema = z
     .object({
@@ -107,14 +107,14 @@ export const ResourceSchema = z
     })
     .refine(
         (obj) => {
-            if (obj.type !== 'link' && obj.type !== 'tile-cache') return true
-            if (!obj.url) return false
+            if (obj.type !== 'link' && obj.type !== 'tile-cache') return true;
+            if (!obj.url) return false;
             if (
                 !obj.url.startsWith('http://') &&
                 !obj.url.startsWith('https://')
             )
-                return false
-            return true
+                return false;
+            return true;
         },
         {
             message: 'Invalid URL',
@@ -123,9 +123,9 @@ export const ResourceSchema = z
     )
     .refine(
         (obj) => {
-            if (obj.type !== 'gee-asset') return true
-            if (!obj.asset_type) return false
-            return true
+            if (obj.type !== 'gee-asset') return true;
+            if (!obj.asset_type) return false;
+            return true;
         },
         {
             message: 'Required',
@@ -134,15 +134,15 @@ export const ResourceSchema = z
     )
     .refine(
         (obj) => {
-            if (obj.type !== 'tile-cache') return true
-            if (!obj.cache_type) return false
-            return true
+            if (obj.type !== 'tile-cache') return true;
+            if (!obj.cache_type) return false;
+            return true;
         },
         {
             message: 'Required',
             path: ['cache_type'],
         }
-    )
+    );
 
 const DatasetSchemaObject = z.object({
     id: z.string().uuid().optional().nullable(),
@@ -301,14 +301,14 @@ const DatasetSchemaObject = z.object({
         .enum(['address', 'geom', 'global', 'derived_from_resources'])
         .optional(),
     release_notes: z.string().optional(),
-})
+});
 
 export const DatasetSchema = DatasetSchemaObject.refine(
     (obj) => {
-        if (!obj.featured_dataset) return true
+        if (!obj.featured_dataset) return true;
         // ODP-520
         //if (obj.featured_dataset && !obj.featured_image) return false
-        return true
+        return true;
     },
     {
         message: 'An image is required for featured Datasets',
@@ -317,9 +317,9 @@ export const DatasetSchema = DatasetSchemaObject.refine(
 )
     .refine(
         (obj) => {
-            if (!obj.rw_dataset) return true
-            if (obj.rw_dataset && !obj.connectorType) return false
-            return true
+            if (!obj.rw_dataset) return true;
+            if (obj.rw_dataset && !obj.connectorType) return false;
+            return true;
         },
         {
             message: 'Connector Type is required for RW Datasets',
@@ -328,9 +328,9 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     )
     .refine(
         (obj) => {
-            if (!obj.rw_dataset) return true
-            if (obj.rw_dataset && !obj.connectorType) return false
-            return true
+            if (!obj.rw_dataset) return true;
+            if (obj.rw_dataset && !obj.connectorType) return false;
+            return true;
         },
         {
             message: 'Provider is required for RW Datasets',
@@ -339,10 +339,10 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     )
     .refine(
         (obj) => {
-            if (!obj.rw_dataset) return true
+            if (!obj.rw_dataset) return true;
             if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName)
-                return false
-            return true
+                return false;
+            return true;
         },
         {
             message:
@@ -352,10 +352,10 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     )
     .refine(
         (obj) => {
-            if (!obj.rw_dataset) return true
+            if (!obj.rw_dataset) return true;
             if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName)
-                return false
-            return true
+                return false;
+            return true;
         },
         {
             message:
@@ -365,9 +365,9 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     )
     .refine(
         (obj) => {
-            if (obj.visibility_type.value !== 'public') return true
-            if (!obj.technical_notes) return false
-            return true
+            if (obj.visibility_type.value !== 'public') return true;
+            if (!obj.technical_notes) return false;
+            return true;
         },
         {
             message: 'Technical notes are required for public Datasets',
@@ -376,8 +376,8 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     )
     .refine(
         (obj) => {
-            if (obj.authors.length === 0) return false
-            return true
+            if (obj.authors.length === 0) return false;
+            return true;
         },
         {
             message: 'At least one (1) Author Name is required.',
@@ -386,8 +386,8 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     )
     .refine(
         (obj) => {
-            if (obj.maintainers.length === 0) return false
-            return true
+            if (obj.maintainers.length === 0) return false;
+            return true;
         },
         {
             message:
@@ -402,8 +402,8 @@ export const DatasetSchema = DatasetSchemaObject.refine(
                     obj.visibility_type.value === 'internal') &&
                 obj.team.visibility === 'private'
             )
-                return false
-            return true
+                return false;
+            return true;
         },
         {
             message: 'Public Dataset cannot be assigned to private Team',
@@ -412,20 +412,20 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     )
     .refine(
         (obj) => {
-            if (!obj.team?.value) return false
-            return true
+            if (!obj.team?.value) return false;
+            return true;
         },
         {
             message: 'Team is required for all Datasets',
             path: ['team'],
         }
-    )
+    );
 
-export const DatasetSchemaForEdit = DatasetSchemaObject.partial()
-export type VisibilityTypeUnion = z.infer<typeof visibilityTypeSchema>
-export type UpdateFrequencyUnion = z.infer<typeof updateFrequencySchema>
-export type CapacityUnion = z.infer<typeof capacitySchema>
+export const DatasetSchemaForEdit = DatasetSchemaObject.partial();
+export type VisibilityTypeUnion = z.infer<typeof visibilityTypeSchema>;
+export type UpdateFrequencyUnion = z.infer<typeof updateFrequencySchema>;
+export type CapacityUnion = z.infer<typeof capacitySchema>;
 
-export type DataDictionaryFormType = z.infer<typeof DataDictionarySchema>
-export type DatasetFormType = z.infer<typeof DatasetSchema>
-export type ResourceFormType = z.infer<typeof ResourceSchema>
+export type DataDictionaryFormType = z.infer<typeof DataDictionarySchema>;
+export type DatasetFormType = z.infer<typeof DatasetSchema>;
+export type ResourceFormType = z.infer<typeof ResourceSchema>;

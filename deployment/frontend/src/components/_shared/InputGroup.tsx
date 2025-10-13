@@ -1,9 +1,9 @@
-import classNames from '@/utils/classnames'
-import { ErrorMessage } from '@hookform/error-message'
-import { type FieldErrors } from 'react-hook-form'
-import { DefaultTooltip } from './Tooltip'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { InformationCircleIcon as InformationSolidCircle } from '@heroicons/react/24/solid'
+import classNames from '@/utils/classnames';
+import { ErrorMessage } from '@hookform/error-message';
+import { type FieldErrors } from 'react-hook-form';
+import { DefaultTooltip } from './Tooltip';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { InformationCircleIcon as InformationSolidCircle } from '@heroicons/react/24/solid';
 
 export function InputGroup({
     label,
@@ -15,14 +15,14 @@ export function InputGroup({
     contentClassName = '',
     info,
 }: {
-    label: string | React.ReactNode
-    className?: string
-    labelClassName?: string
-    children: React.ReactNode
-    required?: boolean
-    info?: string | React.ReactNode
-    deepInfoIcon?: boolean
-    contentClassName?: string
+    label: string | React.ReactNode;
+    className?: string;
+    labelClassName?: string;
+    children: React.ReactNode;
+    required?: boolean;
+    info?: string | React.ReactNode;
+    deepInfoIcon?: boolean;
+    contentClassName?: string;
 }) {
     return (
         <div
@@ -64,7 +64,7 @@ export function InputGroup({
             )}
             <div className="col-span-6 h-full grow w-full">{children}</div>
         </div>
-    )
+    );
 }
 
 export function InputGroupCustom({
@@ -75,12 +75,12 @@ export function InputGroupCustom({
     required = false,
     info,
 }: {
-    label: string | React.ReactNode
-    className?: string
-    labelClassName?: string
-    children: React.ReactNode
-    required?: boolean
-    info?: React.ReactNode | string
+    label: string | React.ReactNode;
+    className?: string;
+    labelClassName?: string;
+    children: React.ReactNode;
+    required?: boolean;
+    info?: React.ReactNode | string;
 }) {
     return (
         <div
@@ -115,15 +115,15 @@ export function InputGroupCustom({
             )}
             <div className="col-span-6 h-full grow w-full">{children}</div>
         </div>
-    )
+    );
 }
 
 export function ErrorDisplay({
     name,
     errors,
 }: {
-    name: string
-    errors: FieldErrors
+    name: string;
+    errors: FieldErrors;
 }) {
     return (
         <ErrorMessage
@@ -135,5 +135,5 @@ export function ErrorDisplay({
                 </p>
             )}
         />
-    )
+    );
 }

@@ -1,4 +1,4 @@
-import { toast, type ToastContent, ToastOptions } from 'react-toastify'
+import { toast, type ToastContent, ToastOptions } from 'react-toastify';
 
 export default function notify(
     text: any,
@@ -9,14 +9,14 @@ export default function notify(
      * can be set
      *
      */
-    const options = {}
+    const options = {};
 
     switch (severity) {
         case 'success':
-            toast(text, { type: 'success' })
-            break
+            toast(text, { type: 'success' });
+            break;
         case 'error':
-            toast.error(text, { type: 'error' })
-            break
+            toast.error(text, { type: 'error' });
+            break;
     }
 }

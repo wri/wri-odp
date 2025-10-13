@@ -7,6 +7,6 @@ export const isValidUrl = (urlString: string) => {
             '(\\?[;&a-z\\d%_.~+=-]*)?' + // validate query string
             '(\\#[-a-z\\d_]*)?$',
         'i'
-    ) // validate fragment locator
-    return !urlPattern.test(urlString)
-}
+    ); // validate fragment locator
+    return !urlPattern.test(urlString);
+};

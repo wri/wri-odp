@@ -2,22 +2,22 @@ type LegendTypeLegendConfigType =
     | 'proportional'
     | 'gradient'
     | 'choropleth'
-    | 'basic'
+    | 'basic';
 
 export interface LegendTypeProps {
     activeLayer: {
         legendConfig: {
-            type: LegendTypeLegendConfigType
-            items: LegendTypeLegendConfigItem[]
-        }
-    }
+            type: LegendTypeLegendConfigType;
+            items: LegendTypeLegendConfigItem[];
+        };
+    };
 }
 
 interface LegendTypeLegendConfigItem {
-    name: string
-    color: string
-    styles?: string
-    size: string
-    value: string
-    items?: LegendTypeLegendConfigItem[]
+    name: string;
+    color: string;
+    styles?: string;
+    size: string;
+    value: string;
+    items?: LegendTypeLegendConfigItem[];
 }

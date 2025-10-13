@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import Tooltip from '../../../../tooltip'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import Tooltip from '../../../../tooltip';
 
 class LegendItemButtonBBox extends PureComponent {
     static propTypes = {
@@ -13,7 +13,7 @@ class LegendItemButtonBBox extends PureComponent {
         tooltipText: PropTypes.string,
         scrolling: PropTypes.bool,
         onChangeBBox: PropTypes.func,
-    }
+    };
 
     static defaultProps = {
         activeLayer: {},
@@ -25,17 +25,17 @@ class LegendItemButtonBBox extends PureComponent {
         scrolling: false,
 
         onChangeBBox: () => {},
-    }
+    };
 
     state = {
         visible: false,
-    }
+    };
 
     componentWillReceiveProps(nextProps) {
-        const { scrolling } = nextProps
+        const { scrolling } = nextProps;
 
         if (scrolling) {
-            this.setState({ visible: false })
+            this.setState({ visible: false });
         }
     }
 
@@ -47,10 +47,10 @@ class LegendItemButtonBBox extends PureComponent {
             focusStyle,
             defaultStyle,
             tooltipText,
-        } = this.props
-        const { visible } = this.state
+        } = this.props;
+        const { visible } = this.state;
         if (activeLayer.layerConfig && !activeLayer.layerConfig.bbox) {
-            return null
+            return null;
         }
 
         return (
@@ -77,8 +77,8 @@ class LegendItemButtonBBox extends PureComponent {
                     />
                 </button>
             </Tooltip>
-        )
+        );
     }
 }
 
-export default LegendItemButtonBBox
+export default LegendItemButtonBBox;

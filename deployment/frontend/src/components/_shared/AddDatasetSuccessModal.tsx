@@ -1,5 +1,5 @@
-import React from 'react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import React from 'react';
+import { CheckIcon } from '@heroicons/react/24/outline';
 
 export default function AddDatasetSuccessModal() {
     return (
@@ -42,5 +42,5 @@ export default function AddDatasetSuccessModal() {
                 </div>
             </div>
         </section>
-    )
+    );
 }

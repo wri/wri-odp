@@ -1,8 +1,8 @@
-import React from 'react'
-import { Tab } from '@headlessui/react'
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
-import TeamCard from './TeamCard'
-import Link from 'next/link'
+import React from 'react';
+import { Tab } from '@headlessui/react';
+import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import TeamCard from './TeamCard';
+import Link from 'next/link';
 
 const tabs = [
     {
@@ -10,7 +10,7 @@ const tabs = [
         content: <TeamCard />,
         title: 'All Teams',
     },
-]
+];
 
 export default function TeamList() {
     return (
@@ -57,5 +57,5 @@ export default function TeamList() {
                 </Tab.Panels>
             </Tab.Group>
         </section>
-    )
+    );
 }

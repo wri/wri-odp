@@ -4,26 +4,26 @@ import React, {
     useCallback,
     type MutableRefObject,
     useEffect,
-} from 'react'
+} from 'react';
 // import Geosuggest, { Suggest } from 'react-geosuggest';
-import { fitBounds } from '@math.gl/web-mercator'
-import { useDebouncedCallback } from 'use-debounce'
-import { useMapState, useBounds } from '@/utils/storeHooks'
-import isEmpty from 'lodash/isEmpty'
-import IconButton from './IconButton'
-import { SearchIcon } from '../../icons/SearchIcon'
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder'
-import classNames from '@/utils/classnames'
+import { fitBounds } from '@math.gl/web-mercator';
+import { useDebouncedCallback } from 'use-debounce';
+import { useMapState, useBounds } from '@/utils/storeHooks';
+import isEmpty from 'lodash/isEmpty';
+import IconButton from './IconButton';
+import { SearchIcon } from '../../icons/SearchIcon';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import classNames from '@/utils/classnames';
 
 export default function Search({
     mapContainerRef,
 }: {
-    mapContainerRef: MutableRefObject<HTMLDivElement | null>
+    mapContainerRef: MutableRefObject<HTMLDivElement | null>;
 }) {
-    const [showSearchInput, setShowSearchInput] = useState(false)
-    const firstRender = useRef(true)
-    const { setViewState, viewState } = useMapState()
-    const { bounds, setBounds } = useBounds()
+    const [showSearchInput, setShowSearchInput] = useState(false);
+    const firstRender = useRef(true);
+    const { setViewState, viewState } = useMapState();
+    const { bounds, setBounds } = useBounds();
 
     useEffect(() => {
         if (firstRender.current) {
@@ -32,40 +32,40 @@ export default function Search({
                 accessToken:
                     'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA',
                 types: 'country,region,place,locality',
-            })
+            });
 
             geocoder.on('result', (r) => {
-                geocoder.clear()
-                handleSearchInput(false)
-                handleSearch(r)
-            })
+                geocoder.clear();
+                handleSearchInput(false);
+                handleSearch(r);
+            });
 
-            geocoder.addTo('#search-location-map')
+            geocoder.addTo('#search-location-map');
 
-            firstRender.current = false
+            firstRender.current = false;
         }
-    }, [])
+    }, []);
 
     const debouncedOnMapViewportChange = useDebouncedCallback((v: any) => {
-        setViewState(v)
-    }, 250)
+        setViewState(v);
+    }, 250);
 
     const handleSearch = useCallback(
         (locationParams: any) => {
             setBounds({
                 bbox: locationParams.result.bbox,
                 options: { zoom: 2 },
-            })
+            });
         },
         [setBounds]
-    )
+    );
 
     const handleFitBounds = useCallback(() => {
-        const bbox = bounds.bbox as number[]
-        const options = bounds.options
-        const mapContainer = mapContainerRef.current!
+        const bbox = bounds.bbox as number[];
+        const options = bounds.options;
+        const mapContainer = mapContainerRef.current!;
         if (mapContainer.offsetWidth <= 0 || mapContainer.offsetHeight <= 0) {
-            throw new Error("mapContainerRef doesn't have any dimensions")
+            throw new Error("mapContainerRef doesn't have any dimensions");
         }
 
         const { longitude, latitude, zoom } = fitBounds({
@@ -78,31 +78,31 @@ export default function Search({
                 [bbox[2], bbox[3]],
             ],
             ...options,
-        })
+        });
 
         const newViewport = {
             longitude,
             latitude,
             zoom,
-        }
+        };
 
-        const viewport = { ...viewState, ...newViewport }
-        setViewState(viewport)
-        debouncedOnMapViewportChange(newViewport)
+        const viewport = { ...viewState, ...newViewport };
+        setViewState(viewport);
+        debouncedOnMapViewportChange(newViewport);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [bounds, debouncedOnMapViewportChange, mapContainerRef])
+    }, [bounds, debouncedOnMapViewportChange, mapContainerRef]);
 
     const handleSearchInput = (show: boolean) => {
-        const el = document.getElementById('search_location_map')
+        const el = document.getElementById('search_location_map');
         if (show) {
-            if (el) el.focus()
-            setShowSearchInput(true)
+            if (el) el.focus();
+            setShowSearchInput(true);
         } else {
-            if (el) el.focus()
-            setShowSearchInput(false)
+            if (el) el.focus();
+            setShowSearchInput(false);
         }
-    }
+    };
 
     useEffect(() => {
         if (
@@ -110,9 +110,9 @@ export default function Search({
             !!bounds.bbox &&
             bounds.bbox.every((b: any) => typeof b === 'number')
         ) {
-            handleFitBounds()
+            handleFitBounds();
         }
-    }, [bounds, handleFitBounds])
+    }, [bounds, handleFitBounds]);
 
     return (
         <div className="c-search-control relative">
@@ -132,5 +132,5 @@ export default function Search({
                 <SearchIcon />
             </IconButton>
         </div>
-    )
+    );
 }

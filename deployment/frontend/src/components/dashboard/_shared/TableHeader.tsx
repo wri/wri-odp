@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export default function TableHeader({
     rightNode,
@@ -7,11 +7,11 @@ export default function TableHeader({
     rightStyle,
     Pagination,
 }: {
-    rightNode?: React.ReactNode
-    leftNode?: React.ReactNode
-    leftstyle?: string
-    rightStyle?: string
-    Pagination?: React.ReactNode
+    rightNode?: React.ReactNode;
+    leftNode?: React.ReactNode;
+    leftstyle?: string;
+    rightStyle?: string;
+    Pagination?: React.ReactNode;
 }) {
     return (
         <div className="flex w-full  sm:items-center gap-y-4 flex-col sm:flex-row py-2">
@@ -25,5 +25,5 @@ export default function TableHeader({
                 {Pagination && Pagination}
             </div>
         </div>
-    )
+    );
 }

@@ -1,26 +1,26 @@
-import { GlobeAmericasIcon } from '@heroicons/react/24/outline'
-import { Input } from '@/components/_shared/SimpleInput'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Disclosure, Transition } from '@headlessui/react'
-import { MetadataAccordion } from './MetadataAccordion'
-import { type UseFormReturn } from 'react-hook-form'
-import { type DatasetFormType } from '@/schema/dataset.schema'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { GlobeAmericasIcon } from '@heroicons/react/24/outline';
+import { Input } from '@/components/_shared/SimpleInput';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Disclosure, Transition } from '@headlessui/react';
+import { MetadataAccordion } from './MetadataAccordion';
+import { type UseFormReturn } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 export function RWDatasetForm({
     formObj,
     editing = false,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    editing?: boolean
+    formObj: UseFormReturn<DatasetFormType>;
+    editing?: boolean;
 }) {
     const {
         register,
         watch,
         formState: { errors, defaultValues },
-    } = formObj
-    const rwDatasetToggled = watch('rw_dataset')
+    } = formObj;
+    const rwDatasetToggled = watch('rw_dataset');
     return (
         <MetadataAccordion
             defaultOpen
@@ -212,5 +212,5 @@ export function RWDatasetForm({
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>
-    )
+    );
 }

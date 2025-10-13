@@ -1,36 +1,36 @@
-import * as React from 'react'
-import { useState } from 'react'
+import * as React from 'react';
+import { useState } from 'react';
 import {
     useControl,
     Marker,
     type MarkerProps,
     type ControlPosition,
-} from 'react-map-gl'
+} from 'react-map-gl';
 import MapboxGeocoder, {
     type GeocoderOptions,
-} from '@mapbox/mapbox-gl-geocoder'
+} from '@mapbox/mapbox-gl-geocoder';
 
 type GeocoderControlProps = Omit<
     GeocoderOptions,
     'accessToken' | 'mapboxgl' | 'marker'
 > & {
-    mapboxAccessToken: string
-    marker?: boolean | Omit<MarkerProps, 'longitude' | 'latitude'>
+    mapboxAccessToken: string;
+    marker?: boolean | Omit<MarkerProps, 'longitude' | 'latitude'>;
 
-    position: ControlPosition
+    position: ControlPosition;
 
-    onLoading?: (e: object) => void
-    onResults?: (e: object) => void
-    onResult?: (e: any) => void
-    onError?: (e: object) => void
-    onClear?: (e: any) => void
+    onLoading?: (e: object) => void;
+    onResults?: (e: object) => void;
+    onResult?: (e: any) => void;
+    onError?: (e: object) => void;
+    onClear?: (e: any) => void;
 
-    initialValue?: string
-}
+    initialValue?: string;
+};
 
 /* eslint-disable complexity,max-statements */
 export default function GeocoderControl(props: GeocoderControlProps) {
-    const [marker, setMarker] = useState<any>(null)
+    const [marker, setMarker] = useState<any>(null);
 
     const geocoder = useControl<MapboxGeocoder>(
         () => {
@@ -40,7 +40,7 @@ export default function GeocoderControl(props: GeocoderControlProps) {
                 accessToken: props.mapboxAccessToken,
                 types: 'country,region,place,locality',
                 limit: 8,
-            })
+            });
             if (
                 props &&
                 props.onLoading &&
@@ -49,19 +49,19 @@ export default function GeocoderControl(props: GeocoderControlProps) {
                 props.onError &&
                 props.onClear
             ) {
-                ctrl.on('loading', props.onLoading)
-                ctrl.on('results', props.onResults)
+                ctrl.on('loading', props.onLoading);
+                ctrl.on('results', props.onResults);
                 ctrl.on('result', (evt) => {
                     if (props.onResult) {
-                        props.onResult(evt)
+                        props.onResult(evt);
                     }
 
-                    const { result } = evt
+                    const { result } = evt;
                     const location =
                         result &&
                         (result.center ||
                             (result.geometry?.type === 'Point' &&
-                                result.geometry.coordinates))
+                                result.geometry.coordinates));
                     if (location && props.marker) {
                         setMarker(
                             (
@@ -71,33 +71,33 @@ export default function GeocoderControl(props: GeocoderControlProps) {
                                     latitude={location[1]}
                                 />
                             ) as any
-                        )
+                        );
                     } else {
-                        setMarker(null)
+                        setMarker(null);
                     }
-                })
+                });
 
-                ctrl.on('error', props.onError)
+                ctrl.on('error', props.onError);
                 ctrl.on('clear', (e) => {
-                    if (props.onClear) props.onClear(e)
-                    setMarker(null)
-                })
-                return ctrl
+                    if (props.onClear) props.onClear(e);
+                    setMarker(null);
+                });
+                return ctrl;
             }
 
-            return ctrl
+            return ctrl;
         },
         {
             position: props.position,
         }
-    )
+    );
 
     React.useEffect(() => {
         // @ts-ignore (TS2339) private member
         if (geocoder._map && props.initialValue) {
-            geocoder.query(props.initialValue)
+            geocoder.query(props.initialValue);
         }
-    }, [])
+    }, []);
 
     // @ts-ignore (TS2339) private member
     if (geocoder._map) {
@@ -105,61 +105,61 @@ export default function GeocoderControl(props: GeocoderControlProps) {
             geocoder.getProximity() !== props.proximity &&
             props.proximity !== undefined
         ) {
-            geocoder.setProximity(props.proximity)
+            geocoder.setProximity(props.proximity);
         }
         if (
             geocoder.getRenderFunction() !== props.render &&
             props.render !== undefined
         ) {
-            geocoder.setRenderFunction(props.render)
+            geocoder.setRenderFunction(props.render);
         }
         if (
             geocoder.getLanguage() !== props.language &&
             props.language !== undefined
         ) {
-            geocoder.setLanguage(props.language)
+            geocoder.setLanguage(props.language);
         }
         if (geocoder.getZoom() !== props.zoom && props.zoom !== undefined) {
-            geocoder.setZoom(props.zoom)
+            geocoder.setZoom(props.zoom);
         }
         if (geocoder.getFlyTo() !== props.flyTo && props.flyTo !== undefined) {
-            geocoder.setFlyTo(props.flyTo)
+            geocoder.setFlyTo(props.flyTo);
         }
         if (
             geocoder.getPlaceholder() !== props.placeholder &&
             props.placeholder !== undefined
         ) {
-            geocoder.setPlaceholder(props.placeholder)
+            geocoder.setPlaceholder(props.placeholder);
         }
         if (
             geocoder.getCountries() !== props.countries &&
             props.countries !== undefined
         ) {
-            geocoder.setCountries(props.countries)
+            geocoder.setCountries(props.countries);
         }
         if (geocoder.getTypes() !== props.types && props.types !== undefined) {
-            geocoder.setTypes(props.types)
+            geocoder.setTypes(props.types);
         }
         if (
             geocoder.getMinLength() !== props.minLength &&
             props.minLength !== undefined
         ) {
-            geocoder.setMinLength(props.minLength)
+            geocoder.setMinLength(props.minLength);
         }
         if (geocoder.getLimit() !== props.limit && props.limit !== undefined) {
-            geocoder.setLimit(props.limit)
+            geocoder.setLimit(props.limit);
         }
         if (
             geocoder.getFilter() !== props.filter &&
             props.filter !== undefined
         ) {
-            geocoder.setFilter(props.filter)
+            geocoder.setFilter(props.filter);
         }
         if (
             geocoder.getOrigin() !== props.origin &&
             props.origin !== undefined
         ) {
-            geocoder.setOrigin(props.origin)
+            geocoder.setOrigin(props.origin);
         }
         // Types missing from @types/mapbox__mapbox-gl-geocoder
         // if (geocoder.getAutocomplete() !== props.autocomplete && props.autocomplete !== undefined) {
@@ -175,10 +175,10 @@ export default function GeocoderControl(props: GeocoderControlProps) {
         //   geocoder.setWorldview(props.worldview);
         // }
     }
-    return marker ? marker : <></>
+    return marker ? marker : <></>;
 }
 
-const noop = () => {}
+const noop = () => {};
 
 GeocoderControl.defaultProps = {
     marker: true,
@@ -186,4 +186,4 @@ GeocoderControl.defaultProps = {
     onResults: noop,
     onResult: noop,
     onError: noop,
-}
+};

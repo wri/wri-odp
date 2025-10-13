@@ -1,41 +1,41 @@
-import React from 'react'
-import Header from '@/components/_shared/Header'
-import Layout from '@/components/dashboard/Layout'
-import TopicList from '@/components/dashboard/topics/TopicList'
-import Footer from '@/components/_shared/Footer'
-import { NextSeo } from 'next-seo'
-import { env } from '@/env.mjs'
+import React from 'react';
+import Header from '@/components/_shared/Header';
+import Layout from '@/components/dashboard/Layout';
+import TopicList from '@/components/dashboard/topics/TopicList';
+import Footer from '@/components/_shared/Footer';
+import { NextSeo } from 'next-seo';
+import { env } from '@/env.mjs';
 
-import { getServerAuthSession } from '../../../server/auth'
+import { getServerAuthSession } from '../../../server/auth';
 import {
     type GetServerSidePropsContext,
     InferGetServerSidePropsType,
-} from 'next'
-import superjson from 'superjson'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import { appRouter } from '@/server/api/root'
+} from 'next';
+import superjson from 'superjson';
+import { createServerSideHelpers } from '@trpc/react-query/server';
+import { appRouter } from '@/server/api/root';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
     const helpers = createServerSideHelpers({
         router: appRouter,
         ctx: { session, ip: undefined },
         transformer: superjson,
-    })
+    });
 
-    await helpers.notification.getAllNotifications.prefetch({})
-    await helpers.user.getUserCapacity.prefetch()
+    await helpers.notification.getAllNotifications.prefetch({});
+    await helpers.user.getUserCapacity.prefetch();
     await helpers.topics.getUsersTopics.prefetch({
         search: '',
         page: { start: 0, rows: 10 },
-    })
+    });
     if (!session) {
         return {
             redirect: {
                 destination: '/auth/signin',
                 permanent: false,
             },
-        }
+        };
     }
 
     return {
@@ -43,7 +43,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             trpcState: helpers.dehydrate(),
             session,
         },
-    }
+    };
 }
 
 export default function topics() {
@@ -64,5 +64,5 @@ export default function topics() {
             </Layout>
             <Footer style="mt-0" />
         </>
-    )
+    );
 }

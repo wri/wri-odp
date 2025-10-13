@@ -5,39 +5,39 @@ import {
     MinusCircleIcon,
     InformationCircleIcon,
     Squares2X2Icon,
-} from '@heroicons/react/24/outline'
-import { type UseFormReturn } from 'react-hook-form'
-import { DataFileAccordion } from './DatafileAccordion'
-import { match, P } from 'ts-pattern'
+} from '@heroicons/react/24/outline';
+import { type UseFormReturn } from 'react-hook-form';
+import { DataFileAccordion } from './DatafileAccordion';
+import { match, P } from 'ts-pattern';
 import {
     type DatasetFormType,
     type ResourceFormType,
-} from '@/schema/dataset.schema'
-import { convertBytes } from '@/utils/convertBytes'
-import { Tab } from '@headlessui/react'
-import { Fragment, useState } from 'react'
-import classNames from '@/utils/classnames'
-import { DataDictionaryTable } from './DataDictionaryTable'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { Input } from '@/components/_shared/SimpleInput'
-import FormatInput from './FormatInput'
-import { Datapusher, DatapusherStatus } from './Datapusher'
-import { LoaderButton } from '@/components/_shared/Button'
-import { api } from '@/utils/api'
-import notify from '@/utils/notify'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
-import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
-import ViewsList from '@/components/views/ViewsList'
-import { type WriDataset } from '@/schema/ckan.schema'
-import { DatafileLocation } from './DatafileLocation'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
-import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm'
-import { LinkExternalForm } from './sections/LinkExternalForm'
-import { TileCacheForm } from './sections/TileCacheForm'
-import { GeeAssetForm } from './sections/GeeAssetForm'
+} from '@/schema/dataset.schema';
+import { convertBytes } from '@/utils/convertBytes';
+import { Tab } from '@headlessui/react';
+import { Fragment, useState } from 'react';
+import classNames from '@/utils/classnames';
+import { DataDictionaryTable } from './DataDictionaryTable';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { Input } from '@/components/_shared/SimpleInput';
+import FormatInput from './FormatInput';
+import { Datapusher, DatapusherStatus } from './Datapusher';
+import { LoaderButton } from '@/components/_shared/Button';
+import { api } from '@/utils/api';
+import notify from '@/utils/notify';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { BuildALayer } from './sections/BuildALayer/BuildALayerSection';
+import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection';
+import ViewsList from '@/components/views/ViewsList';
+import { type WriDataset } from '@/schema/ckan.schema';
+import { DatafileLocation } from './DatafileLocation';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor';
+import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm';
+import { LinkExternalForm } from './sections/LinkExternalForm';
+import { TileCacheForm } from './sections/TileCacheForm';
+import { GeeAssetForm } from './sections/GeeAssetForm';
 
 export function EditDataFile({
     remove,
@@ -46,19 +46,19 @@ export function EditDataFile({
     formObj,
     dataset,
 }: {
-    remove: () => void
-    index: number
-    field: ResourceFormType
-    formObj: UseFormReturn<DatasetFormType>
-    dataset: WriDataset
+    remove: () => void;
+    index: number;
+    field: ResourceFormType;
+    formObj: UseFormReturn<DatasetFormType>;
+    dataset: WriDataset;
 }) {
     const {
         watch,
         register,
         formState: { errors },
-    } = formObj
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const allDataFiles = watch('resources')
+    } = formObj;
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const allDataFiles = watch('resources');
     const notLayers = allDataFiles.filter(
         (datafile) =>
             datafile.type === 'upload' ||
@@ -66,21 +66,21 @@ export function EditDataFile({
             datafile.type === 'empty-file' ||
             datafile.type === 'tile-cache' ||
             datafile.type === 'gee-asset'
-    )
-    const notLayersCount = notLayers.length ?? 0
+    );
+    const notLayersCount = notLayers.length ?? 0;
 
-    const datafile = watch(`resources.${index}`)
+    const datafile = watch(`resources.${index}`);
 
     const isLayer =
         datafile.type !== 'upload' &&
         datafile.type !== 'link' &&
         datafile.type !== 'empty-file' &&
         datafile.type !== 'tile-cache' &&
-        datafile.type !== 'gee-asset'
+        datafile.type !== 'gee-asset';
 
     const heading = isLayer
         ? `Layer ${index + 1 - notLayersCount}`
-        : `Data File ${index + 1}`
+        : `Data File ${index + 1}`;
 
     return (
         <>
@@ -497,5 +497,5 @@ export function EditDataFile({
                 </div>
             </DataFileAccordion>
         </>
-    )
+    );
 }

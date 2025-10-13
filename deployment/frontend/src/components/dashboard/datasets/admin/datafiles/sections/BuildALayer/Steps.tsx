@@ -1,9 +1,9 @@
-import { useFormContext } from 'react-hook-form'
-import { type LayerFormType } from './layer.schema'
-import classNames from '@/utils/classnames'
+import { useFormContext } from 'react-hook-form';
+import { type LayerFormType } from './layer.schema';
+import classNames from '@/utils/classnames';
 
 export function Steps({ state }: { state: string }) {
-    const { watch } = useFormContext<LayerFormType>() // retrieve those props
+    const { watch } = useFormContext<LayerFormType>(); // retrieve those props
     const steps = [
         { name: 'General Config', state: 'setSourceConfig', enabled: true },
         {
@@ -14,7 +14,7 @@ export function Steps({ state }: { state: string }) {
         },
         { name: 'Legend', state: 'setLegendConfig', enabled: true },
         { name: 'Interaction', state: 'setInteractionConfig', enabled: true },
-    ]
+    ];
 
     return (
         <>
@@ -169,5 +169,5 @@ export function Steps({ state }: { state: string }) {
                 </ol>
             </nav>
         </>
-    )
+    );
 }

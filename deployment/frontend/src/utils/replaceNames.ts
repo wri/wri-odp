@@ -8,5 +8,5 @@ export function replaceNames(error: string, replaceTeam?: boolean) {
         .replace('group', replaceTeam ? 'team' : 'topic')
         .replace('groups', replaceTeam ? 'teams' : 'topics')
         .replace('Group', replaceTeam ? 'Team' : 'Topic')
-        .replace('Groups', replaceTeam ? 'Teams' : 'Topics')
+        .replace('Groups', replaceTeam ? 'Teams' : 'Topics');
 }

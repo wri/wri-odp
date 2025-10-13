@@ -1,6 +1,6 @@
-import { useLayerGroupsFromRW } from '@/utils/queryHooks'
-import { useActiveLayerGroups, useLayerStates } from '@/utils/storeHooks'
-import { type APILayerSpec } from '@/interfaces/layer.interface'
+import { useLayerGroupsFromRW } from '@/utils/queryHooks';
+import { useActiveLayerGroups, useLayerStates } from '@/utils/storeHooks';
+import { type APILayerSpec } from '@/interfaces/layer.interface';
 import {
     Legend,
     LegendListItem,
@@ -11,13 +11,13 @@ import {
     LegendItemButtonVisibility,
     Icons,
     // @ts-ignore
-} from 'vizzuality-components'
+} from 'vizzuality-components';
 
-import { type ActiveLayerGroup } from '@/interfaces/state.interface'
-import LegendItemButtonThreshold from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonThreshold'
-import LegendItemTypesList from '@/components/vizzuality/components/legend/components/legend-item-types/LegendItemTypesList'
-import LegendItemButtonRemoveLayer from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonRemoveLayer'
-import dynamic from 'next/dynamic'
+import { type ActiveLayerGroup } from '@/interfaces/state.interface';
+import LegendItemButtonThreshold from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonThreshold';
+import LegendItemTypesList from '@/components/vizzuality/components/legend/components/legend-item-types/LegendItemTypesList';
+import LegendItemButtonRemoveLayer from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonRemoveLayer';
+import dynamic from 'next/dynamic';
 
 // @ts-ignore
 const LegendItemTimeline = dynamic(
@@ -29,28 +29,28 @@ const LegendItemTimeline = dynamic(
     {
         ssr: false,
     }
-)
+);
 
 export function Legends() {
-    const { data: layerGroups } = useLayerGroupsFromRW()
-    const { activeLayerGroups, replaceLayersGroups } = useActiveLayerGroups()
-    const { currentLayers, updateLayerState } = useLayerStates()
+    const { data: layerGroups } = useLayerGroupsFromRW();
+    const { activeLayerGroups, replaceLayersGroups } = useActiveLayerGroups();
+    const { currentLayers, updateLayerState } = useLayerStates();
 
     function reorderLayerGroups(newOrder: string[]) {
         const isActiveLayerGroup = (
             item: ActiveLayerGroup | undefined
         ): item is ActiveLayerGroup => {
-            return !!item
-        }
+            return !!item;
+        };
         const newLayerGroups = newOrder
             .map((id) => {
-                return activeLayerGroups.find((lg: any) => lg.datasetId === id)
+                return activeLayerGroups.find((lg: any) => lg.datasetId === id);
             })
-            .filter(isActiveLayerGroup)
-        replaceLayersGroups(newLayerGroups)
+            .filter(isActiveLayerGroup);
+        replaceLayersGroups(newLayerGroups);
     }
 
-    if (!layerGroups) return <span>Loading...</span>
+    if (!layerGroups) return <span>Loading...</span>;
     return (
         <div className="c-legend-map">
             <Icons />
@@ -74,23 +74,23 @@ export function Legends() {
                                         lg.layers
                                             .map((l: APILayerSpec) => {
                                                 const layerState =
-                                                    currentLayers.get(l.id)
+                                                    currentLayers.get(l.id);
 
                                                 if (layerState?.active) {
-                                                    return layerState.visibility
+                                                    return layerState.visibility;
                                                 }
 
-                                                return false
+                                                return false;
                                             })
                                             .some((l: boolean) => l),
                                     layers: lg.layers.map((l: APILayerSpec) => {
                                         const layerState = currentLayers.get(
                                             l.id
-                                        )
+                                        );
                                         return {
                                             ...l,
                                             ...layerState,
-                                        }
+                                        };
                                     }),
                                 }}
                                 // visibility={
@@ -133,18 +133,18 @@ export function Legends() {
                                     layer: any,
                                     newOpacity: number
                                 ) => {
-                                    updateLayerState(layer.id, 'active', true)
+                                    updateLayerState(layer.id, 'active', true);
                                     updateLayerState(
                                         layer.id,
                                         'opacity',
                                         newOpacity
-                                    )
+                                    );
                                 }}
                                 onChangeVisibility={(layer: any) => {
                                     const layerState = currentLayers.get(
                                         layer.id
-                                    )
-                                    updateLayerState(layer.id, 'active', true)
+                                    );
+                                    updateLayerState(layer.id, 'active', true);
                                     updateLayerState(
                                         layer.id,
                                         'visibility',
@@ -152,7 +152,7 @@ export function Legends() {
                                             'undefined'
                                             ? false
                                             : !layerState?.visibility
-                                    )
+                                    );
                                 }}
                                 onChangeThreshold={(
                                     layer: any,
@@ -160,13 +160,13 @@ export function Legends() {
                                 ) => {
                                     const layerState = currentLayers.get(
                                         layer.id
-                                    )
-                                    updateLayerState(layer.id, 'active', true)
+                                    );
+                                    updateLayerState(layer.id, 'active', true);
                                     updateLayerState(
                                         layer.id,
                                         'threshold',
                                         threshold
-                                    )
+                                    );
                                 }}
                                 onChangeLayer={(layer: APILayerSpec) => {
                                     lg.layers.forEach(
@@ -175,10 +175,10 @@ export function Legends() {
                                                 _layer.id,
                                                 'active',
                                                 false
-                                            )
+                                            );
                                         }
-                                    )
-                                    updateLayerState(layer.id, 'active', true)
+                                    );
+                                    updateLayerState(layer.id, 'active', true);
                                 }}
                                 onRemoveLayer={(layer: APILayerSpec) =>
                                     console.log(layer)
@@ -195,7 +195,7 @@ export function Legends() {
                                     !lg.layers.find(
                                         (
                                             l: APILayerSpec & {
-                                                timelineParams: any
+                                                timelineParams: any;
                                             }
                                         ) => !!l.timelineParams
                                     ) && (
@@ -220,25 +220,25 @@ export function Legends() {
                                                                 _layer.id,
                                                                 'active',
                                                                 false
-                                                            )
+                                                            );
                                                         }
-                                                    )
+                                                    );
                                                 updateLayerState(
                                                     layer.id,
                                                     'active',
                                                     true
-                                                )
+                                                );
                                             }}
                                             customClass="rw-legend-timeline"
                                             {...LEGEND_TIMELINE_PROPERTIES}
                                         />
                                     )}
                             </LegendListItem>
-                        )
+                        );
                     })}
             </Legend>
         </div>
-    )
+    );
 }
 
 const LEGEND_TIMELINE_PROPERTIES = {
@@ -291,4 +291,4 @@ const LEGEND_TIMELINE_PROPERTIES = {
         fontFamily: "'Lato', 'Helvetica Neue', Helvetica, Arial, sans",
         color: '#393f44',
     },
-}
+};

@@ -1,13 +1,13 @@
 // @ts-nocheck
 
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import Slider, { createSliderWithTooltip, Handle } from 'rc-slider'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import Slider, { createSliderWithTooltip, Handle } from 'rc-slider';
 
 // components
-import Tooltip from '../../../components/tooltip'
+import Tooltip from '../../../components/tooltip';
 
-const RangeRender = createSliderWithTooltip(Slider.Range)
+const RangeRender = createSliderWithTooltip(Slider.Range);
 
 class Range extends PureComponent {
     static propTypes = {
@@ -20,7 +20,7 @@ class Range extends PureComponent {
         activeDotStyle: PropTypes.object,
         showTooltip: PropTypes.func,
         formatValue: PropTypes.func,
-    }
+    };
 
     static defaultProps = {
         value: 0,
@@ -42,19 +42,19 @@ class Range extends PureComponent {
         ],
         dotStyle: { display: 'none' },
         activeDotStyle: { display: 'none' },
-    }
+    };
 
     constructor(props) {
-        super(props)
-        const { value } = props
-        this.state = { value }
+        super(props);
+        const { value } = props;
+        this.state = { value };
     }
 
     renderHandle = (props) => {
-        const { formatValue, showTooltip } = this.props
-        const { value, dragging, index, ...restProps } = props
-        const formattedValue = formatValue ? formatValue(value) : value
-        const tooltipVisible = showTooltip ? showTooltip(index) : false
+        const { formatValue, showTooltip } = this.props;
+        const { value, dragging, index, ...restProps } = props;
+        const formattedValue = formatValue ? formatValue(value) : value;
+        const tooltipVisible = showTooltip ? showTooltip(index) : false;
 
         return (
             <Tooltip
@@ -69,13 +69,13 @@ class Range extends PureComponent {
             >
                 <Handle className="drag-handle" value={value} {...restProps} />
             </Tooltip>
-        )
-    }
+        );
+    };
 
     render() {
-        const { value } = this.state
-        const { range } = this.props
-        const Component = range ? RangeRender : Slider
+        const { value } = this.state;
+        const { range } = this.props;
+        const Component = range ? RangeRender : Slider;
 
         return (
             <Component
@@ -85,8 +85,8 @@ class Range extends PureComponent {
                 onChange={(v) => this.setState({ value: v })}
                 className="wri_api__slider-range"
             />
-        )
+        );
     }
 }
 
-export default Range
+export default Range;

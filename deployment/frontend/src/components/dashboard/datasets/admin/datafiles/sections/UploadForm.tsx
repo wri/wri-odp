@@ -1,7 +1,7 @@
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
 import {
     Table,
     TableBody,
@@ -9,21 +9,21 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/_shared/Table'
+} from '@/components/_shared/Table';
 import {
     InformationCircleIcon,
     MinusCircleIcon,
     PaperClipIcon,
-} from '@heroicons/react/24/outline'
-import { type DatasetFormType } from '@/schema/dataset.schema'
-import { type UseFormReturn, useFieldArray } from 'react-hook-form'
-import { convertBytes } from '@/utils/convertBytes'
-import Spinner from '@/components/_shared/Spinner'
-import FormatInput from '../FormatInput'
-import { DataDictionaryTable } from '../DataDictionaryTable'
-import DefaultTooltip from '@/components/_shared/Tooltip'
-import { DatafileLocation } from '../DatafileLocation'
-import { SimpleEditor } from '../../metadata/RTE/SimpleEditor'
+} from '@heroicons/react/24/outline';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { type UseFormReturn, useFieldArray } from 'react-hook-form';
+import { convertBytes } from '@/utils/convertBytes';
+import Spinner from '@/components/_shared/Spinner';
+import FormatInput from '../FormatInput';
+import { DataDictionaryTable } from '../DataDictionaryTable';
+import DefaultTooltip from '@/components/_shared/Tooltip';
+import { DatafileLocation } from '../DatafileLocation';
+import { SimpleEditor } from '../../metadata/RTE/SimpleEditor';
 
 export function UploadForm({
     removeFile,
@@ -31,17 +31,17 @@ export function UploadForm({
     index,
     dataDictionaryLoading,
 }: {
-    removeFile: () => void
-    formObj: UseFormReturn<DatasetFormType>
-    index: number
-    dataDictionaryLoading: boolean
+    removeFile: () => void;
+    formObj: UseFormReturn<DatasetFormType>;
+    index: number;
+    dataDictionaryLoading: boolean;
 }) {
     const {
         register,
         formState: { errors },
         watch,
-    } = formObj
-    const datafile = watch(`resources.${index}`)
+    } = formObj;
+    const datafile = watch(`resources.${index}`);
     return (
         <div className="flex flex-col gap-y-4 font-acumin">
             <div className="flex w-full justify-between bg-slate-100 px-6 py-3">
@@ -140,5 +140,5 @@ export function UploadForm({
                 <DatafileLocation formObj={formObj} index={index} />
             </div>
         </div>
-    )
+    );
 }

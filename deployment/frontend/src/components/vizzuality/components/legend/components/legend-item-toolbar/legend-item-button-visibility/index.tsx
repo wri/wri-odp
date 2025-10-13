@@ -1,20 +1,20 @@
 // @ts-nocheck
-import React, { PureComponent, useState } from 'react'
-import PropTypes from 'prop-types'
-import Tooltip from '../../../../tooltip'
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
+import React, { PureComponent, useState } from 'react';
+import PropTypes from 'prop-types';
+import Tooltip from '../../../../tooltip';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 interface LegendItemButtonVisibilityProps {
-    activeLayer: object
-    visibility: boolean
-    onChangeVisibility: (activeLayer, visibility: boolean) => void
-    iconShow: string
-    iconHide: string
-    focusStyle: object
-    defaultStyle: object
-    tooltipOpened: boolean
-    tooltipText: string
-    scrolling: boolean
+    activeLayer: object;
+    visibility: boolean;
+    onChangeVisibility: (activeLayer, visibility: boolean) => void;
+    iconShow: string;
+    iconHide: string;
+    focusStyle: object;
+    defaultStyle: object;
+    tooltipOpened: boolean;
+    tooltipText: string;
+    scrolling: boolean;
 }
 
 function LegendItemButtonVisibilityFn(
@@ -31,8 +31,8 @@ function LegendItemButtonVisibilityFn(
         onChangeVisibility: () => {},
     }
 ) {
-    const [visible, setState] = useState(false)
-    return <></>
+    const [visible, setState] = useState(false);
+    return <></>;
 }
 
 class LegendItemButtonVisibility extends PureComponent {
@@ -47,7 +47,7 @@ class LegendItemButtonVisibility extends PureComponent {
         tooltipOpened: PropTypes.bool,
         tooltipText: PropTypes.string,
         scrolling: PropTypes.bool,
-    }
+    };
 
     static defaultProps = {
         activeLayer: {},
@@ -61,17 +61,17 @@ class LegendItemButtonVisibility extends PureComponent {
         scrolling: false,
 
         onChangeVisibility: () => {},
-    }
+    };
 
     state = {
         visible: false,
-    }
+    };
 
     componentWillReceiveProps(nextProps) {
-        const { scrolling } = nextProps
+        const { scrolling } = nextProps;
 
         if (scrolling) {
-            this.setState({ visible: false })
+            this.setState({ visible: false });
         }
     }
 
@@ -85,8 +85,8 @@ class LegendItemButtonVisibility extends PureComponent {
             focusStyle,
             defaultStyle,
             tooltipText,
-        } = this.props
-        const { visible } = this.state
+        } = this.props;
+        const { visible } = this.state;
 
         return (
             <Tooltip
@@ -116,8 +116,8 @@ class LegendItemButtonVisibility extends PureComponent {
                     )}
                 </button>
             </Tooltip>
-        )
+        );
     }
 }
 
-export default LegendItemButtonVisibility
+export default LegendItemButtonVisibility;

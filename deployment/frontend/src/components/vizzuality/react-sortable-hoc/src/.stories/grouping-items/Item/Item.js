@@ -1,15 +1,15 @@
-import React from 'react'
-import classNames from 'classnames'
-import { sortableElement } from '../../../../src'
+import React from 'react';
+import classNames from 'classnames';
+import { sortableElement } from '../../../../src';
 
-import styles from './Item.scss'
+import styles from './Item.scss';
 
-const ENTER_KEY = 13
+const ENTER_KEY = 13;
 
 function Item(props) {
     const { dragging, sorting, onClick, selected, selectedItemsCount, value } =
-        props
-    const shouldRenderItemCountBadge = dragging && selectedItemsCount > 1
+        props;
+    const shouldRenderItemCountBadge = dragging && selectedItemsCount > 1;
 
     return (
         <div
@@ -22,7 +22,7 @@ function Item(props) {
             onClick={() => onClick(value)}
             onKeyPress={(event) => {
                 if (event.which === ENTER_KEY) {
-                    onClick(value)
+                    onClick(value);
                 }
             }}
             tabIndex={0}
@@ -32,11 +32,11 @@ function Item(props) {
                 <Badge count={selectedItemsCount} />
             ) : null}
         </div>
-    )
+    );
 }
 
 function Badge(props) {
-    return <div className={styles.Badge}>{props.count}</div>
+    return <div className={styles.Badge}>{props.count}</div>;
 }
 
-export default sortableElement(Item)
+export default sortableElement(Item);

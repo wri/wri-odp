@@ -1,15 +1,15 @@
-import React, { Fragment } from 'react'
-import { Menu, Transition } from '@headlessui/react'
-import { UserCircleIcon } from '@heroicons/react/20/solid'
-import { signOut, useSession } from 'next-auth/react'
-import Link from 'next/link'
+import React, { Fragment } from 'react';
+import { Menu, Transition } from '@headlessui/react';
+import { UserCircleIcon } from '@heroicons/react/20/solid';
+import { signOut, useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 export default function UserMenu({
     colors = 'dark',
 }: {
-    colors?: 'dark' | 'light'
+    colors?: 'dark' | 'light';
 }) {
-    const session = useSession()
+    const session = useSession();
 
     const navigation = [
         {
@@ -34,17 +34,17 @@ export default function UserMenu({
                                 id: session.data?.user.id!,
                             }),
                         }
-                    )
+                    );
                 } catch (error) {
                     console.error(
                         'Failed to logout from CKAN backend. The current token will not be revoked until next login.'
-                    )
-                    console.error(error)
+                    );
+                    console.error(error);
                 }
-                signOut({ redirect: true, callbackUrl: window.location.href })
+                signOut({ redirect: true, callbackUrl: window.location.href });
             },
         },
-    ]
+    ];
 
     return (
         <div
@@ -100,11 +100,11 @@ export default function UserMenu({
                                         </Menu.Item>
                                     </div>
                                 </div>
-                            )
+                            );
                         })}
                     </Menu.Items>
                 </Transition>
             </Menu>
         </div>
-    )
+    );
 }

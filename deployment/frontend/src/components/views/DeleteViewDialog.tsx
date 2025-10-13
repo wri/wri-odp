@@ -1,14 +1,14 @@
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import dynamic from 'next/dynamic'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { Dialog } from '@headlessui/react'
-import { type Dispatch, type SetStateAction } from 'react'
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import { api } from '@/utils/api'
-import { toast } from 'react-toastify'
-import { type WriDataset } from '@/schema/ckan.schema'
+});
+import { Dialog } from '@headlessui/react';
+import { type Dispatch, type SetStateAction } from 'react';
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import { api } from '@/utils/api';
+import { toast } from 'react-toastify';
+import { type WriDataset } from '@/schema/ckan.schema';
 
 export default function DeleteViewDialog({
     isOpen,
@@ -18,15 +18,16 @@ export default function DeleteViewDialog({
     provider,
     dataset,
 }: {
-    isOpen: boolean
-    setIsOpen: Dispatch<SetStateAction<boolean>>
-    id: string
-    onDelete: () => void
-    provider: 'rw' | 'datastore'
-    dataset: WriDataset
+    isOpen: boolean;
+    setIsOpen: Dispatch<SetStateAction<boolean>>;
+    id: string;
+    onDelete: () => void;
+    provider: 'rw' | 'datastore';
+    dataset: WriDataset;
 }) {
-    const datastoreDeleteMutation = api.dataset.deleteResourceView.useMutation()
-    const rwDeleteMutation = api.rw.deleteDatasetView.useMutation()
+    const datastoreDeleteMutation =
+        api.dataset.deleteResourceView.useMutation();
+    const rwDeleteMutation = api.rw.deleteDatasetView.useMutation();
 
     const handleDelete = () => {
         if (provider == 'datastore') {
@@ -36,17 +37,17 @@ export default function DeleteViewDialog({
                     onSuccess: () => {
                         toast('View was successfully deleted', {
                             type: 'success',
-                        })
-                        onDelete()
+                        });
+                        onDelete();
                     },
                     onError: (e) => {
-                        console.error(e)
+                        console.error(e);
                         toast('Failed to delete view', {
                             type: 'error',
-                        })
+                        });
                     },
                 }
-            )
+            );
         } else if (provider == 'rw') {
             rwDeleteMutation.mutate(
                 {
@@ -58,18 +59,18 @@ export default function DeleteViewDialog({
                     onSuccess: () => {
                         toast('View was successfully deleted', {
                             type: 'success',
-                        })
-                        onDelete()
+                        });
+                        onDelete();
                     },
                     onError: (e) => {
                         toast('Failed to delete view', {
                             type: 'error',
-                        })
+                        });
                     },
                 }
-            )
+            );
         }
-    }
+    };
 
     return (
         <Modal
@@ -115,5 +116,5 @@ export default function DeleteViewDialog({
                 </Button>
             </div>
         </Modal>
-    )
+    );
 }

@@ -1,30 +1,30 @@
-import MapboxDraw, { type DrawFeature } from '@mapbox/mapbox-gl-draw'
-import { Layer, Source } from 'react-map-gl'
+import MapboxDraw, { type DrawFeature } from '@mapbox/mapbox-gl-draw';
+import { Layer, Source } from 'react-map-gl';
 
-import type { MapRef } from 'react-map-gl'
+import type { MapRef } from 'react-map-gl';
 import {
     type MutableRefObject,
     useCallback,
     useEffect,
     useRef,
     useState,
-} from 'react'
-import { type LineLayer } from 'mapbox-gl'
-import { useIsDrawing } from '@/utils/storeHooks'
-import IconButton from './IconButton'
+} from 'react';
+import { type LineLayer } from 'mapbox-gl';
+import { useIsDrawing } from '@/utils/storeHooks';
+import IconButton from './IconButton';
 
 interface DrawProps {
-    mapRef: MutableRefObject<MapRef | null>
-    onDraw?: (feature: DrawFeature) => void
+    mapRef: MutableRefObject<MapRef | null>;
+    onDraw?: (feature: DrawFeature) => void;
 }
 
 export default function Draw({
     mapRef,
     onDraw = () => null,
 }: DrawProps): JSX.Element | null {
-    const { isDrawing, setIsDrawing } = useIsDrawing()
-    const [features, setFeatures] = useState()
-    const drawControlRef = useRef<MapboxDraw>()
+    const { isDrawing, setIsDrawing } = useIsDrawing();
+    const [features, setFeatures] = useState();
+    const drawControlRef = useRef<MapboxDraw>();
 
     useEffect(() => {
         /*
@@ -33,65 +33,65 @@ export default function Draw({
          *
          */
         if (isDrawing === undefined) {
-            setIsDrawing(true)
-            return
+            setIsDrawing(true);
+            return;
         }
 
         if (!isDrawing) {
-            startDrawing()
+            startDrawing();
         } else {
-            stopDrawing()
+            stopDrawing();
         }
 
         return () => {
-            removeDrawControl()
-        }
-    }, [isDrawing])
+            removeDrawControl();
+        };
+    }, [isDrawing]);
 
     const drawControlOpts = {
         displayControlsDefault: false,
         defaultMode: 'draw_polygon',
-    }
+    };
 
     const onDrawCreate = useCallback((e: any) => {
-        const feature = e.features[0]
-        setFeatures(feature)
-        drawControlRef.current?.deleteAll()
-        onDraw(feature)
-    }, [])
+        const feature = e.features[0];
+        setFeatures(feature);
+        drawControlRef.current?.deleteAll();
+        onDraw(feature);
+    }, []);
 
     const addDrawControl = () => {
         if (mapRef.current) {
             if (drawControlRef.current) {
-                removeDrawControl()
+                removeDrawControl();
             }
 
-            drawControlRef.current = new MapboxDraw(drawControlOpts)
-            mapRef.current.addControl(drawControlRef.current)
-            mapRef.current.on('draw.create', onDrawCreate)
+            drawControlRef.current = new MapboxDraw(drawControlOpts);
+            mapRef.current.addControl(drawControlRef.current);
+            mapRef.current.on('draw.create', onDrawCreate);
         }
-    }
+    };
 
     const removeDrawControl = () => {
         if (mapRef.current && drawControlRef.current) {
-            mapRef.current.off('draw.create', onDrawCreate)
-            mapRef.current.removeControl(drawControlRef.current)
-            drawControlRef.current = undefined
+            mapRef.current.off('draw.create', onDrawCreate);
+            mapRef.current.removeControl(drawControlRef.current);
+            drawControlRef.current = undefined;
         }
-    }
+    };
 
     const startDrawing = () => {
-        addDrawControl()
-    }
+        addDrawControl();
+    };
 
     const stopDrawing = () => {
-        removeDrawControl()
-        setFeatures(undefined)
-    }
+        removeDrawControl();
+        setFeatures(undefined);
+    };
 
     const toggleDrawing = () => {
-        setIsDrawing(!isDrawing)
-    }
+        setIsDrawing(!isDrawing);
+    };
 
     const layerStyle: LineLayer = {
         id: 'drawn-polygon-layer',
@@ -100,7 +100,7 @@ export default function Draw({
             'line-color': '#ff0000',
             'line-width': 5,
         },
-    }
+    };
 
     return (
         <>
@@ -121,7 +121,7 @@ export default function Draw({
                 </Source>
             )}
         </>
-    )
+    );
 }
 
 function DrawIcon() {
@@ -152,5 +152,5 @@ function DrawIcon() {
                 />
             </defs>
         </svg>
-    )
+    );
 }

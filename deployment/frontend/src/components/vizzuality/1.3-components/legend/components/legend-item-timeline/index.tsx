@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import classnames from 'classnames'
-import debounce from 'lodash/debounce'
-import sortBy from 'lodash/sortBy'
-import { Range, Tooltip } from '../../..'
-import Slider from 'rc-slider'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
+import debounce from 'lodash/debounce';
+import sortBy from 'lodash/sortBy';
+import { Range, Tooltip } from '../../..';
+import Slider from 'rc-slider';
 
 class LegendItemTimeline extends PureComponent {
     static propTypes = {
@@ -21,7 +21,7 @@ class LegendItemTimeline extends PureComponent {
         activeDotStyle: PropTypes.object,
         markStyle: PropTypes.object,
         onChangeLayer: PropTypes.func.isRequired,
-    }
+    };
 
     static defaultProps = {
         layers: [],
@@ -35,88 +35,88 @@ class LegendItemTimeline extends PureComponent {
         dotStyle: null,
         activeDotStyle: null,
         markStyle: {},
-    }
+    };
 
     state = {
         step: null,
         isPlaying: false,
-    }
+    };
 
     /**
      * HELPERS
      * - getTimelineLayers
      */
     getTimelineLayers = () => {
-        const { layers } = this.props
+        const { layers } = this.props;
 
         return sortBy(
             layers.filter((l) => l.layerConfig.timeline),
             (l) => l.layerConfig.order
-        )
-    }
+        );
+    };
 
     setPlay = (isPlaying, first, last) => {
-        const { step } = this.state
-        const { onChangeLayer } = this.props
-        const timelineLayers = this.getTimelineLayers()
+        const { step } = this.state;
+        const { onChangeLayer } = this.props;
+        const timelineLayers = this.getTimelineLayers();
 
-        if (this.timer) clearInterval(this.timer)
+        if (this.timer) clearInterval(this.timer);
 
         if (isPlaying) {
             this.timer = setInterval(
                 () => {
-                    const newStep = step || first
+                    const newStep = step || first;
 
                     if (newStep === last) {
-                        clearInterval(this.timer)
+                        clearInterval(this.timer);
 
-                        const currentLayer = timelineLayers[0]
-                        onChangeLayer(currentLayer)
+                        const currentLayer = timelineLayers[0];
+                        onChangeLayer(currentLayer);
 
                         return this.setState({
                             step: null,
                             isPlaying: false,
-                        })
+                        });
                     }
 
                     const currentLayer = timelineLayers.find(
                         (l) => l.layerConfig.order === newStep
-                    )
+                    );
                     const currentIndex = timelineLayers.findIndex(
                         (l) => l.layerConfig.order === newStep
-                    )
+                    );
 
                     requestAnimationFrame(() => {
-                        onChangeLayer(currentLayer)
-                    })
+                        onChangeLayer(currentLayer);
+                    });
 
                     return this.setState({
                         step: timelineLayers[currentIndex + 1].layerConfig
                             .order,
-                    })
+                    });
                 },
                 3000,
                 true
-            )
+            );
         }
 
-        this.setState({ isPlaying })
-    }
+        this.setState({ isPlaying });
+    };
 
     setStep = debounce((step) => {
-        const { onChangeLayer } = this.props
-        const timelineLayers = this.getTimelineLayers()
+        const { onChangeLayer } = this.props;
+        const timelineLayers = this.getTimelineLayers();
 
         const currentLayer = timelineLayers.find(
             (l) => l.layerConfig.order === step
-        )
+        );
 
-        if (currentLayer) onChangeLayer(currentLayer)
-    }, 500)
+        if (currentLayer) onChangeLayer(currentLayer);
+    }, 500);
 
     renderHandle = (props) => {
-        const { value, dragging, index, ...restProps } = props
-        const { Handle } = Slider
+        const { value, dragging, index, ...restProps } = props;
+        const { Handle } = Slider;
 
         return (
             <Tooltip
@@ -128,8 +128,8 @@ class LegendItemTimeline extends PureComponent {
             >
                 <Handle value={value} {...restProps} />
             </Tooltip>
-        )
-    }
+        );
+    };
 
     render() {
         const {
@@ -140,31 +140,35 @@ class LegendItemTimeline extends PureComponent {
             activeDotStyle,
             markStyle,
             customClass,
-        } = this.props
-        const { step } = this.state
-        const externalClass = classnames({ [customClass]: !!customClass })
-        const timelineLayers = this.getTimelineLayers()
+        } = this.props;
+        const { step } = this.state;
+        const externalClass = classnames({ [customClass]: !!customClass });
+        const timelineLayers = this.getTimelineLayers();
 
         // Return null if timeline doesn not exist
-        if (!timelineLayers.length) return null
+        if (!timelineLayers.length) return null;
 
-        const timelineMarks = {}
+        const timelineMarks = {};
 
         timelineLayers.forEach((val, index) => {
-            const isVisible = index === 0 || index === timelineLayers.length - 1
+            const isVisible =
+                index === 0 || index === timelineLayers.length - 1;
             timelineMarks[val.layerConfig.timelineLabel] = {
                 label: val.layerConfig.timelineLabel,
                 style: {
                     ...markStyle,
                     visibility: isVisible ? 'visible' : 'hidden',
                 },
-            }
-        })
+            };
+        });
 
-        const first = timelineLayers[0].layerConfig.order
-        const last = timelineLayers[timelineLayers.length - 1].layerConfig.order
-        const activeLayer = timelineLayers.find((_layer) => _layer.active)
-        const defaultValue = activeLayer ? activeLayer.layerConfig.order : first
+        const first = timelineLayers[0].layerConfig.order;
+        const last =
+            timelineLayers[timelineLayers.length - 1].layerConfig.order;
+        const activeLayer = timelineLayers.find((_layer) => _layer.active);
+        const defaultValue = activeLayer
+            ? activeLayer.layerConfig.order
+            : first;
 
         return (
             <div className={`${externalClass} mt-[8px]`}>
@@ -177,7 +181,7 @@ class LegendItemTimeline extends PureComponent {
                     defaultValue={defaultValue}
                     value={step || defaultValue}
                     onAfterChange={(nextStep) => {
-                        this.setStep(nextStep)
+                        this.setStep(nextStep);
                     }}
                     {...(trackStyle && { trackStyle })}
                     {...(railStyle && { railStyle })}
@@ -186,8 +190,8 @@ class LegendItemTimeline extends PureComponent {
                     {...(activeDotStyle && { activeDotStyle })}
                 />
             </div>
-        )
+        );
     }
 }
 
-export default LegendItemTimeline
+export default LegendItemTimeline;

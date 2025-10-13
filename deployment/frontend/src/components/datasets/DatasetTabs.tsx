@@ -1,23 +1,23 @@
-import classNames from '@/utils/classnames'
-import { Tab } from '@headlessui/react'
+import classNames from '@/utils/classnames';
+import { Tab } from '@headlessui/react';
 import {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
-} from '@heroicons/react/20/solid'
-import { Navigation } from 'swiper/modules'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-import { slugify } from '@/utils/slugify'
+} from '@heroicons/react/20/solid';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { slugify } from '@/utils/slugify';
 
 export function DatasetTabs({
     tabs,
 }: {
-    tabs: { name: string; count?: number; highlighted?: boolean }[]
+    tabs: { name: string; count?: number; highlighted?: boolean }[];
 }) {
-    const prevEl = `.nav-prev-button--tabs`
-    const nextEl = `.nav-next-button--tabs`
+    const prevEl = `.nav-prev-button--tabs`;
+    const nextEl = `.nav-next-button--tabs`;
     return (
         <>
             <Swiper
@@ -72,5 +72,5 @@ export function DatasetTabs({
                 <ChevronDoubleRightIcon className="h-6 w-6 text-black" />
             </button>
         </>
-    )
+    );
 }

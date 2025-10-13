@@ -1,8 +1,8 @@
-import { Popup } from 'react-map-gl'
+import { Popup } from 'react-map-gl';
 
 function Tooltip({ layersInfo, coordinates, close }: any) {
-    if (layersInfo.length === 0) return <></>
-    if (!coordinates) return <></>
+    if (layersInfo.length === 0) return <></>;
+    if (!coordinates) return <></>;
     return (
         <Popup
             {...coordinates}
@@ -31,7 +31,7 @@ function Tooltip({ layersInfo, coordinates, close }: any) {
                                         </span>{' '}
                                         {prop.value ?? ''}
                                     </p>
-                                )
+                                );
                             }) || (
                                 <p className="text-sm">
                                     No info found for this coordinate
@@ -39,10 +39,10 @@ function Tooltip({ layersInfo, coordinates, close }: any) {
                             )}
                         </div>
                     </div>
-                )
+                );
             })}
         </Popup>
-    )
+    );
 }
 
-export default Tooltip
+export default Tooltip;

@@ -149,4 +149,4 @@ export const marine_ecoregions = {
     staticImageConfig: {},
     createdAt: '2017-08-21T20:38:57.963Z',
     updatedAt: '2022-02-08T19:19:00.739Z',
-}
+};

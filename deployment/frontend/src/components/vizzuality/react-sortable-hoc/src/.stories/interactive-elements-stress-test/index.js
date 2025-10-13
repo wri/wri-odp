@@ -1,8 +1,8 @@
-import React from 'react'
-import arrayMove from 'array-move'
+import React from 'react';
+import arrayMove from 'array-move';
 
-import SortableList from './List'
-import ItemStyles from './Item/Item.scss'
+import SortableList from './List';
+import ItemStyles from './Item/Item.scss';
 
 const items = {
     input: <input placeholder="Regular text input" />,
@@ -47,12 +47,12 @@ const items = {
             }}
         />
     ),
-}
+};
 
 export default class InteractiveElements extends React.Component {
     state = {
         items: Object.entries(items),
-    }
+    };
 
     render() {
         return (
@@ -65,16 +65,16 @@ export default class InteractiveElements extends React.Component {
                 onSortEnd={this.onSortEnd}
                 helperClass={ItemStyles.dragging}
             />
-        )
+        );
     }
 
     onSortEnd = ({ oldIndex, newIndex }) => {
         if (oldIndex === newIndex) {
-            return
+            return;
         }
 
         this.setState(({ items }) => ({
             items: arrayMove(items, oldIndex, newIndex),
-        }))
-    }
+        }));
+    };
 }

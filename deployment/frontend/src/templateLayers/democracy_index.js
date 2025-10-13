@@ -125,4 +125,4 @@ export const democracy_index = {
     staticImageConfig: {},
     createdAt: '2017-09-13T14:24:32.159Z',
     updatedAt: '2022-02-01T17:28:59.881Z',
-}
+};

@@ -1,10 +1,10 @@
-import { type Config } from 'tailwindcss'
-import defaultTheme from 'tailwindcss/defaultTheme'
-import containerQueries from '@tailwindcss/container-queries'
-import plugin from 'tailwindcss/plugin'
-import tailwindcssAnimate from 'tailwindcss-animate'
-import forms from '@tailwindcss/forms'
-import typography from '@tailwindcss/typography'
+import { type Config } from 'tailwindcss';
+import defaultTheme from 'tailwindcss/defaultTheme';
+import containerQueries from '@tailwindcss/container-queries';
+import plugin from 'tailwindcss/plugin';
+import tailwindcssAnimate from 'tailwindcss-animate';
+import forms from '@tailwindcss/forms';
+import typography from '@tailwindcss/typography';
 
 export default {
     content: ['./src/**/*.{js,ts,jsx,tsx}'],
@@ -106,10 +106,10 @@ export default {
     plugins: [
         containerQueries,
         plugin((api) => {
-            api.addVariant('not-last', '&:not(:last-child)')
+            api.addVariant('not-last', '&:not(:last-child)');
         }),
         tailwindcssAnimate,
         forms,
         typography,
     ],
-} satisfies Config
+} satisfies Config;

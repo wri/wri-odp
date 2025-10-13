@@ -1,55 +1,55 @@
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import { ErrorDisplay } from '@/components/_shared/InputGroup'
-import dynamic from 'next/dynamic'
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import { ErrorDisplay } from '@/components/_shared/InputGroup';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
+});
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import Spinner from '@/components/_shared/Spinner'
-import { api } from '@/utils/api'
+} from '@/components/_shared/Popover';
+import Spinner from '@/components/_shared/Spinner';
+import { api } from '@/utils/api';
 import {
     ArrowDownTrayIcon,
     PaperAirplaneIcon,
-} from '@heroicons/react/24/outline'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
-import { z } from 'zod'
-import { type TabularResource } from '../datasets/visualizations/Visualizations'
-import { ArrowDownCircleIcon } from '@heroicons/react/20/solid'
-import { DefaultTooltip } from '../_shared/Tooltip'
-import { DownloadPopup } from '../_shared/DownloadPopup'
-import { useDataset } from '@/utils/storeHooks'
+} from '@heroicons/react/24/outline';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import { z } from 'zod';
+import { type TabularResource } from '../datasets/visualizations/Visualizations';
+import { ArrowDownCircleIcon } from '@heroicons/react/20/solid';
+import { DefaultTooltip } from '../_shared/Tooltip';
+import { DownloadPopup } from '../_shared/DownloadPopup';
+import { useDataset } from '@/utils/storeHooks';
 
 export function DownloadButton({
     sql,
     tabularResource,
     numOfRows,
 }: {
-    tabularResource: TabularResource
-    sql: string
-    numOfRows: number
+    tabularResource: TabularResource;
+    sql: string;
+    numOfRows: number;
 }) {
-    const { dataset } = useDataset()
-    const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
+    const { dataset } = useDataset();
+    const conversibleFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML'];
     const [convertTo, setConvertTo] = useState<'CSV' | 'XLSX' | 'TSV' | 'XML'>(
         'CSV'
-    )
-    const [open, setOpen] = useState(false)
-    const downloadSubset = api.dataset.downloadSubsetOfData.useMutation()
+    );
+    const [open, setOpen] = useState(false);
+    const downloadSubset = api.dataset.downloadSubsetOfData.useMutation();
     const createDownloadEvent = api.downloadEvents.createEvents.useMutation({
         onError: (err) => {
             toast('Failed to send your information', {
                 type: 'error',
             }),
-                setOpen(false)
+                setOpen(false);
         },
-    })
+    });
     const handleFormSubmit = (data: any) => {
         downloadSubset.mutate(
             {
@@ -66,28 +66,28 @@ export function DownloadButton({
                 onSuccess: () => {
                     toast("You'll receive an email when the file is ready", {
                         type: 'success',
-                    })
+                    });
                     const _data = {
                         ...data,
                         resources: [tabularResource.id],
                         package_id: tabularResource.datasetId ?? '',
                         typeOfForm: 'email-download',
                         package_name: tabularResource.datasetName,
-                    }
-                    createDownloadEvent.mutate(_data)
+                    };
+                    createDownloadEvent.mutate(_data);
 
-                    setOpen(false)
+                    setOpen(false);
                 },
                 onError: (err) => {
-                    console.error(err)
+                    console.error(err);
 
                     toast('Failed to request file', {
                         type: 'error',
-                    })
+                    });
                 },
             }
-        )
-    }
+        );
+    };
     return (
         <>
             <Popover>
@@ -112,8 +112,8 @@ export function DownloadButton({
                             id={`download-subset-${f.toLowerCase()}`}
                             onClick={() => {
                                 // @ts-ignore
-                                setConvertTo(f)
-                                setOpen(true)
+                                setConvertTo(f);
+                                setOpen(true);
                             }}
                         >
                             {f}
@@ -140,5 +140,5 @@ export function DownloadButton({
                 }
             />
         </>
-    )
+    );
 }

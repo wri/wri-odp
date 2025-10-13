@@ -1,77 +1,77 @@
-import React, { useState } from 'react'
-import ApprovalHeader from './ApprovalHeader'
-import ApprovalRow from './ApprovalRow'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import RejectApproval from './RejectApproval'
-import { type WriDataset } from '@/schema/ckan.schema'
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { type SearchInput } from '@/schema/search.schema'
-import Pagination from '@/components/dashboard/_shared/Pagination'
-import { useSession } from 'next-auth/react'
-import notify from '@/utils/notify'
+import React, { useState } from 'react';
+import ApprovalHeader from './ApprovalHeader';
+import ApprovalRow from './ApprovalRow';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import RejectApproval from './RejectApproval';
+import { type WriDataset } from '@/schema/ckan.schema';
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { type SearchInput } from '@/schema/search.schema';
+import Pagination from '@/components/dashboard/_shared/Pagination';
+import { useSession } from 'next-auth/react';
+import notify from '@/utils/notify';
 
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
+});
 
 export default function Approvallist() {
-    const { data: session } = useSession()
-    const [rejectOpen, setRejectOpen] = useState(false)
-    const [approveOpen, setApproveOpen] = useState(false)
-    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const utils = api.useUtils()
+    const { data: session } = useSession();
+    const [rejectOpen, setRejectOpen] = useState(false);
+    const [approveOpen, setApproveOpen] = useState(false);
+    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const utils = api.useUtils();
     const { data: userIdentity, isLoading: isLoadingIUser } =
-        api.user.getUserCapacity.useQuery()
+        api.user.getUserCapacity.useQuery();
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
         sortBy: 'metadata_modified desc',
-    })
+    });
     const { data, isLoading, refetch } =
-        api.dataset.getPendingDatasets.useQuery(query)
+        api.dataset.getPendingDatasets.useQuery(query);
 
     const approveDataset = api.dataset.approvePendingDataset.useMutation({
         onSuccess: async (data) => {
-            await refetch()
+            await refetch();
             await utils.dataset.getPendingDatasets.invalidate({
                 search: '',
                 page: { start: 0, rows: 100 },
                 sortBy: 'metadata_modified desc',
-            })
-            setApproveOpen(false)
+            });
+            setApproveOpen(false);
             notify(
                 `Successfully approved the Dataset ${
                     selectDataset?.name ?? selectDataset?.title
                 }`,
                 'success'
-            )
+            );
         },
         onError: (error) => {
-            setErrorMessage(error.message)
-            setApproveOpen(false)
+            setErrorMessage(error.message);
+            setApproveOpen(false);
         },
-    })
+    });
 
     const handleOpenModal = (
         dataset: WriDataset,
         approvalType: 'approve' | 'reject'
     ) => {
-        setSelectDataset(dataset)
+        setSelectDataset(dataset);
         if (approvalType === 'approve') {
-            setApproveOpen(true)
+            setApproveOpen(true);
         } else {
-            setRejectOpen(true)
+            setRejectOpen(true);
         }
-    }
+    };
 
     if (!session?.user.sysadmin && isLoadingIUser) {
-        return <Spinner className="mx-auto my-2" />
+        return <Spinner className="mx-auto my-2" />;
     }
 
     if (!session?.user.sysadmin && userIdentity && !userIdentity.isOrgAdmin) {
@@ -79,7 +79,7 @@ export default function Approvallist() {
             <div className="flex justify-center items-center h-screen">
                 You are not authorized to access this page
             </div>
-        )
+        );
     }
 
     //TODO: might need to change ApprovalHeader and Approval Row to make use of table
@@ -189,5 +189,5 @@ export default function Approvallist() {
                 </Modal>
             )}
         </section>
-    )
+    );
 }

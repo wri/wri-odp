@@ -4,8 +4,8 @@ import React, {
     type SetStateAction,
     useEffect,
     useState,
-} from 'react'
-import { zodResolver } from '@hookform/resolvers/zod'
+} from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
     ExclamationCircleIcon,
@@ -13,27 +13,27 @@ import {
     LockClosedIcon,
     UserIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import Image from 'next/image'
-import { getCsrfToken, signIn } from 'next-auth/react'
-import { useRouter } from 'next/router'
-import { useForm } from 'react-hook-form'
+} from '@heroicons/react/24/outline';
+import Image from 'next/image';
+import { getCsrfToken, signIn } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { useForm } from 'react-hook-form';
 import {
     type RequestResetPasswordFormType,
     RequestResetPasswordSchema,
     type SignInFormType,
     SignInSchema,
-} from '@/schema/auth.schema'
-import { ErrorAlert } from './Alerts'
-import { api } from '@/utils/api'
-import notify from '@/utils/notify'
+} from '@/schema/auth.schema';
+import { ErrorAlert } from './Alerts';
+import { api } from '@/utils/api';
+import notify from '@/utils/notify';
 
 export default function Login({
     onSignIn = () => {},
 }: {
-    onSignIn?: () => void
+    onSignIn?: () => void;
 }) {
-    const [isPasswordReset, setIsPasswordReset] = useState(false)
+    const [isPasswordReset, setIsPasswordReset] = useState(false);
 
     return (
         <section id="login-modal" className=" font-acumin mb-4">
@@ -50,21 +50,21 @@ export default function Login({
                 )}
             </div>
         </section>
-    )
+    );
 }
 
 function SignInForm({
     onSignIn,
     setIsPasswordReset,
 }: {
-    onSignIn: () => void
-    setIsPasswordReset: Dispatch<SetStateAction<boolean>>
+    onSignIn: () => void;
+    setIsPasswordReset: Dispatch<SetStateAction<boolean>>;
 }) {
-    const router = useRouter()
-    const [errorMessage, setErrorMessage] = useState('')
-    const [isLoading, setIsLoading] = useState(false)
-    const [isLoadingAzure, setIsLoadingAzure] = useState(false)
-    const [isLoadingOkta, setIsLoadingOkta] = useState(false)
+    const router = useRouter();
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingAzure, setIsLoadingAzure] = useState(false);
+    const [isLoadingOkta, setIsLoadingOkta] = useState(false);
 
     const {
         register,
@@ -73,38 +73,38 @@ function SignInForm({
         formState: { errors },
     } = useForm<SignInFormType & { confirm: string }>({
         resolver: zodResolver(SignInSchema),
-    })
+    });
 
     const error =
-        errorMessage || errors.username?.message || errors.password?.message
+        errorMessage || errors.username?.message || errors.password?.message;
 
     const handleAzureSignIn = async () => {
-        setIsLoadingAzure(true)
+        setIsLoadingAzure(true);
         try {
             await signIn('azure-ad', {
                 callbackUrl: '/dashboard',
                 redirect: false,
-            })
+            });
         } catch (error) {
-            console.error('Azure AD Sign-in error:', error)
-            setErrorMessage('Azure AD Sign-in failed')
+            console.error('Azure AD Sign-in error:', error);
+            setErrorMessage('Azure AD Sign-in failed');
         }
-        setIsLoadingAzure(false)
-    }
+        setIsLoadingAzure(false);
+    };
 
     const handleOktaSignIn = async () => {
-        setIsLoadingOkta(true)
+        setIsLoadingOkta(true);
         try {
             await signIn('okta', {
                 callbackUrl: '/dashboard',
                 redirect: false,
-            })
+            });
         } catch (error) {
-            console.error('Okta Sign-in error:', error)
-            setErrorMessage('Okta Sign-in failed')
+            console.error('Okta Sign-in error:', error);
+            setErrorMessage('Okta Sign-in failed');
         }
-        setIsLoadingOkta(false)
-    }
+        setIsLoadingOkta(false);
+    };
 
     return (
         <>
@@ -121,24 +121,24 @@ function SignInForm({
                 <form
                     className="flex flex-col gap-y-4"
                     onSubmit={(data) => {
-                        setErrorMessage('')
+                        setErrorMessage('');
                         handleSubmit(async (data) => {
-                            setIsLoading(true)
+                            setIsLoading(true);
                             const signInStatus = await signIn('credentials', {
                                 callbackUrl: '/dashboard',
                                 redirect: false,
                                 ...data,
-                            })
+                            });
 
-                            setIsLoading(false)
+                            setIsLoading(false);
                             if (signInStatus?.error) {
-                                setErrorMessage(signInStatus.error)
+                                setErrorMessage(signInStatus.error);
                             } else {
-                                notify('Sign in successful')
-                                onSignIn ? onSignIn() : router.reload()
-                                router.push('/dashboard')
+                                notify('Sign in successful');
+                                onSignIn ? onSignIn() : router.reload();
+                                router.push('/dashboard');
                             }
-                        })(data)
+                        })(data);
                     }}
                 >
                     <div className=" rounded-md px-4 group py-3 gap-x-2 flex pr-8 flex-row items-center min-w-fit  w-full bg-white border-[1px] border-wri-gray-200">
@@ -175,9 +175,9 @@ function SignInForm({
                         className="font-light text-[0.875rem] text-wri-black text-right -mt-2"
                         type="button"
                         onClick={(e) => {
-                            e.preventDefault()
-                            setIsPasswordReset(true)
-                            return false
+                            e.preventDefault();
+                            setIsPasswordReset(true);
+                            return false;
                         }}
                         id="forgot-password-button"
                     >
@@ -229,16 +229,16 @@ function SignInForm({
                 </div>
             </button>*/}
         </>
-    )
+    );
 }
 
 function ResetPasswordForm({
     setIsPasswordReset,
 }: {
-    setIsPasswordReset: Dispatch<SetStateAction<boolean>>
+    setIsPasswordReset: Dispatch<SetStateAction<boolean>>;
 }) {
-    const [errorMessage, setErrorMessage] = useState('')
-    const [result, setResult] = useState('')
+    const [errorMessage, setErrorMessage] = useState('');
+    const [result, setResult] = useState('');
 
     const {
         register,
@@ -247,18 +247,18 @@ function ResetPasswordForm({
         formState: { errors },
     } = useForm<RequestResetPasswordFormType>({
         resolver: zodResolver(RequestResetPasswordSchema),
-    })
+    });
 
     const requestPasswordReset = api.auth.requestPasswordReset.useMutation({
         onSuccess: (data) => {
-            setResult(data.result)
+            setResult(data.result);
         },
         onError: (e) => {
-            setErrorMessage(e.message)
+            setErrorMessage(e.message);
         },
-    })
+    });
 
-    const error = errorMessage || errors.email?.message
+    const error = errorMessage || errors.email?.message;
 
     return (
         <>
@@ -271,11 +271,11 @@ function ResetPasswordForm({
                 <form
                     className="flex flex-col gap-y-4"
                     onSubmit={(data) => {
-                        setErrorMessage('')
-                        setResult('')
+                        setErrorMessage('');
+                        setResult('');
                         handleSubmit(async (data) => {
-                            requestPasswordReset.mutate(data)
-                        })(data)
+                            requestPasswordReset.mutate(data);
+                        })(data);
                     }}
                 >
                     <div className=" rounded-md px-4 group py-3 gap-x-2 flex pr-8 flex-row items-center min-w-fit  w-full bg-white border-[1px] border-wri-gray-200">
@@ -297,9 +297,9 @@ function ResetPasswordForm({
                         className="font-light text-[0.875rem] text-wri-black text-right -mt-2"
                         type="button"
                         onClick={(e) => {
-                            e.preventDefault()
-                            setIsPasswordReset(false)
-                            return false
+                            e.preventDefault();
+                            setIsPasswordReset(false);
+                            return false;
                         }}
                     >
                         Go back to sign in
@@ -328,5 +328,5 @@ function ResetPasswordForm({
                 </form>
             </div>
         </>
-    )
+    );
 }

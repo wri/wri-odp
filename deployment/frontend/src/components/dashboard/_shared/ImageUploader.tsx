@@ -1,14 +1,14 @@
-import React, { useRef, useState } from 'react'
-import Uppy, { type UploadResult, type UppyFile } from '@uppy/core'
+import React, { useRef, useState } from 'react';
+import Uppy, { type UploadResult, type UppyFile } from '@uppy/core';
 
-import '@uppy/core/dist/style.min.css'
-import AwsS3 from '@uppy/aws-s3'
-import { getUploadParameters } from '@/utils/uppyFunctions'
-import { ArrowUpTrayIcon } from '@heroicons/react/24/outline'
-import { MinusCircleIcon } from '@heroicons/react/20/solid'
-import { Button } from '@/components/_shared/Button'
-import { api } from '@/utils/api'
-import DefaultTooltip from '@/components/_shared/Tooltip'
+import '@uppy/core/dist/style.min.css';
+import AwsS3 from '@uppy/aws-s3';
+import { getUploadParameters } from '@/utils/uppyFunctions';
+import { ArrowUpTrayIcon } from '@heroicons/react/24/outline';
+import { MinusCircleIcon } from '@heroicons/react/20/solid';
+import { Button } from '@/components/_shared/Button';
+import { api } from '@/utils/api';
+import DefaultTooltip from '@/components/_shared/Tooltip';
 
 export function ImageUploader({
     onUploadSuccess,
@@ -19,26 +19,26 @@ export function ImageUploader({
     defaultImage,
     tooltip,
 }: {
-    onUploadSuccess: (result: UploadResult) => void
-    onPresignedUrlSuccess?: (response: string) => void
-    onUploadStart?: () => void
-    clearImage?: () => void
-    text?: string
-    defaultImage?: string | null
-    tooltip?: string
+    onUploadSuccess: (result: UploadResult) => void;
+    onPresignedUrlSuccess?: (response: string) => void;
+    onUploadStart?: () => void;
+    clearImage?: () => void;
+    text?: string;
+    defaultImage?: string | null;
+    tooltip?: string;
 }) {
-    const [key, setKey] = useState<string | null>(null)
-    const [uploading, setIsUploading] = useState(false)
-    const uploadInputRef = useRef<HTMLInputElement>(null)
+    const [key, setKey] = useState<string | null>(null);
+    const [uploading, setIsUploading] = useState(false);
+    const uploadInputRef = useRef<HTMLInputElement>(null);
     const presignedGetUrl = api.uploads.getPresignedUrl.useQuery(
         { key: key! },
         {
             enabled: !!key,
             onSuccess: (data) => {
-                if (onPresignedUrlSuccess) onPresignedUrlSuccess(data)
+                if (onPresignedUrlSuccess) onPresignedUrlSuccess(data);
             },
         }
-    )
+    );
     const uppy = React.useMemo(() => {
         const uppy = new Uppy({
             autoProceed: true,
@@ -49,60 +49,60 @@ export function ImageUploader({
             id: 'AwsS3',
             getUploadParameters: (file: UppyFile) =>
                 getUploadParameters(file, 'ckan/storage/uploads/group'),
-        })
-        return uppy
-    }, [])
+        });
+        return uppy;
+    }, []);
 
     function upload() {
         uppy.upload().then((result) => {
-            setIsUploading(false)
+            setIsUploading(false);
             if (result?.successful[0]) {
                 const paths = new URL(result.successful[0].uploadURL).pathname
                     .substring(1)
-                    .split('/')
-                const key = paths.slice(0, paths.length).join('/')
-                uppy.setState({ ...uppy.getState(), files: [] })
-                setKey(key)
+                    .split('/');
+                const key = paths.slice(0, paths.length).join('/');
+                uppy.setState({ ...uppy.getState(), files: [] });
+                setKey(key);
                 if (uploadInputRef && uploadInputRef.current)
-                    uploadInputRef.current.value = ''
+                    uploadInputRef.current.value = '';
             }
 
             if (result.failed.length > 0) {
                 result.failed.forEach((file) => {
-                    console.error(file.error)
-                })
+                    console.error(file.error);
+                });
             }
-        })
+        });
     }
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const files = e.target.files
-        if (!files?.[0]) return
+        const files = e.target.files;
+        if (!files?.[0]) return;
         try {
             uppy.addFile({
                 name: files[0].name,
                 type: files[0].type,
                 data: files[0],
-            })
+            });
         } catch (e) {
-            const firstFile = uppy.getFiles()[0]
-            uppy.removeFile(firstFile?.id ?? '')
+            const firstFile = uppy.getFiles()[0];
+            uppy.removeFile(firstFile?.id ?? '');
             uppy.addFile({
                 name: files[0].name,
                 type: files[0].type,
                 data: files[0],
-            })
+            });
         }
-        upload()
+        upload();
     }
 
     uppy.on('complete', (result) => {
-        onUploadSuccess(result)
-    })
+        onUploadSuccess(result);
+    });
     uppy.on('upload', (_result) => {
-        setIsUploading(true)
-        if (onUploadStart) onUploadStart()
-    })
+        setIsUploading(true);
+        if (onUploadStart) onUploadStart();
+    });
 
     const uplader = (
         <>
@@ -184,8 +184,8 @@ export function ImageUploader({
                             className="w-fit my-2"
                             size="sm"
                             onClick={() => {
-                                clearImage()
-                                setKey(null)
+                                clearImage();
+                                setKey(null);
                             }}
                         >
                             <MinusCircleIcon className="h-5 w-5 text-white mr-2" />{' '}
@@ -194,13 +194,13 @@ export function ImageUploader({
                     </div>
                 )}
         </>
-    )
+    );
     if (tooltip) {
         return (
             <DefaultTooltip content={tooltip}>
                 <div>{uplader}</div>
             </DefaultTooltip>
-        )
+        );
     }
-    return uplader
+    return uplader;
 }

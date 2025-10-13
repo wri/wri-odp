@@ -1,40 +1,40 @@
 // @ts-nocheck
 export default class Manager {
-    refs = {}
+    refs = {};
 
     add(collection, ref) {
         if (!this.refs[collection]) {
-            this.refs[collection] = []
+            this.refs[collection] = [];
         }
 
-        this.refs[collection].push(ref)
+        this.refs[collection].push(ref);
     }
 
     remove(collection, ref) {
-        const index = this.getIndex(collection, ref)
+        const index = this.getIndex(collection, ref);
 
         if (index !== -1) {
-            this.refs[collection].splice(index, 1)
+            this.refs[collection].splice(index, 1);
         }
     }
 
     isActive() {
-        return this.active
+        return this.active;
     }
 
     getActive() {
         return this.refs[this.active.collection].find(
             // eslint-disable-next-line eqeqeq
             ({ node }) => node.sortableInfo.index == this.active.index
-        )
+        );
     }
 
     getIndex(collection, ref) {
-        return this.refs[collection].indexOf(ref)
+        return this.refs[collection].indexOf(ref);
     }
 
     getOrderedRefs(collection = this.active.collection) {
-        return this.refs[collection].sort(sortByIndex)
+        return this.refs[collection].sort(sortByIndex);
     }
 }
 
@@ -50,5 +50,5 @@ function sortByIndex(
         },
     }
 ) {
-    return index1 - index2
+    return index1 - index2;
 }

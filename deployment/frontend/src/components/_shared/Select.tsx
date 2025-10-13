@@ -1,17 +1,17 @@
-import { Fragment, useState } from 'react'
-import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import classNames from '@/utils/classnames'
+import { Fragment, useState } from 'react';
+import { Listbox, Transition } from '@headlessui/react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import classNames from '@/utils/classnames';
 
 interface Option {
-    id: number
-    label: string
+    id: number;
+    label: string;
 }
 
 export default function Select({ options }: { options: Option[] }) {
     const [selected, setSelected] = useState(
         options[0] ? options[0] : { id: 0, label: '' }
-    )
+    );
 
     return (
         <Listbox value={selected} onChange={setSelected}>
@@ -73,5 +73,5 @@ export default function Select({ options }: { options: Option[] }) {
                 </>
             )}
         </Listbox>
-    )
+    );
 }

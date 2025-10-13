@@ -1,5 +1,5 @@
-import { join } from 'path'
-import { configDefaults, defineConfig } from 'vitest/config'
+import { join } from 'path';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
     test: {
@@ -10,4 +10,4 @@ export default defineConfig({
             '@/': join(__dirname, './src/'),
         },
     },
-})
+});

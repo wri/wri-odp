@@ -1,7 +1,7 @@
-import React from 'react'
-import DatasetHorizontalCard from '../search/DatasetHorizontalCard'
-import Pagination from '@/components/_shared/Pagination'
-import { type WriDataset } from '@/schema/ckan.schema'
+import React from 'react';
+import DatasetHorizontalCard from '../search/DatasetHorizontalCard';
+import Pagination from '@/components/_shared/Pagination';
+import { type WriDataset } from '@/schema/ckan.schema';
 
 export default function DatasetList({ datasets }: { datasets: WriDataset[] }) {
     return (
@@ -17,5 +17,5 @@ export default function DatasetList({ datasets }: { datasets: WriDataset[] }) {
             ))}
             <Pagination />
         </section>
-    )
+    );
 }

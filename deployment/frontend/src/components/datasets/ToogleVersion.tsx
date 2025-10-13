@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Switch } from '@headlessui/react'
-import { DefaultTooltip } from '../_shared/Tooltip'
-import classNames from '@/utils/classnames'
+import { useState } from 'react';
+import { Switch } from '@headlessui/react';
+import { DefaultTooltip } from '../_shared/Tooltip';
+import classNames from '@/utils/classnames';
 
 export default function ToggleVersion({
     enabled,
@@ -9,10 +9,10 @@ export default function ToggleVersion({
     approval_status,
     is_approved,
 }: {
-    enabled: boolean
-    approval_status: string
-    is_approved: boolean
-    setEnabled: (enabled: boolean) => void
+    enabled: boolean;
+    approval_status: string;
+    is_approved: boolean;
+    setEnabled: (enabled: boolean) => void;
 }) {
     return (
         <Switch.Group
@@ -57,5 +57,5 @@ export default function ToggleVersion({
                       } version`}
             </span>
         </Switch.Group>
-    )
+    );
 }

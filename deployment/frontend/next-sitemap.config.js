@@ -1,4 +1,4 @@
-console.log('[*] SITE_URL', process.env.NEXT_PUBLIC_NEXTAUTH_URL)
+console.log('[*] SITE_URL', process.env.NEXT_PUBLIC_NEXTAUTH_URL);
 
 module.exports = {
     siteUrl: process.env.NEXT_PUBLIC_NEXTAUTH_URL,
@@ -19,4 +19,4 @@ module.exports = {
             },
         ],
     },
-}
+};

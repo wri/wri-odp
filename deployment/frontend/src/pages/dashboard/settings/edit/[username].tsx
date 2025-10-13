@@ -1,27 +1,27 @@
-import React from 'react'
-import Header from '@/components/_shared/Header'
-import Layout from '@/components/dashboard/Layout'
-import Footer from '@/components/_shared/Footer'
-import { getServerAuthSession } from '../../../../server/auth'
+import React from 'react';
+import Header from '@/components/_shared/Header';
+import Layout from '@/components/dashboard/Layout';
+import Footer from '@/components/_shared/Footer';
+import { getServerAuthSession } from '../../../../server/auth';
 import {
     type GetServerSidePropsContext,
     type InferGetServerSidePropsType,
-} from 'next'
-import { NextSeo } from 'next-seo'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import UserForm from '@/components/dashboard/users/UserForm'
-import { type User } from '@portaljs/ckan'
-import { Tab } from '@headlessui/react'
-import { SettingsTabs } from '@/components/dashboard/users/SettingsTabs'
-import { ApiKeys } from '@/components/dashboard/users/ApiKeys'
+} from 'next';
+import { NextSeo } from 'next-seo';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import UserForm from '@/components/dashboard/users/UserForm';
+import { type User } from '@portaljs/ckan';
+import { Tab } from '@headlessui/react';
+import { SettingsTabs } from '@/components/dashboard/users/SettingsTabs';
+import { ApiKeys } from '@/components/dashboard/users/ApiKeys';
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ username: string }>
 ) {
-    const session = await getServerAuthSession(context)
-    const username = context.params?.username
-    const existSession = session!
+    const session = await getServerAuthSession(context);
+    const username = context.params?.username;
+    const existSession = session!;
     if (
         !session &&
         (username !== existSession?.user?.name || existSession?.user?.sysadmin)
@@ -31,7 +31,7 @@ export async function getServerSideProps(
                 destination: '/login',
                 permanent: false,
             },
-        }
+        };
     }
 
     return {
@@ -39,18 +39,18 @@ export async function getServerSideProps(
             session,
             username,
         },
-    }
+    };
 }
 
 export default function User(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const username = props.username!
-    const { data, isLoading } = api.user.getUser.useQuery(username)
-    const { data: apiTokens } = api.user.getUserApiTokens.useQuery()
+    const username = props.username!;
+    const { data, isLoading } = api.user.getUser.useQuery(username);
+    const { data: apiTokens } = api.user.getUserApiTokens.useQuery();
 
     if (isLoading) {
-        return <Spinner />
+        return <Spinner />;
     }
 
     return (
@@ -80,5 +80,5 @@ export default function User(
                 style="mt-0"
             />
         </>
-    )
+    );
 }

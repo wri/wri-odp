@@ -33,7 +33,8 @@ const config = {
                 checksVoidReturn: false,
             },
         ],
+        semi: ['error', 'always'],
     },
-}
+};
 
-module.exports = config
+module.exports = config;

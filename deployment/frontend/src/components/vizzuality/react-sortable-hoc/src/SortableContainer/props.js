@@ -1,10 +1,10 @@
 // @ts-nocheck
-import PropTypes from 'prop-types'
-import invariant from 'invariant'
+import PropTypes from 'prop-types';
+import invariant from 'invariant';
 
-import { KEYCODE } from '../utils'
-import defaultGetHelperDimensions from './defaultGetHelperDimensions'
-import defaultShouldCancelStart from './defaultShouldCancelStart'
+import { KEYCODE } from '../utils';
+import defaultGetHelperDimensions from './defaultGetHelperDimensions';
+import defaultShouldCancelStart from './defaultShouldCancelStart';
 
 export const propTypes = {
     axis: PropTypes.oneOf(['x', 'y', 'xy']),
@@ -49,7 +49,7 @@ export const propTypes = {
     updateBeforeSortStart: PropTypes.func,
     useDragHandle: PropTypes.bool,
     useWindowAsScrollContainer: PropTypes.bool,
-}
+};
 
 export const defaultKeyCodes = {
     lift: [KEYCODE.SPACE],
@@ -57,7 +57,7 @@ export const defaultKeyCodes = {
     cancel: [KEYCODE.ESC],
     up: [KEYCODE.UP, KEYCODE.LEFT],
     down: [KEYCODE.DOWN, KEYCODE.RIGHT],
-}
+};
 
 export const defaultProps = {
     axis: 'y',
@@ -73,13 +73,13 @@ export const defaultProps = {
     shouldCancelStart: defaultShouldCancelStart,
     transitionDuration: 300,
     useWindowAsScrollContainer: false,
-}
+};
 
-export const omittedProps = Object.keys(propTypes)
+export const omittedProps = Object.keys(propTypes);
 
 export function validateProps(props) {
     invariant(
         !(props.distance && props.pressDelay),
         'Attempted to set both `pressDelay` and `distance` on SortableContainer, you may only use one or the other, not both at the same time.'
-    )
+    );
 }

@@ -1,27 +1,27 @@
-import { type Session } from 'next-auth'
-import { SessionProvider } from 'next-auth/react'
-import { type AppProps, type AppType } from 'next/app'
-import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
-import { Provider, useCreateStore } from '@/utils/store'
-import { useState, useEffect } from 'react'
+import { type Session } from 'next-auth';
+import { SessionProvider } from 'next-auth/react';
+import { type AppProps, type AppType } from 'next/app';
+import { Hydrate, QueryClient, QueryClientProvider } from 'react-query';
+import { Provider, useCreateStore } from '@/utils/store';
+import { useState, useEffect } from 'react';
 
-import 'react-toastify/dist/ReactToastify.css'
-import 'mapbox-gl/dist/mapbox-gl.css'
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css'
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import '@/styles/highlight.css'
-import localFont from 'next/font/local'
+import 'react-toastify/dist/ReactToastify.css';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+import '@/styles/highlight.css';
+import localFont from 'next/font/local';
 
-import { api } from '@/utils/api'
+import { api } from '@/utils/api';
 
-import '@/styles/globals.scss'
-import '@/styles/rte.scss'
-import ReactToastContainer from '@/components/_shared/ReactToastContainer'
-import { DefaultSeo } from 'next-seo'
-import { type LayerState } from '@/interfaces/state.interface'
-import { env } from '@/env.mjs'
-import NProgress from 'nprogress'
-import Router from 'next/router'
+import '@/styles/globals.scss';
+import '@/styles/rte.scss';
+import ReactToastContainer from '@/components/_shared/ReactToastContainer';
+import { DefaultSeo } from 'next-seo';
+import { type LayerState } from '@/interfaces/state.interface';
+import { env } from '@/env.mjs';
+import NProgress from 'nprogress';
+import Router from 'next/router';
 
 const acumin = localFont({
     src: [
@@ -47,55 +47,55 @@ const acumin = localFont({
         },
     ],
     variable: '--font-acumin',
-})
+});
 
 const MyApp: AppType<{ session: Session | null }> = ({
     Component,
     pageProps: { session, ...pageProps },
 }: AppProps) => {
-    const [queryClient] = useState(() => new QueryClient())
-    const { initialZustandState } = pageProps
-    let { dataset, prevdataset } = pageProps
+    const [queryClient] = useState(() => new QueryClient());
+    const { initialZustandState } = pageProps;
+    let { dataset, prevdataset } = pageProps;
 
     useEffect(() => {
-        const handleRouteStart = () => NProgress.start()
-        const handleRouteDone = () => NProgress.done()
+        const handleRouteStart = () => NProgress.start();
+        const handleRouteDone = () => NProgress.done();
 
-        Router.events.on('routeChangeStart', handleRouteStart)
-        Router.events.on('routeChangeComplete', handleRouteDone)
-        Router.events.on('routeChangeError', handleRouteDone)
+        Router.events.on('routeChangeStart', handleRouteStart);
+        Router.events.on('routeChangeComplete', handleRouteDone);
+        Router.events.on('routeChangeError', handleRouteDone);
 
         return () => {
-            Router.events.off('routeChangeStart', handleRouteStart)
-            Router.events.off('routeChangeComplete', handleRouteDone)
-            Router.events.off('routeChangeError', handleRouteDone)
-        }
-    }, [])
+            Router.events.off('routeChangeStart', handleRouteStart);
+            Router.events.off('routeChangeComplete', handleRouteDone);
+            Router.events.off('routeChangeError', handleRouteDone);
+        };
+    }, []);
 
     if (typeof prevdataset == 'string') {
-        prevdataset = JSON.parse(prevdataset)
+        prevdataset = JSON.parse(prevdataset);
     }
     if (typeof dataset == 'string') {
-        dataset = JSON.parse(dataset)
+        dataset = JSON.parse(dataset);
     }
     if (typeof initialZustandState?.dataset == 'string') {
-        initialZustandState.dataset = JSON.parse(initialZustandState.dataset)
+        initialZustandState.dataset = JSON.parse(initialZustandState.dataset);
     }
 
-    const newLayersState = new Map()
+    const newLayersState = new Map();
     if (initialZustandState?.mapView?.layersParsed) {
         initialZustandState.mapView?.layersParsed?.forEach(
             (layer: [string, LayerState]) => {
-                newLayersState.set(layer[0], layer[1])
+                newLayersState.set(layer[0], layer[1]);
             }
-        )
+        );
     }
 
     const activeLayerGroups =
-        initialZustandState?.mapView?.activeLayerGroups || []
+        initialZustandState?.mapView?.activeLayerGroups || [];
 
-    const layerAsLayerObj = new Map()
-    const tempLayerAsLayerobj = new Map()
+    const layerAsLayerObj = new Map();
+    const tempLayerAsLayerobj = new Map();
 
     if (dataset) {
         for (const resource of dataset?.resources) {
@@ -104,16 +104,16 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     (resource.layerObj || resource.layerObjRaw) &&
                     (resource.rw_id == '' || !resource.rw_id)
                 ) {
-                    layerAsLayerObj.set(resource.id, 'pending')
+                    layerAsLayerObj.set(resource.id, 'pending');
                 } else {
-                    layerAsLayerObj.set(resource.rw_id, 'approved')
+                    layerAsLayerObj.set(resource.rw_id, 'approved');
                 }
             }
         }
     }
 
     if (initialZustandState?.relatedDatasets?.length) {
-        const datasets = initialZustandState?.relatedDatasets
+        const datasets = initialZustandState?.relatedDatasets;
         for (const dataset of datasets) {
             for (const resource of dataset?.resources) {
                 if (resource.format == 'Layer') {
@@ -121,9 +121,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
                         (resource.layerObj || resource.layerObjRaw) &&
                         (resource.rw_id == '' || !resource.rw_id)
                     ) {
-                        layerAsLayerObj.set(resource.rw_id, 'pending')
+                        layerAsLayerObj.set(resource.rw_id, 'pending');
                     } else {
-                        layerAsLayerObj.set(resource.rw_id, 'approved')
+                        layerAsLayerObj.set(resource.rw_id, 'approved');
                     }
                 }
             }
@@ -131,7 +131,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     }
 
     if (initialZustandState?.prevRelatedDatasets?.length) {
-        const datasets = initialZustandState?.prevRelatedDatasets
+        const datasets = initialZustandState?.prevRelatedDatasets;
         for (const dataset of datasets) {
             for (const resource of dataset?.resources) {
                 if (resource.format == 'Layer') {
@@ -139,9 +139,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
                         (resource.layerObj || resource.layerObjRaw) &&
                         (resource.rw_id == '' || !resource.rw_id)
                     ) {
-                        tempLayerAsLayerobj.set(resource.rw_id, 'pending')
+                        tempLayerAsLayerobj.set(resource.rw_id, 'pending');
                     } else {
-                        tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                        tempLayerAsLayerobj.set(resource.rw_id, 'approved');
                     }
                 }
             }
@@ -155,9 +155,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     (resource.layerObj || resource.layerObjRaw) &&
                     (resource.rw_id == '' || !resource.rw_id)
                 ) {
-                    tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')
+                    tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset');
                 } else {
-                    tempLayerAsLayerobj.set(resource.rw_id, 'approved')
+                    tempLayerAsLayerobj.set(resource.rw_id, 'approved');
                 }
             }
         }
@@ -182,7 +182,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 zoom: initialZustandState?.mapView?.viewState?.zoom ?? 3,
             },
         },
-    })
+    });
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -228,7 +228,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                 </Provider>
             </Hydrate>
         </QueryClientProvider>
-    )
-}
+    );
+};
 
-export default api.withTRPC(MyApp)
+export default api.withTRPC(MyApp);

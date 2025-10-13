@@ -1,24 +1,24 @@
-import { Navigation } from 'swiper/modules'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-import CarouselNavButton from '../_shared/CarouselNavButton'
-import Image from 'next/image'
-import { AutoCarousel } from '../_shared/AutoCarousel'
-import Link from 'next/link'
-import { api } from '@/utils/api'
-import { ErrorAlert } from '../_shared/Alerts'
-import Spinner from '../_shared/Spinner'
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import CarouselNavButton from '../_shared/CarouselNavButton';
+import Image from 'next/image';
+import { AutoCarousel } from '../_shared/AutoCarousel';
+import Link from 'next/link';
+import { api } from '@/utils/api';
+import { ErrorAlert } from '../_shared/Alerts';
+import Spinner from '../_shared/Spinner';
 import {
     type Application,
     GroupTree,
     GroupsmDetails,
-} from '@/schema/ckan.schema'
-import { Group } from '@portaljs/ckan'
+} from '@/schema/ckan.schema';
+import { Group } from '@portaljs/ckan';
 
 export function ApplicationCard({ application }: { application: Application }) {
-    const datasetCount = application.package_count
+    const datasetCount = application.package_count;
     return (
         <Link
             href={`/applications/${application.name}`}
@@ -45,12 +45,12 @@ export function ApplicationCard({ application }: { application: Application }) {
                     : `${datasetCount} Dataset`}
             </p>
         </Link>
-    )
+    );
 }
 
 export function ApplicationsCarousel() {
     const { data, isLoading, error } =
-        api.applications.getAllApplications.useQuery()
+        api.applications.getAllApplications.useQuery();
     return (
         <div className="relative">
             <div className="peer">
@@ -74,8 +74,8 @@ export function ApplicationsCarousel() {
 
                     {data
                         ?.filter((application) => {
-                            const datasetCount = application.package_count
-                            return datasetCount > 0
+                            const datasetCount = application.package_count;
+                            return datasetCount > 0;
                         })
                         .map((application, index) => (
                             <SwiperSlide key={index} className="">
@@ -89,7 +89,7 @@ export function ApplicationsCarousel() {
                 </AutoCarousel>
             </div>
         </div>
-    )
+    );
 }
 
 const PrevButton = () => (
@@ -98,7 +98,7 @@ const PrevButton = () => (
     >
         <CarouselNavButton orientation="left" />
     </div>
-)
+);
 
 const NextButton = () => (
     <div
@@ -106,4 +106,4 @@ const NextButton = () => (
     >
         <CarouselNavButton orientation="right" />
     </div>
-)
+);

@@ -1,10 +1,10 @@
-import Link from 'next/link'
-import { HttpMethodChip } from './HttpMethodChip'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { Button } from '@/components/_shared/Button'
-import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { useState } from 'react'
+import Link from 'next/link';
+import { HttpMethodChip } from './HttpMethodChip';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { Button } from '@/components/_shared/Button';
+import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { useState } from 'react';
 
 export const QueryEndpoint = ({
     description,
@@ -15,13 +15,13 @@ export const QueryEndpoint = ({
     headers = {},
     copyButton,
 }: {
-    description?: string
-    url: string
-    method?: string
-    body?: string
-    lang?: string
-    headers?: Record<string, string>
-    copyButton?: React.ReactNode
+    description?: string;
+    url: string;
+    method?: string;
+    body?: string;
+    lang?: string;
+    headers?: Record<string, string>;
+    copyButton?: React.ReactNode;
 }) => {
     return (
         <div className="mb-10 pr-5">
@@ -76,17 +76,17 @@ export const QueryEndpoint = ({
                 </div>
             )}
         </div>
-    )
-}
+    );
+};
 
 export const SnippetEndpoint = ({
     description,
     snippet,
     language,
 }: {
-    description: string
-    snippet: string
-    language: 'javascript' | 'python' | 'r'
+    description: string;
+    snippet: string;
+    language: 'javascript' | 'python' | 'r';
 }) => {
     return (
         <div className="mb-10 pr-5">
@@ -104,8 +104,8 @@ export const SnippetEndpoint = ({
                 </div>
             )}
         </div>
-    )
-}
+    );
+};
 
 const CopyButton = ({ content }: { content: string }) => {
     return (
@@ -114,14 +114,14 @@ const CopyButton = ({ content }: { content: string }) => {
                 aria-label="copy button"
                 className=" h-auto rounded-full p-2"
                 onClick={() => {
-                    navigator.clipboard.writeText(content)
+                    navigator.clipboard.writeText(content);
                 }}
             >
                 <DocumentDuplicateIcon className="w-3 text-white" />
             </Button>
         </DefaultTooltip>
-    )
-}
+    );
+};
 
 export const getJsSnippet = (
     url: string,
@@ -145,8 +145,8 @@ export const getJsSnippet = (
 const data = await response.json();
 
 console.log(data);
-`
-}
+`;
+};
 
 export const getPythonSnippet = (
     url: string,
@@ -171,8 +171,8 @@ response = requests.request(
 data = response.json()
 
 print(data)
-`
-}
+`;
+};
 
 export const getRSnippet = (
     url: string,
@@ -197,8 +197,8 @@ response <- httr::VERB(
 data <- httr::content(response, "parsed")
 
 print(data)
-`
-}
+`;
+};
 
 export const CkanApiMoreInfo = () => {
     return (
@@ -217,8 +217,8 @@ export const CkanApiMoreInfo = () => {
                 .
             </p>
         </div>
-    )
-}
+    );
+};
 
 export const RwMoreInfo = () => {
     return (
@@ -237,5 +237,5 @@ export const RwMoreInfo = () => {
                 .
             </p>
         </div>
-    )
-}
+    );
+};

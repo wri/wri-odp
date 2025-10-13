@@ -2,29 +2,29 @@ import {
     FolderPlusIcon,
     InformationCircleIcon,
     MinusCircleIcon,
-} from '@heroicons/react/24/outline'
-import { Disclosure } from '@headlessui/react'
-import { Input } from '@/components/_shared/SimpleInput'
-import { InputGroup } from '@/components/_shared/InputGroup'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { MetadataAccordion } from './MetadataAccordion'
-import { type DatasetFormType } from '@/schema/dataset.schema'
+} from '@heroicons/react/24/outline';
+import { Disclosure } from '@headlessui/react';
+import { Input } from '@/components/_shared/SimpleInput';
+import { InputGroup } from '@/components/_shared/InputGroup';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { MetadataAccordion } from './MetadataAccordion';
+import { type DatasetFormType } from '@/schema/dataset.schema';
 import {
     type UseFieldArrayRemove,
     type UseFormRegister,
     type UseFormReturn,
     useFieldArray,
-} from 'react-hook-form'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
+} from 'react-hook-form';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 function CustomField({
     register,
     index,
     remove,
 }: {
-    register: UseFormRegister<DatasetFormType>
-    index: number
-    remove: UseFieldArrayRemove
+    register: UseFormRegister<DatasetFormType>;
+    index: number;
+    remove: UseFieldArrayRemove;
 }) {
     return (
         <div className="flex items-center gap-x-2">
@@ -51,19 +51,19 @@ function CustomField({
                 />
             </DefaultTooltip>
         </div>
-    )
+    );
 }
 
 export function CustomFieldsForm({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { control, register } = formObj
+    const { control, register } = formObj;
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'extras',
-    })
+    });
     return (
         <MetadataAccordion
             label={
@@ -107,5 +107,5 @@ export function CustomFieldsForm({
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>
-    )
+    );
 }

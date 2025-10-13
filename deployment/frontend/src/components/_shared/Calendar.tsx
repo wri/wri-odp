@@ -1,22 +1,22 @@
-import * as React from 'react'
-import { buttonVariants } from '@/components/_shared/Button'
-import { ScrollArea } from '@/components/_shared/ScrollArea'
-import { cn } from '@/utils/classnames'
-import { DayPicker, type DropdownProps } from 'react-day-picker'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import * as React from 'react';
+import { buttonVariants } from '@/components/_shared/Button';
+import { ScrollArea } from '@/components/_shared/ScrollArea';
+import { cn } from '@/utils/classnames';
+import { DayPicker, type DropdownProps } from 'react-day-picker';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import {
     CaretSortIcon,
     CheckIcon,
     ChevronDownIcon,
     ChevronUpIcon,
-} from '@radix-ui/react-icons'
-import * as SelectPrimitive from '@radix-ui/react-select'
+} from '@radix-ui/react-icons';
+import * as SelectPrimitive from '@radix-ui/react-select';
 
-const Select = SelectPrimitive.Root
+const Select = SelectPrimitive.Root;
 
-const SelectGroup = SelectPrimitive.Group
+const SelectGroup = SelectPrimitive.Group;
 
-const SelectValue = SelectPrimitive.Value
+const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.Trigger>,
@@ -35,8 +35,8 @@ const SelectTrigger = React.forwardRef<
             <CaretSortIcon className="h-4 w-4 opacity-50" />
         </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
-))
-SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
+));
+SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
 const SelectScrollUpButton = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
@@ -52,8 +52,8 @@ const SelectScrollUpButton = React.forwardRef<
     >
         <ChevronUpIcon />
     </SelectPrimitive.ScrollUpButton>
-))
-SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
+));
+SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
 
 const SelectScrollDownButton = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
@@ -69,9 +69,9 @@ const SelectScrollDownButton = React.forwardRef<
     >
         <ChevronDownIcon />
     </SelectPrimitive.ScrollDownButton>
-))
+));
 SelectScrollDownButton.displayName =
-    SelectPrimitive.ScrollDownButton.displayName
+    SelectPrimitive.ScrollDownButton.displayName;
 
 const SelectContent = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.Content>,
@@ -102,8 +102,8 @@ const SelectContent = React.forwardRef<
             <SelectScrollDownButton />
         </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
-))
-SelectContent.displayName = SelectPrimitive.Content.displayName
+));
+SelectContent.displayName = SelectPrimitive.Content.displayName;
 
 const SelectLabel = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.Label>,
@@ -114,8 +114,8 @@ const SelectLabel = React.forwardRef<
         className={cn('px-2 py-1.5 text-sm font-semibold', className)}
         {...props}
     />
-))
-SelectLabel.displayName = SelectPrimitive.Label.displayName
+));
+SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
 const SelectItem = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.Item>,
@@ -136,8 +136,8 @@ const SelectItem = React.forwardRef<
         </span>
         <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
-))
-SelectItem.displayName = SelectPrimitive.Item.displayName
+));
+SelectItem.displayName = SelectPrimitive.Item.displayName;
 
 const SelectSeparator = React.forwardRef<
     React.ElementRef<typeof SelectPrimitive.Separator>,
@@ -148,10 +148,10 @@ const SelectSeparator = React.forwardRef<
         className={cn('-mx-1 my-1 h-px bg-muted', className)}
         {...props}
     />
-))
-SelectSeparator.displayName = SelectPrimitive.Separator.displayName
+));
+SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
-type CalendarProps = React.ComponentProps<typeof DayPicker>
+type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 function Calendar({
     className,
@@ -207,21 +207,21 @@ function Calendar({
                         children
                     ) as React.ReactElement<
                         React.HTMLProps<HTMLOptionElement>
-                    >[]
+                    >[];
                     const selected = options.find(
                         (child) => child.props.value === value
-                    )
+                    );
                     const handleChange = (value: string) => {
                         const changeEvent = {
                             target: { value },
-                        } as React.ChangeEvent<HTMLSelectElement>
-                        onChange?.(changeEvent)
-                    }
+                        } as React.ChangeEvent<HTMLSelectElement>;
+                        onChange?.(changeEvent);
+                    };
                     return (
                         <Select
                             value={value?.toString()}
                             onValueChange={(value: any) => {
-                                handleChange(value)
+                                handleChange(value);
                             }}
                         >
                             <SelectTrigger className="pr-1.5 focus:ring-0">
@@ -245,7 +245,7 @@ function Calendar({
                                 </ScrollArea>
                             </SelectContent>
                         </Select>
-                    )
+                    );
                 },
                 IconLeft: ({ ...props }) => (
                     <ChevronLeftIcon className="h-5 w-5 text-white" />
@@ -256,8 +256,8 @@ function Calendar({
             }}
             {...props}
         />
-    )
+    );
 }
-Calendar.displayName = 'Calendar'
+Calendar.displayName = 'Calendar';
 
-export { Calendar }
+export { Calendar };

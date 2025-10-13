@@ -1,45 +1,45 @@
-import React, { useState } from 'react'
-import SearchHeader from '../_shared/SearchHeader'
-import RowProfile from '../_shared/RowProfile'
-import Row from '../_shared/Row'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
-import type { IRowProfile } from '../_shared/RowProfile'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import type { SearchInput } from '@/schema/search.schema'
-import Pagination from '../_shared/Pagination'
-import notify from '@/utils/notify'
-import dynamic from 'next/dynamic'
+import React, { useState } from 'react';
+import SearchHeader from '../_shared/SearchHeader';
+import RowProfile from '../_shared/RowProfile';
+import Row from '../_shared/Row';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import type { IRowProfile } from '../_shared/RowProfile';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import type { SearchInput } from '@/schema/search.schema';
+import Pagination from '../_shared/Pagination';
+import notify from '@/utils/notify';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import { useQuery } from 'react-query'
-import { useRouter } from 'next/router'
+});
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import { useQuery } from 'react-query';
+import { useRouter } from 'next/router';
 
 type IUser = {
-    title?: string
-    id: string
-    description?: string
-    email_hash?: string
-    orgnumber?: number
-    image_display_url?: string
+    title?: string;
+    id: string;
+    description?: string;
+    email_hash?: string;
+    orgnumber?: number;
+    image_display_url?: string;
     orgs?: {
-        title?: string
-        capacity?: string
-        image_display_url?: string
-        name?: string
-        userCapacity?: string
-    }[]
-}
+        title?: string;
+        capacity?: string;
+        image_display_url?: string;
+        name?: string;
+        userCapacity?: string;
+    }[];
+};
 
 function TeamProfile({ user }: { user: IRowProfile | IUser }) {
-    const UserProfile = user as IUser
+    const UserProfile = user as IUser;
     user.image_display_url = user?.image_display_url!
         ? user?.image_display_url
-        : `https://gravatar.com/avatar/${(user as IUser)?.email_hash}?s=270&d=identicon`
+        : `https://gravatar.com/avatar/${(user as IUser)?.email_hash}?s=270&d=identicon`;
     return (
         <div className="flex flex-col sm:flex-row py-3 pl-4 sm:pl-8 gap-x-14 gap-y-6">
             <RowProfile
@@ -53,36 +53,36 @@ function TeamProfile({ user }: { user: IRowProfile | IUser }) {
                     : 'No Teams'}
             </div>
         </div>
-    )
+    );
 }
 
 function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
-    const utils = api.useUtils()
-    const [open, setOpen] = useState(false)
+    const utils = api.useUtils();
+    const [open, setOpen] = useState(false);
     const [selectedTeam, setSelectedTeam] = useState<{ name?: string } | null>(
         null
-    )
+    );
     const removeMember = api.user.deleteMember.useMutation({
         onSuccess: async (data) => {
             await utils.user.getAllUsers.invalidate({
                 search: '',
                 page: { start: 0, rows: 100 },
-            })
-            setOpen(false)
+            });
+            setOpen(false);
             notify(
                 `Successfully deleted user from ${selectedTeam?.name} Team`,
                 'error'
-            )
+            );
         },
-    })
+    });
 
     const handleOpenModal = (team: { name?: string }) => {
-        setSelectedTeam(team)
-        setOpen(true)
-    }
+        setSelectedTeam(team);
+        setOpen(true);
+    };
 
-    const UserProfile = user as IUser
-    if (UserProfile?.orgnumber === 0) return <></>
+    const UserProfile = user as IUser;
+    if (UserProfile?.orgnumber === 0) return <></>;
 
     return (
         <div className="flex flex-col pt-2">
@@ -139,7 +139,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
                             ]}
                         />
                     </div>
-                )
+                );
             })}
 
             {selectedTeam && (
@@ -193,65 +193,65 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
                 </Modal>
             )}
         </div>
-    )
+    );
 }
 
 export default function UserCard({ username }: { username: string }) {
     const [query, setQuery] = useState<SearchInput>({
         search: username ?? '',
         page: { start: 0, rows: 10 },
-    })
+    });
     const { data, isLoading, refetch } = api.user.getAllUsers.useQuery({
         search: '',
         page: { start: 0, rows: 100 },
-    })
-    const [open, setOpen] = useState(false)
-    const router = useRouter()
-    const [selectedUser, setSelectedUser] = useState<IUser | null>(null)
+    });
+    const [open, setOpen] = useState(false);
+    const router = useRouter();
+    const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
     const datasetUser = api.user.deleteUser.useMutation({
         onSuccess: async (data) => {
-            await refetch()
-            setOpen(false)
+            await refetch();
+            setOpen(false);
             notify(
                 `Successfully deleted the ${selectedUser?.title} user`,
                 'error'
-            )
+            );
         },
-    })
+    });
 
     const processedData = useQuery(
         ['processedUser', data, query],
         () => {
-            if (!data) return { users: [], count: 0 }
-            const searchTerm = query.search.toLowerCase()
-            const users = data.users
-            let filteredData = users
+            if (!data) return { users: [], count: 0 };
+            const searchTerm = query.search.toLowerCase();
+            const users = data.users;
+            let filteredData = users;
             if (searchTerm) {
                 filteredData = users
                     .filter((user) =>
                         user.title?.toLowerCase().includes(searchTerm)
                     )
                     .sort((a, b) => {
-                        const titleA = a.title?.toLowerCase() || ''
-                        const titleB = b.title?.toLowerCase() || ''
+                        const titleA = a.title?.toLowerCase() || '';
+                        const titleB = b.title?.toLowerCase() || '';
 
-                        return titleA.localeCompare(titleB)
-                    })
+                        return titleA.localeCompare(titleB);
+                    });
             }
-            const start = query.page.start
-            const rows = query.page.rows
-            const slicedData = filteredData.slice(start, start + rows)
-            return { users: slicedData, count: filteredData.length }
+            const start = query.page.start;
+            const rows = query.page.rows;
+            const slicedData = filteredData.slice(start, start + rows);
+            return { users: slicedData, count: filteredData.length };
         },
         {
             enabled: !!data, // Only run the query when data is available
         }
-    )
+    );
 
     const handleOpenModal = (user: IUser) => {
-        setSelectedUser(user)
-        setOpen(true)
-    }
+        setSelectedUser(user);
+        setOpen(true);
+    };
 
     return (
         <section className="w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0">
@@ -299,7 +299,7 @@ export default function UserCard({ username }: { username: string }) {
                                             onClick: async () => {
                                                 router.push(
                                                     `/dashboard/settings/edit/${user.title}`
-                                                )
+                                                );
                                             },
                                         },
                                         {
@@ -320,7 +320,7 @@ export default function UserCard({ username }: { username: string }) {
                                     isDropDown
                                 />
                             </div>
-                        )
+                        );
                     })
                 )}
 
@@ -375,5 +375,5 @@ export default function UserCard({ username }: { username: string }) {
                 )}
             </div>
         </section>
-    )
+    );
 }

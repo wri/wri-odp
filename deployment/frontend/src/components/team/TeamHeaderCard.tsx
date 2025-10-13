@@ -1,86 +1,86 @@
-import React, { useState } from 'react'
-import Image from 'next/image'
-import { ChevronLeftIcon } from '@heroicons/react/20/solid'
-import { Button } from '../_shared/Button'
-import { PencilSquareIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
-import { useSession } from 'next-auth/react'
-import { api } from '@/utils/api'
-import Spinner from '../_shared/Spinner'
-import EditCard from './EditCard'
-import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
-import { useEffect } from 'react'
-import { type WriUser } from '@/schema/ckan.schema'
-import Chip from '../_shared/Chip'
-import { visibilityTypeLabels } from '@/utils/constants'
+import React, { useState } from 'react';
+import Image from 'next/image';
+import { ChevronLeftIcon } from '@heroicons/react/20/solid';
+import { Button } from '../_shared/Button';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
+import { useSession } from 'next-auth/react';
+import { api } from '@/utils/api';
+import Spinner from '../_shared/Spinner';
+import EditCard from './EditCard';
+import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
+import { useEffect } from 'react';
+import { type WriUser } from '@/schema/ckan.schema';
+import Chip from '../_shared/Chip';
+import { visibilityTypeLabels } from '@/utils/constants';
 
 async function getCascadingUserCapacity(
     utils: ReturnType<typeof api.useUtils>,
     orgId: string,
     username: string
 ): Promise<string | undefined> {
-    let currentId = orgId
+    let currentId = orgId;
 
     while (currentId) {
-        const data = await utils.teams.getTeam.fetch({ id: currentId })
-        const user = data.users?.find((u) => u.name === username)
-        if (user?.capacity) return user.capacity
-        currentId = data.parent ?? ''
+        const data = await utils.teams.getTeam.fetch({ id: currentId });
+        const user = data.users?.find((u) => u.name === username);
+        if (user?.capacity) return user.capacity;
+        currentId = data.parent ?? '';
     }
 
-    return undefined
+    return undefined;
 }
 
 export default function TeamHeaderCard({
     teams,
     teamsDetails,
 }: {
-    teams?: GroupTree[]
-    teamsDetails: Record<string, GroupsmDetails>
+    teams?: GroupTree[];
+    teamsDetails: Record<string, GroupsmDetails>;
 }) {
-    const { data: session } = useSession()
+    const { data: session } = useSession();
 
-    teams = teams!
-    const team = teams[0]!
-    const authorized = session && session.user?.sysadmin ? true : false
-    const enableQuery = session && !authorized
+    teams = teams!;
+    const team = teams[0]!;
+    const authorized = session && session.user?.sysadmin ? true : false;
+    const enableQuery = session && !authorized;
     const orgdetails = api.teams.getTeam.useQuery(
         { id: team.id },
         {
             enabled: !!enableQuery,
         }
-    )
+    );
 
     const [currentUserCapacity, setCurrentUserCapacity] = useState<
         string | undefined
-    >(undefined)
-    const utils = api.useUtils()
+    >(undefined);
+    const utils = api.useUtils();
 
     useEffect(() => {
-        if (!session?.user?.name || !team?.id || currentUserCapacity) return
+        if (!session?.user?.name || !team?.id || currentUserCapacity) return;
 
         const fallback = async () => {
             const localRole = orgdetails.data?.users?.find(
                 (u: WriUser) => u.name === session.user.name
-            )?.capacity
+            )?.capacity;
             const next =
                 localRole ||
                 (await getCascadingUserCapacity(
                     utils,
                     team.id,
                     session.user.name!
-                ))
+                ));
 
             if (next) {
-                setCurrentUserCapacity(next)
+                setCurrentUserCapacity(next);
             }
-        }
+        };
 
-        fallback().catch(console.error)
-    }, [session?.user?.name, team?.id, orgdetails.data])
+        fallback().catch(console.error);
+    }, [session?.user?.name, team?.id, orgdetails.data]);
 
-    const canEdit = currentUserCapacity === 'admin'
+    const canEdit = currentUserCapacity === 'admin';
 
     return (
         <section id="team-header-card" className="flex flex-col">
@@ -185,11 +185,11 @@ export default function TeamHeaderCard({
                 </div>
             </div>
         </section>
-    )
+    );
 }
 
 function CopyLink() {
-    const [clicked, setClicked] = useState(false)
+    const [clicked, setClicked] = useState(false);
     return (
         <>
             {!clicked ? (
@@ -197,11 +197,11 @@ function CopyLink() {
                     onClick={async () => {
                         await navigator.clipboard.writeText(
                             window.location.href
-                        )
-                        setClicked(!clicked)
+                        );
+                        setClicked(!clicked);
                         setTimeout(() => {
-                            setClicked(false)
-                        }, 3000)
+                            setClicked(false);
+                        }, 3000);
                     }}
                     variant="default"
                     className="mr-auto mt-3"
@@ -226,5 +226,5 @@ function CopyLink() {
                 </button>
             )}
         </>
-    )
+    );
 }

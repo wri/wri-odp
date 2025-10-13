@@ -1,16 +1,16 @@
-import React, { useState } from 'react'
-import TableHeader from '../_shared/TableHeader'
-import SelectFilter from '../_shared/SelectFilter'
-import { api } from '@/utils/api'
-import type { SearchInput } from '@/schema/search.schema'
-import { getKeyValues2, getKeyValues } from '@/utils/general'
+import React, { useState } from 'react';
+import TableHeader from '../_shared/TableHeader';
+import SelectFilter from '../_shared/SelectFilter';
+import { api } from '@/utils/api';
+import type { SearchInput } from '@/schema/search.schema';
+import { getKeyValues2, getKeyValues } from '@/utils/general';
 import type {
     ActivityDisplay,
     WriDataset,
     WriOrganization,
-} from '@/schema/ckan.schema'
-import { type Group } from '@portaljs/ckan'
-import Topic from '@/interfaces/topic.interface'
+} from '@/schema/ckan.schema';
+import { type Group } from '@portaljs/ckan';
+import Topic from '@/interfaces/topic.interface';
 
 function LeftNode({
     setQuery,
@@ -18,28 +18,28 @@ function LeftNode({
     setServerQuery,
     serverQuery,
 }: {
-    setServerQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    serverQuery: SearchInput
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
+    setServerQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    serverQuery: SearchInput;
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
 }) {
     const [selectEntity, setSelectEntity] = useState<SearchInput>({
         search: '',
         fq: {},
         page: { start: 0, rows: 10 },
-    })
+    });
     const { data: activity, isLoading: isLoadingActivity } =
         api.dashboardActivity.listActivityStreamDashboard.useQuery({
             search: '',
             fq: {},
             page: { start: 0, rows: 1000 },
-        })
+        });
     const { data: organization, isLoading: isLoadingOrganization } =
-        api.organization.getAllOrganizations.useQuery()
+        api.organization.getAllOrganizations.useQuery();
     const { data: dataset, isLoading: isLoadingDataset } =
-        api.dataset.getFavoriteDataset.useQuery()
+        api.dataset.getFavoriteDataset.useQuery();
     const { data: group, isLoading: isLoadingGroup } =
-        api.topics.getAllTopics.useQuery()
+        api.topics.getAllTopics.useQuery();
 
     if (isLoadingActivity || isLoadingOrganization || isLoadingGroup)
         return (
@@ -80,7 +80,7 @@ function LeftNode({
                     query={query}
                 />
             </div>
-        )
+        );
 
     return (
         <div className="flex w-full gap-x-4 pl-6 pr-2 sm:pr-0 pt-2 sm:pt-0 flex-col gap-y-2 sm:flex-row sm:gap-y-0">
@@ -161,7 +161,7 @@ function LeftNode({
                 query={query}
             />
         </div>
-    )
+    );
 }
 
 export default function ActivitystreamHeader({
@@ -171,11 +171,11 @@ export default function ActivitystreamHeader({
     serverQuery,
     Pagination,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
-    setServerQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    serverQuery: SearchInput
-    Pagination?: React.ReactNode
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
+    setServerQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    serverQuery: SearchInput;
+    Pagination?: React.ReactNode;
 }) {
     return (
         <TableHeader
@@ -190,5 +190,5 @@ export default function ActivitystreamHeader({
             rightStyle="sm:mt-4"
             Pagination={Pagination}
         />
-    )
+    );
 }

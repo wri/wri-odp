@@ -1,11 +1,11 @@
-import { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Fragment, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 import {
     ExclamationTriangleIcon,
     XCircleIcon,
     XMarkIcon,
-} from '@heroicons/react/24/outline'
-import classNames from '@/utils/classnames'
+} from '@heroicons/react/24/outline';
+import classNames from '@/utils/classnames';
 
 export default function Modal({
     open,
@@ -13,10 +13,10 @@ export default function Modal({
     children,
     className = '',
 }: {
-    open: boolean
-    setOpen: (open: boolean) => void
-    children: React.ReactNode
-    className?: string
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    children: React.ReactNode;
+    className?: string;
 }) {
     return (
         <Transition.Root show={open} as={Fragment}>
@@ -70,5 +70,5 @@ export default function Modal({
                 </div>
             </Dialog>
         </Transition.Root>
-    )
+    );
 }

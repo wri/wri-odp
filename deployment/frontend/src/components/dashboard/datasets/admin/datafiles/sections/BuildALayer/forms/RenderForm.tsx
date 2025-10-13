@@ -1,37 +1,37 @@
-import { Fragment } from 'react'
-import { Button } from '@/components/_shared/Button'
-import { InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
+import { Fragment } from 'react';
+import { Button } from '@/components/_shared/Button';
+import { InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
 import {
     ChevronDownIcon,
     InformationCircleIcon,
     PlusCircleIcon,
-} from '@heroicons/react/24/outline'
-import { type Path, useFieldArray, useFormContext } from 'react-hook-form'
-import { match } from 'ts-pattern'
+} from '@heroicons/react/24/outline';
+import { type Path, useFieldArray, useFormContext } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import {
     filterOperationOptions,
     rampTypes,
     renderTypeOptions,
-} from '../../../../formOptions'
-import { Disclosure, Switch, Transition } from '@headlessui/react'
-import { type FilterFormType, type LayerFormType } from '../layer.schema'
-import { useState } from 'react'
-import classNames from '@/utils/classnames'
-import { useColumns } from '../useColumns'
-import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
-import { Accordion } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
-import { ScrollArea } from '@/components/_shared/ScrollArea'
+} from '../../../../formOptions';
+import { Disclosure, Switch, Transition } from '@headlessui/react';
+import { type FilterFormType, type LayerFormType } from '../layer.schema';
+import { useState } from 'react';
+import classNames from '@/utils/classnames';
+import { useColumns } from '../useColumns';
+import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox';
+import { Accordion } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion';
+import { ScrollArea } from '@/components/_shared/ScrollArea';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
+} from '@/components/_shared/Popover';
 
 interface InteractionFormProps {
-    onNext: () => void
-    onPrev: () => void
+    onNext: () => void;
+    onPrev: () => void;
 }
 
 function RampObjExplanation() {
@@ -85,14 +85,14 @@ function RampObjExplanation() {
                 </PopoverContent>
             </PopoverTrigger>
         </Popover>
-    )
+    );
 }
 
 export default function RenderForm({ onPrev, onNext }: InteractionFormProps) {
-    const formObj = useFormContext<LayerFormType>()
+    const formObj = useFormContext<LayerFormType>();
     const onSubmit = () => {
-        onNext()
-    }
+        onNext();
+    };
 
     return (
         <>
@@ -121,15 +121,15 @@ export default function RenderForm({ onPrev, onNext }: InteractionFormProps) {
                 </div>
             </form>
         </>
-    )
+    );
 }
 function ItemsArray() {
-    const formObj = useFormContext<LayerFormType>()
-    const { control, register, watch } = formObj
+    const formObj = useFormContext<LayerFormType>();
+    const { control, register, watch } = formObj;
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'layerConfig.render.layers',
-    })
+    });
 
     const RenderCirclePaint = (index: number) => (
         <div className="flex flex-col gap-y-2">
@@ -154,7 +154,7 @@ function ItemsArray() {
                             {
                                 valueAsNumber: true,
                                 setValueAs: (v) => {
-                                    return v === '' ? undefined : parseFloat(v)
+                                    return v === '' ? undefined : parseFloat(v);
                                 },
                             }
                         )}
@@ -184,7 +184,7 @@ function ItemsArray() {
                 </InputGroup>
             </div>
         </div>
-    )
+    );
 
     const RenderFillPaint = (index: number) => (
         <div className="flex flex-col gap-y-2">
@@ -217,7 +217,7 @@ function ItemsArray() {
                 />
             </InputGroup>
         </div>
-    )
+    );
 
     const RenderLinePaint = (index: number) => (
         <div className="flex flex-col gap-y-2">
@@ -271,7 +271,7 @@ function ItemsArray() {
                 </InputGroup>
             </div>
         </div>
-    )
+    );
 
     return (
         <ScrollArea className="h-[375px]">
@@ -360,16 +360,16 @@ function ItemsArray() {
                 </button>
             </div>
         </ScrollArea>
-    )
+    );
 }
 
 function FilterExpressions({ layerIdx }: { layerIdx: number }) {
-    const formObj = useFormContext<LayerFormType>()
-    const { control, register, watch } = formObj
+    const formObj = useFormContext<LayerFormType>();
+    const { control, register, watch } = formObj;
     const { fields, append, remove } = useFieldArray({
         control,
         name: `layerConfig.render.layers.${layerIdx}.filter`,
-    })
+    });
     return (
         <div className="flex flex-col gap-y-4 pb-4">
             {fields.map((field, index) => (
@@ -397,7 +397,7 @@ function FilterExpressions({ layerIdx }: { layerIdx: number }) {
                 </span>
             </button>
         </div>
-    )
+    );
 }
 
 function FilterExpression({
@@ -405,26 +405,26 @@ function FilterExpression({
     filterIdx,
     remove,
 }: {
-    layerIdx: number
-    filterIdx: number
-    remove: () => void
+    layerIdx: number;
+    filterIdx: number;
+    remove: () => void;
 }) {
-    const formObj = useFormContext<LayerFormType>()
-    const { control, register, watch } = formObj
+    const formObj = useFormContext<LayerFormType>();
+    const { control, register, watch } = formObj;
     if (
         watch(`layerConfig.render.layers.${layerIdx}.filter.${filterIdx}`) ===
         'all'
     )
-        return <></>
+        return <></>;
     const columns = useColumns(
         watch('layerConfig.source.provider.type.value'),
         watch('connectorUrl')!,
         !!watch('connectorUrl')
-    )
+    );
 
     const filterExpression: FilterFormType = watch(
         `layerConfig.render.layers.${layerIdx}.filter.${filterIdx}`
-    ) as FilterFormType
+    ) as FilterFormType;
     return (
         <Accordion text={`Filter ${filterIdx}`}>
             <div className="py-4 flex flex-col gap-y-2">
@@ -463,8 +463,8 @@ function FilterExpression({
                                         filterExpression.operation.value ===
                                         '=='
                                     )
-                                        return v
-                                    return v === '' ? undefined : parseFloat(v)
+                                        return v;
+                                    return v === '' ? undefined : parseFloat(v);
                                 },
                             }
                         )}
@@ -483,7 +483,7 @@ function FilterExpression({
                 </Button>
             </div>
         </Accordion>
-    )
+    );
 }
 
 function ColorPicker({
@@ -492,13 +492,13 @@ function ColorPicker({
     name:
         | `layerConfig.render.layers.${number}.paint.fill-color`
         | `layerConfig.render.layers.${number}.paint.circle-color`
-        | `layerConfig.render.layers.${number}.paint.line-color`
+        | `layerConfig.render.layers.${number}.paint.line-color`;
 }) {
-    const formObj = useFormContext<LayerFormType>()
-    const { register, watch } = formObj
+    const formObj = useFormContext<LayerFormType>();
+    const { register, watch } = formObj;
     const [rampObjEnabled, setRampObjEnabled] = useState(
         watch(name) ? typeof watch(name) !== 'string' : false
-    )
+    );
     return (
         <div className="flex flex-col gap-y-4">
             <div className="flex items-center gap-x-2">
@@ -538,7 +538,7 @@ function ColorPicker({
                 </div>
             )}
         </div>
-    )
+    );
 }
 
 function RampObj({
@@ -547,19 +547,19 @@ function RampObj({
     name:
         | `layerConfig.render.layers.${number}.paint.fill-color`
         | `layerConfig.render.layers.${number}.paint.circle-color`
-        | `layerConfig.render.layers.${number}.paint.line-color`
+        | `layerConfig.render.layers.${number}.paint.line-color`;
 }) {
-    const formObj = useFormContext<LayerFormType>()
-    const { control, register, watch } = formObj
+    const formObj = useFormContext<LayerFormType>();
+    const { control, register, watch } = formObj;
     const { fields, append, remove } = useFieldArray({
         control,
         name: `${name}.output`,
-    })
+    });
     const columns = useColumns(
         watch('layerConfig.source.provider.type.value'),
         watch('connectorUrl')!,
         !!watch('connectorUrl')
-    )
+    );
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 pb-8">
             <InputGroup
@@ -642,5 +642,5 @@ function RampObj({
                 </span>
             </button>
         </div>
-    )
+    );
 }

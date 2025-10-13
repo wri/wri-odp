@@ -1,58 +1,58 @@
 // @ts-nocheck
-import SortableContainer from '../../../../react-sortable-hoc/src/SortableContainer/index'
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
+import SortableContainer from '../../../../react-sortable-hoc/src/SortableContainer/index';
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 
 class LegendList extends PureComponent {
     static propTypes = {
         sortable: PropTypes.bool,
         children: PropTypes.node,
-    }
+    };
 
     static defaultProps = {
         sortable: true,
         children: [],
-    }
+    };
 
-    timeout: any
+    timeout: any;
 
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             scrolling: false,
-        }
+        };
 
-        this.timeout = null
+        this.timeout = null;
     }
 
     onScroll = (e) => {
         if (e.target.id !== 'vizzuality-legend-list') {
-            return false
+            return false;
         }
 
-        const { scrolling } = this.state
+        const { scrolling } = this.state;
         if (this.timeout) {
             // if there is already a timeout in process cancel it
-            clearTimeout(this.timeout)
+            clearTimeout(this.timeout);
         }
 
         this.timeout = setTimeout(() => {
-            this.timeout = null
+            this.timeout = null;
             this.setState({
                 scrolling: false,
-            })
-        }, 250)
+            });
+        }, 250);
 
         if (!scrolling) {
             this.setState({
                 scrolling: true,
-            })
+            });
         }
-    }
+    };
 
     render() {
-        const { sortable, children } = this.props
-        const { scrolling } = this.state
+        const { sortable, children } = this.props;
+        const { scrolling } = this.state;
 
         return (
             <ul
@@ -69,8 +69,8 @@ class LegendList extends PureComponent {
                     })
                 )}
             </ul>
-        )
+        );
     }
 }
 
-export default SortableContainer(LegendList)
+export default SortableContainer(LegendList);

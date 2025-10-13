@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 export const UserFormSchema = z.object({
     id: z.string().optional(),
@@ -23,7 +23,7 @@ export const UserFormSchema = z.object({
             id: z.string(),
         })
         .optional(),
-})
+});
 
 export const UserFormInviteSchema = z.object({
     email: z.string().email('Email is invalid'),
@@ -41,17 +41,17 @@ export const UserFormInviteSchema = z.object({
             id: z.string(),
         })
         .optional(),
-})
+});
 
 export interface UserSchema {
-    id?: string
-    name: string
-    fullname?: string
-    image_url?: string
-    email: string
-    password?: string
-    orgId?: string
+    id?: string;
+    name: string;
+    fullname?: string;
+    image_url?: string;
+    email: string;
+    password?: string;
+    orgId?: string;
 }
 
-export type UserFormInput = z.infer<typeof UserFormSchema>
-export type UserFormInviteInput = z.infer<typeof UserFormInviteSchema>
+export type UserFormInput = z.infer<typeof UserFormSchema>;
+export type UserFormInviteInput = z.infer<typeof UserFormInviteSchema>;

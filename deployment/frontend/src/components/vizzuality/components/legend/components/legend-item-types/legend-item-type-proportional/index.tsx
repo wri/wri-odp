@@ -1,4 +1,4 @@
-import { type LegendTypeProps } from '../interfaces/legend-types'
+import { type LegendTypeProps } from '../interfaces/legend-types';
 
 export default function LegendTypeGradient(
     { activeLayer }: Readonly<LegendTypeProps> = {
@@ -10,7 +10,7 @@ export default function LegendTypeGradient(
         },
     }
 ) {
-    const { legendConfig } = activeLayer
+    const { legendConfig } = activeLayer;
     return !legendConfig || legendConfig.type !== 'proportional' ? null : (
         <ul className="flex m-0 p-0 items-end list-none">
             {legendConfig.items.map(({ name, color, size }) => (
@@ -33,5 +33,5 @@ export default function LegendTypeGradient(
                 </li>
             ))}
         </ul>
-    )
+    );
 }

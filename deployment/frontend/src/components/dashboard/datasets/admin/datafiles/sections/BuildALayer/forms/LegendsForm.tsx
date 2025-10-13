@@ -1,10 +1,10 @@
-import { Button } from '@/components/_shared/Button'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
+import { Button } from '@/components/_shared/Button';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
 import {
     InformationCircleIcon,
     MinusCircleIcon,
-} from '@heroicons/react/24/outline'
-import { zodResolver } from '@hookform/resolvers/zod'
+} from '@heroicons/react/24/outline';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
     Control,
     UseFieldArrayReturn,
@@ -12,31 +12,31 @@ import {
     useFieldArray,
     useForm,
     useFormContext,
-} from 'react-hook-form'
-import { type LayerFormType } from '../layer.schema'
-import { getColors, legendsToAdd } from '../getColors'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { ScrollArea } from '@/components/_shared/ScrollArea'
+} from 'react-hook-form';
+import { type LayerFormType } from '../layer.schema';
+import { getColors, legendsToAdd } from '../getColors';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { ScrollArea } from '@/components/_shared/ScrollArea';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import Image from 'next/image'
+} from '@/components/_shared/Popover';
+import Image from 'next/image';
 
 export default function LegendForm({
     onNext,
     onPrev,
 }: {
-    onNext: () => void
-    onPrev: () => void
+    onNext: () => void;
+    onPrev: () => void;
 }) {
-    const formObj = useFormContext<LayerFormType>()
-    const { handleSubmit, register, watch, control } = formObj
+    const formObj = useFormContext<LayerFormType>();
+    const { handleSubmit, register, watch, control } = formObj;
     const { append, fields, remove } = useFieldArray({
         name: 'legendConfig.items',
-    })
-    const onSubmit = () => onNext()
+    });
+    const onSubmit = () => onNext();
     return (
         <>
             <form
@@ -55,7 +55,7 @@ export default function LegendForm({
                                     append({
                                         name: 'Item',
                                         color: color ?? '#000000',
-                                    })
+                                    });
                                 })
                             }
                         >
@@ -198,5 +198,5 @@ export default function LegendForm({
                 </div>
             </form>
         </>
-    )
+    );
 }

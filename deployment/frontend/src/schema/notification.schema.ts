@@ -1,7 +1,7 @@
-import { z } from 'zod'
-import { type User, type WriDataset, WriOrganization } from './ckan.schema'
-import type Team from '@/interfaces/team.interface'
-import type Topic from '@/interfaces/topic.interface'
+import { z } from 'zod';
+import { type User, type WriDataset, WriOrganization } from './ckan.schema';
+import type Team from '@/interfaces/team.interface';
+import type Topic from '@/interfaces/topic.interface';
 
 const NotificationSchema = z.object({
     id: z.string(),
@@ -21,22 +21,22 @@ const NotificationSchema = z.object({
     time_text: z.string().optional(),
     objectIdName: z.string().optional(),
     msg: z.string().optional(),
-})
+});
 
-type Notification = z.infer<typeof NotificationSchema>
+type Notification = z.infer<typeof NotificationSchema>;
 
 export interface NotificationType extends Notification {
-    sender_obj?: User
-    object_data?: WriDataset | Topic | Team
+    sender_obj?: User;
+    object_data?: WriDataset | Topic | Team;
 }
 
 export const NotificationInput = z.object({
     notifications: z.array(NotificationSchema),
     state: z.string().optional(),
     is_unread: z.boolean().optional(),
-})
+});
 
-type NotificationInputType = z.infer<typeof NotificationInput>
+type NotificationInputType = z.infer<typeof NotificationInput>;
 
 const NewNotificationInput = z.object({
     recipient_id: z.string(),
@@ -45,6 +45,6 @@ const NewNotificationInput = z.object({
     object_type: z.string(),
     object_id: z.string(),
     is_unread: z.boolean().optional(),
-})
+});
 
-export type NewNotificationInputType = z.infer<typeof NewNotificationInput>
+export type NewNotificationInputType = z.infer<typeof NewNotificationInput>;

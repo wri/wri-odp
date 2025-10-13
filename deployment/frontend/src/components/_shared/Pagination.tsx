@@ -3,7 +3,7 @@ import {
     ChevronDoubleRightIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
-} from '@heroicons/react/20/solid'
+} from '@heroicons/react/20/solid';
 
 export default function Pagination() {
     return (
@@ -99,5 +99,5 @@ export default function Pagination() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

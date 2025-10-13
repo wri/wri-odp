@@ -3,30 +3,30 @@ import {
     useFieldArray,
     useForm,
     useFormContext,
-} from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Button, LoaderButton } from '@/components/_shared/Button'
+} from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button, LoaderButton } from '@/components/_shared/Button';
 import {
     ArrowPathIcon,
     ExclamationCircleIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { layerTypeOptions, providerOptions } from '../../../../formOptions'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { type LayerFormType } from '../layer.schema'
-import { useState } from 'react'
-import { useColumns } from '../useColumns'
-import classNames from '@/utils/classnames'
-import { ChooseTemplates } from './ChooseTemplates'
-import { ScrollArea } from '@/components/_shared/ScrollArea'
-import { DatafileLocation } from '../../../DatafileLocation'
-import { SimpleEditor } from '../../../../metadata/RTE/SimpleEditor'
-import { type DatasetFormType } from '@/schema/dataset.schema'
+} from '@heroicons/react/24/outline';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { layerTypeOptions, providerOptions } from '../../../../formOptions';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { type LayerFormType } from '../layer.schema';
+import { useState } from 'react';
+import { useColumns } from '../useColumns';
+import classNames from '@/utils/classnames';
+import { ChooseTemplates } from './ChooseTemplates';
+import { ScrollArea } from '@/components/_shared/ScrollArea';
+import { DatafileLocation } from '../../../DatafileLocation';
+import { SimpleEditor } from '../../../../metadata/RTE/SimpleEditor';
+import { type DatasetFormType } from '@/schema/dataset.schema';
 
 export default function SourceForm({
     onNext,
@@ -34,28 +34,28 @@ export default function SourceForm({
     formObj: _formObj,
     index: _index,
 }: {
-    onNext: () => void
-    convertToRaw: () => void
-    formObj: UseFormReturn<DatasetFormType>
-    index: number
+    onNext: () => void;
+    convertToRaw: () => void;
+    formObj: UseFormReturn<DatasetFormType>;
+    index: number;
 }) {
-    const formObj = useFormContext<LayerFormType>()
-    const [columnsFetchEnabled, setColumnsFetchEnabled] = useState(false)
-    const [templateModalOpen, setTemplateModalOpen] = useState(false)
+    const formObj = useFormContext<LayerFormType>();
+    const [columnsFetchEnabled, setColumnsFetchEnabled] = useState(false);
+    const [templateModalOpen, setTemplateModalOpen] = useState(false);
     const {
         register,
         watch,
         handleSubmit,
         control,
         formState: { errors },
-    } = formObj
+    } = formObj;
     const onSubmit = () => {
-        onNext()
-    }
+        onNext();
+    };
     const { append } = useFieldArray({
         control,
         name: 'interactionConfig.output',
-    })
+    });
     const columns = useColumns(
         watch('layerConfig.source.provider.type.value'),
         watch('connectorUrl')!,
@@ -71,11 +71,11 @@ export default function SourceForm({
                         suffix: '',
                         enabled: false,
                         type: 'string',
-                    })
-                })
+                    });
+                });
             }
         }
-    )
+    );
 
     return (
         <>
@@ -338,8 +338,8 @@ export default function SourceForm({
                                                     formObj.setValue(
                                                         'interactionConfig.output',
                                                         []
-                                                    )
-                                                    columns.refetch()
+                                                    );
+                                                    columns.refetch();
                                                 }}
                                                 className="px-2"
                                                 type="button"
@@ -442,5 +442,5 @@ export default function SourceForm({
                 </Button>
             </form>
         </>
-    )
+    );
 }

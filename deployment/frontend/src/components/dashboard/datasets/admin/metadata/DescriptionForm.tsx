@@ -1,22 +1,22 @@
-import { Bars4Icon, InformationCircleIcon } from '@heroicons/react/24/outline'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Disclosure } from '@headlessui/react'
-import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
-import { MetadataAccordion } from './MetadataAccordion'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { type UseFormReturn } from 'react-hook-form'
-import { type DatasetFormType } from '@/schema/dataset.schema'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import { Bars4Icon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Disclosure } from '@headlessui/react';
+import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor';
+import { MetadataAccordion } from './MetadataAccordion';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { type UseFormReturn } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 export function DescriptionForm({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
     const {
         register,
         formState: { errors },
-    } = formObj
+    } = formObj;
     return (
         <MetadataAccordion
             defaultOpen
@@ -77,5 +77,5 @@ export function DescriptionForm({
                 </InputGroup>
             </Disclosure.Panel>
         </MetadataAccordion>
-    )
+    );
 }

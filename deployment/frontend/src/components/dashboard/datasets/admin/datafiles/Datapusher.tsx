@@ -1,6 +1,6 @@
-import { LoaderButton } from '@/components/_shared/Button'
-import { ScrollArea } from '@/components/_shared/ScrollArea'
-import { Badge } from '@/components/_shared/Badge'
+import { LoaderButton } from '@/components/_shared/Button';
+import { ScrollArea } from '@/components/_shared/ScrollArea';
+import { Badge } from '@/components/_shared/Badge';
 import {
     Table,
     TableHead,
@@ -8,17 +8,17 @@ import {
     TableRow,
     TableCell,
     TableBody,
-} from '@/components/_shared/Table'
-import { type ResourceFormType } from '@/schema/dataset.schema'
-import { type Log } from '@/server/api/routers/prefect'
-import { api } from '@/utils/api'
-import notify from '@/utils/notify'
-import { match } from 'ts-pattern'
-import Spinner from '@/components/_shared/Spinner'
+} from '@/components/_shared/Table';
+import { type ResourceFormType } from '@/schema/dataset.schema';
+import { type Log } from '@/server/api/routers/prefect';
+import { api } from '@/utils/api';
+import notify from '@/utils/notify';
+import { match } from 'ts-pattern';
+import Spinner from '@/components/_shared/Spinner';
 
 function convertTimestamp(timestamp: string) {
-    const date = new Date(timestamp)
-    return `${date.toLocaleDateString()} - ${date.toLocaleTimeString()}`
+    const date = new Date(timestamp);
+    return `${date.toLocaleDateString()} - ${date.toLocaleTimeString()}`;
 }
 
 export function DatapusherStatus({ datafile }: { datafile: ResourceFormType }) {
@@ -34,8 +34,8 @@ export function DatapusherStatus({ datafile }: { datafile: ResourceFormType }) {
                       ? 5000
                       : 1000,
         }
-    )
-    if (!flowState) return <></>
+    );
+    if (!flowState) return <></>;
     return (
         <Badge
             variant={
@@ -53,22 +53,22 @@ export function DatapusherStatus({ datafile }: { datafile: ResourceFormType }) {
                 flowState.type
             ) && <Spinner className="text-white w-3 h-3 mb-1" />}
         </Badge>
-    )
+    );
 }
 
 export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
-    const utils = api.useContext()
+    const utils = api.useContext();
     const submitToDatapusher = api.prefect.submitToDatapusher.useMutation({
         onSuccess: async () => {
             await utils.prefect.getFlowState.invalidate({
                 resourceId: datafile.id ?? '',
-            })
+            });
             notify(
                 `Successfully submited Data File to the datapusher`,
                 'success'
-            )
+            );
         },
-    })
+    });
     const { isLoading, data: flowState } = api.prefect.getFlowState.useQuery(
         {
             resourceId: datafile.id ?? '',
@@ -77,7 +77,7 @@ export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
             refetchInterval: (data) =>
                 data && data.type === 'COMPLETED' ? false : 5000,
         }
-    )
+    );
     return (
         <>
             <div className="pt-4 pb-8">
@@ -129,5 +129,5 @@ export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
                 </Table>
             </ScrollArea>
         </>
-    )
+    );
 }

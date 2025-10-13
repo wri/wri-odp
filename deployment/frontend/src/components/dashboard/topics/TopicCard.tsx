@@ -1,38 +1,38 @@
-import React, { useEffect, useState } from 'react'
-import SearchHeader from '../_shared/SearchHeader'
-import RowProfile from '../_shared/RowProfile'
-import Row from '../_shared/Row'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
-import type { IRowProfile } from '../_shared/RowProfile'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import type { SearchInput } from '@/schema/search.schema'
-import Pagination from '../_shared/Pagination'
-import type { GroupTree } from '@/schema/ckan.schema'
-import notify from '@/utils/notify'
-import dynamic from 'next/dynamic'
+import React, { useEffect, useState } from 'react';
+import SearchHeader from '../_shared/SearchHeader';
+import RowProfile from '../_shared/RowProfile';
+import Row from '../_shared/Row';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import type { IRowProfile } from '../_shared/RowProfile';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import type { SearchInput } from '@/schema/search.schema';
+import Pagination from '../_shared/Pagination';
+import type { GroupTree } from '@/schema/ckan.schema';
+import notify from '@/utils/notify';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { useRouter } from 'next/router'
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import { useQuery } from 'react-query'
+});
+import { useRouter } from 'next/router';
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import { useQuery } from 'react-query';
 
 function TopicProfile({
     team,
     topic2Image,
 }: {
-    team: GroupTree
-    topic2Image: Record<string, string>
+    team: GroupTree;
+    topic2Image: Record<string, string>;
 }) {
     const description = team?.children?.length
         ? `${team?.children?.length} SubTopics`
-        : 'No SubTopics'
-    const TopicProfile = team as IRowProfile
-    TopicProfile.description = description
-    TopicProfile.image_display_url = topic2Image[team.id]
+        : 'No SubTopics';
+    const TopicProfile = team as IRowProfile;
+    TopicProfile.description = description;
+    TopicProfile.image_display_url = topic2Image[team.id];
     return (
         <div className="flex py-5 pl-2">
             <RowProfile
@@ -42,22 +42,22 @@ function TopicProfile({
                 defaultImg="/images/placeholders/topics/topicsdefault.png"
             />
         </div>
-    )
+    );
 }
 
 function SubTopicProfile({
     team,
     topic2Image,
 }: {
-    team: GroupTree
-    topic2Image: Record<string, string>
+    team: GroupTree;
+    topic2Image: Record<string, string>;
 }) {
     const description = team?.children?.length
         ? `${team?.children?.length} SubTopics`
-        : 'No SubTopics'
-    const TopicProfile = team as IRowProfile
-    TopicProfile.description = description
-    TopicProfile.image_display_url = topic2Image[team.id]
+        : 'No SubTopics';
+    const TopicProfile = team as IRowProfile;
+    TopicProfile.description = description;
+    TopicProfile.image_display_url = topic2Image[team.id];
     return (
         <div className="flex py-5 pl-3 sm:pl-5">
             <RowProfile
@@ -67,7 +67,7 @@ function SubTopicProfile({
                 defaultImg="/images/placeholders/topics/topicsdefault.png"
             />
         </div>
-    )
+    );
 }
 
 function SubCardProfile({
@@ -75,40 +75,40 @@ function SubCardProfile({
     highlighted,
     topic2Image,
 }: {
-    teams: IRowProfile[] | GroupTree[] | undefined
-    highlighted?: boolean
-    topic2Image: Record<string, string>
+    teams: IRowProfile[] | GroupTree[] | undefined;
+    highlighted?: boolean;
+    topic2Image: Record<string, string>;
 }) {
-    const utils = api.useUtils()
-    const [open, setOpen] = useState(false)
-    const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
-    const router = useRouter()
+    const utils = api.useUtils();
+    const [open, setOpen] = useState(false);
+    const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null);
+    const router = useRouter();
     const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
         onSuccess: async (data) => {
             await utils.topics.getUsersTopics.invalidate({
                 search: '',
                 page: { start: 0, rows: 10000 },
-            })
-            setOpen(false)
+            });
+            setOpen(false);
             notify(
                 `Successfully deleted the ${selectedTopic?.name} Topic`,
                 'error'
-            )
+            );
         },
-    })
+    });
 
     const handleOpenModal = (topic: GroupTree) => {
-        setSelectedTopic(topic)
-        setOpen(true)
-    }
+        setSelectedTopic(topic);
+        setOpen(true);
+    };
 
     const Topic = (team: GroupTree) => {
-        const TeamProfile = team as IRowProfile
-        TeamProfile.image_display_url = topic2Image[team.id]
-        return TeamProfile
-    }
+        const TeamProfile = team as IRowProfile;
+        TeamProfile.image_display_url = topic2Image[team.id];
+        return TeamProfile;
+    };
 
-    if (!teams || teams.length === 0) return <></>
+    if (!teams || teams.length === 0) return <></>;
     return (
         <div className="flex flex-col pt-2 pl-4">
             {teams.map((team, index) => {
@@ -146,7 +146,7 @@ function SubCardProfile({
                                             onClick: () => {
                                                 router.push(
                                                     `/dashboard/topics/${team.name}/edit`
-                                                )
+                                                );
                                             },
                                         },
                                         {
@@ -211,7 +211,7 @@ function SubCardProfile({
                                             onClick: () => {
                                                 router.push(
                                                     `/dashboard/topics/${team.name}/edit`
-                                                )
+                                                );
                                             },
                                         },
                                         {
@@ -234,7 +234,7 @@ function SubCardProfile({
                             </>
                         )}
                     </>
-                )
+                );
             })}
             {selectedTopic && (
                 <Modal
@@ -282,58 +282,58 @@ function SubCardProfile({
                 </Modal>
             )}
         </div>
-    )
+    );
 }
 
 export default function TopicCard() {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
-    })
+    });
     const [pagination, setPagination] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
-    })
+    });
     const { data, isLoading, refetch } =
-        api.topics.getUsersTopics.useQuery(query)
-    const [open, setOpen] = useState(false)
-    const router = useRouter()
-    const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null)
+        api.topics.getUsersTopics.useQuery(query);
+    const [open, setOpen] = useState(false);
+    const router = useRouter();
+    const [selectedTopic, setSelectedTopic] = useState<GroupTree | null>(null);
     const deleteTopic = api.topics.deleteDashBoardTopic.useMutation({
         onSuccess: async (data) => {
-            await refetch()
-            setOpen(false)
+            await refetch();
+            setOpen(false);
             notify(
                 `Successfully deleted the ${selectedTopic?.name} Topic`,
                 'error'
-            )
+            );
         },
-    })
+    });
 
     const handleOpenModal = (topic: GroupTree) => {
-        setSelectedTopic(topic)
-        setOpen(true)
-    }
+        setSelectedTopic(topic);
+        setOpen(true);
+    };
 
     const ProcessedTopic = useQuery(
         ['paginatedTopics', data, pagination],
         () => {
-            if (!data) return { topics: [], topic2Image: {}, count: 0 }
+            if (!data) return { topics: [], topic2Image: {}, count: 0 };
             const topics = data?.topics.slice(
                 pagination.page.start,
                 pagination.page.start + pagination.page.rows
-            )
-            const topic2Image = data?.topic2Image
-            return { topics, topic2Image, count: data?.count }
+            );
+            const topic2Image = data?.topic2Image;
+            return { topics, topic2Image, count: data?.count };
         },
         {
             enabled: !!data,
         }
-    )
+    );
 
     useEffect(() => {
-        setPagination({ search: '', page: { start: 0, rows: 10 } })
-    }, [query.search])
+        setPagination({ search: '', page: { start: 0, rows: 10 } });
+    }, [query.search]);
 
     return (
         <section className="w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0">
@@ -389,7 +389,7 @@ export default function TopicCard() {
                                             onClick: () => {
                                                 router.push(
                                                     `/dashboard/topics/${topic.name}/edit`
-                                                )
+                                                );
                                             },
                                         },
                                         {
@@ -416,7 +416,7 @@ export default function TopicCard() {
                                     isDropDown
                                 />
                             </div>
-                        )
+                        );
                     })
                 )}
 
@@ -471,5 +471,5 @@ export default function TopicCard() {
                 )}
             </div>
         </section>
-    )
+    );
 }

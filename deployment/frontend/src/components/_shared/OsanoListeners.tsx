@@ -1,9 +1,9 @@
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 declare global {
     interface Window {
-        Osano: any
+        Osano: any;
     }
 }
 
@@ -16,64 +16,64 @@ const osanoListeners = () => {
         document
             .querySelector('.osano-cookie-preference-link')
             ?.addEventListener('click', function () {
-                const saveButton = document.querySelector('.osano-cm-save')
+                const saveButton = document.querySelector('.osano-cm-save');
                 if (saveButton) {
                     saveButton.addEventListener('click', function () {
-                        window.location.reload()
-                    })
+                        window.location.reload();
+                    });
                 }
-            })
+            });
     }
 
-    const router = useRouter()
+    const router = useRouter();
 
     useEffect(() => {
         const showOsanaDialog = (e: Event) => {
-            e.preventDefault()
+            e.preventDefault();
             if (window.Osano?.cm) {
-                window.Osano.cm.showDrawer('osano-cm-dom-info-dialog-open')
+                window.Osano.cm.showDrawer('osano-cm-dom-info-dialog-open');
             } else {
-                console.error('Osano not available!')
+                console.error('Osano not available!');
             }
-        }
+        };
 
         const attachEventListeners = () => {
             const elements = document.getElementsByClassName(
                 'osano-cookie-preference-link'
-            )
+            );
 
             if (elements.length > 0) {
                 for (let i = 0; i < elements.length; i++) {
-                    elements[i]?.removeEventListener('click', showOsanaDialog)
+                    elements[i]?.removeEventListener('click', showOsanaDialog);
                     elements[i]?.addEventListener(
                         'click',
                         showOsanaDialog,
                         false
-                    )
+                    );
                 }
             } else {
-                console.error('Elements not found!')
+                console.error('Elements not found!');
             }
-        }
+        };
 
         const checkOsanoAvailability = () => {
             if (typeof window.Osano !== 'undefined') {
-                attachEventListeners()
+                attachEventListeners();
             } else {
-                setTimeout(checkOsanoAvailability, 500)
+                setTimeout(checkOsanoAvailability, 500);
             }
-        }
+        };
 
-        checkOsanoAvailability()
+        checkOsanoAvailability();
 
         router.events.on('routeChangeComplete', () => {
-            checkOsanoAvailability()
-        })
+            checkOsanoAvailability();
+        });
 
         return () => {
-            router.events.off('routeChangeComplete', checkOsanoAvailability)
-        }
-    }, [router.events])
-}
+            router.events.off('routeChangeComplete', checkOsanoAvailability);
+        };
+    }, [router.events]);
+};
 
-export default osanoListeners
+export default osanoListeners;

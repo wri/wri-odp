@@ -3,53 +3,53 @@ import React, {
     type SetStateAction,
     useEffect,
     useState,
-} from 'react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import classNames from '@/utils/classnames'
-import { SearchInput } from '@/schema/search.schema'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { type Filter } from '@/interfaces/search.interface'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+} from 'react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import classNames from '@/utils/classnames';
+import { SearchInput } from '@/schema/search.schema';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type Filter } from '@/interfaces/search.interface';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function Search({
     setFilters,
     filters,
 }: {
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    filters: Filter[]
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    filters: Filter[];
 }) {
     const getIsSearching = () => {
-        const filter = filters?.find((f) => f.key == 'search')
+        const filter = filters?.find((f) => f.key == 'search');
 
-        return !!filter
-    }
+        return !!filter;
+    };
 
-    const [isSearch, setIsSearch] = useState(getIsSearching())
+    const [isSearch, setIsSearch] = useState(getIsSearching());
 
-    const router = useRouter()
-    const { pathname } = router
+    const router = useRouter();
+    const { pathname } = router;
 
-    const searchSchema = z.object({ search: z.string() })
-    type searchFormType = z.infer<typeof searchSchema>
+    const searchSchema = z.object({ search: z.string() });
+    type searchFormType = z.infer<typeof searchSchema>;
 
     const { handleSubmit, register, reset, watch } = useForm<searchFormType>({
         resolver: zodResolver(searchSchema),
         defaultValues: {
             search: filters?.find((f) => f.key == 'search')?.value ?? '',
         },
-    })
+    });
 
     useEffect(() => {
-        setIsSearch(getIsSearching())
+        setIsSearch(getIsSearching());
 
         if (watch('search') != filters.find((f) => f.key == 'search')?.value) {
-            reset({ search: '' })
+            reset({ search: '' });
         }
-    }, [filters])
+    }, [filters]);
 
     return (
         <section
@@ -66,24 +66,24 @@ export default function Search({
                         filters.find((f) => f.key == 'search')?.value
                     ) {
                         setFilters((prev) => {
-                            const newFilters = [...prev]
+                            const newFilters = [...prev];
                             const searchFilter = newFilters.find(
                                 (filter) => filter.key == 'search'
-                            )
+                            );
 
                             if (searchFilter) {
                                 if (data.search) {
-                                    searchFilter.value = data.search
-                                    searchFilter.label = data.search
-                                    setIsSearch(true)
+                                    searchFilter.value = data.search;
+                                    searchFilter.label = data.search;
+                                    setIsSearch(true);
                                 } else {
                                     newFilters.splice(
                                         newFilters.findIndex(
                                             (filter) => filter.key == 'search'
                                         ),
                                         1
-                                    )
-                                    setIsSearch(false)
+                                    );
+                                    setIsSearch(false);
                                 }
                             } else if (data.search) {
                                 newFilters.push({
@@ -91,12 +91,12 @@ export default function Search({
                                     key: 'search',
                                     label: data.search,
                                     value: data.search,
-                                })
-                                setIsSearch(true)
+                                });
+                                setIsSearch(true);
                             }
 
-                            return newFilters
-                        })
+                            return newFilters;
+                        });
                     }
                 })}
                 className="w-full px-8 xxl:px-0 max-w-8xl mx-auto -mt-[37px] "
@@ -127,21 +127,21 @@ export default function Search({
                         ) : (
                             <button
                                 onClick={(e) => {
-                                    e.preventDefault()
+                                    e.preventDefault();
                                     setFilters((prev) => {
-                                        const newFilters = [...prev]
+                                        const newFilters = [...prev];
                                         newFilters.splice(
                                             newFilters.findIndex(
                                                 (filter) =>
                                                     filter.key == 'search'
                                             ),
                                             1
-                                        )
-                                        return newFilters
-                                    })
-                                    setIsSearch(false)
+                                        );
+                                        return newFilters;
+                                    });
+                                    setIsSearch(false);
 
-                                    reset({ search: '' })
+                                    reset({ search: '' });
                                 }}
                             >
                                 <XMarkIcon className="h-5 w-5 text-wri-black" />
@@ -151,5 +151,5 @@ export default function Search({
                 </div>
             </form>
         </section>
-    )
+    );
 }

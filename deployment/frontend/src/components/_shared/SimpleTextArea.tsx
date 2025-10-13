@@ -1,14 +1,14 @@
-import classNames from '@/utils/classnames'
-import * as React from 'react'
+import classNames from '@/utils/classnames';
+import * as React from 'react';
 
 interface TextAreaProps extends React.InputHTMLAttributes<HTMLTextAreaElement> {
-    placeholder?: string
-    name?: string
-    type: string
-    icon?: React.ReactNode
-    children?: React.ReactNode
-    className?: string
-    maxWidth?: string
+    placeholder?: string;
+    name?: string;
+    type: string;
+    icon?: React.ReactNode;
+    children?: React.ReactNode;
+    className?: string;
+    maxWidth?: string;
 }
 
 export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
@@ -34,6 +34,6 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
                     </div>
                 )}
             </div>
-        )
+        );
     }
-)
+);

@@ -1,10 +1,10 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import isEqual from 'lodash/isEqual'
-import classnames from 'classnames'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import isEqual from 'lodash/isEqual';
+import classnames from 'classnames';
 
-import Timestep from '../../../../components/timestep'
+import Timestep from '../../../../components/timestep';
 
 import {
     addToDate,
@@ -13,96 +13,99 @@ import {
     formatDatePretty,
     formatDate,
     getTicks,
-} from './utils'
+} from './utils';
 
 class TimestepContainer extends PureComponent {
-    timelineParams = null
+    timelineParams = null;
 
     static propTypes = {
         defaultStyles: PropTypes.shape({}),
         activeLayer: PropTypes.shape({}),
         handleChange: PropTypes.func.isRequired,
-    }
+    };
 
-    static defaultProps = { defaultStyles: {}, activeLayer: {} }
+    static defaultProps = { defaultStyles: {}, activeLayer: {} };
 
     constructor(props) {
-        super(props)
-        const { activeLayer } = props
-        const { timelineParams } = activeLayer
+        super(props);
+        const { activeLayer } = props;
+        const { timelineParams } = activeLayer;
 
-        this.timelineParams = timelineParams
+        this.timelineParams = timelineParams;
     }
 
     componentDidUpdate(prevProps) {
-        const { activeLayer } = this.props
-        const { activeLayer: prevActiveLayer } = prevProps
+        const { activeLayer } = this.props;
+        const { activeLayer: prevActiveLayer } = prevProps;
 
-        const { timelineParams } = activeLayer
-        const { timelineParams: prevTimelineParams } = prevActiveLayer
+        const { timelineParams } = activeLayer;
+        const { timelineParams: prevTimelineParams } = prevActiveLayer;
 
         // Should we use timelineParams directly from params instead of doing this? I think so
         if (!isEqual(timelineParams, prevTimelineParams)) {
-            this.timelineParams = timelineParams
-            this.forceUpdate()
+            this.timelineParams = timelineParams;
+            this.forceUpdate();
         }
     }
 
     getTrackStyle = () => {
-        const { minDate, interval, trackStyle } = this.timelineParams
+        const { minDate, interval, trackStyle } = this.timelineParams;
 
         if (Array.isArray(trackStyle)) {
             return trackStyle.map((t) => {
-                const { gradient } = t || {}
+                const { gradient } = t || {};
 
-                if (!gradient) return t
+                if (!gradient) return t;
 
                 const styles = {
                     ...t,
                     gradient: gradientConverter(gradient, minDate, interval),
-                }
+                };
 
-                return styles
-            })
+                return styles;
+            });
         }
 
-        const { gradient } = trackStyle || {}
+        const { gradient } = trackStyle || {};
 
         if (gradient) {
             return {
                 ...trackStyle,
                 gradient: gradientConverter(gradient, minDate, interval),
-            }
+            };
         }
 
-        return trackStyle
-    }
+        return trackStyle;
+    };
 
     handleOnAfterChange = (range) => {
-        const { activeLayer, handleChange } = this.props
-        const formattedRange = this.formatRange([range[0], range[1], range[2]])
+        const { activeLayer, handleChange } = this.props;
+        const formattedRange = this.formatRange([range[0], range[1], range[2]]);
 
-        handleChange(formattedRange, activeLayer)
-    }
+        handleChange(formattedRange, activeLayer);
+    };
 
     formatRange = (range) => {
-        const { minDate, interval } = this.timelineParams
+        const { minDate, interval } = this.timelineParams;
         return range.map((r, i) => {
             // if date is not the start date we should select the end of the interval
-            const toEnd = i !== 0
+            const toEnd = i !== 0;
 
-            return formatDate(addToDate(minDate, r, interval, toEnd))
-        })
-    }
+            return formatDate(addToDate(minDate, r, interval, toEnd));
+        });
+    };
 
     formatValue = (value) => {
-        const { minDate, dateFormat, interval } = this.timelineParams
-        return formatDatePretty(addToDate(minDate, value, interval), dateFormat)
-    }
+        const { minDate, dateFormat, interval } = this.timelineParams;
+        return formatDatePretty(
+            addToDate(minDate, value, interval),
+            dateFormat
+        );
+    };
 
     render() {
-        if (!this.timelineParams) return null
-        const { defaultStyles } = this.props
+        if (!this.timelineParams) return null;
+        const { defaultStyles } = this.props;
         const {
             marks,
             maxDate,
@@ -114,7 +117,7 @@ class TimestepContainer extends PureComponent {
             endDate,
             trimEndDate,
             canPlay,
-        } = this.timelineParams
+        } = this.timelineParams;
         return (
             <div
                 className={classnames({
@@ -150,6 +153,6 @@ class TimestepContainer extends PureComponent {
                     handleOnAfterChange={this.handleOnAfterChange}
                 />
             </div>
-        )
+        );
     }
 }

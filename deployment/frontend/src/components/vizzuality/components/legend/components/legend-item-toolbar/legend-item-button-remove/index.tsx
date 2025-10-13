@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import Tooltip from '../../../../tooltip'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import Tooltip from '../../../../tooltip';
 
 class LegendItemButtonRemove extends PureComponent {
     static propTypes = {
@@ -15,7 +15,7 @@ class LegendItemButtonRemove extends PureComponent {
 
         // ACTIONS
         onRemoveLayer: PropTypes.func,
-    }
+    };
 
     static defaultProps = {
         activeLayer: {},
@@ -28,17 +28,17 @@ class LegendItemButtonRemove extends PureComponent {
 
         // ACTIONS
         onRemoveLayer: () => {},
-    }
+    };
 
     state = {
         visible: false,
-    }
+    };
 
     componentWillReceiveProps(nextProps) {
-        const { scrolling } = nextProps
+        const { scrolling } = nextProps;
 
         if (scrolling) {
-            this.setState({ visible: false })
+            this.setState({ visible: false });
         }
     }
 
@@ -50,8 +50,8 @@ class LegendItemButtonRemove extends PureComponent {
             focusStyle,
             defaultStyle,
             tooltipText,
-        } = this.props
-        const { visible } = this.state
+        } = this.props;
+        const { visible } = this.state;
 
         return (
             <Tooltip
@@ -77,8 +77,8 @@ class LegendItemButtonRemove extends PureComponent {
                     />
                 </button>
             </Tooltip>
-        )
+        );
     }
 }
 
-export default LegendItemButtonRemove
+export default LegendItemButtonRemove;

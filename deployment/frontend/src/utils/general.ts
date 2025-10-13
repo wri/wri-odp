@@ -3,28 +3,28 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 export function formatDate(inputDate: string): string {
-    const date = new Date(inputDate)
-    const day = date.getDate()
-    const month = date.toLocaleString('default', { month: 'short' })
-    const year = date.getFullYear()
+    const date = new Date(inputDate);
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
 
-    return `${day} ${month} ${year}`
+    return `${day} ${month} ${year}`;
 }
 
 export function searchArrayForKeyword<T>(arr: T[], keyword: string): T[] {
-    const results: T[] = []
+    const results: T[] = [];
     for (const obj of arr) {
         for (const key in obj) {
             if (
                 typeof obj[key] === 'string' &&
                 (obj[key] as string).includes(keyword)
             ) {
-                results.push(obj)
-                break
+                results.push(obj);
+                break;
             }
         }
     }
-    return results
+    return results;
 }
 
 export function filterObjects<T>(
@@ -33,8 +33,8 @@ export function filterObjects<T>(
 ): T[] {
     return arrayObject.filter((item) => {
         return Object.keys(filterObject).every((key) => {
-            const filterValue = filterObject[key]
-            const itemValue = (item as Record<string, string>)[key]
+            const filterValue = filterObject[key];
+            const itemValue = (item as Record<string, string>)[key];
 
             // if (key === 'groupId') {
             //     const groupIds = (item as Record<string, string[] | undefined>)
@@ -44,11 +44,11 @@ export function filterObjects<T>(
             //     }
             // }
             if (key === 'timestamp') {
-                return isWithinTimeframe(itemValue!, filterValue!)
+                return isWithinTimeframe(itemValue!, filterValue!);
             }
-            return filterValue === itemValue
-        })
-    })
+            return filterValue === itemValue;
+        });
+    });
 }
 
 export function getKeyValues<T, K extends keyof T>(
@@ -57,14 +57,14 @@ export function getKeyValues<T, K extends keyof T>(
     index: K
 ): { id: string; label: string }[] {
     const o: {
-        id: string
-        label: string
+        id: string;
+        label: string;
     }[] = array.map((item, i) => ({
         id: item[index] as string,
         label: item[key] as string,
-    }))
+    }));
 
-    return o
+    return o;
 }
 
 export function getKeyValues2<T, K extends keyof T>(
@@ -72,41 +72,41 @@ export function getKeyValues2<T, K extends keyof T>(
     key: K,
     index: K
 ): { id: string; label: T[K] | string }[] {
-    const keyValueMap = new Map<string, string>()
-    const result: { id: string; label: string }[] = []
+    const keyValueMap = new Map<string, string>();
+    const result: { id: string; label: string }[] = [];
 
     array.forEach((item, i) => {
-        const keyValue = item[key]
+        const keyValue = item[key];
         if (!keyValueMap.has(keyValue as string)) {
-            keyValueMap.set(keyValue as string, item[index] as string)
+            keyValueMap.set(keyValue as string, item[index] as string);
             result.push({
                 id: item[index] as string,
                 label: item[key] as string,
-            })
+            });
         }
-    })
-    return result
+    });
+    return result;
 }
 
 function isWithinTimeframe(isoTimestamp: string, timeframe: string): boolean {
-    const timestamp = new Date(isoTimestamp).getTime()
-    const now = Date.now()
-    const millisecondsInDay = 24 * 60 * 60 * 1000 // 1 day
-    const millisecondsInWeek = 7 * millisecondsInDay
-    const millisecondsInMonth = 30 * millisecondsInDay // Assuming a month is 30 days
-    const millisecondsInYear = 365 * millisecondsInDay // Assuming a year is 365 days
+    const timestamp = new Date(isoTimestamp).getTime();
+    const now = Date.now();
+    const millisecondsInDay = 24 * 60 * 60 * 1000; // 1 day
+    const millisecondsInWeek = 7 * millisecondsInDay;
+    const millisecondsInMonth = 30 * millisecondsInDay; // Assuming a month is 30 days
+    const millisecondsInYear = 365 * millisecondsInDay; // Assuming a year is 365 days
 
     switch (timeframe) {
         case 'day':
-            return now - timestamp < millisecondsInDay
+            return now - timestamp < millisecondsInDay;
         case 'week':
-            return now - timestamp < millisecondsInWeek
+            return now - timestamp < millisecondsInWeek;
         case 'month':
-            return now - timestamp < millisecondsInMonth
+            return now - timestamp < millisecondsInMonth;
         case 'year':
-            return now - timestamp < millisecondsInYear
+            return now - timestamp < millisecondsInYear;
         default:
-            return true
+            return true;
     }
 }
 
@@ -139,8 +139,8 @@ export function matchesAnyPattern(item: string): boolean {
         /isopen/,
         /has_chart_views/,
         /is_approved/,
-    ]
-    return !patterns.some((pattern) => pattern.test(item))
+    ];
+    return !patterns.some((pattern) => pattern.test(item));
 }
 
 const datasetFormFieldmap: Record<string, string> = {
@@ -182,7 +182,7 @@ const datasetFormFieldmap: Record<string, string> = {
     'organization.title': 'Team',
     'organization.name': 'Team',
     tag_string: 'Tags',
-}
+};
 
 //@ts-nocheck
 export function formatDiff(
@@ -191,17 +191,17 @@ export function formatDiff(
     const outputDiff: Record<
         string,
         { old_value: string | string[]; new_value: string | string[] }
-    > = {}
+    > = {};
     if (data) {
         for (const key in data) {
             if (key.startsWith('authors') || key.startsWith('maintainers')) {
                 const key_cleaned = key.includes('authors')
                     ? 'authors'
-                    : 'maintainers'
-                const newKey = datasetFormFieldmap[key_cleaned]!
+                    : 'maintainers';
+                const newKey = datasetFormFieldmap[key_cleaned]!;
 
-                const old_value = data[key]?.old_value
-                const new_value = data[key]?.new_value
+                const old_value = data[key]?.old_value;
+                const new_value = data[key]?.new_value;
 
                 outputDiff[newKey] = {
                     old_value:
@@ -216,118 +216,122 @@ export function formatDiff(
                         new_value.startsWith('[{')
                             ? JSON.parse(new_value)
                             : new_value || '',
-                }
+                };
             } else if (
                 !key.startsWith('resource') &&
                 (/\[\d+\]\.\w+/.exec(key) || /\[\d+\]/.exec(key))
             ) {
-                const keyoldNew = data[key]?.old_value ?? data[key]?.new_value
+                const keyoldNew = data[key]?.old_value ?? data[key]?.new_value;
                 if (
                     key.includes('display_name') ||
                     key.includes('name') ||
                     (keyoldNew && Object.keys(keyoldNew).includes('name'))
                 ) {
                     if (key.includes('display_name')) {
-                        continue
+                        continue;
                     }
-                    let newKey = key.split('[')[0]
-                    newKey = newKey === 'groups' ? 'Topics' : newKey
+                    let newKey = key.split('[')[0];
+                    newKey = newKey === 'groups' ? 'Topics' : newKey;
 
                     outputDiff[newKey] = outputDiff[newKey] || {
                         old_value: [],
                         new_value: [],
-                    }
+                    };
                     if (Object.keys(keyoldNew).includes('name')) {
                         if (data[key]?.old_value) {
                             outputDiff[newKey].old_value.push(
                                 data[key]?.old_value.name
-                            )
+                            );
                         } else {
                             outputDiff[newKey].old_value.push(
                                 data[key]?.old_value
-                            )
+                            );
                         }
 
                         if (data[key]?.new_value) {
                             outputDiff[newKey].new_value.push(
                                 data[key]?.new_value.name
-                            )
+                            );
                         } else {
                             outputDiff[newKey].new_value.push(
                                 data[key]?.new_value
-                            )
+                            );
                         }
                     } else {
-                        outputDiff[newKey].old_value.push(data[key]?.old_value)
+                        outputDiff[newKey].old_value.push(data[key]?.old_value);
 
-                        outputDiff[newKey].new_value.push(data[key]?.new_value)
+                        outputDiff[newKey].new_value.push(data[key]?.new_value);
                     }
                 }
             } else if (key.startsWith('resources[')) {
                 if (matchesAnyPattern(key)) {
-                    const mainKey = key.split('.')[0]!
-                    const subKey = key.split('.').slice(1).join('.')
+                    const mainKey = key.split('.')[0]!;
+                    const subKey = key.split('.').slice(1).join('.');
                     if (subKey) {
                         if (subKey === 'title') {
                             if (
                                 data[key]?.old_value === null ||
                                 data[key]?.old_value === 'null'
                             ) {
-                                continue
+                                continue;
                             }
                         }
                         outputDiff[mainKey] = outputDiff[mainKey] || {
                             old_value: [],
                             new_value: [],
-                        }
+                        };
                         const old_value = `${subKey
                             .split('_')
                             .join(' ')}: ${JSON.stringify(
                             data[key]?.old_value,
                             null,
                             2
-                        )}`
+                        )}`;
                         const new_value = `${subKey
                             .split('_')
                             .join(' ')}: ${JSON.stringify(
                             data[key]?.new_value,
                             null,
                             2
-                        )}`
+                        )}`;
 
                         if (
                             subKey.includes('layerObj') ||
                             subKey.includes('layerRaw')
                         ) {
                             if (!subKey.includes('.')) {
-                                const layerold = data[key]?.old_value
-                                const layerNew = data[key]?.new_value
+                                const layerold = data[key]?.old_value;
+                                const layerNew = data[key]?.new_value;
                                 if (layerold === null || layerold === 'null') {
-                                    outputDiff[mainKey].old_value.push(layerold)
+                                    outputDiff[mainKey].old_value.push(
+                                        layerold
+                                    );
 
                                     outputDiff[mainKey].new_value.push(
                                         layerNew.name
-                                    )
+                                    );
                                 } else if (
                                     layerNew === null ||
                                     layerNew === 'null'
                                 ) {
                                     outputDiff[mainKey].old_value.push(
                                         layerold.name
-                                    )
+                                    );
 
-                                    outputDiff[mainKey].new_value.push(layerNew)
+                                    outputDiff[mainKey].new_value.push(
+                                        layerNew
+                                    );
                                 }
                             } else {
-                                outputDiff[mainKey].old_value.push(old_value)
+                                outputDiff[mainKey].old_value.push(old_value);
 
-                                outputDiff[mainKey].new_value.push(new_value)
+                                outputDiff[mainKey].new_value.push(new_value);
                             }
                         }
 
-                        outputDiff[mainKey].old_value.push(old_value)
+                        outputDiff[mainKey].old_value.push(old_value);
 
-                        outputDiff[mainKey].new_value.push(new_value)
+                        outputDiff[mainKey].new_value.push(new_value);
                     } else {
                         outputDiff[mainKey] = {
                             old_value:
@@ -343,26 +347,26 @@ export function formatDiff(
                                     ? null
                                     : (data[key]?.new_value.name ??
                                       data[key]?.new_value.title),
-                        }
+                        };
                     }
                 }
             } else {
                 if (key in datasetFormFieldmap) {
-                    const newKey = datasetFormFieldmap[key]!
+                    const newKey = datasetFormFieldmap[key]!;
 
-                    outputDiff[newKey] = data[key]
+                    outputDiff[newKey] = data[key];
                 } else {
                     if (
                         matchesAnyPattern(key) &&
                         !['draft', 'state'].includes(key)
                     ) {
-                        const newKey = key.split('_').join(' ')
+                        const newKey = key.split('_').join(' ');
 
-                        outputDiff[newKey] = data[key]
+                        outputDiff[newKey] = data[key];
                     }
                 }
             }
         }
     }
-    return outputDiff
+    return outputDiff;
 }

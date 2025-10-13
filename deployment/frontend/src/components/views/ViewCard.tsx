@@ -1,10 +1,10 @@
-import { ChartBarIcon } from '@heroicons/react/20/solid'
-import ChartViewEditor from './ChartViewEditor'
-import { PencilSquareIcon } from '@heroicons/react/24/outline'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { type View, type ViewState } from '@/interfaces/dataset.interface'
-import { type Dispatch, type SetStateAction } from 'react'
-import { type WriDataset } from '@/schema/ckan.schema'
+import { ChartBarIcon } from '@heroicons/react/20/solid';
+import ChartViewEditor from './ChartViewEditor';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { type View, type ViewState } from '@/interfaces/dataset.interface';
+import { type Dispatch, type SetStateAction } from 'react';
+import { type WriDataset } from '@/schema/ckan.schema';
 
 export default function ViewCard({
     view,
@@ -15,18 +15,18 @@ export default function ViewCard({
     onSave,
     dataset,
 }: {
-    view: View
-    setView: Dispatch<SetStateAction<View>>
-    onCancelOrDelete: (mode: string) => void
-    mode: ViewState['_state']
-    setMode: Dispatch<SetStateAction<ViewState['_state']>>
+    view: View;
+    setView: Dispatch<SetStateAction<View>>;
+    onCancelOrDelete: (mode: string) => void;
+    mode: ViewState['_state'];
+    setMode: Dispatch<SetStateAction<ViewState['_state']>>;
     onSave: (
         mode: string,
         view: View,
         onError: () => void,
         onSuccess: () => void
-    ) => void
-    dataset: WriDataset
+    ) => void;
+    dataset: WriDataset;
 }) {
     return (
         <div>
@@ -35,9 +35,9 @@ export default function ViewCard({
                     className="w-full px-6 py-5 shadow-md hover:bg-slate-100 group flex justify-between items-center"
                     onClick={() => {
                         if (mode == 'edit') {
-                            setMode('saved')
+                            setMode('saved');
                         } else if (mode == 'saved') {
-                            setMode('edit')
+                            setMode('edit');
                         }
                     }}
                 >
@@ -67,5 +67,5 @@ export default function ViewCard({
                     />
                 )}
         </div>
-    )
+    );
 }

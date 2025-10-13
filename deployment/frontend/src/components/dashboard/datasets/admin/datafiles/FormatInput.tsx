@@ -1,26 +1,26 @@
-import { useState } from 'react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import { Combobox } from '@headlessui/react'
-import { api } from '@/utils/api'
-import classNames from '@/utils/classnames'
-import { Controller, type Path, type UseFormReturn } from 'react-hook-form'
-import { type DatasetFormType } from '@/schema/dataset.schema'
-import Spinner from '@/components/_shared/Spinner'
-import { match, P } from 'ts-pattern'
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
+import { useState } from 'react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { Combobox } from '@headlessui/react';
+import { api } from '@/utils/api';
+import classNames from '@/utils/classnames';
+import { Controller, type Path, type UseFormReturn } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import Spinner from '@/components/_shared/Spinner';
+import { match, P } from 'ts-pattern';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 export default function FormatInput({
     formObj,
     name,
     className = '',
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    name: Path<DatasetFormType>
-    className?: string
+    formObj: UseFormReturn<DatasetFormType>;
+    name: Path<DatasetFormType>;
+    className?: string;
 }) {
-    const { control } = formObj
-    const [query, setQuery] = useState('')
-    const possibleFormats = api.dataset.getFormats.useQuery({ q: query })
+    const { control } = formObj;
+    const [query, setQuery] = useState('');
+    const possibleFormats = api.dataset.getFormats.useQuery({ q: query });
 
     return (
         <Controller
@@ -136,5 +136,5 @@ export default function FormatInput({
                 </Combobox>
             )}
         />
-    )
+    );
 }

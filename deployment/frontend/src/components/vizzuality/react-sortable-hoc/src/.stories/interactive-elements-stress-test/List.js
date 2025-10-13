@@ -1,7 +1,7 @@
-import React from 'react'
-import { sortableContainer } from '../../../src'
+import React from 'react';
+import { sortableContainer } from '../../../src';
 
-import Item from './Item'
+import Item from './Item';
 
 function List({ items }) {
     return (
@@ -11,10 +11,10 @@ function List({ items }) {
                     <Item key={key} index={index}>
                         {children}
                     </Item>
-                )
+                );
             })}
         </div>
-    )
+    );
 }
 
-export default sortableContainer(List)
+export default sortableContainer(List);

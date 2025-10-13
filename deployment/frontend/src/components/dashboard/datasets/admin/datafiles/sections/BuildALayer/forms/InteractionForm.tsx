@@ -1,38 +1,38 @@
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { MinusCircleIcon } from '@heroicons/react/24/outline'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { MinusCircleIcon } from '@heroicons/react/24/outline';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
     type Control,
     type UseFormRegister,
     useFieldArray,
     useForm,
     useFormContext,
-} from 'react-hook-form'
-import { type LayerFormType } from '../layer.schema'
-import { InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import { Button } from '@/components/_shared/Button'
-import { useState } from 'react'
-import { Accordion } from '../Accordion'
-import { ScrollArea } from '@/components/_shared/ScrollArea'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
+} from 'react-hook-form';
+import { type LayerFormType } from '../layer.schema';
+import { InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import { Button } from '@/components/_shared/Button';
+import { useState } from 'react';
+import { Accordion } from '../Accordion';
+import { ScrollArea } from '@/components/_shared/ScrollArea';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 interface InteractionFormProps {
-    onNext: () => void
-    onPrev: () => void
+    onNext: () => void;
+    onPrev: () => void;
 }
 
 export default function InteractionForm({
     onPrev,
     onNext,
 }: InteractionFormProps) {
-    const formObj = useFormContext<LayerFormType>()
-    const [q, setQ] = useState('')
-    const { handleSubmit, register, control } = formObj
+    const formObj = useFormContext<LayerFormType>();
+    const [q, setQ] = useState('');
+    const { handleSubmit, register, control } = formObj;
     const onSubmit = () => {
-        onNext()
-    }
+        onNext();
+    };
     return (
         <>
             <div className="mt-10 px-4 mb-4">
@@ -60,7 +60,7 @@ export default function InteractionForm({
                 </div>
             </form>
         </>
-    )
+    );
 }
 
 function ItemsArray({
@@ -68,15 +68,15 @@ function ItemsArray({
     register,
     q = '',
 }: {
-    register: UseFormRegister<LayerFormType>
-    control: Control<LayerFormType>
-    q?: string
+    register: UseFormRegister<LayerFormType>;
+    control: Control<LayerFormType>;
+    q?: string;
 }) {
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'interactionConfig.output',
-    })
-    const { watch } = useFormContext<LayerFormType>()
+    });
+    const { watch } = useFormContext<LayerFormType>();
     const filteredOutputs =
         q !== ''
             ? watch(`interactionConfig.output`)
@@ -84,7 +84,7 @@ function ItemsArray({
                       item.column ? item.column.includes(q) : false
                   )
                   .map((item) => item.column)
-            : watch(`interactionConfig.output`).map((item) => item.column)
+            : watch(`interactionConfig.output`).map((item) => item.column);
     return (
         <>
             <ScrollArea className="h-[375px]">
@@ -280,5 +280,5 @@ function ItemsArray({
                 </div>
             </ScrollArea>
         </>
-    )
+    );
 }

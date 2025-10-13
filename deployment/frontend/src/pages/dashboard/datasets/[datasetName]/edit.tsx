@@ -1,67 +1,67 @@
-import { appRouter } from '@/server/api/root'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import superjson from 'superjson'
+import { appRouter } from '@/server/api/root';
+import { createServerSideHelpers } from '@trpc/react-query/server';
+import superjson from 'superjson';
 import {
     type GetServerSidePropsContext,
     type InferGetServerSidePropsType,
-} from 'next'
-import { NextSeo } from 'next-seo'
-import Header from '@/components/_shared/Header'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import { api } from '@/utils/api'
-import { getServerAuthSession } from '@/server/auth'
-import { P, match } from 'ts-pattern'
-import EditDatasetForm from '@/components/dashboard/datasets/admin/EditDatasetForm'
-import { useRouter } from 'next/router'
-import dynamic from 'next/dynamic'
+} from 'next';
+import { NextSeo } from 'next-seo';
+import Header from '@/components/_shared/Header';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import { api } from '@/utils/api';
+import { getServerAuthSession } from '@/server/auth';
+import { P, match } from 'ts-pattern';
+import EditDatasetForm from '@/components/dashboard/datasets/admin/EditDatasetForm';
+import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import notify from '@/utils/notify'
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import { useState } from 'react'
-import { getOneDataset, getOnePendingDataset } from '@/utils/apiUtils'
+});
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import notify from '@/utils/notify';
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import { useState } from 'react';
+import { getOneDataset, getOnePendingDataset } from '@/utils/apiUtils';
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ datasetName: string }>
 ) {
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
     const helpers = createServerSideHelpers({
         router: appRouter,
         ctx: { session, ip: undefined },
         transformer: superjson,
-    })
-    const datasetName = context.params?.datasetName!
+    });
+    const datasetName = context.params?.datasetName!;
     try {
-        const prevdataset = await getOneDataset(datasetName, session)
+        const prevdataset = await getOneDataset(datasetName, session);
 
         const pendingDataset = await getOnePendingDataset(
             prevdataset.id,
             session
-        )
-        let initialDataset = prevdataset
+        );
+        let initialDataset = prevdataset;
         const pendingExist =
             pendingDataset && Object.keys(pendingDataset).length > 0
                 ? true
-                : false
+                : false;
 
         if (pendingExist && pendingDataset) {
-            initialDataset = pendingDataset
+            initialDataset = pendingDataset;
         }
 
-        await helpers.teams.getAllTeams.prefetch()
-        await helpers.tags.getAllTags.prefetch()
-        await helpers.topics.getTopicsHierarchy.prefetch()
-        await helpers.dataset.getLicenses.prefetch()
+        await helpers.teams.getAllTeams.prefetch();
+        await helpers.tags.getAllTags.prefetch();
+        await helpers.topics.getTopicsHierarchy.prefetch();
+        await helpers.dataset.getLicenses.prefetch();
         await helpers.dataset.getOneActualOrPendingDataset.prefetch({
             id: initialDataset.id,
             isPending: pendingExist,
-        })
+        });
         await helpers.dataset.getDatasetCollaborators.prefetch({
             id: datasetName,
-        })
+        });
         return {
             props: {
                 trpcState: helpers.dehydrate(),
@@ -69,7 +69,7 @@ export async function getServerSideProps(
                 pendingExist,
                 datasetId: initialDataset.id,
             },
-        }
+        };
     } catch (e) {
         return {
             props: {
@@ -77,44 +77,44 @@ export async function getServerSideProps(
                     destination: '/datasets/404',
                 },
             },
-        }
+        };
     }
 }
 
 export default function EditDatasetPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const { datasetName } = props
-    const [deleteOpen, setDeleteOpen] = useState(false)
-    const pendingExist = props.pendingExist!
-    const datasetId = props.datasetId!
-    const router = useRouter()
-    const utils = api.useContext()
+    const { datasetName } = props;
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const pendingExist = props.pendingExist!;
+    const datasetId = props.datasetId!;
+    const router = useRouter();
+    const utils = api.useContext();
     const dataset = api.dataset.getOneActualOrPendingDataset.useQuery({
         id: datasetId,
         isPending: pendingExist,
-    })
+    });
 
     const deleteDataset = api.dataset.deleteDataset.useMutation({
         onSuccess: async () => {
             await utils.dataset.getOneActualOrPendingDataset.invalidate({
                 id: datasetId,
                 isPending: pendingExist,
-            })
-            setDeleteOpen(false)
+            });
+            setDeleteOpen(false);
             notify(
                 `Successfully deleted the ${
                     dataset.data?.name ?? datasetName
                 } Dataset`,
                 'error'
-            )
-            router.push('/dashboard/datasets')
+            );
+            router.push('/dashboard/datasets');
         },
         onError: (error) => {
-            console.error(error)
-            setDeleteOpen(false)
+            console.error(error);
+            setDeleteOpen(false);
         },
-    })
+    });
     const links = [
         { label: 'Dashboard', url: '/dashboard', current: false },
         { label: 'Datasets', url: '/dashboard/datasets', current: false },
@@ -123,7 +123,7 @@ export default function EditDatasetPage(
             url: `/dashboard/datasets/${datasetName}/edit`,
             current: true,
         },
-    ]
+    ];
 
     return (
         <>
@@ -219,5 +219,5 @@ export default function EditDatasetPage(
                 </main>
             </div>
         </>
-    )
+    );
 }

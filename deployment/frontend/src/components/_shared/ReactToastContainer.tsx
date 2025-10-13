@@ -1,5 +1,5 @@
 //@ts-ignore
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer } from 'react-toastify';
 
 export default function ReactToastContainer() {
     return (
@@ -14,5 +14,5 @@ export default function ReactToastContainer() {
             pauseOnFocusLoss
             pauseOnHover
         />
-    )
+    );
 }

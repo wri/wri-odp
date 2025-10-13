@@ -1,4 +1,4 @@
-import z from 'zod'
+import z from 'zod';
 
 export const searchSchema = z.object({
     search: z.string().default(''),
@@ -24,6 +24,6 @@ export const searchSchema = z.object({
     pageEnabled: z.boolean().optional(),
     removeUnecessaryDataInResources: z.boolean().optional(),
     tab: z.string().optional(),
-})
+});
 
-export type SearchInput = z.infer<typeof searchSchema>
+export type SearchInput = z.infer<typeof searchSchema>;

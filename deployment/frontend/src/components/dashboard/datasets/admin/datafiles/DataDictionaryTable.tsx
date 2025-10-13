@@ -5,23 +5,23 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/_shared/Table'
-import { type DatasetFormType } from '@/schema/dataset.schema'
-import { type UseFormReturn, useFieldArray } from 'react-hook-form'
+} from '@/components/_shared/Table';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 
 export function DataDictionaryTable({
     formObj,
     resourceIndex,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    resourceIndex: number
+    formObj: UseFormReturn<DatasetFormType>;
+    resourceIndex: number;
 }) {
-    const { control, watch, register } = formObj
+    const { control, watch, register } = formObj;
     const { fields } = useFieldArray({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: `resources.${resourceIndex}.schema`, // unique name for your Field Array
-    })
-    if (fields.length === 0) return <></>
+    });
+    if (fields.length === 0) return <></>;
     return (
         <Table>
             <TableHeader>
@@ -94,5 +94,5 @@ export function DataDictionaryTable({
                 ))}
             </TableBody>
         </Table>
-    )
+    );
 }

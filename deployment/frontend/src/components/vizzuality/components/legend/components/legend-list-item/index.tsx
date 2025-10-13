@@ -1,11 +1,11 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import classnames from 'classnames'
-import SortableElement from '../../../../react-sortable-hoc/src/SortableElement/index'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
+import SortableElement from '../../../../react-sortable-hoc/src/SortableElement/index';
 
 // Components
-import LegendItemDrag from '../legend-item-drag'
+import LegendItemDrag from '../legend-item-drag';
 
 class LegendListItem extends PureComponent {
     static propTypes = {
@@ -15,7 +15,7 @@ class LegendListItem extends PureComponent {
         children: PropTypes.node,
         toolbar: PropTypes.node,
         title: PropTypes.node,
-    }
+    };
 
     static defaultProps = {
         dataset: '',
@@ -24,12 +24,12 @@ class LegendListItem extends PureComponent {
         children: [],
         toolbar: [],
         title: [],
-    }
+    };
 
     render() {
         const { layers, sortable, children, toolbar, title, ...props } =
-            this.props
-        const activeLayer = layers.find((l) => l.active) || layers[0]
+            this.props;
+        const activeLayer = layers.find((l) => l.active) || layers[0];
 
         return (
             <li
@@ -86,6 +86,6 @@ class LegendListItem extends PureComponent {
                     </div>
                 </div>
             </li>
-        )
+        );
     }
 }

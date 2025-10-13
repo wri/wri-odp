@@ -1,7 +1,7 @@
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import classNames from '@/utils/classnames'
-import { Disclosure, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import classNames from '@/utils/classnames';
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import {
     ArrowDownCircleIcon,
     ArrowPathIcon,
@@ -12,12 +12,12 @@ import {
     MapPinIcon,
     PaperAirplaneIcon,
     PlusCircleIcon,
-} from '@heroicons/react/24/outline'
-import { DownloadButton } from './datafiles/Download'
-import { OpenInButton } from './datafiles/OpenIn'
-import { type Resource, type View } from '@/interfaces/dataset.interface'
-import { getFormatColor } from '@/utils/formatColors'
-import { type Index } from 'flexsearch'
+} from '@heroicons/react/24/outline';
+import { DownloadButton } from './datafiles/Download';
+import { OpenInButton } from './datafiles/OpenIn';
+import { type Resource, type View } from '@/interfaces/dataset.interface';
+import { getFormatColor } from '@/utils/formatColors';
+import { type Index } from 'flexsearch';
 import {
     Fragment,
     useCallback,
@@ -25,29 +25,29 @@ import {
     useMemo,
     useRef,
     useState,
-} from 'react'
-import { type WriDataset } from '@/schema/ckan.schema'
-import { useLayersFromRW } from '@/utils/queryHooks'
-import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
-import { type TabularResource } from '../visualizations/Visualizations'
-import { APIButton } from './datafiles/API'
-import { UseFormReturn, useForm } from 'react-hook-form'
-import { api } from '@/utils/api'
-import DefaultTooltip from '@/components/_shared/Tooltip'
-import { toast } from 'react-toastify'
+} from 'react';
+import { type WriDataset } from '@/schema/ckan.schema';
+import { useLayersFromRW } from '@/utils/queryHooks';
+import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks';
+import { type TabularResource } from '../visualizations/Visualizations';
+import { APIButton } from './datafiles/API';
+import { UseFormReturn, useForm } from 'react-hook-form';
+import { api } from '@/utils/api';
+import DefaultTooltip from '@/components/_shared/Tooltip';
+import { toast } from 'react-toastify';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import { env } from '@/env.mjs'
-import { DownloadPopup } from '@/components/_shared/DownloadPopup'
-import dynamic from 'next/dynamic'
-import { QueryEndpoint } from './APIEndpoint'
+} from '@/components/_shared/Popover';
+import { env } from '@/env.mjs';
+import { DownloadPopup } from '@/components/_shared/DownloadPopup';
+import dynamic from 'next/dynamic';
+import { QueryEndpoint } from './APIEndpoint';
 
 const LocationSearch = dynamic(() => import('./LocationSearch'), {
     ssr: false,
-})
+});
 
 function customDataLayer(data: { event: string; resource_name: string }) {
     if (env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
@@ -55,14 +55,14 @@ function customDataLayer(data: { event: string; resource_name: string }) {
         dataLayer.push({
             event: data.event,
             resource_name: data.resource_name,
-        })
+        });
     }
 }
 
 export interface LocationSearchFormType {
-    bbox: Array<Array<number>> | null
-    point: Array<number> | null
-    location: string
+    bbox: Array<Array<number>> | null;
+    point: Array<number> | null;
+    location: string;
 }
 
 export function DataFiles({
@@ -76,40 +76,40 @@ export function DataFiles({
     mapDisplaypreview,
     setMapDisplayPreview,
 }: {
-    dataset: WriDataset
-    index: Index
-    setTabularResource: (tabularResource: TabularResource | null) => void
-    setDisplayNoPreview: (displayNoPreview: boolean) => void
-    setMapDisplayPreview: (mapDisplaypreview: boolean) => void
-    mapDisplaypreview: boolean
-    tabularResource: TabularResource | null
-    isCurrentVersion?: boolean
-    diffFields: Array<Record<string, { old_value: string; new_value: string }>>
+    dataset: WriDataset;
+    index: Index;
+    setTabularResource: (tabularResource: TabularResource | null) => void;
+    setDisplayNoPreview: (displayNoPreview: boolean) => void;
+    setMapDisplayPreview: (mapDisplaypreview: boolean) => void;
+    mapDisplaypreview: boolean;
+    tabularResource: TabularResource | null;
+    isCurrentVersion?: boolean;
+    diffFields: Array<Record<string, { old_value: string; new_value: string }>>;
 }) {
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
-        useActiveLayerGroups()
-    const { data: activeLayers } = useLayersFromRW()
+        useActiveLayerGroups();
+    const { data: activeLayers } = useLayersFromRW();
     const [datafilesToDownload, setDatafilesToDownload] = useState<Resource[]>(
         []
-    )
-    const [showOnlySelected, setShowOnlySelected] = useState(false)
+    );
+    const [showOnlySelected, setShowOnlySelected] = useState(false);
     function addDatafilesToDownload(resources: Resource[]) {
         const existingResources = datafilesToDownload.filter((resource) =>
             resources.some((r) => r.id === resource.id)
-        )
+        );
         setDatafilesToDownload((prev) => [
             ...prev.filter((resource) => !existingResources.includes(resource)),
             ...resources,
-        ])
+        ]);
     }
-    const datafiles = dataset?.resources
+    const datafiles = dataset?.resources;
     const formObj = useForm<LocationSearchFormType>({
         defaultValues: {
             bbox: null,
             point: null,
             location: '',
         },
-    })
+    });
     const { data: searchedResources, isLoading: isLoadingLocationSearch } =
         api.dataset.resourceLocationSearch.useQuery(
             {
@@ -121,12 +121,12 @@ export function DataFiles({
             },
             {
                 onSuccess: (data) => {
-                    addDatafilesToDownload(data ?? [])
-                    formObj.reset()
+                    addDatafilesToDownload(data ?? []);
+                    formObj.reset();
                 },
             }
-        )
-    const [q, setQ] = useState('')
+        );
+    const [q, setQ] = useState('');
 
     function handleSearch() {
         const filteredDatafilesByName =
@@ -134,8 +134,8 @@ export function DataFiles({
                 ? datafiles?.filter((datafile) =>
                       index.search(q).includes(datafile.id)
                   )
-                : []
-        addDatafilesToDownload(filteredDatafilesByName)
+                : [];
+        addDatafilesToDownload(filteredDatafilesByName);
     }
 
     const geojsons = useMemo(() => {
@@ -148,52 +148,52 @@ export function DataFiles({
                 selected: datafilesToDownload.some((f) => f.id === df.id),
                 id: df.id,
                 datafile: df,
-            }))
-    }, [datafilesToDownload])
+            }));
+    }, [datafilesToDownload]);
 
     const datafileList = useMemo(() => {
         if (!showOnlySelected) {
-            return datafiles
+            return datafiles;
         }
         return datafiles.filter((d) =>
             datafilesToDownload.some((r) => r.id === d.id)
-        )
-    }, [datafilesToDownload, showOnlySelected])
+        );
+    }, [datafilesToDownload, showOnlySelected]);
 
     const addDatafileToDownload = (datafile: Resource) => {
-        setDatafilesToDownload((prev) => [...prev, datafile])
-    }
+        setDatafilesToDownload((prev) => [...prev, datafile]);
+    };
     const removeDatafileToDownload = (datafile: Resource) => {
         setDatafilesToDownload((prev) =>
             prev.filter((r) => r.id !== datafile.id)
-        )
-    }
+        );
+    };
 
     const toggleDatafileToDownload = (datafile: Resource) => {
         if (datafilesToDownload.some((f) => f.id === datafile.id)) {
-            removeDatafileToDownload(datafile)
+            removeDatafileToDownload(datafile);
         } else {
-            addDatafileToDownload(datafile)
+            addDatafileToDownload(datafile);
         }
-    }
+    };
 
     const uploadedDatafiles = datafiles.filter(
         (r) => r.url_type === 'upload' || r.url_type === 'link'
-    )
+    );
 
-    const downloadZipped = api.dataset.downloadZippedResources.useMutation()
+    const downloadZipped = api.dataset.downloadZippedResources.useMutation();
     const createDownloadEvent = api.downloadEvents.createEvents.useMutation({
         onError: (err) => {
             toast('Failed to send your information', {
                 type: 'error',
-            })
-            setOpenDownload(false)
+            });
+            setOpenDownload(false);
         },
-    })
+    });
 
     const keys = datafilesToDownload
         .map((r) => r.key ?? r.url)
-        .filter(Boolean) as string[]
+        .filter(Boolean) as string[];
     const handleFormSubmit = (data: any) => {
         downloadZipped.mutate(
             {
@@ -209,27 +209,27 @@ export function DataFiles({
                         package_id: dataset.id ?? '',
                         typeOfForm: 'email-download',
                         package_name: dataset.name,
-                    }
-                    console.log('Creating download event with data:', _data)
-                    createDownloadEvent.mutate(_data)
+                    };
+                    console.log('Creating download event with data:', _data);
+                    createDownloadEvent.mutate(_data);
                     toast("You'll receive an email when the file is ready", {
                         type: 'success',
-                    })
-                    setOpenDownload(false)
+                    });
+                    setOpenDownload(false);
                 },
                 onError: (err) => {
-                    console.error(err)
+                    console.error(err);
                     toast('Failed to request file', {
                         type: 'error',
-                    })
+                    });
                 },
             }
-        )
-    }
-    const [openDownload, setOpenDownload] = useState(false)
+        );
+    };
+    const [openDownload, setOpenDownload] = useState(false);
     const notDownloadable = uploadedDatafiles.filter(
         (r) => r.not_downloadable === true
-    )
+    );
     return (
         <>
             <div className="py-4">
@@ -350,8 +350,8 @@ export function DataFiles({
                             {datafilesToDownload.length > 0 && (
                                 <button
                                     onClick={() => {
-                                        setShowOnlySelected(false)
-                                        setDatafilesToDownload([])
+                                        setShowOnlySelected(false);
+                                        setDatafilesToDownload([]);
                                     }}
                                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                                 >
@@ -379,9 +379,9 @@ export function DataFiles({
                                             addLayerToLayerGroup(
                                                 r.rw_id ?? '',
                                                 dataset.id
-                                            )
+                                            );
                                         }
-                                    })
+                                    });
                                 }}
                                 className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                             >
@@ -396,9 +396,9 @@ export function DataFiles({
                                                 // @ts-ignore
                                                 r.rw_id,
                                                 dataset.id
-                                            )
+                                            );
                                         }
-                                    })
+                                    });
                                 }}
                             >
                                 Hide All Layers
@@ -435,7 +435,7 @@ export function DataFiles({
                                         isCurrentVersion={isCurrentVersion}
                                         index={index}
                                     />
-                                )
+                                );
                             }
                             if (datafile.type === 'gee-asset') {
                                 return (
@@ -446,7 +446,7 @@ export function DataFiles({
                                         isCurrentVersion={isCurrentVersion}
                                         index={index}
                                     />
-                                )
+                                );
                             }
                             return (
                                 <DatafileCard
@@ -470,7 +470,7 @@ export function DataFiles({
                                     isCurrentVersion={isCurrentVersion}
                                     index={index}
                                 />
-                            )
+                            );
                         })}
                     </>
                 )}
@@ -493,7 +493,7 @@ export function DataFiles({
                 }
             />
         </>
-    )
+    );
 }
 
 function DatafileCard({
@@ -510,31 +510,31 @@ function DatafileCard({
     mapDisplaypreview,
     setMapDisplayPreview,
 }: {
-    datafile: Resource
-    dataset: WriDataset
-    setTabularResource: (tabularResource: TabularResource | null) => void
-    tabularResource: TabularResource | null
-    isCurrentVersion?: boolean
-    diffFields: Array<Record<string, { old_value: string; new_value: string }>>
-    index: number
-    selected: boolean
-    addDatafileToDownload: (datafile: Resource) => void
-    removeDatafileToDownload: (datafile: Resource) => void
-    setMapDisplayPreview: (mapDisplaypreview: boolean) => void
-    mapDisplaypreview: boolean
+    datafile: Resource;
+    dataset: WriDataset;
+    setTabularResource: (tabularResource: TabularResource | null) => void;
+    tabularResource: TabularResource | null;
+    isCurrentVersion?: boolean;
+    diffFields: Array<Record<string, { old_value: string; new_value: string }>>;
+    index: number;
+    selected: boolean;
+    addDatafileToDownload: (datafile: Resource) => void;
+    removeDatafileToDownload: (datafile: Resource) => void;
+    setMapDisplayPreview: (mapDisplaypreview: boolean) => void;
+    mapDisplaypreview: boolean;
 }) {
-    const { activeCharts, addCharts, removeCharts } = useActiveCharts()
-    const { data: activeLayers } = useLayersFromRW()
+    const { activeCharts, addCharts, removeCharts } = useActiveCharts();
+    const { data: activeLayers } = useLayersFromRW();
     const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
-        useActiveLayerGroups()
+        useActiveLayerGroups();
 
-    const created_at = new Date(datafile?.created ?? '')
-    const last_updated = new Date(datafile?.metadata_modified ?? '')
+    const created_at = new Date(datafile?.created ?? '');
+    const last_updated = new Date(datafile?.metadata_modified ?? '');
     const options = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-    } as const
+    } as const;
 
     const higlighted = (field: string, value: string) => {
         if (diffFields && !isCurrentVersion) {
@@ -545,22 +545,22 @@ function DatafileCard({
                         diffField[field]?.new_value === value
                 )
             ) {
-                return 'bg-yellow-200'
+                return 'bg-yellow-200';
             }
         }
-        return ''
-    }
+        return '';
+    };
     const newDatafile = () => {
         if (diffFields && !isCurrentVersion) {
             if (
                 diffFields[index] &&
                 diffFields[index]?.undefined?.old_value === null
             ) {
-                return 'bg-yellow-200'
+                return 'bg-yellow-200';
             }
         }
-        return ''
-    }
+        return '';
+    };
 
     return (
         <Disclosure>
@@ -593,11 +593,11 @@ function DatafileCard({
                                                 if (selected) {
                                                     removeDatafileToDownload(
                                                         datafile
-                                                    )
+                                                    );
                                                 } else {
                                                     addDatafileToDownload(
                                                         datafile
-                                                    )
+                                                    );
                                                 }
                                             }}
                                         />
@@ -667,7 +667,7 @@ function DatafileCard({
                                         return (
                                             datafile.url?.endsWith(a?.id) ||
                                             datafile.id === a?.id
-                                        )
+                                        );
                                     }) ? (
                                         <Button
                                             variant="light"
@@ -679,13 +679,13 @@ function DatafileCard({
                                                         // @ts-ignore
                                                         datafile?.rw_id,
                                                         dataset.id
-                                                    )
+                                                    );
                                                 }
                                                 removeLayerFromLayerGroup(
                                                     // @ts-ignore
                                                     datafile?.id,
                                                     dataset.id
-                                                )
+                                                );
                                             }}
                                         >
                                             <span className="mt-1 text-xs 2xl:text-sm whitespace-nowrap">
@@ -701,7 +701,7 @@ function DatafileCard({
                                             onClick={() => {
                                                 // @ts-ignore
                                                 if (!mapDisplaypreview) {
-                                                    setMapDisplayPreview(true)
+                                                    setMapDisplayPreview(true);
                                                 }
                                                 if (
                                                     datafile.layerObj
@@ -714,7 +714,7 @@ function DatafileCard({
                                                         datafile.id,
                                                         dataset.id,
                                                         'ckan'
-                                                    )
+                                                    );
                                                 } else {
                                                     addLayerToLayerGroup(
                                                         // @ts-ignore
@@ -725,14 +725,14 @@ function DatafileCard({
                                                             : datafile.id,
                                                         dataset.id,
                                                         'rw'
-                                                    )
+                                                    );
                                                 }
                                                 customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:
                                                         datafile.title ??
                                                         datafile.name!,
-                                                })
+                                                });
                                             }}
                                         >
                                             Show Layer
@@ -770,14 +770,14 @@ function DatafileCard({
                                                     name:
                                                         datafile?.title ??
                                                         datafile.name!,
-                                                })
+                                                });
 
                                                 customDataLayer({
                                                     event: 'gtm.click',
                                                     resource_name:
                                                         datafile.title ??
                                                         datafile.name!,
-                                                })
+                                                });
                                             }}
                                         >
                                             View Table Preview
@@ -800,11 +800,11 @@ function DatafileCard({
                                                 const viewIds =
                                                     datafile._views?.map(
                                                         (v: View) => v.id
-                                                    )
+                                                    );
                                                 if (viewIds) {
                                                     removeCharts(
                                                         viewIds as string[]
-                                                    )
+                                                    );
                                                 }
                                             }}
                                         >
@@ -822,7 +822,7 @@ function DatafileCard({
                                             }
                                             onClick={() => {
                                                 if (datafile._views)
-                                                    addCharts(datafile._views)
+                                                    addCharts(datafile._views);
 
                                                 //@ts-ignore
                                                 customDataLayer({
@@ -830,7 +830,7 @@ function DatafileCard({
                                                     resource_name:
                                                         datafile.title ??
                                                         datafile.name!,
-                                                })
+                                                });
                                             }}
                                         >
                                             View Chart Preview
@@ -876,7 +876,7 @@ function DatafileCard({
                                                             // @ts-ignore
                                                             datafile?.rw_id,
                                                             dataset.id
-                                                        )
+                                                        );
                                                     }
                                                 }}
                                             >
@@ -898,13 +898,13 @@ function DatafileCard({
                                                         ) {
                                                             setMapDisplayPreview(
                                                                 true
-                                                            )
+                                                            );
                                                         }
                                                         addLayerToLayerGroup(
                                                             // @ts-ignore
                                                             datafile.rw_id,
                                                             dataset.id
-                                                        )
+                                                        );
                                                     }
 
                                                     customDataLayer({
@@ -912,7 +912,7 @@ function DatafileCard({
                                                         resource_name:
                                                             datafile.title ??
                                                             datafile.name!,
-                                                    })
+                                                    });
                                                 }}
                                             >
                                                 Show Layer
@@ -951,14 +951,14 @@ function DatafileCard({
                                                         name:
                                                             datafile?.title ??
                                                             datafile.name!,
-                                                    })
+                                                    });
 
                                                     customDataLayer({
                                                         event: 'gtm.click',
                                                         resource_name:
                                                             datafile.title ??
                                                             datafile.name!,
-                                                    })
+                                                    });
                                                 }}
                                             >
                                                 View Table Preview
@@ -981,11 +981,11 @@ function DatafileCard({
                                                     const viewIds =
                                                         datafile._views?.map(
                                                             (v: View) => v.id
-                                                        )
+                                                        );
                                                     if (viewIds) {
                                                         removeCharts(
                                                             viewIds as string[]
-                                                        )
+                                                        );
                                                     }
                                                 }}
                                             >
@@ -1003,14 +1003,14 @@ function DatafileCard({
                                                     if (datafile._views)
                                                         addCharts(
                                                             datafile._views
-                                                        )
+                                                        );
 
                                                     customDataLayer({
                                                         event: 'gtm.click',
                                                         resource_name:
                                                             datafile.title ??
                                                             datafile.name!,
-                                                    })
+                                                    });
                                                 }}
                                             >
                                                 View Chart Preview
@@ -1082,7 +1082,7 @@ function DatafileCard({
                 </div>
             )}
         </Disclosure>
-    )
+    );
 }
 
 function TilecacheCard({
@@ -1092,19 +1092,19 @@ function TilecacheCard({
     isCurrentVersion,
     index,
 }: {
-    datafile: Resource
-    dataset: WriDataset
-    isCurrentVersion?: boolean
-    diffFields: Array<Record<string, { old_value: string; new_value: string }>>
-    index: number
+    datafile: Resource;
+    dataset: WriDataset;
+    isCurrentVersion?: boolean;
+    diffFields: Array<Record<string, { old_value: string; new_value: string }>>;
+    index: number;
 }) {
-    const created_at = new Date(datafile?.created ?? '')
-    const last_updated = new Date(datafile?.metadata_modified ?? '')
+    const created_at = new Date(datafile?.created ?? '');
+    const last_updated = new Date(datafile?.metadata_modified ?? '');
     const options = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-    } as const
+    } as const;
 
     const higlighted = (field: string, value: string) => {
         if (diffFields && !isCurrentVersion) {
@@ -1115,30 +1115,30 @@ function TilecacheCard({
                         diffField[field]?.new_value === value
                 )
             ) {
-                return 'bg-yellow-200'
+                return 'bg-yellow-200';
             }
         }
-        return ''
-    }
+        return '';
+    };
     const newDatafile = () => {
         if (diffFields && !isCurrentVersion) {
             if (
                 diffFields[index] &&
                 diffFields[index]?.undefined?.old_value === null
             ) {
-                return 'bg-yellow-200'
+                return 'bg-yellow-200';
             }
         }
-        return ''
-    }
+        return '';
+    };
 
     const CopyButton = ({ content }: { content: string }) => {
-        const [copied, setCopied] = useState(false)
+        const [copied, setCopied] = useState(false);
         const handleClick = () => {
-            navigator.clipboard.writeText(content)
-            setCopied(true)
-            setTimeout(() => setCopied(false), 1500)
-        }
+            navigator.clipboard.writeText(content);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        };
         return (
             <DefaultTooltip
                 content={
@@ -1147,7 +1147,7 @@ function TilecacheCard({
                 contentClassName={`${copied ? 'bg-wri-green text-white' : ''}`}
                 delayDuration={copied ? 0 : 100}
                 onOpenChange={(open) => {
-                    if (copied && open) return
+                    if (copied && open) return;
                 }}
                 open={copied ? true : undefined}
             >
@@ -1159,8 +1159,8 @@ function TilecacheCard({
                     <DocumentDuplicateIcon className="w-3 text-white" />
                 </Button>
             </DefaultTooltip>
-        )
-    }
+        );
+    };
     return (
         <Disclosure>
             {({ open }) => (
@@ -1289,7 +1289,7 @@ function TilecacheCard({
                 </div>
             )}
         </Disclosure>
-    )
+    );
 }
 
 function GeeAssetCard({
@@ -1299,19 +1299,19 @@ function GeeAssetCard({
     isCurrentVersion,
     index,
 }: {
-    datafile: Resource
-    dataset: WriDataset
-    isCurrentVersion?: boolean
-    diffFields: Array<Record<string, { old_value: string; new_value: string }>>
-    index: number
+    datafile: Resource;
+    dataset: WriDataset;
+    isCurrentVersion?: boolean;
+    diffFields: Array<Record<string, { old_value: string; new_value: string }>>;
+    index: number;
 }) {
-    const created_at = new Date(datafile?.created ?? '')
-    const last_updated = new Date(datafile?.metadata_modified ?? '')
+    const created_at = new Date(datafile?.created ?? '');
+    const last_updated = new Date(datafile?.metadata_modified ?? '');
     const options = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-    } as const
+    } as const;
 
     const higlighted = (field: string, value: string) => {
         if (diffFields && !isCurrentVersion) {
@@ -1322,37 +1322,37 @@ function GeeAssetCard({
                         diffField[field]?.new_value === value
                 )
             ) {
-                return 'bg-yellow-200'
+                return 'bg-yellow-200';
             }
         }
-        return ''
-    }
+        return '';
+    };
     const newDatafile = () => {
         if (diffFields && !isCurrentVersion) {
             if (
                 diffFields[index] &&
                 diffFields[index]?.undefined?.old_value === null
             ) {
-                return 'bg-yellow-200'
+                return 'bg-yellow-200';
             }
         }
-        return ''
-    }
+        return '';
+    };
 
     const CopyButton = ({ content }: { content: string }) => {
-        const [copied, setCopied] = useState(false)
+        const [copied, setCopied] = useState(false);
         const handleClick = () => {
-            navigator.clipboard.writeText(content)
-            setCopied(true)
-            setTimeout(() => setCopied(false), 1500)
-        }
+            navigator.clipboard.writeText(content);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+        };
         return (
             <DefaultTooltip
                 content={copied ? 'Asset ID copied!' : 'Copy Asset ID'}
                 contentClassName={`${copied ? 'bg-wri-green text-white' : ''}`}
                 delayDuration={copied ? 0 : 100}
                 onOpenChange={(open) => {
-                    if (copied && open) return
+                    if (copied && open) return;
                 }}
                 open={copied ? true : undefined}
             >
@@ -1364,8 +1364,8 @@ function GeeAssetCard({
                     <DocumentDuplicateIcon className="w-3 text-white" />
                 </Button>
             </DefaultTooltip>
-        )
-    }
+        );
+    };
     return (
         <Disclosure>
             {({ open }) => (
@@ -1494,5 +1494,5 @@ function GeeAssetCard({
                 </div>
             )}
         </Disclosure>
-    )
+    );
 }

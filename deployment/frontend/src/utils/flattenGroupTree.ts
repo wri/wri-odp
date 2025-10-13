@@ -1,20 +1,20 @@
-import { type GroupTree } from '@/schema/ckan.schema'
+import { type GroupTree } from '@/schema/ckan.schema';
 
 export function flattenTree(tree: GroupTree[]): Record<string, number> {
-    const counts: Record<string, number> = {}
+    const counts: Record<string, number> = {};
 
     function helper(node: GroupTree): number {
-        let count = node.children.length
+        let count = node.children.length;
         for (const child of node.children) {
-            count += helper(child)
+            count += helper(child);
         }
-        counts[node.name] = count
-        return count
+        counts[node.name] = count;
+        return count;
     }
 
     for (const node of tree) {
-        helper(node)
+        helper(node);
     }
 
-    return counts
+    return counts;
 }

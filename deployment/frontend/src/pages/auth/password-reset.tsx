@@ -1,24 +1,24 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
     ResetPasswordSchema,
     type ResetPasswordFormType,
-} from '@/schema/auth.schema'
-import type { GetServerSideProps } from 'next'
-import { getCsrfToken, signIn } from 'next-auth/react'
-import { useForm } from 'react-hook-form'
-import { api } from '@/utils/api'
-import { useState } from 'react'
-import { getServerAuthSession } from '@/server/auth'
-import Spinner from '@/components/_shared/Spinner'
-import { NextSeo } from 'next-seo'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { LockClosedIcon } from '@heroicons/react/24/outline'
-import Image from 'next/image'
-import notify from '@/utils/notify'
+} from '@/schema/auth.schema';
+import type { GetServerSideProps } from 'next';
+import { getCsrfToken, signIn } from 'next-auth/react';
+import { useForm } from 'react-hook-form';
+import { api } from '@/utils/api';
+import { useState } from 'react';
+import { getServerAuthSession } from '@/server/auth';
+import Spinner from '@/components/_shared/Spinner';
+import { NextSeo } from 'next-seo';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { LockClosedIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
+import notify from '@/utils/notify';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
 
     if (session) {
         return {
@@ -26,16 +26,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 destination: '/',
                 permanent: false,
             },
-        }
+        };
     }
-    const csrfToken = await getCsrfToken(context)
+    const csrfToken = await getCsrfToken(context);
     if (!context.query.user_id || !context.query.token) {
         return {
             redirect: {
                 destination: '/',
                 permanent: false,
             },
-        }
+        };
     }
 
     return {
@@ -46,18 +46,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 reset_key: context.query.token,
             },
         },
-    }
-}
+    };
+};
 
 export default function ResetUserPage({
     csrfToken,
     user,
 }: {
-    csrfToken: string
-    user: { id: string; reset_key: string }
+    csrfToken: string;
+    user: { id: string; reset_key: string };
 }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [isResetSuccessful, setIsResetSuccessful] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [isResetSuccessful, setIsResetSuccessful] = useState(false);
     const {
         register,
         handleSubmit,
@@ -68,12 +68,12 @@ export default function ResetUserPage({
         defaultValues: {
             ...user,
         },
-    })
+    });
 
     const resetPassword = api.auth.resetPassword.useMutation({
         onSuccess: async () => {
-            notify('Your password has been reset')
-            setIsResetSuccessful(true)
+            notify('Your password has been reset');
+            setIsResetSuccessful(true);
             setTimeout(
                 () =>
                     signIn('credentials', {
@@ -82,16 +82,16 @@ export default function ResetUserPage({
                         password: watch('password'),
                     }),
                 3000
-            )
+            );
         },
         onError: (error) => setErrorMessage(error.message),
-    })
+    });
 
     const error =
         errorMessage ??
         errors.password?.message ??
         errors.confirm_password?.message ??
-        errors.confirm?.message
+        errors.confirm?.message;
 
     return (
         <>
@@ -100,7 +100,7 @@ export default function ResetUserPage({
                 <form
                     className="flex flex-col gap-y-4 max-w-2xl w-full px-5"
                     onSubmit={handleSubmit((data) => {
-                        resetPassword.mutate(data)
+                        resetPassword.mutate(data);
                     })}
                 >
                     <input
@@ -167,5 +167,5 @@ export default function ResetUserPage({
                 </form>
             </div>
         </>
-    )
+    );
 }

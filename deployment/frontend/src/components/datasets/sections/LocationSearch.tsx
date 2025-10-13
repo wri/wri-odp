@@ -1,5 +1,5 @@
-import { type Resource, View } from '@/interfaces/dataset.interface'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { type Resource, View } from '@/interfaces/dataset.interface';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     Layer,
     Map,
@@ -8,13 +8,13 @@ import {
     Marker,
     Source,
     useMap,
-} from 'react-map-gl'
-import GeocoderControl from '@/components/search/GeocoderControl'
-import { useQuery } from 'react-query'
-import { type UseFormReturn, useForm } from 'react-hook-form'
-import DrawControl from '@/components/search/Draw'
-import { type LocationSearchFormType } from './DataFiles'
-import { HideBoundaries } from '@/components/_shared/HideBoundaries'
+} from 'react-map-gl';
+import GeocoderControl from '@/components/search/GeocoderControl';
+import { useQuery } from 'react-query';
+import { type UseFormReturn, useForm } from 'react-hook-form';
+import DrawControl from '@/components/search/Draw';
+import { type LocationSearchFormType } from './DataFiles';
+import { HideBoundaries } from '@/components/_shared/HideBoundaries';
 
 export default function LocationSearch({
     geojsons,
@@ -22,116 +22,116 @@ export default function LocationSearch({
     open,
     toggleDatafileToDownload,
 }: {
-    geojsons: any[]
-    open: boolean
-    formObj: UseFormReturn<LocationSearchFormType>
-    toggleDatafileToDownload: (datafile: Resource) => void
+    geojsons: any[];
+    open: boolean;
+    formObj: UseFormReturn<LocationSearchFormType>;
+    toggleDatafileToDownload: (datafile: Resource) => void;
 }) {
-    const { setValue, getValues } = formObj
-    const [cursor, setCursor] = useState('grab')
+    const { setValue, getValues } = formObj;
+    const [cursor, setCursor] = useState('grab');
 
-    const mapRef = useRef<MapRef | null>(null)
+    const mapRef = useRef<MapRef | null>(null);
     const accessToken =
-        'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA'
+        'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA';
     const { data: markers } = useQuery(
         ['markers', geojsons.length],
         async () => {
             const _markers = geojsons
                 .filter((g) => g.address)
                 .filter(Boolean)
-                .map((g) => g.address)
+                .map((g) => g.address);
             return await Promise.all(
                 _markers.map(async (m) => {
                     const res = await fetch(
                         `https://api.mapbox.com/geocoding/v5/mapbox.places/${m}.json?access_token=${accessToken}&limit=1`
-                    )
-                    const json = await res.json()
-                    return json.features[0].center
+                    );
+                    const json = await res.json();
+                    return json.features[0].center;
                 })
-            )
+            );
         }
-    )
+    );
 
     // Store a reference to the geojsons by layer ID for lookup
-    const layerGeojsonMap = useRef<Record<string, any>>({})
+    const layerGeojsonMap = useRef<Record<string, any>>({});
 
     // Set up the layer reference map whenever geojsons change
     useEffect(() => {
-        const newMap: Record<string, any> = {}
+        const newMap: Record<string, any> = {};
         geojsons
             .filter((g) => !g.address)
             .forEach((geojson, index) => {
-                const fillLayerId = `fill-layer-${index}`
-                const lineLayerId = `line-layer-${index}`
-                newMap[fillLayerId] = geojson
-                newMap[lineLayerId] = geojson
-            })
-        layerGeojsonMap.current = newMap
-    }, [geojsons])
+                const fillLayerId = `fill-layer-${index}`;
+                const lineLayerId = `line-layer-${index}`;
+                newMap[fillLayerId] = geojson;
+                newMap[lineLayerId] = geojson;
+            });
+        layerGeojsonMap.current = newMap;
+    }, [geojsons]);
 
     // Handle map clicks and determine if a layer was clicked
     const handleMapClick = useCallback(
         (event: MapLayerMouseEvent) => {
-            if (!mapRef.current) return
+            if (!mapRef.current) return;
 
             // Get the features at the clicked point
-            const features = mapRef.current.queryRenderedFeatures(event.point)
+            const features = mapRef.current.queryRenderedFeatures(event.point);
 
             // Check if any of our layers were clicked
             if (features.length > 0) {
-                const clickedLayerId = features[0]?.layer.id
-                if (!clickedLayerId) return
-                const geojson = layerGeojsonMap.current[clickedLayerId]
+                const clickedLayerId = features[0]?.layer.id;
+                if (!clickedLayerId) return;
+                const geojson = layerGeojsonMap.current[clickedLayerId];
 
                 if (geojson) {
-                    console.log('Layer clicked:', geojson)
+                    console.log('Layer clicked:', geojson);
                     // Call your toggle function or other actions
                     if (geojson.datafile) {
-                        toggleDatafileToDownload(geojson.datafile)
+                        toggleDatafileToDownload(geojson.datafile);
                     }
                 }
             }
         },
         [toggleDatafileToDownload]
-    )
+    );
 
     const onUpdate = useCallback((e: any) => {
         for (const f of e.features) {
             if (f.geometry.coordinates[0].length === 5) {
-                setValue('point', null)
-                setValue('location', '')
+                setValue('point', null);
+                setValue('location', '');
                 setValue('bbox', [
                     f.geometry.coordinates[0][2],
                     f.geometry.coordinates[0][4],
-                ])
+                ]);
                 setValue('bbox', [
                     f.geometry.coordinates[0][2],
                     f.geometry.coordinates[0][4],
-                ])
+                ]);
             } else {
-                setValue('bbox', null)
+                setValue('bbox', null);
             }
         }
-    }, [])
+    }, []);
 
     useEffect(() => {
         if (mapRef.current && open) {
-            mapRef.current.resize()
+            mapRef.current.resize();
         }
-    }, [mapRef.current, open])
+    }, [mapRef.current, open]);
 
     const onModeChange = useCallback((e: any) => {
         if (e.mode === 'draw_polygon') {
-            setCursor('crosshair')
+            setCursor('crosshair');
         } else {
-            setCursor('grab')
+            setCursor('grab');
         }
-    }, [])
+    }, []);
 
     return (
         <Map
             ref={(_map) => {
-                if (_map) mapRef.current = _map.getMap() as unknown as MapRef
+                if (_map) mapRef.current = _map.getMap() as unknown as MapRef;
             }}
             mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
             style={{ height: 300 }}
@@ -156,16 +156,16 @@ export default function LocationSearch({
                     setValue('bbox', [
                         [e.result.bbox[0], e.result.bbox[1]],
                         [e.result.bbox[2], e.result.bbox[3]],
-                    ])
-                    setValue('point', e.result.center)
+                    ]);
+                    setValue('point', e.result.center);
                     if (e.result.place_name.split(',').length <= 2) {
-                        setValue('location', e.result.place_name)
+                        setValue('location', e.result.place_name);
                     }
                 }}
                 onClear={(e) => {
-                    setValue('point', null)
-                    setValue('bbox', null)
-                    setValue('location', '')
+                    setValue('point', null);
+                    setValue('bbox', null);
+                    setValue('location', '');
                 }}
             />
             {markers?.map((m, index) => (
@@ -198,8 +198,8 @@ export default function LocationSearch({
             <DrawControl
                 position="top-left"
                 onClear={() => {
-                    setCursor('grab')
-                    setValue('bbox', null)
+                    setCursor('grab');
+                    setValue('bbox', null);
                 }}
                 displayControlsDefault={false}
                 controls={{
@@ -210,10 +210,10 @@ export default function LocationSearch({
                 onCreate={onUpdate}
                 onUpdate={onUpdate}
                 onDelete={() => {
-                    setCursor('grab')
-                    setValue('bbox', null)
+                    setCursor('grab');
+                    setValue('bbox', null);
                 }}
             />
         </Map>
-    )
+    );
 }

@@ -1,80 +1,80 @@
-import React, { useState, useEffect } from 'react'
-import SearchHeader from '../_shared/SearchHeader'
-import { FavouriteRow } from './DatasetRow'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import type { SearchInput } from '@/schema/search.schema'
-import Pagination from '../_shared/Pagination'
-import { useQuery } from 'react-query'
-import type { WriDataset } from '@/schema/ckan.schema'
-import notify from '@/utils/notify'
-import dynamic from 'next/dynamic'
+import React, { useState, useEffect } from 'react';
+import SearchHeader from '../_shared/SearchHeader';
+import { FavouriteRow } from './DatasetRow';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import type { SearchInput } from '@/schema/search.schema';
+import Pagination from '../_shared/Pagination';
+import { useQuery } from 'react-query';
+import type { WriDataset } from '@/schema/ckan.schema';
+import notify from '@/utils/notify';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import { ErrorAlert } from '@/components/_shared/Alerts'
+});
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import { ErrorAlert } from '@/components/_shared/Alerts';
 
 export default function Favourite({
     setQuery,
     query,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
 }) {
-    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [open, setOpen] = useState(false)
+    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [open, setOpen] = useState(false);
 
     const { data, isLoading, refetch } =
-        api.dataset.getFavoriteDataset.useQuery()
+        api.dataset.getFavoriteDataset.useQuery();
     const removeFromFavorites = api.dataset.unFollowDataset.useMutation({
         onSuccess: async (data) => {
-            await refetch()
-            setOpen(false)
+            await refetch();
+            setOpen(false);
             notify(
                 `Successfully removed the ${
                     selectDataset?.title ?? selectDataset?.name
                 } Dataset from your favourites`,
                 'error'
-            )
+            );
         },
         onError: (error) => setErrorMessage(error.message),
-    })
+    });
     const processedData = useQuery(
         ['processedData', data, query],
         () => {
-            if (!data) return { dataset: [], count: 0 }
-            const searchTerm = query.search.toLowerCase()
-            const dataset = data.datasets
-            let filteredData = dataset
+            if (!data) return { dataset: [], count: 0 };
+            const searchTerm = query.search.toLowerCase();
+            const dataset = data.datasets;
+            let filteredData = dataset;
             if (searchTerm)
                 filteredData = dataset.filter((item) =>
                     item.name.toLowerCase().includes(searchTerm)
-                )
-            const start = query.page.start || 0
-            const rows = query.page.rows || filteredData.length
-            const slicedData = filteredData.slice(start, start + rows)
-            return { dataset: slicedData, count: data.count }
+                );
+            const start = query.page.start || 0;
+            const rows = query.page.rows || filteredData.length;
+            const slicedData = filteredData.slice(start, start + rows);
+            return { dataset: slicedData, count: data.count };
         },
         {
             enabled: !!data,
         }
-    )
+    );
 
     const handleOpenModal = (dataset: WriDataset) => {
-        setSelectDataset(dataset)
-        setOpen(true)
-    }
+        setSelectDataset(dataset);
+        setOpen(true);
+    };
 
     if (isLoading || processedData.isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
                 <Spinner className="mx-auto my-2" />
             </div>
-        )
+        );
     }
 
     return (
@@ -115,7 +115,7 @@ export default function Favourite({
                                         : ''
                                 }
                             />
-                        )
+                        );
                     })
                 )}
                 {selectDataset && (
@@ -152,7 +152,7 @@ export default function Favourite({
                                 onClick={() => {
                                     removeFromFavorites.mutate(
                                         selectDataset?.id
-                                    )
+                                    );
                                 }}
                                 loading={removeFromFavorites.isLoading}
                             >
@@ -170,5 +170,5 @@ export default function Favourite({
                 )}
             </div>
         </section>
-    )
+    );
 }

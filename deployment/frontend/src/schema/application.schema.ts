@@ -1,6 +1,6 @@
-import { Option } from '@/components/_shared/SimpleSelect'
-import z from 'zod'
-const emptyStringToUndefined = z.literal('').transform(() => undefined)
+import { Option } from '@/components/_shared/SimpleSelect';
+import z from 'zod';
+const emptyStringToUndefined = z.literal('').transform(() => undefined);
 
 export const ApplicationSchema = z.object({
     id: z.string().optional(),
@@ -27,6 +27,6 @@ export const ApplicationSchema = z.object({
         .nullable()
         .or(emptyStringToUndefined),
     help_url: z.string().url().optional().nullable().or(emptyStringToUndefined),
-})
+});
 
-export type ApplicationFormType = z.infer<typeof ApplicationSchema>
+export type ApplicationFormType = z.infer<typeof ApplicationSchema>;

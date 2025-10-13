@@ -2,37 +2,37 @@ import {
     ArrowsPointingInIcon,
     ExclamationCircleIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import { Input } from '@/components/_shared/SimpleInput'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Disclosure } from '@headlessui/react'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { TopicsSelect } from '../TopicsSelect'
-import { MetadataAccordion } from './MetadataAccordion'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { type UseFormReturn, useForm } from 'react-hook-form'
-import { type DatasetFormType } from '@/schema/dataset.schema'
-import { ImageUploader } from '@/components/dashboard/_shared/ImageUploader'
-import { UploadResult } from '@uppy/core'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { api } from '@/utils/api'
-import { P, match } from 'ts-pattern'
-import Spinner from '@/components/_shared/Spinner'
-import classNames from '@/utils/classnames'
-import { env } from '@/env.mjs'
-import MulText from '../MulText'
+} from '@heroicons/react/24/outline';
+import { Input } from '@/components/_shared/SimpleInput';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Disclosure } from '@headlessui/react';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { TopicsSelect } from '../TopicsSelect';
+import { MetadataAccordion } from './MetadataAccordion';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { type UseFormReturn, useForm } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { ImageUploader } from '@/components/dashboard/_shared/ImageUploader';
+import { UploadResult } from '@uppy/core';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { api } from '@/utils/api';
+import { P, match } from 'ts-pattern';
+import Spinner from '@/components/_shared/Spinner';
+import classNames from '@/utils/classnames';
+import { env } from '@/env.mjs';
+import MulText from '../MulText';
 import {
     languageOptions,
     updateFrequencyOptions,
     visibilityOptions,
-} from '../formOptions'
+} from '../formOptions';
 
 export function OverviewForm({
     formObj,
     editing = false,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    editing?: boolean
+    formObj: UseFormReturn<DatasetFormType>;
+    editing?: boolean;
 }) {
     const {
         register,
@@ -40,13 +40,13 @@ export function OverviewForm({
         watch,
         getValues,
         formState: { errors, defaultValues },
-    } = formObj
+    } = formObj;
 
-    const possibleOwners = api.teams.getAllTeams.useQuery()
-    const possibleTags = api.tags.getAllTags.useQuery()
-    const possibleApplications = api.applications.getAllApplications.useQuery()
-    const topicHierarchy = api.topics.getTopicsHierarchy.useQuery()
-    const possibleLicenses = api.dataset.getLicenses.useQuery()
+    const possibleOwners = api.teams.getAllTeams.useQuery();
+    const possibleTags = api.tags.getAllTags.useQuery();
+    const possibleApplications = api.applications.getAllApplications.useQuery();
+    const topicHierarchy = api.topics.getTopicsHierarchy.useQuery();
+    const possibleLicenses = api.dataset.getLicenses.useQuery();
 
     return (
         <MetadataAccordion
@@ -493,5 +493,5 @@ export function OverviewForm({
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>
-    )
+    );
 }

@@ -1,13 +1,13 @@
-import classNames from '@/utils/classnames'
-import * as React from 'react'
+import classNames from '@/utils/classnames';
+import * as React from 'react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    name?: string
-    type?: string
-    icon?: React.ReactNode
-    children?: React.ReactNode
-    className?: string
-    maxWidth?: string
+    name?: string;
+    type?: string;
+    icon?: React.ReactNode;
+    children?: React.ReactNode;
+    className?: string;
+    maxWidth?: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -30,9 +30,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     </div>
                 )}
             </div>
-        )
+        );
     }
-)
+);
 
 export function DebouncedInput({
     value: initialValue,
@@ -40,24 +40,24 @@ export function DebouncedInput({
     debounce = 500,
     ...props
 }: {
-    value: string
-    onChange: (value: string) => void
-    debounce?: number
+    value: string;
+    onChange: (value: string) => void;
+    debounce?: number;
 } & InputProps &
     Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
-    const [value, setValue] = React.useState(initialValue)
+    const [value, setValue] = React.useState(initialValue);
 
     React.useEffect(() => {
-        setValue(initialValue)
-    }, [initialValue])
+        setValue(initialValue);
+    }, [initialValue]);
 
     React.useEffect(() => {
         const timeout = setTimeout(() => {
-            onChange(value)
-        }, debounce)
+            onChange(value);
+        }, debounce);
 
-        return () => clearTimeout(timeout)
-    }, [value])
+        return () => clearTimeout(timeout);
+    }, [value]);
 
     return (
         <Input
@@ -65,5 +65,5 @@ export function DebouncedInput({
             value={value}
             onChange={(e) => setValue(e.target.value)}
         />
-    )
+    );
 }

@@ -1,6 +1,6 @@
-import { z } from 'zod'
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
-import { env } from '@/env.mjs'
+import { z } from 'zod';
+import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc';
+import { env } from '@/env.mjs';
 import {
     getUser,
     getUserOrganizations,
@@ -13,34 +13,34 @@ import {
     sendEmail,
     generateEmail,
     generateInviteEmail,
-} from '@/utils/apiUtils'
-import { searchArrayForKeyword } from '@/utils/general'
-import { searchSchema } from '@/schema/search.schema'
+} from '@/utils/apiUtils';
+import { searchArrayForKeyword } from '@/utils/general';
+import { searchSchema } from '@/schema/search.schema';
 import type {
     CkanResponse,
     WriOrganization,
     WriUser,
-} from '@/schema/ckan.schema'
-import { UserFormInviteSchema, UserFormSchema } from '@/schema/user.schema'
-import { type User } from '@portaljs/ckan'
-import { type ApiToken } from '@/interfaces/user.interface'
+} from '@/schema/ckan.schema';
+import { UserFormInviteSchema, UserFormSchema } from '@/schema/user.schema';
+import { type User } from '@portaljs/ckan';
+import { type ApiToken } from '@/interfaces/user.interface';
 
 export const UserRouter = createTRPCRouter({
     getDashboardUser: protectedProcedure.query(async ({ ctx }) => {
         const userdetails = await getUser({
             userId: ctx.session.user.id,
             apiKey: ctx.session.user.apikey,
-        })
+        });
         const organizations = await getUserOrganizations({
             userId: ctx.session.user.id,
             apiKey: ctx.session.user.apikey,
-        })
-        const TeamCount = organizations?.length
+        });
+        const TeamCount = organizations?.length;
         const dataset = await getUserDataset({
             userId: ctx.session.user.id,
             apiKey: ctx.session.user.apikey,
-        })
-        const DatasetCount = dataset?.count
+        });
+        const DatasetCount = dataset?.count;
         const dashboardUser = {
             imageUrl: userdetails?.image_display_url,
             name: userdetails?.name,
@@ -49,43 +49,43 @@ export const UserRouter = createTRPCRouter({
             datasetCount: DatasetCount,
             isSysAdmin: userdetails?.sysadmin,
             email_hash: userdetails?.email_hash,
-        }
+        };
         return {
             userdetails: dashboardUser,
-        }
+        };
     }),
     getAllUsers: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             type IUser = {
-                title?: string
-                id: string
-                description?: string
-                email_hash?: string
-                capacity?: string
-                image_display_url?: string
-                org?: string
-                orgId?: string
-                orgimage?: string
-                orgtitle?: string
-                userCapacity?: string
-            }
+                title?: string;
+                id: string;
+                description?: string;
+                email_hash?: string;
+                capacity?: string;
+                image_display_url?: string;
+                org?: string;
+                orgId?: string;
+                orgimage?: string;
+                orgtitle?: string;
+                userCapacity?: string;
+            };
 
             type IUsers = {
-                title?: string
-                id: string
-                description?: string
-                orgnumber?: number
-                image_display_url?: string
-                email_hash?: string
+                title?: string;
+                id: string;
+                description?: string;
+                orgnumber?: number;
+                image_display_url?: string;
+                email_hash?: string;
                 orgs?: {
-                    title?: string
-                    capacity?: string
-                    image_display_url?: string
-                    name?: string
-                    userCapacity?: string
-                }[]
-            }
+                    title?: string;
+                    capacity?: string;
+                    image_display_url?: string;
+                    name?: string;
+                    userCapacity?: string;
+                }[];
+            };
 
             const response = await fetch(
                 `${env.CKAN_URL}/api/3/action/user_list_wri`,
@@ -95,11 +95,11 @@ export const UserRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<WriUser[]>
-            if (!data.success && data.error) throw Error(data.error.message)
+            );
+            const data = (await response.json()) as CkanResponse<WriUser[]>;
+            if (!data.success && data.error) throw Error(data.error.message);
 
-            const users = data.result
+            const users = data.result;
 
             let result: IUsers[] = users.map((user) => {
                 const rslt = {
@@ -110,7 +110,7 @@ export const UserRouter = createTRPCRouter({
                     image_display_url: user.image_url!,
                     orgnumber: user.organizations?.length ?? 0,
                     orgs: [] as IUsers['orgs'],
-                }
+                };
 
                 if (user.organizations) {
                     rslt.orgs = user.organizations.map((org) => {
@@ -119,21 +119,21 @@ export const UserRouter = createTRPCRouter({
                             capacity: org.capacity,
                             image_display_url: org.image_display_url,
                             name: org.name,
-                        }
-                    })
+                        };
+                    });
                 }
-                return rslt
-            })
+                return rslt;
+            });
 
             if (input.search) {
-                result = searchArrayForKeyword<IUsers>(result, input.search)
+                result = searchArrayForKeyword<IUsers>(result, input.search);
             }
 
             result = result.sort((a, b) => {
-                if (a.title! < b.title!) return -1
-                if (a.title! > b.title!) return 1
-                return 0
-            })
+                if (a.title! < b.title!) return -1;
+                if (a.title! > b.title!) return 1;
+                return 0;
+            });
 
             return {
                 users: result.slice(
@@ -141,7 +141,7 @@ export const UserRouter = createTRPCRouter({
                     input.page.start + input.page.rows
                 ),
                 count: result.length,
-            }
+            };
         }),
     deleteUser: protectedProcedure
         .input(z.string())
@@ -156,10 +156,10 @@ export const UserRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error) throw Error(data.error.message)
-            return data
+            );
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message);
+            return data;
         }),
 
     deleteMember: protectedProcedure
@@ -183,10 +183,10 @@ export const UserRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error) throw Error(data.error.message)
-            return data
+            );
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message);
+            return data;
         }),
 
     getUser: protectedProcedure
@@ -195,20 +195,20 @@ export const UserRouter = createTRPCRouter({
             const userdetails = (await getUser({
                 userId: input,
                 apiKey: ctx.session.user.apikey,
-            }))!
+            }))!;
             return {
                 userdetails: userdetails,
-            }
+            };
         }),
     updateUser: protectedProcedure
         .input(UserFormSchema)
         .mutation(async ({ input, ctx }) => {
-            const image_url = input.image_url
+            const image_url = input.image_url;
             if (image_url?.includes('ckanuploadimage:')) {
                 input.image_url = image_url.replace(
                     'ckanuploadimage:',
                     `${env.CKAN_URL}/uploads/group/`
-                )
+                );
             }
             const response = await fetch(
                 `${env.CKAN_URL}/api/3/action/user_update`,
@@ -220,10 +220,10 @@ export const UserRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<User>
-            if (!data.success && data.error) throw Error(data.error.message)
-            return data.result
+            );
+            const data = (await response.json()) as CkanResponse<User>;
+            if (!data.success && data.error) throw Error(data.error.message);
+            return data.result;
         }),
     getPossibleMembers: protectedProcedure
         .input(z.string())
@@ -231,42 +231,42 @@ export const UserRouter = createTRPCRouter({
             const orgMembers = (await getOrgDetails({
                 orgId: input,
                 apiKey: ctx.session.user.apikey,
-            }))!
+            }))!;
             const allUsers = await getAllUsers({
                 apiKey: ctx.session.user.apikey,
-            })
-            const orgUsers = orgMembers.users?.map((user) => user.name)
+            });
+            const orgUsers = orgMembers.users?.map((user) => user.name);
             const nonOrgUsers = allUsers.filter(
                 (user) => !orgUsers?.includes(user.name)
-            )
+            );
             return {
                 users: nonOrgUsers,
-            }
+            };
         }),
     getUserCapacity: protectedProcedure.query(async ({ ctx }) => {
-        let isOrgAdmin = false
-        let adminOrg: WriOrganization[] = []
+        let isOrgAdmin = false;
+        let adminOrg: WriOrganization[] = [];
         if (ctx.session.user.sysadmin) {
-            isOrgAdmin = true
+            isOrgAdmin = true;
             adminOrg = (await getAllOrganizations({
                 apiKey: ctx.session.user.apikey,
-            }))!
+            }))!;
         } else {
             const orgdetails = await getUserOrganizations({
                 userId: ctx.session.user.id,
                 apiKey: ctx.session.user.apikey,
-            })
-            isOrgAdmin = orgdetails?.some((org) => org.capacity === 'admin')
-            adminOrg = orgdetails?.filter((org) => org.capacity === 'admin')
+            });
+            isOrgAdmin = orgdetails?.some((org) => org.capacity === 'admin');
+            adminOrg = orgdetails?.filter((org) => org.capacity === 'admin');
         }
 
         return {
             isOrgAdmin: isOrgAdmin,
             adminOrg: adminOrg,
-        }
+        };
     }),
     getUserApiTokens: protectedProcedure.query(async ({ ctx }) => {
-        const username = ctx.session.user.name
+        const username = ctx.session.user.name;
         const res = await fetch(
             `${env.CKAN_URL}/api/3/action/api_token_list?user_id=${username}`,
             {
@@ -275,9 +275,9 @@ export const UserRouter = createTRPCRouter({
                     'Content-Type': 'application/json',
                 },
             }
-        )
-        const apiTokens: CkanResponse<ApiToken[]> = await res.json()
-        return apiTokens.result
+        );
+        const apiTokens: CkanResponse<ApiToken[]> = await res.json();
+        return apiTokens.result;
     }),
     deleteApiToken: protectedProcedure
         .input(z.object({ jti: z.string() }))
@@ -292,13 +292,13 @@ export const UserRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const apiToken: CkanResponse<ApiToken> = await res.json()
+            );
+            const apiToken: CkanResponse<ApiToken> = await res.json();
             if (!apiToken.success && apiToken.error) {
-                if (apiToken.error.message) throw Error(apiToken.error.message)
-                throw Error(JSON.stringify(apiToken.error))
+                if (apiToken.error.message) throw Error(apiToken.error.message);
+                throw Error(JSON.stringify(apiToken.error));
             }
-            return apiToken.result
+            return apiToken.result;
         }),
     createApiToken: protectedProcedure
         .input(z.object({ user: z.string(), name: z.string() }))
@@ -313,19 +313,19 @@ export const UserRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const apiToken: CkanResponse<{ token: string }> = await res.json()
+            );
+            const apiToken: CkanResponse<{ token: string }> = await res.json();
             if (!apiToken.success && apiToken.error) {
-                if (apiToken.error.message) throw Error(apiToken.error.message)
-                throw Error(JSON.stringify(apiToken.error))
+                if (apiToken.error.message) throw Error(apiToken.error.message);
+                throw Error(JSON.stringify(apiToken.error));
             }
-            return apiToken.result
+            return apiToken.result;
         }),
     createOtherUser: protectedProcedure
         .input(UserFormInviteSchema)
         .mutation(async ({ input, ctx }) => {
-            const name = await getRandomUsernameFromEmail(input.email)
-            const password = generateRandomPassword(12)
+            const name = await getRandomUsernameFromEmail(input.email);
+            const password = generateRandomPassword(12);
 
             const response = await fetch(
                 `${env.CKAN_URL}/api/3/action/user_create`,
@@ -341,21 +341,21 @@ export const UserRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
 
-            const data = (await response.json()) as CkanResponse<User>
+            const data = (await response.json()) as CkanResponse<User>;
             if (!data.success && data.error) {
                 const errors = Object.keys(data.error).map((key) => {
                     const error = data.error as Record<
                         string,
                         string | string[]
-                    >
-                    const value = error[key]
+                    >;
+                    const value = error[key];
                     if (Array.isArray(value)) {
-                        return `${key}: ${value.join(', ')}`
+                        return `${key}: ${value.join(', ')}`;
                     }
-                })
-                throw Error(errors.join(',\n'))
+                });
+                throw Error(errors.join(',\n'));
             }
 
             if (input.team?.value) {
@@ -373,40 +373,41 @@ export const UserRouter = createTRPCRouter({
                             'Content-Type': 'application/json',
                         },
                     }
-                )
-                const data = (await response.json()) as CkanResponse<null>
-                if (!data.success && data.error) throw Error(data.error.message)
+                );
+                const data = (await response.json()) as CkanResponse<null>;
+                if (!data.success && data.error)
+                    throw Error(data.error.message);
 
                 try {
-                    const role = input.role?.value!
+                    const role = input.role?.value!;
                     const email = generateInviteEmail(
                         input.email,
                         password,
                         name,
                         input.team.label,
                         role
-                    )
+                    );
                     await sendEmail(
                         input.email,
                         'Invite for WRI OpenData Platform',
                         email
-                    )
+                    );
                 } catch (error) {
-                    throw Error(error as string)
+                    throw Error(error as string);
                 }
             } else {
                 try {
-                    const email = generateEmail(input.email, password, name)
+                    const email = generateEmail(input.email, password, name);
                     await sendEmail(
                         input.email,
                         'Invite for WRI OpenData Platform',
                         email
-                    )
+                    );
                 } catch (error) {
-                    throw Error(error as string)
+                    throw Error(error as string);
                 }
             }
 
-            return data.result
+            return data.result;
         }),
-})
+});

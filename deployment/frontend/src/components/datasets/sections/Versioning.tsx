@@ -1,17 +1,17 @@
-import Loading from '@/components/_shared/Loading'
-import { Accordion } from '@/components/dashboard/datasets/admin/Accordion'
-import { type WriDataset } from '@/schema/ckan.schema'
-import { api } from '@/utils/api'
-import { ClockIcon } from '@heroicons/react/24/outline'
+import Loading from '@/components/_shared/Loading';
+import { Accordion } from '@/components/dashboard/datasets/admin/Accordion';
+import { type WriDataset } from '@/schema/ckan.schema';
+import { api } from '@/utils/api';
+import { ClockIcon } from '@heroicons/react/24/outline';
 
 export function Versioning({
     dataset,
     isCurrentVersion,
     diffFields,
 }: {
-    dataset: WriDataset
-    isCurrentVersion?: boolean
-    diffFields: string[]
+    dataset: WriDataset;
+    isCurrentVersion?: boolean;
+    diffFields: string[];
 }) {
     const {
         data: releaseNotes,
@@ -22,27 +22,27 @@ export function Versioning({
         {
             select: (data) => {
                 return (data || []).sort((a, b) => {
-                    return b.date.localeCompare(a.date)
-                })
+                    return b.date.localeCompare(a.date);
+                });
             },
         }
-    )
+    );
 
     const isReleaseNotesChanged =
-        diffFields.includes('release_notes') && !isCurrentVersion
+        diffFields.includes('release_notes') && !isCurrentVersion;
 
-    const isFirstReleaseNotes = !releaseNotes?.length && dataset.release_notes
+    const isFirstReleaseNotes = !releaseNotes?.length && dataset.release_notes;
     const sortedReleaseNotes = releaseNotes?.sort((a, b) => {
-        const aDate = new Date(a.date)
-        const bDate = new Date(b.date)
+        const aDate = new Date(a.date);
+        const bDate = new Date(b.date);
         if (bDate > aDate) {
-            return 1
+            return 1;
         }
         if (bDate < aDate) {
-            return -1
+            return -1;
         }
-        return 0
-    })
+        return 0;
+    });
 
     return (
         <div className="flex flex-col gap-y-4 py-2">
@@ -81,7 +81,7 @@ export function Versioning({
                 </div>
             )}
         </div>
-    )
+    );
 }
 
 function ReleaseNotesCard({
@@ -91,11 +91,11 @@ function ReleaseNotesCard({
     defaultOpen,
     version,
 }: {
-    releaseNotes: string
-    date?: string
-    isPending?: boolean
-    defaultOpen?: boolean
-    version: string
+    releaseNotes: string;
+    date?: string;
+    isPending?: boolean;
+    defaultOpen?: boolean;
+    version: string;
 }) {
     // TODO: change this to an expansion panel
     if (date) {
@@ -103,7 +103,7 @@ function ReleaseNotesCard({
             year: 'numeric',
             month: 'short',
             day: 'numeric',
-        })
+        });
     }
 
     return (
@@ -126,7 +126,7 @@ function ReleaseNotesCard({
                 ></div>
             </Accordion>
         </div>
-    )
+    );
 }
 
 function Pill({ text, className }: { text: string; className?: string }) {
@@ -136,5 +136,5 @@ function Pill({ text, className }: { text: string; className?: string }) {
         >
             {text}
         </div>
-    )
+    );
 }

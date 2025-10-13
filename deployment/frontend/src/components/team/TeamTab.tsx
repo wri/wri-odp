@@ -1,18 +1,18 @@
-import React, { useState } from 'react'
-import { Tab } from '@headlessui/react'
-import DatasetList from './DatasetList'
-import ActivityStreamList from '../_shared/ActivityStreamList'
-import { api } from '@/utils/api'
-import { type SearchInput } from '@/schema/search.schema'
+import React, { useState } from 'react';
+import { Tab } from '@headlessui/react';
+import DatasetList from './DatasetList';
+import ActivityStreamList from '../_shared/ActivityStreamList';
+import { api } from '@/utils/api';
+import { type SearchInput } from '@/schema/search.schema';
 
 export default function TeamTab() {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 0 },
         fq: {},
-    })
+    });
 
-    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query);
 
     return (
         <section
@@ -56,5 +56,5 @@ export default function TeamTab() {
                 </Tab.Panels>
             </Tab.Group>
         </section>
-    )
+    );
 }

@@ -2,65 +2,67 @@ import {
     ArrowUpTrayIcon,
     GlobeEuropeAfricaIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import { Disclosure, Tab } from '@headlessui/react'
-import { type DatasetFormType } from '@/schema/dataset.schema'
-import { MapPinIcon } from '@heroicons/react/20/solid'
-import { useEffect, useRef, useState } from 'react'
-import classNames from '@/utils/classnames'
-import { match } from 'ts-pattern'
-import GeocoderControl from '@/components/search/GeocoderControl'
-import { Layer, Map, Source } from 'react-map-gl'
-import notify from '@/utils/notify'
-import Spinner from '@/components/_shared/Spinner'
-import { type UseFormReturn } from 'react-hook-form'
-import * as turf from '@turf/turf'
-import { HideBoundaries } from '@/components/_shared/HideBoundaries'
-import DefaultTooltip from '@/components/_shared/Tooltip'
+} from '@heroicons/react/24/outline';
+import { Disclosure, Tab } from '@headlessui/react';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { MapPinIcon } from '@heroicons/react/20/solid';
+import { useEffect, useRef, useState } from 'react';
+import classNames from '@/utils/classnames';
+import { match } from 'ts-pattern';
+import GeocoderControl from '@/components/search/GeocoderControl';
+import { Layer, Map, Source } from 'react-map-gl';
+import notify from '@/utils/notify';
+import Spinner from '@/components/_shared/Spinner';
+import { type UseFormReturn } from 'react-hook-form';
+import * as turf from '@turf/turf';
+import { HideBoundaries } from '@/components/_shared/HideBoundaries';
+import DefaultTooltip from '@/components/_shared/Tooltip';
 
 export function DatafileLocation({
     formObj,
     index,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    index: number
+    formObj: UseFormReturn<DatasetFormType>;
+    index: number;
 }) {
-    const [isLoadingGeoJSON, setIsLoadingGeoJSON] = useState(false)
+    const [isLoadingGeoJSON, setIsLoadingGeoJSON] = useState(false);
 
     const {
         formState: { errors },
         setValue,
         watch,
-    } = formObj
+    } = formObj;
 
-    const uploadInputRef = useRef<HTMLInputElement>(null)
+    const uploadInputRef = useRef<HTMLInputElement>(null);
 
     /*
      * This useEffect prevents page from scrolling to the map
      *
      */
     useEffect(() => {
-        const chooseAddress = document.getElementById(`choose-address-${index}`)
+        const chooseAddress = document.getElementById(
+            `choose-address-${index}`
+        );
 
         if (chooseAddress) {
-            chooseAddress.style.visibility = 'hidden'
+            chooseAddress.style.visibility = 'hidden';
             setTimeout(() => {
-                chooseAddress.style.visibility = 'visible'
-            }, 2000)
+                chooseAddress.style.visibility = 'visible';
+            }, 2000);
         }
-    }, [])
+    }, []);
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         if (!e.target.files) {
-            return
+            return;
         }
 
-        setIsLoadingGeoJSON(true)
+        setIsLoadingGeoJSON(true);
 
-        const file = e?.target?.files[0]
+        const file = e?.target?.files[0];
 
         if (!file) {
-            return
+            return;
         }
 
         if (
@@ -68,45 +70,45 @@ export function DatafileLocation({
             !file.type.startsWith('application/geo') &&
             !file.type.startsWith('application/json')
         ) {
-            notify('File is not GeoJSON', 'error')
-            return
+            notify('File is not GeoJSON', 'error');
+            return;
         }
 
-        const reader = new FileReader()
+        const reader = new FileReader();
         reader.addEventListener('load', (event) => {
-            setIsLoadingGeoJSON(false)
+            setIsLoadingGeoJSON(false);
             try {
-                const json = JSON.parse(event?.target?.result as string)
-                const geojsonType = json?.type
+                const json = JSON.parse(event?.target?.result as string);
+                const geojsonType = json?.type;
 
-                const geometries = []
+                const geometries = [];
                 if (geojsonType == 'Feature') {
-                    geometries.push(json.geometry)
+                    geometries.push(json.geometry);
                 } else if (geojsonType == 'FeatureCollection') {
-                    const features = json.features
+                    const features = json.features;
                     for (const feature of features) {
-                        geometries.push(feature.geometry)
+                        geometries.push(feature.geometry);
                     }
                 } else {
-                    geometries.push(json)
+                    geometries.push(json);
                 }
 
-                let union = geometries[0]
-                let i
+                let union = geometries[0];
+                let i;
                 for (i = 1; i < geometries.length; i++) {
-                    union = turf.union(union, geometries[i])
+                    union = turf.union(union, geometries[i]);
                 }
 
                 // union = turf.simplify(union, { tolerance: 1 })
 
-                setValue(`resources.${index}.spatial_geom`, union)
+                setValue(`resources.${index}.spatial_geom`, union);
             } catch (e) {
-                console.error(e)
-                notify('Failed to parse GeoJSON file', 'error')
+                console.error(e);
+                notify('Failed to parse GeoJSON file', 'error');
             }
-        })
+        });
 
-        reader.readAsText(file)
+        reader.readAsText(file);
     }
 
     return (
@@ -140,20 +142,20 @@ export function DatafileLocation({
                                     : setValue(
                                           `resources.${index}.spatial_geom`,
                                           undefined
-                                      )
+                                      );
 
                                 setValue(
                                     `resources.${index}.spatial_type`,
                                     'geom'
-                                )
+                                );
                                 setValue(
                                     `resources.${index}.spatial_address`,
                                     undefined
-                                )
+                                );
                                 setValue(
                                     `resources.${index}.spatial_coordinates`,
                                     undefined
-                                )
+                                );
                             }}
                             id="locationUpload"
                         >
@@ -180,11 +182,11 @@ export function DatafileLocation({
                                 setValue(
                                     `resources.${index}.spatial_type`,
                                     'address'
-                                )
+                                );
                                 setValue(
                                     `resources.${index}.spatial_geom`,
                                     undefined
-                                )
+                                );
                             }}
                         >
                             {({ selected }) => (
@@ -264,21 +266,21 @@ export function DatafileLocation({
                                         setValue(
                                             `resources.${index}.spatial_address`,
                                             e?.result?.place_name
-                                        )
+                                        );
                                         setValue(
                                             `resources.${index}.spatial_coordinates`,
                                             e?.result?.center
-                                        )
+                                        );
                                     }}
                                     onClear={(e) => {
                                         setValue(
                                             `resources.${index}.spatial_address`,
                                             ''
-                                        )
+                                        );
                                         setValue(
                                             `resources.${index}.spatial_coordinates`,
                                             undefined
-                                        )
+                                        );
                                     }}
                                     initialValue={
                                         watch(
@@ -292,5 +294,5 @@ export function DatafileLocation({
                 </Tab.Group>
             </Disclosure.Panel>
         </div>
-    )
+    );
 }

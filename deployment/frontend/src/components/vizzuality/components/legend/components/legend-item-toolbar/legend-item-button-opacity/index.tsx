@@ -1,9 +1,9 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import classnames from 'classnames'
-import Tooltip from '../../../../tooltip'
-import LegendOpacityTooltip from './legend-item-button-opacity-tooltip'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
+import Tooltip from '../../../../tooltip';
+import LegendOpacityTooltip from './legend-item-button-opacity-tooltip';
 
 class LegendItemButtonOpacity extends PureComponent {
     static propTypes = {
@@ -21,7 +21,7 @@ class LegendItemButtonOpacity extends PureComponent {
         scrolling: PropTypes.bool,
         onChangeOpacity: PropTypes.func,
         onTooltipVisibilityChange: PropTypes.func,
-    }
+    };
 
     static defaultProps = {
         layers: [],
@@ -39,45 +39,45 @@ class LegendItemButtonOpacity extends PureComponent {
 
         onChangeOpacity: () => {},
         onTooltipVisibilityChange: () => {},
-    }
+    };
 
     state = {
         visibilityHover: false,
         visibilityClick: false,
-    }
+    };
 
     componentWillReceiveProps(nextProps) {
-        const { scrolling } = nextProps
+        const { scrolling } = nextProps;
 
         if (scrolling) {
-            this.onTooltipVisibilityChange(false)
+            this.onTooltipVisibilityChange(false);
         }
     }
 
     onTooltipVisibilityChange = (v) => {
-        const { visibility, onTooltipVisibilityChange } = this.props
+        const { visibility, onTooltipVisibilityChange } = this.props;
 
         if (visibility) {
             this.setState({
                 visibilityHover: false,
                 visibilityClick: v,
-            })
+            });
 
-            onTooltipVisibilityChange(v)
+            onTooltipVisibilityChange(v);
         }
-    }
+    };
 
     setHoverText = (tooltipText, opacity, visibility) => {
-        if (tooltipText) return tooltipText
+        if (tooltipText) return tooltipText;
 
-        if (!visibility) return 'Opacity (disabled)'
+        if (!visibility) return 'Opacity (disabled)';
 
         return `Opacity ${
             typeof opacity !== 'undefined'
                 ? `(${Math.round(opacity * 100)}%)`
                 : ''
-        }`
-    }
+        }`;
+    };
 
     render() {
         const {
@@ -95,15 +95,15 @@ class LegendItemButtonOpacity extends PureComponent {
             scrolling,
             onChangeOpacity,
             ...rest
-        } = this.props
+        } = this.props;
 
-        const { visibilityClick, visibilityHover } = this.state
-        const { opacity } = activeLayer
-        let iconStyle = visibility ? defaultStyle : disabledStyle
+        const { visibilityClick, visibilityHover } = this.state;
+        const { opacity } = activeLayer;
+        let iconStyle = visibility ? defaultStyle : disabledStyle;
         if (visibility && (visibilityHover || visibilityClick)) {
-            iconStyle = focusStyle
+            iconStyle = focusStyle;
         }
-        if (visibility && opacity < 1) iconStyle = enabledStyle
+        if (visibility && opacity < 1) iconStyle = enabledStyle;
 
         return (
             <Tooltip
@@ -165,8 +165,8 @@ class LegendItemButtonOpacity extends PureComponent {
                     </button>
                 </Tooltip>
             </Tooltip>
-        )
+        );
     }
 }
 
-export default LegendItemButtonOpacity
+export default LegendItemButtonOpacity;

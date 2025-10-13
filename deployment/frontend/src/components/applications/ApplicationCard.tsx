@@ -1,15 +1,15 @@
-import React from 'react'
-import Image from 'next/image'
-import { type Application } from '@/schema/ckan.schema'
-import { api } from '@/utils/api'
-import Link from 'next/link'
+import React from 'react';
+import Image from 'next/image';
+import { type Application } from '@/schema/ckan.schema';
+import { api } from '@/utils/api';
+import Link from 'next/link';
 
 export default function ApplicationCard({
     application,
 }: {
-    application: Application
+    application: Application;
 }) {
-    const datasetCount = application.package_count
+    const datasetCount = application.package_count;
     return (
         <Link
             href={`/applications/${application.name}`}
@@ -36,5 +36,5 @@ export default function ApplicationCard({
                     : `${datasetCount} Dataset`}
             </p>
         </Link>
-    )
+    );
 }

@@ -2,20 +2,20 @@ import {
     createTRPCRouter,
     protectedProcedure,
     publicProcedure,
-} from '@/server/api/trpc'
-import { env } from '@/env.mjs'
-import { type CkanResponse, Collaborator } from '@/schema/ckan.schema'
-import { type Organization } from '@/schema/ckan.schema'
-import { TeamSchema } from '@/schema/team.schema'
-import { z } from 'zod'
-import { replaceNames } from '@/utils/replaceNames'
-import { searchSchema } from '@/schema/search.schema'
+} from '@/server/api/trpc';
+import { env } from '@/env.mjs';
+import { type CkanResponse, Collaborator } from '@/schema/ckan.schema';
+import { type Organization } from '@/schema/ckan.schema';
+import { TeamSchema } from '@/schema/team.schema';
+import { z } from 'zod';
+import { replaceNames } from '@/utils/replaceNames';
+import { searchSchema } from '@/schema/search.schema';
 import type {
     GroupTree,
     GroupsmDetails,
     User,
     WriOrganization,
-} from '@/schema/ckan.schema'
+} from '@/schema/ckan.schema';
 import {
     getGroups,
     getAllOrganizations,
@@ -23,15 +23,15 @@ import {
     findAllNameInTree,
     getAllDatasetFq,
     fetchFacets,
-} from '@/utils/apiUtils'
-import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils'
-import { json } from 'stream/consumers'
-import { flattenTree } from '@/utils/flattenGroupTree'
+} from '@/utils/apiUtils';
+import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils';
+import { json } from 'stream/consumers';
+import { flattenTree } from '@/utils/flattenGroupTree';
 
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
-        const user = ctx.session.user
-        const teamsMap = new Map()
+        const user = ctx.session.user;
+        const teamsMap = new Map();
         const teamsList = await Promise.all(
             [0, 1, 2, 3, 4, 5].map(async (i) => {
                 const teamRes = await fetch(
@@ -52,41 +52,43 @@ export const teamRouter = createTRPCRouter({
                             Authorization: `${user.apikey}`,
                         },
                     }
-                )
+                );
                 const teams: CkanResponse<WriOrganization[]> =
-                    await teamRes.json()
+                    await teamRes.json();
                 if (!teams.success && teams.error) {
                     if (teams.error.message)
-                        throw Error(replaceNames(teams.error.message, true))
-                    throw Error(replaceNames(JSON.stringify(teams.error), true))
+                        throw Error(replaceNames(teams.error.message, true));
+                    throw Error(
+                        replaceNames(JSON.stringify(teams.error), true)
+                    );
                 }
                 teams.result.forEach((team) => {
-                    if (teamsMap.has(team.id)) return
-                    teamsMap.set(team.id, team)
-                })
+                    if (teamsMap.has(team.id)) return;
+                    teamsMap.set(team.id, team);
+                });
             })
-        )
+        );
         return Array.from(teamsMap.values()).sort((a, b) => {
-            const nameA = a.name.toLowerCase()
-            const nameB = b.name.toLowerCase()
+            const nameA = a.name.toLowerCase();
+            const nameB = b.name.toLowerCase();
             return nameA.localeCompare(nameB, undefined, {
                 numeric: true,
                 sensitivity: 'base',
-            })
-        })
+            });
+        });
     }),
     editTeam: protectedProcedure
         .input(TeamSchema)
         .mutation(async ({ ctx, input }) => {
             try {
-                const user = ctx.session.user
+                const user = ctx.session.user;
 
-                const newMembers = []
+                const newMembers = [];
                 for (const member of input.members) {
                     newMembers.push({
                         name: member.user.value,
                         capacity: member.capacity.value,
-                    })
+                    });
                 }
                 try {
                     sendMemberNotifications(
@@ -95,11 +97,11 @@ export const teamRouter = createTRPCRouter({
                         input.users,
                         input.id,
                         'team'
-                    )
+                    );
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 }
-                input.users = newMembers
+                input.users = newMembers;
                 const body = JSON.stringify({
                     ...input,
                     image_display_url: input.image_url
@@ -110,7 +112,7 @@ export const teamRouter = createTRPCRouter({
                             ? [{ name: input.parent.value }]
                             : [],
                     visibility: input.visibility.value,
-                })
+                });
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_patch`,
                     {
@@ -121,25 +123,25 @@ export const teamRouter = createTRPCRouter({
                         },
                         body,
                     }
-                )
-                const team: CkanResponse<Organization> = await teamRes.json()
+                );
+                const team: CkanResponse<Organization> = await teamRes.json();
                 if (!team.success && team.error) {
                     if (team.error.message)
-                        throw Error(replaceNames(team.error.message, true))
-                    throw Error(replaceNames(JSON.stringify(team.error), true))
+                        throw Error(replaceNames(team.error.message, true));
+                    throw Error(replaceNames(JSON.stringify(team.error), true));
                 }
-                return team.result
+                return team.result;
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the System Administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(replaceNames(error, true))
+                    'Something went wrong please contact the System Administrator';
+                if (e instanceof Error) error = e.message;
+                throw Error(replaceNames(error, true));
             }
         }),
     getTeam: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
+            const user = ctx.session.user;
             const teamRes = await fetch(
                 `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True&include_extras=true`,
                 {
@@ -148,23 +150,23 @@ export const teamRouter = createTRPCRouter({
                         Authorization: `${user.apikey}`,
                     },
                 }
-            )
+            );
 
             const team: CkanResponse<
                 WriOrganization & {
-                    groups: Organization[]
+                    groups: Organization[];
                 }
-            > = await teamRes.json()
+            > = await teamRes.json();
             return {
                 ...team.result,
                 parent: team.result.groups[0]?.name ?? null,
-            }
+            };
         }),
     deleteTeam: protectedProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ ctx, input }) => {
             try {
-                const user = ctx.session.user
+                const user = ctx.session.user;
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_delete`,
                     {
@@ -175,29 +177,29 @@ export const teamRouter = createTRPCRouter({
                         },
                         body: JSON.stringify({ id: input.id }),
                     }
-                )
+                );
                 const team: CkanResponse<
                     Organization & { groups: Organization[] }
-                > = await teamRes.json()
+                > = await teamRes.json();
                 if (!team.success && team.error) {
                     if (team.error.message)
-                        throw Error(replaceNames(team.error.message, true))
-                    throw Error(replaceNames(JSON.stringify(team.error), true))
+                        throw Error(replaceNames(team.error.message, true));
+                    throw Error(replaceNames(JSON.stringify(team.error), true));
                 }
                 return {
                     ...team.result,
-                }
+                };
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the System Administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(replaceNames(error, true))
+                    'Something went wrong please contact the System Administrator';
+                if (e instanceof Error) error = e.message;
+                throw Error(replaceNames(error, true));
             }
         }),
     getTeamUsers: protectedProcedure
         .input(z.object({ id: z.string(), capacity: z.string().optional() }))
         .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
+            const user = ctx.session.user;
             const membersListRes = await fetch(
                 `${env.CKAN_URL}/api/action/member_list?id=${input.id}${
                     input.capacity ? `&capacity=${input.capacity}` : ''
@@ -208,23 +210,23 @@ export const teamRouter = createTRPCRouter({
                         Authorization: `${user.apikey}`,
                     },
                 }
-            )
+            );
             const membersList: CkanResponse<string[][]> =
-                await membersListRes.json()
-            return membersList.result
+                await membersListRes.json();
+            return membersList.result;
         }),
     createTeam: protectedProcedure
         .input(TeamSchema)
         .mutation(async ({ ctx, input }) => {
             try {
-                const user = ctx.session.user
+                const user = ctx.session.user;
 
                 // only sysadmin is allowed to create Parent teams
                 if (
                     !user.sysadmin &&
                     (!input.parent || input.parent.value === '')
                 )
-                    throw Error('Only Sysadmins can create parent Teams')
+                    throw Error('Only Sysadmins can create parent Teams');
 
                 const body = JSON.stringify({
                     ...input,
@@ -236,7 +238,7 @@ export const teamRouter = createTRPCRouter({
                             ? [{ name: input.parent.value }]
                             : [],
                     visibility: input.visibility.value,
-                })
+                });
 
                 const teamRes = await fetch(
                     `${env.CKAN_URL}/api/action/organization_create`,
@@ -248,19 +250,19 @@ export const teamRouter = createTRPCRouter({
                         },
                         body,
                     }
-                )
-                const team: CkanResponse<Organization> = await teamRes.json()
+                );
+                const team: CkanResponse<Organization> = await teamRes.json();
                 if (!team.success && team.error) {
                     if (team.error.message)
-                        throw Error(replaceNames(team.error.message, true))
-                    throw Error(replaceNames(JSON.stringify(team.error), true))
+                        throw Error(replaceNames(team.error.message, true));
+                    throw Error(replaceNames(JSON.stringify(team.error), true));
                 }
-                return team.result
+                return team.result;
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the System Administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(replaceNames(error, true))
+                    'Something went wrong please contact the System Administrator';
+                if (e instanceof Error) error = e.message;
+                throw Error(replaceNames(error, true));
             }
         }),
     deleteDashboardTeam: protectedProcedure
@@ -277,16 +279,16 @@ export const teamRouter = createTRPCRouter({
                             'Content-Type': 'application/json',
                         },
                     }
-                )
-                const data = (await response.json()) as CkanResponse<null>
+                );
+                const data = (await response.json()) as CkanResponse<null>;
                 if (!data.success && data.error)
-                    throw Error(replaceNames(data.error.message, true))
-                return data
+                    throw Error(replaceNames(data.error.message, true));
+                return data;
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the System Administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(replaceNames(error, true))
+                    'Something went wrong please contact the System Administrator';
+                if (e instanceof Error) error = e.message;
+                throw Error(replaceNames(error, true));
             }
         }),
     getGeneralTeam: publicProcedure
@@ -303,14 +305,14 @@ export const teamRouter = createTRPCRouter({
                 await getAllOrganizations({
                     apiKey: ctx?.session?.user.apikey ?? '',
                 }),
-            ])
+            ]);
 
             if (groupTree.length === 0) {
                 return {
                     teams: groupTree,
                     teamsDetails: {} as Record<string, GroupsmDetails>,
                     count: 0,
-                }
+                };
             }
             const teamDetails = allGroups.reduce(
                 (acc, org) => {
@@ -320,35 +322,35 @@ export const teamRouter = createTRPCRouter({
                         package_count: org.package_count!,
                         name: org.name,
                         visibility: org.visibility,
-                    }
-                    return acc
+                    };
+                    return acc;
                 },
                 {} as Record<string, GroupsmDetails>
-            )
+            );
 
             const facets = await fetchFacets(
                 teamDetails,
                 'organization',
                 ctx?.session?.user.apikey ?? ''
-            )
+            );
 
             for (const group in teamDetails) {
-                const team = teamDetails[group]!
-                team.package_count = facets[team.name] ?? 0
+                const team = teamDetails[group]!;
+                team.package_count = facets[team.name] ?? 0;
             }
 
-            const result = groupTree
+            const result = groupTree;
             return {
                 teams: result,
                 allTeams: allGroups,
                 teamsDetails: teamDetails,
                 count: result.length,
-            }
+            };
         }),
     getPossibleMembers: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
+            const user = ctx.session.user;
             const teamRes = await fetch(
                 `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
                 {
@@ -357,18 +359,18 @@ export const teamRouter = createTRPCRouter({
                         Authorization: `${user.apikey}`,
                     },
                 }
-            )
+            );
             const team: CkanResponse<
                 Organization & { groups: Organization[] }
-            > = await teamRes.json()
+            > = await teamRes.json();
             if (!team.success && team.error) {
                 if (team.error.message)
-                    throw Error(replaceNames(team.error.message, true))
-                throw Error(replaceNames(JSON.stringify(team.error), true))
+                    throw Error(replaceNames(team.error.message, true));
+                throw Error(replaceNames(JSON.stringify(team.error), true));
             }
             const teamUsers = team?.result?.users?.map(
                 (user) => user.name
-            ) as string[]
+            ) as string[];
             const usersRes = await fetch(
                 `${env.CKAN_URL}/api/action/user_list?all_fields=True&limit=1000`,
                 {
@@ -377,22 +379,22 @@ export const teamRouter = createTRPCRouter({
                         Authorization: `${user.apikey}`,
                     },
                 }
-            )
-            const users: CkanResponse<User[]> = await usersRes.json()
+            );
+            const users: CkanResponse<User[]> = await usersRes.json();
             if (!users.success && users.error) {
                 if (users.error.message)
-                    throw Error(replaceNames(users.error.message, true))
-                throw Error(replaceNames(JSON.stringify(users.error), true))
+                    throw Error(replaceNames(users.error.message, true));
+                throw Error(replaceNames(JSON.stringify(users.error), true));
             }
 
             return users.result.filter(
                 (user) => user.name && !teamUsers.includes(user.name)
-            )
+            );
         }),
     getCurrentMembers: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
+            const user = ctx.session.user;
             const teamRes = await fetch(
                 `${env.CKAN_URL}/api/action/organization_show?id=${input.id}&include_users=True`,
                 {
@@ -401,17 +403,17 @@ export const teamRouter = createTRPCRouter({
                         Authorization: `${user.apikey}`,
                     },
                 }
-            )
+            );
             const team: CkanResponse<
                 Organization & { groups: Organization[] }
-            > = await teamRes.json()
+            > = await teamRes.json();
             if (!team.success && team.error) {
                 if (team.error.message)
-                    throw Error(replaceNames(team.error.message, true))
-                throw Error(replaceNames(JSON.stringify(team.error), true))
+                    throw Error(replaceNames(team.error.message, true));
+                throw Error(replaceNames(JSON.stringify(team.error), true));
             }
 
-            return team.result.users
+            return team.result.users;
         }),
     list: publicProcedure.query(async ({ ctx, input }) => {
         const teamRes = await fetch(
@@ -421,14 +423,14 @@ export const teamRouter = createTRPCRouter({
                     'Content-Type': 'application/json',
                 },
             }
-        )
+        );
 
-        const team: CkanResponse<Organization[]> = await teamRes.json()
+        const team: CkanResponse<Organization[]> = await teamRes.json();
         if (!team.success && team.error)
-            throw Error(replaceNames(team.error.message))
+            throw Error(replaceNames(team.error.message));
         return {
             teams: team.result,
-        }
+        };
     }),
     getNumberOfSubTeams: publicProcedure.query(async ({ ctx, input }) => {
         const teamRes = await fetch(
@@ -439,17 +441,17 @@ export const teamRouter = createTRPCRouter({
                     Authorization: `${ctx?.session?.user.apikey}`,
                 },
             }
-        )
-        const team: CkanResponse<GroupTree[]> = await teamRes.json()
+        );
+        const team: CkanResponse<GroupTree[]> = await teamRes.json();
         if (!team.success && team.error)
-            throw Error(replaceNames(team.error.message))
-        const numOfSubtopics = flattenTree(team.result)
-        return numOfSubtopics
+            throw Error(replaceNames(team.error.message));
+        const numOfSubtopics = flattenTree(team.result);
+        return numOfSubtopics;
     }),
     removeMember: protectedProcedure
         .input(z.object({ id: z.string(), username: z.string() }))
         .mutation(async ({ ctx, input }) => {
-            const user = ctx.session.user
+            const user = ctx.session.user;
             const teamRes = await fetch(
                 `${env.CKAN_URL}/api/action/member_delete`,
                 {
@@ -464,15 +466,15 @@ export const teamRouter = createTRPCRouter({
                         object_type: 'user',
                     }),
                 }
-            )
+            );
             const team: CkanResponse<
                 Organization & { groups: Organization[] }
-            > = await teamRes.json()
+            > = await teamRes.json();
             if (!team.success && team.error) {
                 if (team.error.message)
-                    throw Error(replaceNames(team.error.message, true))
-                throw Error(replaceNames(JSON.stringify(team.error), true))
+                    throw Error(replaceNames(team.error.message, true));
+                throw Error(replaceNames(JSON.stringify(team.error), true));
             }
-            return team.result
+            return team.result;
         }),
-})
+});

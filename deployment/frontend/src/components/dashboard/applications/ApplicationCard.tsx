@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react'
-import SearchHeader from '../_shared/SearchHeader'
-import RowProfile from '../_shared/RowProfile'
-import Row from '../_shared/Row'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
-import type { IRowProfile } from '../_shared/RowProfile'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import type { SearchInput } from '@/schema/search.schema'
-import Pagination from '../_shared/Pagination'
-import type { GroupTree } from '@/schema/ckan.schema'
-import notify from '@/utils/notify'
-import dynamic from 'next/dynamic'
+import React, { useEffect, useState } from 'react';
+import SearchHeader from '../_shared/SearchHeader';
+import RowProfile from '../_shared/RowProfile';
+import Row from '../_shared/Row';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import type { IRowProfile } from '../_shared/RowProfile';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import type { SearchInput } from '@/schema/search.schema';
+import Pagination from '../_shared/Pagination';
+import type { GroupTree } from '@/schema/ckan.schema';
+import notify from '@/utils/notify';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { useRouter } from 'next/router'
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import Image from 'next/image'
-import type { Application } from '@/schema/ckan.schema'
+});
+import { useRouter } from 'next/router';
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import Image from 'next/image';
+import type { Application } from '@/schema/ckan.schema';
 
 function ApplicationProfile({ application }: { application: Application }) {
     return (
@@ -53,39 +53,39 @@ function ApplicationProfile({ application }: { application: Application }) {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default function ApplicationCard() {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
-    })
+    });
     const {
         data: applications,
         isLoading,
         refetch,
-    } = api.applications.getAllApplications.useQuery()
-    const [open, setOpen] = useState(false)
-    const router = useRouter()
+    } = api.applications.getAllApplications.useQuery();
+    const [open, setOpen] = useState(false);
+    const router = useRouter();
     const [selectedApplication, setSelectedApplication] =
-        useState<Application | null>(null)
+        useState<Application | null>(null);
     const deleteApplication =
         api.applications.deleteDashBoardApplication.useMutation({
             onSuccess: async (data) => {
-                await refetch()
-                setOpen(false)
+                await refetch();
+                setOpen(false);
                 notify(
                     `Successfully deleted the ${selectedApplication?.name} Application`,
                     'error'
-                )
+                );
             },
-        })
+        });
 
     const handleOpenModal = (application: Application) => {
-        setSelectedApplication(application)
-        setOpen(true)
-    }
+        setSelectedApplication(application);
+        setOpen(true);
+    };
 
     const filteredApplications = applications?.filter((application) => {
         return (
@@ -98,12 +98,12 @@ export default function ApplicationCard() {
             application.description
                 .toLowerCase()
                 .includes(query.search.toLowerCase())
-        )
-    })
+        );
+    });
     const paginatedApplications = filteredApplications?.slice(
         query.page.start,
         query.page.start + query.page.rows
-    )
+    );
 
     return (
         <section className="w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0">
@@ -157,7 +157,7 @@ export default function ApplicationCard() {
                                             onClick: () => {
                                                 router.push(
                                                     `/dashboard/applications/${application.name}/edit`
-                                                )
+                                                );
                                             },
                                         },
                                         {
@@ -178,7 +178,7 @@ export default function ApplicationCard() {
                                     isDropDown={false}
                                 />
                             </div>
-                        )
+                        );
                     })
                 )}
 
@@ -235,5 +235,5 @@ export default function ApplicationCard() {
                 )}
             </div>
         </section>
-    )
+    );
 }

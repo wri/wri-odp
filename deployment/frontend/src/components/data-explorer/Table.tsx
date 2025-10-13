@@ -5,14 +5,14 @@ import {
     type Header,
     Updater,
     VisibilityState,
-} from '@tanstack/react-table'
+} from '@tanstack/react-table';
 import {
     ChevronLeftIcon,
     ChevronRightIcon,
     FunnelIcon as FunnelIconSolid,
     MapPinIcon as MapPinIconSolid,
-} from '@heroicons/react/24/solid'
-import React, { Fragment, useEffect, useState } from 'react'
+} from '@heroicons/react/24/solid';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
     ArrowDownIcon,
     ArrowsUpDownIcon,
@@ -21,46 +21,46 @@ import {
     FunnelIcon as FunnelIconOutline,
     XCircleIcon,
     MapPinIcon as MapPinIconOutline,
-} from '@heroicons/react/24/outline'
-import { DefaultTooltip } from '../_shared/Tooltip'
-import { match } from 'ts-pattern'
-import { Menu, Popover, Transition } from '@headlessui/react'
-import { DebouncedInput } from '../_shared/SimpleInput'
+} from '@heroicons/react/24/outline';
+import { DefaultTooltip } from '../_shared/Tooltip';
+import { match } from 'ts-pattern';
+import { Menu, Popover, Transition } from '@headlessui/react';
+import { DebouncedInput } from '../_shared/SimpleInput';
 import {
     Controller,
     FormProvider,
     useFieldArray,
     useForm,
     useFormContext,
-} from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+} from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
     type FilterFormType,
     type FilterObjType,
     filterSchema,
-} from './search.schema'
-import { Button } from '../_shared/Button'
-import SimpleSelect from '../_shared/SimpleSelect'
-import { type DataExplorerColumnFilter } from './DataExplorer'
-import { DatePicker } from '../_shared/DatePicker'
+} from './search.schema';
+import { Button } from '../_shared/Button';
+import SimpleSelect from '../_shared/SimpleSelect';
+import { type DataExplorerColumnFilter } from './DataExplorer';
+import { DatePicker } from '../_shared/DatePicker';
 
 type TableProps = {
-    table: TableType<any>
-    numOfRows: number
-    isLoading: boolean
-    columnFilters: DataExplorerColumnFilter[]
-}
+    table: TableType<any>;
+    numOfRows: number;
+    isLoading: boolean;
+    columnFilters: DataExplorerColumnFilter[];
+};
 
 export function TopBar({
     table,
     numOfRows,
 }: {
-    table: TableType<any>
-    numOfRows: number
+    table: TableType<any>;
+    numOfRows: number;
 }) {
-    const pageIndex = table.getState().pagination.pageIndex
-    const pageSize = table.getState().pagination.pageSize
-    const numOfColumns = table.getAllColumns().length
+    const pageIndex = table.getState().pagination.pageIndex;
+    const pageSize = table.getState().pagination.pageSize;
+    const numOfColumns = table.getAllColumns().length;
     return (
         <>
             <span className="text-base font-regular leading-5 text-[#3E3E3E] flex items-center">
@@ -103,11 +103,11 @@ export function TopBar({
                 </div>
             </div>
         </>
-    )
+    );
 }
 
 function ToggleColumns({ table }: { table: TableType<any> }) {
-    const [q, setQ] = useState('')
+    const [q, setQ] = useState('');
 
     const filteredItems =
         q === ''
@@ -119,8 +119,8 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
                           column.columnDef.header
                               .toLowerCase()
                               .includes(q.toLowerCase()))
-                  )
-              })
+                  );
+              });
     return (
         <Popover as="div" className="relative inline-block text-left">
             <Popover.Button className=" p-4 flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
@@ -211,11 +211,11 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
                 </Popover.Panel>
             </Transition>
         </Popover>
-    )
+    );
 }
 
 export function Table({ table, isLoading }: TableProps) {
-    const numOfColumns = table.getAllColumns().length
+    const numOfColumns = table.getAllColumns().length;
     return (
         <div className="max-w-full grow flex border-t border-gray-200">
             <table className="block border-r border-gray-200 shadow">
@@ -298,7 +298,7 @@ export function Table({ table, isLoading }: TableProps) {
                                                     ?.default ?? ''}
                                             </div>
                                         </td>
-                                    )
+                                    );
                                 }
                                 return (
                                     <td key={c.id} className="py-2 pl-12">
@@ -309,14 +309,14 @@ export function Table({ table, isLoading }: TableProps) {
                                             )}
                                         </div>
                                     </td>
-                                )
+                                );
                             })}
                         </tr>
                     ))}
                 </tbody>
             </table>
         </div>
-    )
+    );
 }
 
 function Column({ h }: { h: Header<any, unknown> }) {
@@ -365,7 +365,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                             <button
                                 aria-label="pin to left"
                                 onClick={() => {
-                                    h.column.pin('left')
+                                    h.column.pin('left');
                                 }}
                             >
                                 <MapPinIconOutline className="w-4 h-4" />
@@ -376,7 +376,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                             <button
                                 aria-label="unpin"
                                 onClick={() => {
-                                    h.column.pin(false)
+                                    h.column.pin(false);
                                 }}
                             >
                                 <MapPinIconSolid className="w-4 h-4" />
@@ -386,7 +386,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 </div>
             )}
         </div>
-    )
+    );
 }
 
 function FilterColumn({ column }: { column: Column<any, unknown> }) {
@@ -419,11 +419,11 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
                 </>
             )}
         </Popover>
-    )
+    );
 }
 
 function FilterForm({ column }: { column: Column<any, unknown> }) {
-    const defaultValues = column.getFilterValue()
+    const defaultValues = column.getFilterValue();
     const formObj = useForm<FilterFormType>({
         resolver: zodResolver(filterSchema),
         defaultValues: {
@@ -438,14 +438,14 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
                 },
             ],
         },
-    })
-    const { watch } = formObj
+    });
+    const { watch } = formObj;
     useEffect(() => {
         const subscription = watch((value, { name, type }) => {
-            column.setFilterValue(value.filters)
-        })
-        return () => subscription.unsubscribe()
-    }, [watch])
+            column.setFilterValue(value.filters);
+        });
+        return () => subscription.unsubscribe();
+    }, [watch]);
 
     return (
         <FormProvider {...formObj}>
@@ -457,32 +457,32 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
                 </div>
             </div>
         </FormProvider>
-    )
+    );
 }
 
 function Filters({ datePicker = false }: { datePicker?: boolean }) {
-    const formObj = useFormContext<FilterFormType>()
-    const { register, control, setValue, watch, getValues } = formObj
+    const formObj = useFormContext<FilterFormType>();
+    const { register, control, setValue, watch, getValues } = formObj;
     const { append, fields, remove } = useFieldArray({
         control,
         name: 'filters',
-    })
+    });
     const addFilter = (link: 'and' | 'or') => {
-        setValue(`filters.${lastItem}.link`, link)
+        setValue(`filters.${lastItem}.link`, link);
         append({
             operation: { label: 'Equals', value: '=' },
             value: '',
             link: null,
-        })
-    }
+        });
+    };
     const removeFilter = (index: number) => {
-        remove(index)
-        const lastItem = watch(`filters`).length - 1
+        remove(index);
+        const lastItem = watch(`filters`).length - 1;
         if (lastItem >= 0) {
-            setValue(`filters.${lastItem}.link`, null)
+            setValue(`filters.${lastItem}.link`, null);
         }
-    }
-    const lastItem = fields.length - 1
+    };
+    const lastItem = fields.length - 1;
 
     return (
         <>
@@ -520,12 +520,12 @@ function Filters({ datePicker = false }: { datePicker?: boolean }) {
                                 value: '<=',
                             },
                         ].filter((o) => {
-                            if (!datePicker) return true
+                            if (!datePicker) return true;
                             return (
                                 datePicker &&
                                 o.value !== '=' &&
                                 o.value !== '!='
-                            )
+                            );
                         })}
                         placeholder="Select a filter"
                     />
@@ -584,22 +584,22 @@ function Filters({ datePicker = false }: { datePicker?: boolean }) {
                 </Button>
             </div>
         </>
-    )
+    );
 }
 
 export function ListOfFilters({
     filters,
     setFilters,
 }: {
-    filters: DataExplorerColumnFilter[]
-    setFilters: (filters: DataExplorerColumnFilter[]) => void
+    filters: DataExplorerColumnFilter[];
+    setFilters: (filters: DataExplorerColumnFilter[]) => void;
 }) {
     function removeFilter(index: number) {
         if (index >= 0 && index < filters.length) {
             const newFilters = filters
                 .slice(0, index)
-                .concat(filters.slice(index + 1))
-            setFilters(newFilters)
+                .concat(filters.slice(index + 1));
+            setFilters(newFilters);
         }
     }
 
@@ -631,5 +631,5 @@ export function ListOfFilters({
                 </button>
             ) : null}
         </>
-    )
+    );
 }

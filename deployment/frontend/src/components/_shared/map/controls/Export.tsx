@@ -1,24 +1,24 @@
-import { useState } from 'react'
-import IconButton from './IconButton'
-import { TextArea } from '../../SimpleTextArea'
-import { DocumentDuplicateIcon } from '@heroicons/react/20/solid'
-import { useDataset } from '@/utils/storeHooks'
-import { Button } from '../../Button'
-import { DefaultTooltip, Tooltip } from '../../Tooltip'
-import dynamic from 'next/dynamic'
+import { useState } from 'react';
+import IconButton from './IconButton';
+import { TextArea } from '../../SimpleTextArea';
+import { DocumentDuplicateIcon } from '@heroicons/react/20/solid';
+import { useDataset } from '@/utils/storeHooks';
+import { Button } from '../../Button';
+import { DefaultTooltip, Tooltip } from '../../Tooltip';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
+});
 
 export default function Export() {
-    const { dataset } = useDataset()
-    const [open, setOpen] = useState(false)
-    const searchParams = new URLSearchParams(window.location.search)
-    const map = searchParams.get('map')
+    const { dataset } = useDataset();
+    const [open, setOpen] = useState(false);
+    const searchParams = new URLSearchParams(window.location.search);
+    const map = searchParams.get('map');
 
-    const embedUrl = `${window.location.origin}/datasets/${dataset.name}/embed/map?map=${map}`
+    const embedUrl = `${window.location.origin}/datasets/${dataset.name}/embed/map?map=${map}`;
 
-    const iFrameHtml = `<iframe src="${embedUrl}" width="1000" height="800" /></iframe>`
+    const iFrameHtml = `<iframe src="${embedUrl}" width="1000" height="800" /></iframe>`;
     return (
         <IconButton tooltip="Export as" onClick={() => setOpen(true)}>
             <ExportIcon />
@@ -47,7 +47,7 @@ export default function Export() {
                                         onClick={() => {
                                             navigator.clipboard.writeText(
                                                 iFrameHtml
-                                            )
+                                            );
                                         }}
                                     >
                                         <DocumentDuplicateIcon className="w-5 text-white" />
@@ -59,7 +59,7 @@ export default function Export() {
                 </div>
             </Modal>
         </IconButton>
-    )
+    );
 }
 
 function ExportIcon() {
@@ -79,5 +79,5 @@ function ExportIcon() {
                 strokeLinejoin="round"
             />
         </svg>
-    )
+    );
 }

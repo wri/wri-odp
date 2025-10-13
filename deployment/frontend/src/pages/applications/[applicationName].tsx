@@ -1,32 +1,32 @@
-import Header from '@/components/_shared/Header'
-import Footer from '@/components/_shared/Footer'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import { Hero } from '@/components/applications/Hero'
-import { api } from '@/utils/api'
-import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
-import DatasetApplication from '@/components/applications/DatasetApplication'
-import { getServerAuthSession } from '@/server/auth'
+import Header from '@/components/_shared/Header';
+import Footer from '@/components/_shared/Footer';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import { Hero } from '@/components/applications/Hero';
+import { api } from '@/utils/api';
+import { NextSeo } from 'next-seo';
+import { useRouter } from 'next/router';
+import DatasetApplication from '@/components/applications/DatasetApplication';
+import { getServerAuthSession } from '@/server/auth';
 import {
     type GetServerSidePropsContext,
     type InferGetServerSidePropsType,
-} from 'next'
-import { appRouter } from '@/server/api/root'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import superjson from 'superjson'
-import { env } from '@/env.mjs'
+} from 'next';
+import { appRouter } from '@/server/api/root';
+import { createServerSideHelpers } from '@trpc/react-query/server';
+import superjson from 'superjson';
+import { env } from '@/env.mjs';
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ applicationName: string }>
 ) {
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
     const helpers = createServerSideHelpers({
         router: appRouter,
         ctx: { session, ip: undefined },
         transformer: superjson,
-    })
+    });
     try {
-        const applicationName = context.params?.applicationName!
+        const applicationName = context.params?.applicationName!;
         const [_datasets, _application] = await Promise.all([
             await helpers.dataset.getAllDataset.fetch({
                 search: '',
@@ -41,20 +41,20 @@ export async function getServerSideProps(
             await helpers.applications.getApplication.fetch({
                 id: applicationName,
             }),
-        ])
+        ]);
         return {
             props: {
                 trpcState: helpers.dehydrate(),
                 applicationName,
             },
-        }
+        };
     } catch (e) {
         return {
             props: {},
             redirect: {
                 destination: '/applications/404',
             },
-        }
+        };
     }
 }
 
@@ -63,12 +63,12 @@ export default function ApplicationPage(
 ) {
     const { data: application } = api.applications.getApplication.useQuery({
         id: props.applicationName ?? '',
-    })
-    const router = useRouter()
+    });
+    const router = useRouter();
 
-    const applicationName = props.applicationName!
+    const applicationName = props.applicationName!;
     const applicationTitle =
-        application?.title ?? application?.name ?? 'Application'
+        application?.title ?? application?.name ?? 'Application';
 
     const links = [
         {
@@ -81,7 +81,7 @@ export default function ApplicationPage(
             url: `/applications/${applicationName}`,
             current: true,
         },
-    ]
+    ];
 
     return (
         <>
@@ -112,5 +112,5 @@ export default function ApplicationPage(
                 }}
             />
         </>
-    )
+    );
 }

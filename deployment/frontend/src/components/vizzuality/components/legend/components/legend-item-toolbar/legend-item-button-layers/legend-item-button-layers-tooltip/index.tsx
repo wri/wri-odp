@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import classnames from 'classnames'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
 class LegendLayersTooltip extends PureComponent {
     static propTypes = {
@@ -11,10 +11,10 @@ class LegendLayersTooltip extends PureComponent {
         // Callback to call when the layer changes with
         // the ID of the dataset and the ID of the layer
         onChangeLayer: PropTypes.func.isRequired,
-    }
+    };
 
     render() {
-        const { layers, activeLayer } = this.props
+        const { layers, activeLayer } = this.props;
 
         return (
             <div>
@@ -46,8 +46,8 @@ class LegendLayersTooltip extends PureComponent {
                     ))}
                 </ul>
             </div>
-        )
+        );
     }
 }
 
-export default LegendLayersTooltip
+export default LegendLayersTooltip;

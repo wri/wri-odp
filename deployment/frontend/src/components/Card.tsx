@@ -1,10 +1,10 @@
-import React from 'react'
-import Image from 'next/image'
-import { type WriDataset } from '@/schema/ckan.schema'
-import Link from 'next/link'
-import MapViewIcon from './datasets/view-icons/MapViewIcon'
-import TabularViewIcon from './datasets/view-icons/TabularViewIcon'
-import ChartViewIcon from './datasets/view-icons/ChartViewIcon'
+import React from 'react';
+import Image from 'next/image';
+import { type WriDataset } from '@/schema/ckan.schema';
+import Link from 'next/link';
+import MapViewIcon from './datasets/view-icons/MapViewIcon';
+import TabularViewIcon from './datasets/view-icons/TabularViewIcon';
+import ChartViewIcon from './datasets/view-icons/ChartViewIcon';
 
 export default function Card({ dataset }: { dataset: WriDataset }) {
     return (
@@ -63,5 +63,5 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
                 <TabularViewIcon dataset={dataset} />
             </div>
         </Link>
-    )
+    );
 }

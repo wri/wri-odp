@@ -1,15 +1,15 @@
-import React from 'react'
+import React from 'react';
 import {
     ArrowPathIcon,
     ArrowRightIcon,
     Squares2X2Icon,
-} from '@heroicons/react/24/outline'
-import Image from 'next/image'
-import Link from 'next/link'
-import { DefaultTooltip } from '../_shared/Tooltip'
-import { api } from '@/utils/api'
-import Spinner from '../_shared/Spinner'
-import { type NotificationType } from '@/schema/notification.schema'
+} from '@heroicons/react/24/outline';
+import Image from 'next/image';
+import Link from 'next/link';
+import { DefaultTooltip } from '../_shared/Tooltip';
+import { api } from '@/utils/api';
+import Spinner from '../_shared/Spinner';
+import { type NotificationType } from '@/schema/notification.schema';
 
 function Notification({ items }: { items: NotificationType }) {
     return (
@@ -66,14 +66,14 @@ function Notification({ items }: { items: NotificationType }) {
                 )}
             </div>
         </div>
-    )
+    );
 }
 export default function Notifications({ drag }: { drag: boolean }) {
     const { data, isLoading } = api.notification.getAllNotifications.useQuery({
         returnLength: true,
-    })
+    });
 
-    if (isLoading) return <Spinner className="mx-auto" />
+    if (isLoading) return <Spinner className="mx-auto" />;
 
     return (
         <section
@@ -126,9 +126,9 @@ export default function Notifications({ drag }: { drag: boolean }) {
             </div>
             {(data as NotificationType[])?.length
                 ? (data as NotificationType[])?.slice(0, 6).map((items) => {
-                      return <Notification key={items.id} items={items} />
+                      return <Notification key={items.id} items={items} />;
                   })
                 : 'No notifications'}
         </section>
-    )
+    );
 }

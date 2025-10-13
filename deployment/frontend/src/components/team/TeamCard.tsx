@@ -1,26 +1,26 @@
-import React from 'react'
-import Image from 'next/image'
-import Team from '@/interfaces/team.interface'
-import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
-import { api } from '@/utils/api'
-import { type Organization } from '@portaljs/ckan'
-import Link from 'next/link'
-import { visibilityTypeLabels } from '@/utils/constants'
-import Chip from '@/components/_shared/Chip'
+import React from 'react';
+import Image from 'next/image';
+import Team from '@/interfaces/team.interface';
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
+import { api } from '@/utils/api';
+import { type Organization } from '@portaljs/ckan';
+import Link from 'next/link';
+import { visibilityTypeLabels } from '@/utils/constants';
+import Chip from '@/components/_shared/Chip';
 
 //write a typeguard to check if the topic is a GroupTree
 function isGroupTree(org: GroupTree | Organization): org is GroupTree {
-    return (org as GroupTree).children !== undefined
+    return (org as GroupTree).children !== undefined;
 }
 
 export default function TeamCard({
     team,
     teamsDetails,
 }: {
-    team: GroupTree | (Organization & { numSubTeams: number; notes?: string })
-    teamsDetails: Record<string, GroupsmDetails>
+    team: GroupTree | (Organization & { numSubTeams: number; notes?: string });
+    teamsDetails: Record<string, GroupsmDetails>;
 }) {
-    const { data: numOfSubTeams } = api.teams.getNumberOfSubTeams.useQuery()
+    const { data: numOfSubTeams } = api.teams.getNumberOfSubTeams.useQuery();
     return (
         <Link
             href={`/teams/${team.name}`}
@@ -97,5 +97,5 @@ export default function TeamCard({
                 )}
             </div>
         </Link>
-    )
+    );
 }

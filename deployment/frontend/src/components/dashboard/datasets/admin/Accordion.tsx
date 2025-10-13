@@ -1,13 +1,13 @@
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
-import { Disclosure, Transition } from '@headlessui/react'
-import classNames from '@/utils/classnames'
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { Disclosure, Transition } from '@headlessui/react';
+import classNames from '@/utils/classnames';
 
 interface AccordionProps {
-    title: string | React.ReactNode
-    children: React.ReactNode
-    icon: React.ReactNode
-    className?: string
-    defaultOpen?: boolean
+    title: string | React.ReactNode;
+    children: React.ReactNode;
+    icon: React.ReactNode;
+    className?: string;
+    defaultOpen?: boolean;
 }
 
 export function Accordion({
@@ -62,5 +62,5 @@ export function Accordion({
                 </>
             )}
         </Disclosure>
-    )
+    );
 }

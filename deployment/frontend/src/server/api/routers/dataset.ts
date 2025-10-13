@@ -1,10 +1,10 @@
-import { z } from 'zod'
+import { z } from 'zod';
 import {
     createTRPCRouter,
     protectedProcedure,
     publicProcedure,
-} from '@/server/api/trpc'
-import { env } from '@/env.mjs'
+} from '@/server/api/trpc';
+import { env } from '@/env.mjs';
 import {
     getAllDatasetFq,
     getOneDataset,
@@ -31,8 +31,8 @@ import {
     getDatasetReleaseNotes,
     getCollaboratorPackages,
     getAllOrganizations,
-} from '@/utils/apiUtils'
-import { searchSchema } from '@/schema/search.schema'
+} from '@/utils/apiUtils';
+import { searchSchema } from '@/schema/search.schema';
 import type {
     CkanResponse,
     Collaborator,
@@ -43,58 +43,58 @@ import type {
     WriOrganization,
     OpenIn,
     User,
-} from '@/schema/ckan.schema'
+} from '@/schema/ckan.schema';
 import {
     DatasetFormType,
     DatasetSchema,
     DatasetSchemaForEdit,
     ResourceFormType,
     ResourceSchema,
-} from '@/schema/dataset.schema'
-import type { Dataset, Resource } from '@/interfaces/dataset.interface'
-import type { License } from '@/interfaces/licenses.interface'
-import { isValidUrl } from '@/utils/isValidUrl'
-import { cleanUrl } from '@/utils/cleanUrl'
+} from '@/schema/dataset.schema';
+import type { Dataset, Resource } from '@/interfaces/dataset.interface';
+import type { License } from '@/interfaces/licenses.interface';
+import { isValidUrl } from '@/utils/isValidUrl';
+import { cleanUrl } from '@/utils/cleanUrl';
 import {
     convertFormToLayerObj,
     convertLayerObjToForm,
     getApiSpecFromRawObj,
     getRawObjFromApiSpec,
-} from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
-import { APILayerSpec } from '@/interfaces/layer.interface'
+} from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects';
+import { APILayerSpec } from '@/interfaces/layer.interface';
 import {
     type RwLayerResp,
     RwResponse,
     isRwError,
     isRwLayerResp,
     type RwErrorResponse,
-} from '@/interfaces/rw.interface'
-import { sendMemberNotifications } from '@/utils/apiUtils'
-import { TRPCError } from '@trpc/server'
-import { CommentSchema, IssueSchema } from '@/schema/issue.schema'
-import { throws } from 'assert'
+} from '@/interfaces/rw.interface';
+import { sendMemberNotifications } from '@/utils/apiUtils';
+import { TRPCError } from '@trpc/server';
+import { CommentSchema, IssueSchema } from '@/schema/issue.schema';
+import { throws } from 'assert';
 import {
     createViewFormSchema,
     editViewFormSchema,
     viewFormSchema,
-} from '@/schema/view.schema'
+} from '@/schema/view.schema';
 
-import { Organization } from '@portaljs/ckan'
+import { Organization } from '@portaljs/ckan';
 
 export async function getLayerRw(layerUrl: string) {
     const layerRwRes = await fetch(layerUrl, {
         headers: {
             'Content-Type': 'application/json',
         },
-    })
-    const layerRw: RwLayerResp | RwErrorResponse = await layerRwRes.json()
+    });
+    const layerRw: RwLayerResp | RwErrorResponse = await layerRwRes.json();
     if (isRwError(layerRw))
         throw Error(
             `Error reading resource at the Resource Watch API - (${JSON.stringify(
                 layerRw.errors
             )})`
-        )
-    return { ...layerRw.data.attributes, id: layerRw.data.id }
+        );
+    return { ...layerRw.data.attributes, id: layerRw.data.id };
 }
 
 async function fetchDatasetCollaborators(
@@ -110,23 +110,23 @@ async function fetchDatasetCollaborators(
                 Authorization: `${sysAdminApiKey}`,
             },
         }
-    )
-    const collaborators: CkanResponse<any[]> = await collaboratorsRes.json()
+    );
+    const collaborators: CkanResponse<any[]> = await collaboratorsRes.json();
     if (!collaborators.success && collaborators.error) {
         if (collaboratorsRes.status === 403)
             throw new TRPCError({
                 code: 'FORBIDDEN',
                 message: 'You are not authorized to perform this action',
-            })
+            });
         if (collaborators.error.message)
             throw new TRPCError({
                 code: 'BAD_REQUEST',
                 message: collaborators.error.message,
-            })
+            });
         throw new TRPCError({
             code: 'BAD_REQUEST',
             message: JSON.stringify(collaborators.error),
-        })
+        });
     }
 
     // const result = collaborators.result.map((collaborator) => {
@@ -139,7 +139,7 @@ async function fetchDatasetCollaborators(
     //  })
 
     //@ts-ignore
-    return collaborators.result
+    return collaborators.result;
 }
 
 export const DatasetRouter = createTRPCRouter({
@@ -147,7 +147,7 @@ export const DatasetRouter = createTRPCRouter({
         .input(DatasetSchema)
         .mutation(async ({ ctx, input }) => {
             try {
-                const user = ctx.session.user
+                const user = ctx.session.user;
                 const body = {
                     ...input,
                     draft: true,
@@ -196,25 +196,25 @@ export const DatasetRouter = createTRPCRouter({
                                 resource.type !== 'empty-layer'
                         )
                         .map((resource) => {
-                            let description = ''
-                            let title = ''
+                            let description = '';
+                            let title = '';
                             if (resource.layerObjRaw) {
                                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                                 const layerRaw = getApiSpecFromRawObj(
                                     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                                     resource.layerObjRaw
-                                )
+                                );
 
                                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                                 description =
                                     resource.description != ''
                                         ? resource.description
-                                        : layerRaw.description
+                                        : layerRaw.description;
                                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                                 title =
                                     resource.name != ''
                                         ? resource.name
-                                        : layerRaw.name
+                                        : layerRaw.name;
                             }
                             if (resource.layerObj || resource.layerObjRaw) {
                                 return {
@@ -267,7 +267,7 @@ export const DatasetRouter = createTRPCRouter({
                                     //     ? { value: resource.schema }
                                     //     : '{}',
                                     url: resource.url ?? 'https://example.com',
-                                }
+                                };
                             } else {
                                 return {
                                     ...resource,
@@ -282,7 +282,7 @@ export const DatasetRouter = createTRPCRouter({
                                         ? { value: resource.schema }
                                         : '{}',
                                     url: resource.url ?? resource.name,
-                                }
+                                };
                             }
                         }),
                     spatial:
@@ -295,9 +295,9 @@ export const DatasetRouter = createTRPCRouter({
                     spatial_address: input.spatial_address
                         ? input.spatial_address
                         : null,
-                }
+                };
 
-                console.log('calling package_create')
+                console.log('calling package_create');
                 const datasetRes = await fetch(
                     `${env.CKAN_URL}/api/action/package_create`,
                     {
@@ -308,10 +308,10 @@ export const DatasetRouter = createTRPCRouter({
                         },
                         body: JSON.stringify(body),
                     }
-                )
-                const dataset: CkanResponse<Dataset> = await datasetRes.json()
+                );
+                const dataset: CkanResponse<Dataset> = await datasetRes.json();
                 if (!dataset.success && dataset.error) {
-                    console.log('dataset', dataset)
+                    console.log('dataset', dataset);
                     if (
                         //@ts-ignore
                         dataset.error.name &&
@@ -319,45 +319,45 @@ export const DatasetRouter = createTRPCRouter({
                     ) {
                         throw Error(
                             '[!] A page with this URL slug already exists. Please try something different in the URL field.'
-                        )
+                        );
                     }
                     if (dataset.error.message)
-                        throw Error(dataset.error.message)
+                        throw Error(dataset.error.message);
                     throw Error(
                         JSON.stringify(dataset.error).concat(' Dataset create')
-                    )
+                    );
                 }
-                return dataset.result
+                return dataset.result;
             } catch (e) {
-                console.log('E', e)
+                console.log('E', e);
                 let error =
-                    'Something went wrong please contact the system administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(error)
+                    'Something went wrong please contact the system administrator';
+                if (e instanceof Error) error = e.message;
+                throw Error(error);
             }
         }),
     editDataset: protectedProcedure
         .input(DatasetSchemaForEdit)
         .mutation(async ({ ctx, input }) => {
-            const user = ctx.session.user
+            const user = ctx.session.user;
             const existingCollaboratorsDetails =
                 await fetchDatasetCollaborators(
                     input.id ?? '',
                     ctx.session.user.apikey,
                     env.SYS_ADMIN_API_KEY
-                )
+                );
             const newCollaborators = input.collaborators?.map(
                 (collaborator) => ({
                     name: collaborator.user.label.toLowerCase(),
                     capacity: collaborator.capacity.label.toLowerCase(),
                 })
-            )
+            );
             const existingCollaborators = existingCollaboratorsDetails.map(
                 (existingCollaborator) => ({
                     name: existingCollaborator.name,
                     capacity: existingCollaborator.capacity,
                 })
-            )
+            );
 
             try {
                 if (input.collaborators) {
@@ -367,17 +367,17 @@ export const DatasetRouter = createTRPCRouter({
                         existingCollaborators as unknown as User[],
                         input.id ?? '',
                         'dataset'
-                    )
+                    );
                 }
             } catch (e) {
-                console.log('ERROR HERE')
-                console.error(e)
+                console.log('ERROR HERE');
+                console.error(e);
             }
 
-            const inputKeys = Object.keys(input)
+            const inputKeys = Object.keys(input);
             const isUpdate = !(
                 inputKeys.length == 2 && inputKeys.includes('collaborators')
-            )
+            );
 
             const pendingResponse = await fetch(
                 `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${input.id}`,
@@ -387,40 +387,40 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
             const pendingData =
-                (await pendingResponse.json()) as CkanResponse<PendingDataset | null>
+                (await pendingResponse.json()) as CkanResponse<PendingDataset | null>;
             if (!pendingData.success && pendingData.error) {
-                const error = JSON.stringify(pendingData.error).toLowerCase()
+                const error = JSON.stringify(pendingData.error).toLowerCase();
                 if (!error.includes('not found')) {
-                    throw Error(JSON.stringify(pendingData.error))
+                    throw Error(JSON.stringify(pendingData.error));
                 }
             }
 
-            let prevDataset: WriDataset | null = null
+            let prevDataset: WriDataset | null = null;
 
             if (pendingData.result) {
-                prevDataset = pendingData.result.package_data
+                prevDataset = pendingData.result.package_data;
             } else {
                 prevDataset = await getDatasetDetails({
                     id: input.id ?? '',
                     session: ctx.session,
-                })
+                });
             }
 
             const datasetDetails = await getDatasetDetails({
                 id: input.id ?? '',
                 session: ctx.session,
-            })
+            });
 
-            const rw_id = input.rw_id ?? null
+            const rw_id = input.rw_id ?? null;
 
-            let org: WriOrganization | null = null
+            let org: WriOrganization | null = null;
             if (input.team?.value && isUpdate) {
                 org = (await getOrgDetails({
                     orgId: input.team.value,
                     apiKey: ctx.session.user.apikey,
-                }))!
+                }))!;
 
                 org = {
                     id: org.id,
@@ -434,12 +434,12 @@ export const DatasetRouter = createTRPCRouter({
                     is_organization: org.is_organization,
                     state: org.state,
                     visibility: org.visibility,
-                }
+                };
             }
 
             try {
                 if (isUpdate) {
-                    const user = ctx.session.user
+                    const user = ctx.session.user;
                     const body = {
                         ...prevDataset,
                         ...input,
@@ -449,31 +449,31 @@ export const DatasetRouter = createTRPCRouter({
                             ? input.tags.map((tag) => {
                                   const ptag = datasetDetails?.tags?.find(
                                       (x) => x.name === tag
-                                  )
+                                  );
                                   return {
                                       ...ptag,
                                       name: tag,
-                                  }
+                                  };
                               })
                             : [],
                         groups: [
                             ...(input.topics?.map((topic) => {
                                 const pgroups = datasetDetails?.groups?.find(
                                     (x) => x.name === topic
-                                )
+                                );
                                 return {
                                     ...pgroups,
                                     name: topic,
-                                }
+                                };
                             }) ?? []),
                             ...(input.applications?.map((app) => {
                                 const pgroups = datasetDetails?.groups?.find(
                                     (x) => x.name === app
-                                )
+                                );
                                 return {
                                     ...pgroups,
                                     name: app,
-                                }
+                                };
                             }) ?? []),
                         ],
                         topics: undefined,
@@ -515,28 +515,28 @@ export const DatasetRouter = createTRPCRouter({
                                     resource.type !== 'empty-layer'
                             )
                             .map((resource) => {
-                                console.log('ERROR HERE 6')
+                                console.log('ERROR HERE 6');
                                 const rr = prevDataset?.resources.find(
                                     (r) => r.id === resource.id
-                                )
-                                let description = ''
-                                let title = ''
+                                );
+                                let description = '';
+                                let title = '';
                                 if (resource.layerObjRaw) {
                                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                                     const layerRaw = getApiSpecFromRawObj(
                                         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                                         resource.layerObjRaw
-                                    )
+                                    );
                                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                                     description =
                                         resource.description != ''
                                             ? resource.description
-                                            : layerRaw.description
+                                            : layerRaw.description;
                                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                                     title =
                                         resource.title != ''
                                             ? resource.title
-                                            : layerRaw.name
+                                            : layerRaw.name;
                                 }
                                 if (resource.layerObj || resource.layerObjRaw) {
                                     return {
@@ -622,7 +622,7 @@ export const DatasetRouter = createTRPCRouter({
                                         metadata_modified: new Date()
                                             .toISOString()
                                             .replace('Z', ''),
-                                    }
+                                    };
                                 } else {
                                     return {
                                         ...rr,
@@ -644,7 +644,7 @@ export const DatasetRouter = createTRPCRouter({
                                         metadata_modified: new Date()
                                             .toISOString()
                                             .replace('Z', ''),
-                                    }
+                                    };
                                 }
                             }),
                         spatial:
@@ -656,11 +656,11 @@ export const DatasetRouter = createTRPCRouter({
                         spatial_address: input.spatial_address
                             ? input.spatial_address
                             : null,
-                    }
+                    };
 
                     const newBodyDataset = filterDatasetFields(
                         body
-                    ) as WriDataset
+                    ) as WriDataset;
                     // const metadaFilter = Object.keys(newBodyDataset)
                     //     .filter((x) => inputKeys.includes(x))
                     //     .map((x) => ({ [x]: newBodyDataset[x] }))
@@ -668,7 +668,7 @@ export const DatasetRouter = createTRPCRouter({
                     const responseData = {
                         ...prevDataset,
                         ...newBodyDataset,
-                    }
+                    };
 
                     // update main data to pending also
                     const result = await patchDataset({
@@ -677,8 +677,8 @@ export const DatasetRouter = createTRPCRouter({
                             approval_status: 'pending',
                         },
                         session: ctx.session,
-                    })
-                    console.log('result', result)
+                    });
+                    console.log('result', result);
 
                     const response = await fetch(
                         `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
@@ -693,15 +693,15 @@ export const DatasetRouter = createTRPCRouter({
                                 'Content-Type': 'application/json',
                             },
                         }
-                    )
+                    );
 
                     let data =
-                        (await response.json()) as CkanResponse<PendingDataset>
+                        (await response.json()) as CkanResponse<PendingDataset>;
                     // console.log('DATA', data)
                     if (!data.success && data.error) {
-                        const error = JSON.stringify(data.error).toLowerCase()
+                        const error = JSON.stringify(data.error).toLowerCase();
                         if (!error.includes('not found')) {
-                            throw Error(JSON.stringify(data.error))
+                            throw Error(JSON.stringify(data.error));
                         } else {
                             const response = await fetch(
                                 `${env.CKAN_URL}/api/3/action/pending_dataset_create`,
@@ -716,19 +716,19 @@ export const DatasetRouter = createTRPCRouter({
                                         'Content-Type': 'application/json',
                                     },
                                 }
-                            )
+                            );
                             data =
-                                (await response.json()) as CkanResponse<PendingDataset>
+                                (await response.json()) as CkanResponse<PendingDataset>;
                             if (!data.success && data.error)
-                                throw Error(data.error.message)
+                                throw Error(data.error.message);
 
-                            const pendingDataset = data.result.package_data
+                            const pendingDataset = data.result.package_data;
                             try {
                                 // get dataset collaborators id
                                 const collab = await fetchDatasetCollabIds(
                                     pendingDataset.id,
                                     env.SYS_ADMIN_API_KEY
-                                )
+                                );
                                 if (
                                     !['private', 'draft'].includes(
                                         pendingDataset.visibility_type
@@ -744,18 +744,18 @@ export const DatasetRouter = createTRPCRouter({
                                         dataset_id: pendingDataset.id,
                                         session: ctx.session,
                                         action: 'pending_dataset',
-                                    })
+                                    });
                                 }
                             } catch (error) {
-                                console.error(error)
+                                console.error(error);
                                 throw Error(
                                     'Error in sending approval status notification'
-                                )
+                                );
                             }
                         }
                     }
 
-                    prevDataset = data.result.package_data
+                    prevDataset = data.result.package_data;
                 }
 
                 const collaborators = await Promise.all(
@@ -767,9 +767,9 @@ export const DatasetRouter = createTRPCRouter({
                                 capacity: collaborator.capacity.value,
                             },
                             ctx.session
-                        )
+                        );
                     })
-                )
+                );
                 try {
                     await Promise.all(
                         existingCollaborators
@@ -791,9 +791,9 @@ export const DatasetRouter = createTRPCRouter({
                                     ctx.session
                                 )
                             )
-                    )
+                    );
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 }
                 if (
                     ['draft', 'private'].includes(
@@ -801,18 +801,21 @@ export const DatasetRouter = createTRPCRouter({
                     )
                 ) {
                     try {
-                        await approvePendingDataset(input.id ?? '', ctx.session)
+                        await approvePendingDataset(
+                            input.id ?? '',
+                            ctx.session
+                        );
                     } catch (e) {
-                        console.error(e)
+                        console.error(e);
                     }
                 }
 
-                return { ...prevDataset, collaborators }
+                return { ...prevDataset, collaborators };
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(error)
+                    'Something went wrong please contact the system administrator';
+                if (e instanceof Error) error = e.message;
+                throw Error(error);
             }
         }),
     getResourceViews: publicProcedure
@@ -821,9 +824,9 @@ export const DatasetRouter = createTRPCRouter({
             const views = await getResourceViews({
                 ...input,
                 session: ctx.session,
-            })
+            });
 
-            return views
+            return views;
         }),
     getResourceView: publicProcedure
         .input(z.object({ id: z.string() }))
@@ -831,9 +834,9 @@ export const DatasetRouter = createTRPCRouter({
             const views = await getResourceView({
                 ...input,
                 session: ctx.session,
-            })
+            });
 
-            return views
+            return views;
         }),
     createResourceView: protectedProcedure
         .input(
@@ -847,11 +850,11 @@ export const DatasetRouter = createTRPCRouter({
                 await updateDatasetHasChartsFlag({
                     ckanDatasetId: input.ckanDatasetId,
                     session: ctx.session,
-                })
+                });
 
-                return res
-            })
-            return view
+                return res;
+            });
+            return view;
         }),
     updateResourceView: protectedProcedure
         .input(
@@ -865,12 +868,12 @@ export const DatasetRouter = createTRPCRouter({
                 await updateDatasetHasChartsFlag({
                     ckanDatasetId: input.ckanDatasetId,
                     session: ctx.session,
-                })
+                });
 
-                return res
-            })
+                return res;
+            });
 
-            return view
+            return view;
         }),
     deleteResourceView: protectedProcedure
         .input(z.object({ id: z.string(), ckanDatasetId: z.string() }))
@@ -882,12 +885,12 @@ export const DatasetRouter = createTRPCRouter({
                 await updateDatasetHasChartsFlag({
                     ckanDatasetId: input.ckanDatasetId,
                     session: ctx.session,
-                })
+                });
 
-                return res
-            })
+                return res;
+            });
 
-            return view
+            return view;
         }),
     getAllDataset: publicProcedure
         .input(
@@ -900,12 +903,12 @@ export const DatasetRouter = createTRPCRouter({
             })
         )
         .query(async ({ input, ctx }) => {
-            let fq = `" "`
-            const orgsFq = ''
+            let fq = `" "`;
+            const orgsFq = '';
 
-            const fqArray = []
+            const fqArray = [];
             if (input.fq) {
-                const temporalCoverageFqList = []
+                const temporalCoverageFqList = [];
                 for (const key of Object.keys(input.fq)) {
                     if (
                         [
@@ -917,37 +920,39 @@ export const DatasetRouter = createTRPCRouter({
                          * Temporal coverage has to behave as a range
                          * so it's handled differently
                          */
-                        temporalCoverageFqList.push(`${key}:(${input.fq[key]})`)
-                        continue
+                        temporalCoverageFqList.push(
+                            `${key}:(${input.fq[key]})`
+                        );
+                        continue;
                     }
 
-                    fqArray.push(`${key}:(${input.fq[key]})`)
+                    fqArray.push(`${key}:(${input.fq[key]})`);
                 }
-                const filter = fqArray.join('+')
+                const filter = fqArray.join('+');
 
-                if (filter && orgsFq) fq = `${orgsFq}+${filter}`
+                if (filter && orgsFq) fq = `${orgsFq}+${filter}`;
                 else if (filter) {
-                    fq = filter
+                    fq = filter;
                 } else {
-                    fq = orgsFq
+                    fq = orgsFq;
                 }
 
                 if (temporalCoverageFqList.length)
                     fq += `+(${temporalCoverageFqList
                         .map((f) => `(${f})`)
-                        .join(' AND ')})`
+                        .join(' AND ')})`;
             }
 
             if (!fq.includes('is_approved') && !input.showPendingDataset) {
-                fq += '+is_approved:true'
+                fq += '+is_approved:true';
             }
 
-            let user_organization: WriOrganization[] = []
-            let collab: Collaborator[] = []
+            let user_organization: WriOrganization[] = [];
+            let collab: Collaborator[] = [];
 
             if (!ctx.session?.user.sysadmin) {
                 try {
-                    ;[user_organization, collab] = await Promise.all([
+                    [user_organization, collab] = await Promise.all([
                         getUserOrganizations({
                             userId: ctx.session?.user.id || '',
                             apiKey: ctx.session?.user.apikey || '',
@@ -956,12 +961,12 @@ export const DatasetRouter = createTRPCRouter({
                             userId: ctx.session?.user.id || '',
                             apiKey: ctx.session?.user.apikey || '',
                         }),
-                    ])
+                    ]);
                 } catch (e) {
                     let error =
-                        'Something went wrong, please contact the system administrator'
-                    if (e instanceof Error) error = e.message
-                    throw Error(error)
+                        'Something went wrong, please contact the system administrator';
+                    if (e instanceof Error) error = e.message;
+                    throw Error(error);
                 }
             }
 
@@ -974,7 +979,7 @@ export const DatasetRouter = createTRPCRouter({
                 extLocationQ: input.extLocationQ,
                 extAddressQ: input.extAddressQ,
                 extGlobalQ: input.extGlobalQ,
-            })
+            });
 
             const _datasets = input.removeUnecessaryDataInResources
                 ? dataset.datasets.map((d) => ({
@@ -984,7 +989,7 @@ export const DatasetRouter = createTRPCRouter({
                           format: r.format,
                       })),
                   }))
-                : dataset.datasets
+                : dataset.datasets;
 
             if (user_organization || collab) {
                 _datasets.forEach((d) => {
@@ -1000,8 +1005,8 @@ export const DatasetRouter = createTRPCRouter({
                                 c.package_id === d.id &&
                                 (c.capacity === 'admin' ||
                                     c.capacity === 'editor')
-                        )
-                })
+                        );
+                });
             }
 
             const orgSlugs = [
@@ -1010,40 +1015,40 @@ export const DatasetRouter = createTRPCRouter({
                         .map((d) => d.organization?.name)
                         .filter(Boolean)
                 ),
-            ]
+            ];
 
             const allOrgs = await getAllOrganizations({
                 apiKey: ctx.session?.user.apikey ?? '',
-            })
+            });
 
             const teamVisibility = Object.fromEntries(
                 allOrgs.map((org) => [org.name, org.visibility || 'public'])
-            )
+            );
 
             return {
                 datasets: _datasets as unknown as WriDataset[],
                 count: dataset.count,
                 searchFacets: dataset.searchFacets,
                 teamVisibility: teamVisibility,
-            }
+            };
         }),
     getDatasetCollaborators: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
-            const user = ctx.session?.user
+            const user = ctx.session?.user;
             if (env.SYS_ADMIN_API_KEY == ' ') {
-                return []
+                return [];
             }
             return fetchDatasetCollaborators(
                 input.id,
                 user?.apikey ?? '',
                 env.SYS_ADMIN_API_KEY
-            )
+            );
         }),
     getDatasetIssues: protectedProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
-            const user = ctx.session?.user
+            const user = ctx.session?.user;
             const issuesRes = await fetch(
                 `${env.CKAN_URL}/api/action/issue_search_wri?dataset_id=${input.id}`,
                 {
@@ -1052,14 +1057,14 @@ export const DatasetRouter = createTRPCRouter({
                         Authorization: `${user?.apikey ?? ''}`,
                     },
                 }
-            )
-            const issues: CkanResponse<Issue[]> = await issuesRes.json()
+            );
+            const issues: CkanResponse<Issue[]> = await issuesRes.json();
             if (!issues.success && issues.error) {
-                if (issues.error.message) throw Error(issues.error.message)
-                throw Error(JSON.stringify(issues.error))
+                if (issues.error.message) throw Error(issues.error.message);
+                throw Error(JSON.stringify(issues.error));
             }
 
-            return issues.result
+            return issues.result;
         }),
     getOneDataset: publicProcedure
         .input(
@@ -1074,12 +1079,12 @@ export const DatasetRouter = createTRPCRouter({
                 input.id,
                 ctx.session,
                 input.noLayer
-            )
-            return dataset
+            );
+            return dataset;
         }),
     getPossibleCollaborators: protectedProcedure.query(async () => {
-        const apiKey = env.SYS_ADMIN_API_KEY
-        return getAllUsers({ apiKey })
+        const apiKey = env.SYS_ADMIN_API_KEY;
+        return getAllUsers({ apiKey });
     }),
     removeCollaborator: protectedProcedure
         .input(
@@ -1099,10 +1104,10 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error) throw Error(data.error.message)
-            return data
+            );
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message);
+            return data;
         }),
     getMyDataset: protectedProcedure
         .input(searchSchema)
@@ -1111,25 +1116,25 @@ export const DatasetRouter = createTRPCRouter({
                 apiKey: ctx.session.user.apikey,
                 fq: `creator_user_id:${ctx.session.user.id}+draft:false`,
                 query: input,
-            })
+            });
             const privateDataset = await getAllDatasetFq({
                 apiKey: ctx.session.user.apikey,
                 fq: `creator_user_id:${ctx.session.user.id}+draft:true+visibility_type:private`,
                 query: input,
-            })
+            });
 
             const allMydataset = [
                 ...dataset.datasets,
                 ...privateDataset.datasets,
-            ]
-            const allMycount = dataset.count + privateDataset.count
+            ];
+            const allMycount = dataset.count + privateDataset.count;
             return {
                 datasets: allMydataset,
                 count: allMycount,
-            }
+            };
         }),
     getLicenses: protectedProcedure.query(async ({ ctx }) => {
-        const user = ctx.session.user
+        const user = ctx.session.user;
         const licensesRes = await fetch(
             `${env.CKAN_URL}/api/action/license_list`,
             {
@@ -1138,18 +1143,18 @@ export const DatasetRouter = createTRPCRouter({
                     Authorization: `${user.apikey}`,
                 },
             }
-        )
-        const licenses: CkanResponse<License[]> = await licensesRes.json()
+        );
+        const licenses: CkanResponse<License[]> = await licensesRes.json();
         if (!licenses.success && licenses.error) {
-            if (licenses.error.message) throw Error(licenses.error.message)
-            throw Error(JSON.stringify(licenses.error))
+            if (licenses.error.message) throw Error(licenses.error.message);
+            throw Error(JSON.stringify(licenses.error));
         }
-        return licenses.result
+        return licenses.result;
     }),
     getFormats: protectedProcedure
         .input(z.object({ q: z.string() }))
         .query(async ({ ctx, input }) => {
-            const user = ctx.session.user
+            const user = ctx.session.user;
             const formatRes = await fetch(
                 `${env.CKAN_URL}/api/action/format_autocomplete?q=${input.q}`,
                 {
@@ -1158,9 +1163,9 @@ export const DatasetRouter = createTRPCRouter({
                         Authorization: `${user.apikey}`,
                     },
                 }
-            )
-            const formats: CkanResponse<string[]> = await formatRes.json()
-            return formats.result ?? []
+            );
+            const formats: CkanResponse<string[]> = await formatRes.json();
+            return formats.result ?? [];
         }),
     getDraftDataset: protectedProcedure
         .input(searchSchema)
@@ -1169,11 +1174,11 @@ export const DatasetRouter = createTRPCRouter({
                 apiKey: ctx.session.user.apikey,
                 fq: `visibility_type:draft`,
                 query: input,
-            })
+            });
             return {
                 datasets: dataset.datasets,
                 count: dataset.count,
-            }
+            };
         }),
     getFavoriteDataset: protectedProcedure.query(async ({ ctx }) => {
         const response = await fetch(
@@ -1184,14 +1189,14 @@ export const DatasetRouter = createTRPCRouter({
                     Authorization: `${ctx.session.user.apikey}`,
                 },
             }
-        )
-        const data = (await response.json()) as CkanResponse<WriDataset[]>
-        if (!data.success && data.error) throw Error(data.error.message)
+        );
+        const data = (await response.json()) as CkanResponse<WriDataset[]>;
+        if (!data.success && data.error) throw Error(data.error.message);
 
         return {
             datasets: data.result,
             count: data.result?.length,
-        }
+        };
     }),
     getFeaturedDatasets: publicProcedure
         .input(
@@ -1207,7 +1212,7 @@ export const DatasetRouter = createTRPCRouter({
                 apiKey: '',
                 fq: `featured_dataset:true`,
                 query: input,
-            })
+            });
             //This allows us to send less data to the client
             const _datasets = input.removeUnecessaryDataInResources
                 ? dataset.datasets.map((d) => ({
@@ -1217,11 +1222,11 @@ export const DatasetRouter = createTRPCRouter({
                           format: r.format,
                       })),
                   }))
-                : dataset.datasets
+                : dataset.datasets;
             return {
                 datasets: _datasets,
                 count: dataset.count,
-            }
+            };
         }),
     deleteDataset: protectedProcedure
         .input(z.string())
@@ -1236,10 +1241,10 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<null>
-            console.log('DATA', data)
-            if (!data.success && data.error) throw Error(data.error.message)
+            );
+            const data = (await response.json()) as CkanResponse<null>;
+            console.log('DATA', data);
+            if (!data.success && data.error) throw Error(data.error.message);
 
             const deleteResponse = await fetch(
                 `${env.CKAN_URL}/api/3/action/pending_dataset_delete`,
@@ -1251,18 +1256,18 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
 
             const deleteData =
-                (await deleteResponse.json()) as CkanResponse<null>
-            console.log('DELETE DATA', deleteData)
+                (await deleteResponse.json()) as CkanResponse<null>;
+            console.log('DELETE DATA', deleteData);
             if (!deleteData.success && deleteData.error) {
-                const error = JSON.stringify(deleteData.error).toLowerCase()
+                const error = JSON.stringify(deleteData.error).toLowerCase();
                 if (!error.includes('not found')) {
-                    throw Error(JSON.stringify(deleteData.error))
+                    throw Error(JSON.stringify(deleteData.error));
                 }
             }
-            return data
+            return data;
         }),
 
     followDataset: protectedProcedure
@@ -1280,10 +1285,10 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error) throw Error(data.error.message)
-            return data
+            );
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message);
+            return data;
         }),
     unFollowDataset: protectedProcedure
         .input(z.string())
@@ -1300,10 +1305,10 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error) throw Error(data.error.message)
-            return data
+            );
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message);
+            return data;
         }),
     isFavoriteDataset: protectedProcedure
         .input(z.string())
@@ -1316,18 +1321,20 @@ export const DatasetRouter = createTRPCRouter({
                         Authorization: `${ctx.session.user.apikey}`,
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<FolloweeList[]>
-            if (!data.success && data.error) throw Error(data.error.message)
+            );
+            const data = (await response.json()) as CkanResponse<
+                FolloweeList[]
+            >;
+            if (!data.success && data.error) throw Error(data.error.message);
             const result = data.result.reduce((acc, item) => {
                 if (item.type === 'dataset') {
-                    const t = item.dict as WriDataset
-                    acc.push(t)
+                    const t = item.dict as WriDataset;
+                    acc.push(t);
                 }
-                return acc
-            }, [] as WriDataset[])
+                return acc;
+            }, [] as WriDataset[]);
 
-            return result.some((dataset) => dataset.id === input)
+            return result.some((dataset) => dataset.id === input);
         }),
     createIssueComment: protectedProcedure
         .input(CommentSchema)
@@ -1342,16 +1349,16 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
 
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error) throw Error(data.error.message)
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message);
 
             try {
                 const collab = await fetchDatasetCollabIds(
                     input.dataset_id,
                     ctx.session.user.apikey
-                )
+                );
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
@@ -1360,12 +1367,12 @@ export const DatasetRouter = createTRPCRouter({
                     session: ctx.session,
                     title: input.issuetitle,
                     action: 'commented',
-                })
+                });
             } catch (error) {
-                console.error(error)
-                throw Error('Error in sending issue /comment notification')
+                console.error(error);
+                throw Error('Error in sending issue /comment notification');
             }
-            return data
+            return data;
         }),
 
     closeOpenIssue: protectedProcedure
@@ -1381,10 +1388,10 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
 
-            const data = (await response.json()) as CkanResponse<null>
-            if (!data.success && data.error) throw Error(data.error.message)
+            const data = (await response.json()) as CkanResponse<null>;
+            if (!data.success && data.error) throw Error(data.error.message);
 
             const responseComment = await fetch(
                 `${env.CKAN_URL}/api/3/action/issue_comment_create`,
@@ -1396,18 +1403,18 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
 
             const dataComment =
-                (await responseComment.json()) as CkanResponse<null>
+                (await responseComment.json()) as CkanResponse<null>;
             if (!dataComment.success && dataComment.error)
-                throw Error(dataComment.error.message)
+                throw Error(dataComment.error.message);
 
             try {
                 const collab = await fetchDatasetCollabIds(
                     input.dataset_id,
                     ctx.session.user.apikey
-                )
+                );
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
@@ -1416,12 +1423,12 @@ export const DatasetRouter = createTRPCRouter({
                     session: ctx.session,
                     title: input.issuetitle,
                     action: input.status!,
-                })
+                });
             } catch (error) {
-                console.error(error)
-                throw Error('Error in sending issue /comment notification')
+                console.error(error);
+                throw Error('Error in sending issue /comment notification');
             }
-            return input.status
+            return input.status;
         }),
     createIssue: protectedProcedure
         .input(IssueSchema)
@@ -1436,25 +1443,25 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
 
-            const data = (await response.json()) as CkanResponse<null>
+            const data = (await response.json()) as CkanResponse<null>;
             if (!data.success && data.error)
-                throw Error(JSON.stringify(data.error))
+                throw Error(JSON.stringify(data.error));
 
             const mainDataset = await getDatasetDetails({
                 id: input.dataset_id,
                 session: ctx.session,
-            })
+            });
             const rejectMainDataset = {
                 ...mainDataset,
                 approval_status: 'rejected',
-            }
+            };
 
             await patchDataset({
                 dataset: rejectMainDataset,
                 session: ctx.session,
-            })
+            });
 
             // fetch pending dataset
             const pendingDataset = await fetch(
@@ -1465,17 +1472,17 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
 
             const pendingData =
-                (await pendingDataset.json()) as CkanResponse<PendingDataset>
+                (await pendingDataset.json()) as CkanResponse<PendingDataset>;
             if (!pendingData.success && pendingData.error)
-                throw Error(JSON.stringify(pendingData.error))
+                throw Error(JSON.stringify(pendingData.error));
 
             const rejectedPendingDataset = {
                 ...pendingData.result.package_data,
                 approval_status: 'rejected',
-            }
+            };
 
             const responsePending = await fetch(
                 `${env.CKAN_URL}/api/3/action/pending_dataset_update`,
@@ -1490,18 +1497,18 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
 
             const dataPending =
-                (await responsePending.json()) as CkanResponse<PendingDataset>
+                (await responsePending.json()) as CkanResponse<PendingDataset>;
             if (!dataPending.success && dataPending.error)
-                throw Error(JSON.stringify(dataPending.error))
+                throw Error(JSON.stringify(dataPending.error));
 
             try {
                 const collab = await fetchDatasetCollabIds(
                     input.dataset_id,
                     ctx.session.user.apikey
-                )
+                );
                 await sendIssueOrCommentNotigication({
                     owner_org: input.owner_org,
                     creator_id: input.creator_id,
@@ -1510,7 +1517,7 @@ export const DatasetRouter = createTRPCRouter({
                     session: ctx.session,
                     title: input.title,
                     action: 'created',
-                })
+                });
 
                 await sendGroupNotification({
                     owner_org: input.owner_org,
@@ -1519,34 +1526,34 @@ export const DatasetRouter = createTRPCRouter({
                     dataset_id: input.dataset_id,
                     session: ctx.session,
                     action: 'rejected_dataset',
-                })
+                });
             } catch (error) {
-                console.error(error)
-                throw Error('Error in sending issue /approval notification')
+                console.error(error);
+                throw Error('Error in sending issue /approval notification');
             }
-            return data
+            return data;
         }),
     getPendingDatasets: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
             let fq =
-                'approval_status:pending+visibility_type:(public OR internal)'
+                'approval_status:pending+visibility_type:(public OR internal)';
 
             if (input._isUserSearch) {
-                fq = `visibility_type:(public OR internal)+approval_status:(pending OR rejected)+creator_user_id:${ctx.session.user.id}`
+                fq = `visibility_type:(public OR internal)+approval_status:(pending OR rejected)+creator_user_id:${ctx.session.user.id}`;
             }
 
             if (!ctx.session.user.sysadmin && !input._isUserSearch) {
                 const organizations = await getUserOrganizations({
                     userId: ctx.session.user.id,
                     apiKey: ctx.session.user.apikey,
-                })
+                });
                 const orgsFq = `organization:(${organizations
                     ?.map((org) => org.name)
-                    .join(' OR ')})`
+                    .join(' OR ')})`;
 
                 if (organizations.length > 0) {
-                    fq = `${fq}+${orgsFq}`
+                    fq = `${fq}+${orgsFq}`;
                 }
             }
             const dataset = await getAllDatasetFq({
@@ -1554,18 +1561,18 @@ export const DatasetRouter = createTRPCRouter({
                 fq: fq, // TODO: Vverify if organization admin can only see this and sysadmin
                 query: input,
                 user: true,
-            })
+            });
 
             return {
                 datasets: dataset.datasets,
                 count: dataset.count,
-            }
+            };
         }),
 
     approvePendingDataset: protectedProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ input, ctx }) => {
-            return approvePendingDataset(input.id, ctx.session)
+            return approvePendingDataset(input.id, ctx.session);
         }),
     //create pending dataset, only takes in dataset id, and JSon object
     createPendingDataset: protectedProcedure
@@ -1584,10 +1591,11 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<PendingDataset>
-            if (!data.success && data.error) throw Error(data.error.message)
-            return data
+            );
+            const data =
+                (await response.json()) as CkanResponse<PendingDataset>;
+            if (!data.success && data.error) throw Error(data.error.message);
+            return data;
         }),
     updatePendingDataset: protectedProcedure
         .input(z.object({ id: z.string(), data: z.string() }))
@@ -1599,7 +1607,7 @@ export const DatasetRouter = createTRPCRouter({
                     body: JSON.stringify({
                         package_id: input.id,
                         package_data: JSON.parse(input.data) as WriDataset & {
-                            last_modified: string
+                            last_modified: string;
                         },
                     }),
                     headers: {
@@ -1607,10 +1615,11 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<PendingDataset>
-            if (!data.success && data.error) throw Error(data.error.message)
-            return data
+            );
+            const data =
+                (await response.json()) as CkanResponse<PendingDataset>;
+            if (!data.success && data.error) throw Error(data.error.message);
+            return data;
         }),
     // show pending dataset, only takes in dataset id
     showPendingDataset: protectedProcedure
@@ -1624,17 +1633,18 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
-            const data = (await response.json()) as CkanResponse<PendingDataset>
-            if (!data.success && data.error) throw Error(data.error.message)
-            const dataset = data.result.package_data
+            );
+            const data =
+                (await response.json()) as CkanResponse<PendingDataset>;
+            if (!data.success && data.error) throw Error(data.error.message);
+            const dataset = data.result.package_data;
 
-            let spatial = null
+            let spatial = null;
             if (dataset.spatial) {
                 try {
-                    spatial = JSON.parse(dataset.spatial)
+                    spatial = JSON.parse(dataset.spatial);
                 } catch (e) {
-                    console.error(e)
+                    console.error(e);
                 }
             }
 
@@ -1646,7 +1656,7 @@ export const DatasetRouter = createTRPCRouter({
                       ) as OpenIn[])
                     : [],
                 spatial,
-            }
+            };
         }),
 
     getOneActualOrPendingDataset: publicProcedure
@@ -1662,15 +1672,15 @@ export const DatasetRouter = createTRPCRouter({
                 const dataset = await getOnePendingDataset(
                     input.id,
                     ctx.session
-                )
-                return dataset
+                );
+                return dataset;
             }
             const dataset = await getOneDataset(
                 input.id,
                 ctx.session,
                 input.noLayer
-            )
-            return dataset
+            );
+            return dataset;
         }),
 
     // show pending diff
@@ -1685,25 +1695,25 @@ export const DatasetRouter = createTRPCRouter({
                         'Content-Type': 'application/json',
                     },
                 }
-            )
+            );
 
             const packageData = (await response.json()) as CkanResponse<{
-                diff: Record<string, { old_value: string; new_value: string }>
-                old_dataset: WriDataset | null
-                new_dataset: WriDataset | null
-            }>
+                diff: Record<string, { old_value: string; new_value: string }>;
+                old_dataset: WriDataset | null;
+                new_dataset: WriDataset | null;
+            }>;
 
             if (!packageData.success && packageData.error) {
                 if (packageData.error.message)
-                    throw Error(packageData.error.message)
-                throw Error(JSON.stringify(packageData.error))
+                    throw Error(packageData.error.message);
+                throw Error(JSON.stringify(packageData.error));
             }
 
             if (Object.keys(packageData.result.diff).length === 0) {
-                return null
+                return null;
             }
 
-            return packageData.result
+            return packageData.result;
         }),
 
     requestDatafileConversion: publicProcedure
@@ -1730,11 +1740,11 @@ export const DatasetRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
             const headers: any = {
                 'Content-Type': 'application/json',
-            }
+            };
 
-            const user = ctx?.session?.user
+            const user = ctx?.session?.user;
             if (user) {
-                headers.Authorization = user.apikey
+                headers.Authorization = user.apikey;
             }
 
             const response = await fetch(
@@ -1744,13 +1754,13 @@ export const DatasetRouter = createTRPCRouter({
                     headers,
                     body: JSON.stringify(input),
                 }
-            )
+            );
 
-            const data = (await response.json()) as CkanResponse<boolean>
+            const data = (await response.json()) as CkanResponse<boolean>;
             if (response.ok) {
-                return data
+                return data;
             }
-            throw data
+            throw data;
         }),
     downloadSubsetOfData: publicProcedure
         .input(
@@ -1768,11 +1778,11 @@ export const DatasetRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
             const headers: any = {
                 'Content-Type': 'application/json',
-            }
+            };
 
-            const user = ctx?.session?.user
+            const user = ctx?.session?.user;
             if (user) {
-                headers.Authorization = user.apikey
+                headers.Authorization = user.apikey;
             }
 
             const response = await fetch(
@@ -1782,13 +1792,13 @@ export const DatasetRouter = createTRPCRouter({
                     headers,
                     body: JSON.stringify(input),
                 }
-            )
+            );
 
-            const data = (await response.json()) as CkanResponse<boolean>
+            const data = (await response.json()) as CkanResponse<boolean>;
             if (response.ok) {
-                return data
+                return data;
             }
-            throw data
+            throw data;
         }),
     downloadZippedResources: publicProcedure
         .input(
@@ -1801,11 +1811,11 @@ export const DatasetRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
             const headers: any = {
                 'Content-Type': 'application/json',
-            }
+            };
 
-            const user = ctx?.session?.user
+            const user = ctx?.session?.user;
             if (user) {
-                headers.Authorization = user.apikey
+                headers.Authorization = user.apikey;
             }
 
             const response = await fetch(
@@ -1815,18 +1825,18 @@ export const DatasetRouter = createTRPCRouter({
                     headers,
                     body: JSON.stringify(input),
                 }
-            )
+            );
 
-            const data = (await response.json()) as CkanResponse<boolean>
+            const data = (await response.json()) as CkanResponse<boolean>;
             if (response.ok) {
-                return data
+                return data;
             }
-            throw data
+            throw data;
         }),
     getDatasetReleaseNotes: publicProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
-            return getDatasetReleaseNotes(input)
+            return getDatasetReleaseNotes(input);
         }),
     resourceLocationSearch: publicProcedure
         .input(
@@ -1840,26 +1850,26 @@ export const DatasetRouter = createTRPCRouter({
         )
         .query(async ({ input, ctx }) => {
             if (!input.bbox && !input.point) {
-                return null
+                return null;
             }
-            const bbox = input.bbox ? `&bbox=${input.bbox?.join(',')}` : ''
-            const point = input.point ? `&point=${input.point?.join(',')}` : ''
+            const bbox = input.bbox ? `&bbox=${input.bbox?.join(',')}` : '';
+            const point = input.point ? `&point=${input.point?.join(',')}` : '';
             const spatial_address = input.location
                 ? `&spatial_address=${input.location}`
-                : ''
+                : '';
             const is_pending = `&is_pending=${
                 input.is_pending ? 'True' : 'False'
-            }`
-            const url = `${env.CKAN_URL}/api/3/action/resource_location_search?package_id=${input.package_id}${bbox}${point}${spatial_address}${is_pending}`
+            }`;
+            const url = `${env.CKAN_URL}/api/3/action/resource_location_search?package_id=${input.package_id}${bbox}${point}${spatial_address}${is_pending}`;
             const response = await fetch(url, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-            })
+            });
             const results: CkanResponse<{
-                count: number
-                results: Resource[]
-            }> = await response.json()
-            return results.result.results
+                count: number;
+                results: Resource[];
+            }> = await response.json();
+            return results.result.results;
         }),
-})
+});

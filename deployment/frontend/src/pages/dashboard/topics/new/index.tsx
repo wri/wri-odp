@@ -1,14 +1,14 @@
-import Header from '@/components/_shared/Header'
-import CreateTopicForm from '@/components/dashboard/topics/forms/CreateTopicForm'
-import { NextSeo } from 'next-seo'
+import Header from '@/components/_shared/Header';
+import CreateTopicForm from '@/components/dashboard/topics/forms/CreateTopicForm';
+import { NextSeo } from 'next-seo';
 import {
     type GetServerSidePropsContext,
     InferGetServerSidePropsType,
-} from 'next'
-import { getServerAuthSession } from '@/server/auth'
+} from 'next';
+import { getServerAuthSession } from '@/server/auth';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
 
     if (!session?.user.sysadmin) {
         return {
@@ -16,14 +16,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
                 destination: '/dashboard',
                 permanent: false,
             },
-        }
+        };
     }
 
     return {
         props: {
             session,
         },
-    }
+    };
 }
 
 export default function NewTopicPage() {
@@ -33,5 +33,5 @@ export default function NewTopicPage() {
             <Header />
             <CreateTopicForm />
         </>
-    )
+    );
 }

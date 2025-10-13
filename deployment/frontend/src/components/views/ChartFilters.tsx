@@ -1,32 +1,32 @@
-import { Button } from '@/components/_shared/Button'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import classNames from '@/utils/classnames'
-import { MinusCircleIcon } from '@heroicons/react/24/outline'
-import { useRef, useState } from 'react'
-import { type UseFormReturn, useFieldArray } from 'react-hook-form'
+import { Button } from '@/components/_shared/Button';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import classNames from '@/utils/classnames';
+import { MinusCircleIcon } from '@heroicons/react/24/outline';
+import { useRef, useState } from 'react';
+import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 
 export default function ChartFilters({
     formObj,
     columnsOptions,
 }: {
-    formObj: UseFormReturn<any>
-    columnsOptions: any
+    formObj: UseFormReturn<any>;
+    columnsOptions: any;
 }) {
-    const [column, setColumn] = useState()
+    const [column, setColumn] = useState();
     const {
         register,
         formState: { errors },
         setValue,
         watch,
         control,
-    } = formObj
+    } = formObj;
 
     const { fields, append, remove } = useFieldArray({
         control,
         name: `config.query.filters`,
-    })
+    });
 
     return (
         <div className="grow flex flex-col space-y-4 mt-5">
@@ -50,7 +50,7 @@ export default function ChartFilters({
                     type="button"
                     onClick={() => {
                         if (column) {
-                            append({ column })
+                            append({ column });
                         }
                     }}
                 >
@@ -78,7 +78,7 @@ export default function ChartFilters({
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                remove(i)
+                                                remove(i);
                                             }}
                                         >
                                             <MinusCircleIcon className="h-6 w-6 text-red-500" />
@@ -161,12 +161,12 @@ export default function ChartFilters({
                                     </div>
                                 )}
                             </div>
-                        )
+                        );
                     })}
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 const filterOptions = [
@@ -176,4 +176,4 @@ const filterOptions = [
     { value: '>=', label: '>=' },
     { value: '<', label: '<' },
     { value: '<=', label: '<=' },
-]
+];

@@ -120,4 +120,4 @@ export const hdi = {
     staticImageConfig: {},
     createdAt: '2017-09-14T15:23:56.703Z',
     updatedAt: '2021-12-22T17:50:46.360Z',
-}
+};

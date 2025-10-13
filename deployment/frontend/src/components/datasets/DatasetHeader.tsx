@@ -4,8 +4,8 @@ import {
     ExclamationTriangleIcon,
     ExclamationCircleIcon,
     InformationCircleIcon,
-} from '@heroicons/react/20/solid'
-import { Button } from '../_shared/Button'
+} from '@heroicons/react/20/solid';
+import { Button } from '../_shared/Button';
 import {
     ArrowPathIcon,
     ClockIcon,
@@ -13,58 +13,58 @@ import {
     LinkIcon,
     StarIcon,
     TrophyIcon,
-} from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import { type OpenIn, type WriDataset } from '@/schema/ckan.schema'
-import { Menu, Transition } from '@headlessui/react'
-import { Fragment, useEffect } from 'react'
-import classNames from '@/utils/classnames'
-import { getFormatColor } from '@/utils/formatColors'
-import { useSession } from 'next-auth/react'
-import { DefaultTooltip } from '../_shared/Tooltip'
-import { PencilSquareIcon } from '@heroicons/react/24/solid'
-import { api } from '@/utils/api'
-import notify from '@/utils/notify'
-import dynamic from 'next/dynamic'
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { type OpenIn, type WriDataset } from '@/schema/ckan.schema';
+import { Menu, Transition } from '@headlessui/react';
+import { Fragment, useEffect } from 'react';
+import classNames from '@/utils/classnames';
+import { getFormatColor } from '@/utils/formatColors';
+import { useSession } from 'next-auth/react';
+import { DefaultTooltip } from '../_shared/Tooltip';
+import { PencilSquareIcon } from '@heroicons/react/24/solid';
+import { api } from '@/utils/api';
+import notify from '@/utils/notify';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { LoaderButton } from '@/components/_shared/Button'
-import { Dialog } from '@headlessui/react'
-import { useState } from 'react'
-import Spinner from '../_shared/Spinner'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { type TabularResource } from './visualizations/Visualizations'
-import TabularViewIcon from './view-icons/TabularViewIcon'
-import MapViewIcon from './view-icons/MapViewIcon'
-import ToggleVersion from './ToogleVersion'
-import { useToggleLayergroups } from '@/utils/storeHooks'
-import { useActiveCharts } from '@/utils/storeHooks'
-import { type View } from '@/interfaces/dataset.interface'
-import ChartViewIcon from './view-icons/ChartViewIcon'
-import { useQuery } from 'react-query'
-import { type RwDatasetResp, isRwError } from '@/interfaces/rw.interface'
-import { match } from 'ts-pattern'
-import Image from 'next/image'
-import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
-import { env } from '@/env.mjs'
-import { useRouter } from 'next/router'
-import { DocumentDuplicateIcon } from '@heroicons/react/24/outline'
+});
+import { LoaderButton } from '@/components/_shared/Button';
+import { Dialog } from '@headlessui/react';
+import { useState } from 'react';
+import Spinner from '../_shared/Spinner';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { type TabularResource } from './visualizations/Visualizations';
+import TabularViewIcon from './view-icons/TabularViewIcon';
+import MapViewIcon from './view-icons/MapViewIcon';
+import ToggleVersion from './ToogleVersion';
+import { useToggleLayergroups } from '@/utils/storeHooks';
+import { useActiveCharts } from '@/utils/storeHooks';
+import { type View } from '@/interfaces/dataset.interface';
+import ChartViewIcon from './view-icons/ChartViewIcon';
+import { useQuery } from 'react-query';
+import { type RwDatasetResp, isRwError } from '@/interfaces/rw.interface';
+import { match } from 'ts-pattern';
+import Image from 'next/image';
+import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover';
+import { env } from '@/env.mjs';
+import { useRouter } from 'next/router';
+import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 
 const CopyButton = ({ content }: { content: string }) => {
-    const [copied, setCopied] = useState(false)
+    const [copied, setCopied] = useState(false);
     const handleClick = () => {
-        navigator.clipboard.writeText(content)
-        setCopied(true)
-        setTimeout(() => setCopied(false), 1500)
-    }
+        navigator.clipboard.writeText(content);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+    };
     return (
         <DefaultTooltip
             content={copied ? 'Dataset URL copied!' : 'Copy simple page URL'}
             contentClassName={`${copied ? 'bg-wri-green text-white' : ''}`}
             delayDuration={copied ? 0 : 100}
             onOpenChange={(open) => {
-                if (copied && open) return
+                if (copied && open) return;
             }}
             open={copied ? true : undefined}
         >
@@ -76,28 +76,28 @@ const CopyButton = ({ content }: { content: string }) => {
                 <DocumentDuplicateIcon className="w-3 text-white" />
             </Button>
         </DefaultTooltip>
-    )
-}
+    );
+};
 
 function OpenInButton({
     open_in,
     highlighted = '',
     rw_id,
 }: {
-    open_in: OpenIn[]
-    highlighted?: string
-    rw_id?: string
+    open_in: OpenIn[];
+    highlighted?: string;
+    rw_id?: string;
 }) {
-    const session = useSession()
+    const session = useSession();
 
     const { data } = useQuery([rw_id], async () => {
         const datasetRes = await fetch(
             `https://api.resourcewatch.org/v1/dataset/${rw_id}`
-        )
-        const dataset: RwDatasetResp = await datasetRes.json()
-        if (isRwError(dataset)) throw new Error(dataset.errors[0].detail)
-        return dataset.data.attributes
-    })
+        );
+        const dataset: RwDatasetResp = await datasetRes.json();
+        if (isRwError(dataset)) throw new Error(dataset.errors[0].detail);
+        return dataset.data.attributes;
+    });
     if (data) {
         switch (data.provider) {
             case 'cartodb':
@@ -107,8 +107,8 @@ function OpenInButton({
                         title: 'Carto',
                         url: data.connectorUrl,
                     },
-                ]
-                break
+                ];
+                break;
             case 'featureservice':
                 open_in = [
                     ...open_in,
@@ -116,8 +116,8 @@ function OpenInButton({
                         title: 'ArcGIS',
                         url: data.connectorUrl,
                     },
-                ]
-                break
+                ];
+                break;
             case 'gfw':
                 open_in = [
                     ...open_in,
@@ -125,8 +125,8 @@ function OpenInButton({
                         title: 'GFW',
                         url: data.connectorUrl,
                     },
-                ]
-                break
+                ];
+                break;
             case 'gee':
                 open_in = [
                     ...open_in,
@@ -137,8 +137,8 @@ function OpenInButton({
                             '_'
                         )}`,
                     },
-                ]
-                break
+                ];
+                break;
             default:
                 open_in = [
                     ...open_in,
@@ -147,18 +147,18 @@ function OpenInButton({
                             return {
                                 title: data.provider.toUpperCase(),
                                 url: source,
-                            }
+                            };
                         }
                         return {
                             title: `Source ${i + 1}`,
                             url: source,
-                        }
+                        };
                     }),
-                ]
+                ];
         }
     }
 
-    if (open_in.length === 0) return <></>
+    if (open_in.length === 0) return <></>;
     if (open_in.length === 1 && !session.data?.user) {
         return (
             <a
@@ -172,7 +172,7 @@ function OpenInButton({
                 Open in {open_in[0]?.title}
                 <ArrowUpRightIcon className="mb-1 h-6 w-6" />
             </a>
-        )
+        );
     }
     if (open_in.length === 1 && session.data?.user) {
         return (
@@ -186,7 +186,7 @@ function OpenInButton({
                 Open in {open_in[0]?.title}
                 <ArrowUpRightIcon className="mb-1 h-6 w-6" />
             </a>
-        )
+        );
     }
     return (
         <Menu as="div" className="relative inline-block text-left">
@@ -253,19 +253,19 @@ function OpenInButton({
                 </Menu.Items>
             </Transition>
         </Menu>
-    )
+    );
 }
 
 function ExternalService({ rw_id }: { rw_id: string }) {
     const { data } = useQuery([rw_id], async () => {
         const datasetRes = await fetch(
             `https://api.resourcewatch.org/v1/dataset/${rw_id}`
-        )
-        const dataset: RwDatasetResp = await datasetRes.json()
-        if (isRwError(dataset)) throw new Error(dataset.errors[0].detail)
-        return dataset.data.attributes
-    })
-    if (!data) return <></>
+        );
+        const dataset: RwDatasetResp = await datasetRes.json();
+        if (isRwError(dataset)) throw new Error(dataset.errors[0].detail);
+        return dataset.data.attributes;
+    });
+    if (!data) return <></>;
     return (
         <>
             {match(data.provider)
@@ -321,7 +321,7 @@ flex items-center gap-x-1 mt-4 w-fit
                                     Open table {data.provider.toUpperCase()}
                                 </div>
                             </a>
-                        )
+                        );
                     }
                     return (
                         <Menu
@@ -369,13 +369,13 @@ flex items-center gap-x-1 mt-4 w-fit
                                 </Menu.Items>
                             </Transition>
                         </Menu>
-                    )
+                    );
                 })
                 .otherwise(() => (
                     <></>
                 ))}
         </>
-    )
+    );
 }
 
 export function DatasetHeader({
@@ -388,58 +388,58 @@ export function DatasetHeader({
     datasetAuth,
     is_approved,
 }: {
-    dataset?: WriDataset
-    isCurrentVersion?: boolean
-    diffFields: string[]
-    setIsCurrentVersion: React.Dispatch<React.SetStateAction<boolean>>
-    setTabularResource: (tabularResource: TabularResource | null) => void
-    tabularResource: TabularResource | null
-    datasetAuth?: boolean
-    is_approved?: boolean
+    dataset?: WriDataset;
+    isCurrentVersion?: boolean;
+    diffFields: string[];
+    setIsCurrentVersion: React.Dispatch<React.SetStateAction<boolean>>;
+    setTabularResource: (tabularResource: TabularResource | null) => void;
+    tabularResource: TabularResource | null;
+    datasetAuth?: boolean;
+    is_approved?: boolean;
 }) {
-    const router = useRouter()
-    const [expanded, setExpanded] = useState(false)
+    const router = useRouter();
+    const [expanded, setExpanded] = useState(false);
     const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
-        useToggleLayergroups()
-    const { activeCharts, addCharts, removeCharts } = useActiveCharts()
-    const [open, setOpen] = useState(false)
-    const [fopen, setFOpen] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const session = useSession()
+        useToggleLayergroups();
+    const { activeCharts, addCharts, removeCharts } = useActiveCharts();
+    const [open, setOpen] = useState(false);
+    const [fopen, setFOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const session = useSession();
     const { data, isLoading, refetch } = api.dataset.isFavoriteDataset.useQuery(
         dataset?.id!,
         { retry: false, enabled: !!session.data?.user }
-    )
+    );
     const { data: adminUsers } = api.teams.getTeamUsers.useQuery(
         {
             id: dataset?.organization?.id ?? dataset?.owner_org ?? '',
             capacity: 'admin',
         },
         { enabled: !!dataset?.organization?.id }
-    )
+    );
     const { data: editorUsers } = api.teams.getTeamUsers.useQuery(
         {
             id: dataset?.organization?.id ?? dataset?.owner_org ?? '',
             capacity: 'editor',
         },
         { enabled: !!dataset?.organization?.id }
-    )
-    const teamUsers = (adminUsers ?? []).concat(editorUsers ?? [])
+    );
+    const teamUsers = (adminUsers ?? []).concat(editorUsers ?? []);
     const { data: collaborators } =
         api.dataset.getDatasetCollaborators.useQuery(
             {
                 id: dataset?.name ?? '',
             },
             { enabled: !!dataset?.name }
-        )
+        );
     const canEditDataset = match(session.data?.user.sysadmin ?? false)
         .with(true, () => true)
         .with(false, () => {
-            if (dataset?.creator_user_id === session.data?.user.id) return true
+            if (dataset?.creator_user_id === session.data?.user.id) return true;
             if (teamUsers && teamUsers.length > 0) {
                 return teamUsers.some(
                     (user: string[]) => user[0] === session.data?.user.id
-                )
+                );
             }
             return collaborators
                 ? collaborators.some(
@@ -448,9 +448,9 @@ export function DatasetHeader({
                           (collaborator.capacity === 'admin' ||
                               collaborator.capacity === 'editor')
                   )
-                : false
+                : false;
         })
-        .otherwise(() => false)
+        .otherwise(() => false);
 
     const {
         data: datasetViews,
@@ -459,50 +459,50 @@ export function DatasetHeader({
     } = api.rw.getDatasetViews.useQuery(
         { rwDatasetId: dataset?.rw_id ?? '' },
         { enabled: !!dataset?.rw_id }
-    )
+    );
 
     const addToFavorites = api.dataset.followDataset.useMutation({
         onSuccess: async (data) => {
-            await refetch()
-            setOpen(false)
+            await refetch();
+            setOpen(false);
             notify(
                 `Successfully added the ${
                     dataset?.title ?? dataset?.name
                 } Dataset to your favourites`,
                 'success'
-            )
+            );
         },
         onError: (error) => setErrorMessage(error.message),
-    })
+    });
     const removeFromFavorites = api.dataset.unFollowDataset.useMutation({
         onSuccess: async (data) => {
-            await refetch()
-            setFOpen(false)
+            await refetch();
+            setFOpen(false);
             notify(
                 `Successfully removed the ${
                     dataset?.title ?? dataset?.name
                 } Dataset from your favourites`,
                 'error'
-            )
+            );
         },
         onError: (error) => setErrorMessage(error.message),
-    })
-    const created_at = new Date(dataset?.metadata_created ?? '')
-    const last_updated = new Date(dataset?.metadata_modified ?? '')
+    });
+    const created_at = new Date(dataset?.metadata_created ?? '');
+    const last_updated = new Date(dataset?.metadata_modified ?? '');
     const options = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-    } as const
+    } as const;
 
     const highlighted = (field: string) => {
         if (diffFields && !isCurrentVersion) {
             if (diffFields.includes(field)) {
-                return 'bg-yellow-200'
+                return 'bg-yellow-200';
             }
         }
-        return ''
-    }
+        return '';
+    };
 
     return (
         <div className="flex w-full flex-col pb-10 font-acumin">
@@ -547,8 +547,8 @@ export function DatasetHeader({
                                     setToggleLayergroups(
                                         prevLayerGroups,
                                         tempLayerAsLayerobj
-                                    )
-                                    setIsCurrentVersion(enabled)
+                                    );
+                                    setIsCurrentVersion(enabled);
                                 }}
                             />
                         )}
@@ -628,7 +628,7 @@ export function DatasetHeader({
                                     variant="light"
                                     className="bg-wri-gold "
                                     onClick={() => {
-                                        addToFavorites.mutate(dataset?.id!)
+                                        addToFavorites.mutate(dataset?.id!);
                                     }}
                                     loading={addToFavorites.isLoading}
                                 >
@@ -678,7 +678,9 @@ export function DatasetHeader({
                                 <LoaderButton
                                     variant="destructive"
                                     onClick={() => {
-                                        removeFromFavorites.mutate(dataset?.id!)
+                                        removeFromFavorites.mutate(
+                                            dataset?.id!
+                                        );
                                     }}
                                     loading={removeFromFavorites.isLoading}
                                 >
@@ -956,7 +958,7 @@ export function DatasetHeader({
                                                 connectorUrl:
                                                     dataset.connectorUrl!,
                                                 name: dataset.name,
-                                            })
+                                            });
                                             if (
                                                 env.NEXT_PUBLIC_DISABLE_HOTJAR !==
                                                 'disabled'
@@ -966,7 +968,7 @@ export function DatasetHeader({
                                                     event: 'gtm.click',
                                                     resource_name:
                                                         dataset.title,
-                                                })
+                                                });
                                             }
                                         }}
                                     >
@@ -996,7 +998,7 @@ export function DatasetHeader({
                                                 datasetViews?.map(
                                                     (v: View) => v.id ?? ''
                                                 )
-                                            )
+                                            );
                                         }}
                                     >
                                         Remove Chart Preview
@@ -1006,7 +1008,7 @@ export function DatasetHeader({
                                         size="sm"
                                         id={`chartviews-${dataset.id}`}
                                         onClick={() => {
-                                            addCharts(datasetViews)
+                                            addCharts(datasetViews);
                                             if (
                                                 env.NEXT_PUBLIC_DISABLE_HOTJAR !==
                                                 'disabled'
@@ -1016,7 +1018,7 @@ export function DatasetHeader({
                                                     event: 'gtm.click',
                                                     resource_name:
                                                         dataset.title,
-                                                })
+                                                });
                                             }
                                         }}
                                     >
@@ -1033,5 +1035,5 @@ export function DatasetHeader({
                 )} */}
             </div>
         </div>
-    )
+    );
 }

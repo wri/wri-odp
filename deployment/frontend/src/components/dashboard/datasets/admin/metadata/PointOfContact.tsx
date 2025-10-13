@@ -2,30 +2,30 @@ import {
     ArrowsPointingInIcon,
     ChatBubbleLeftRightIcon,
     ChevronDownIcon,
-} from '@heroicons/react/24/outline'
-import { Input } from '@/components/_shared/SimpleInput'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Disclosure, Transition } from '@headlessui/react'
-import { MetadataAccordion } from './MetadataAccordion'
-import { type UseFormReturn, useFieldArray } from 'react-hook-form'
-import { type DatasetFormType } from '@/schema/dataset.schema'
+} from '@heroicons/react/24/outline';
+import { Input } from '@/components/_shared/SimpleInput';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Disclosure, Transition } from '@headlessui/react';
+import { MetadataAccordion } from './MetadataAccordion';
+import { type UseFormReturn, useFieldArray } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
 import {
     MinusCircleIcon,
     PlusCircleIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
+} from '@heroicons/react/24/outline';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 export function PointOfContactForm({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
     const {
         control,
         register,
         formState: { errors },
-    } = formObj
+    } = formObj;
     const {
         fields: authorFields,
         append: appendAuthor,
@@ -33,7 +33,7 @@ export function PointOfContactForm({
     } = useFieldArray({
         control,
         name: 'authors',
-    })
+    });
 
     const {
         fields: maintainerFields,
@@ -42,15 +42,15 @@ export function PointOfContactForm({
     } = useFieldArray({
         control,
         name: 'maintainers',
-    })
+    });
 
     const handleNewAuthor = () => {
-        appendAuthor({ name: '', email: '' })
-    }
+        appendAuthor({ name: '', email: '' });
+    };
 
     const handleNewMaintainer = () => {
-        appendMaintainer({ name: '', email: '' })
-    }
+        appendMaintainer({ name: '', email: '' });
+    };
 
     return (
         <MetadataAccordion
@@ -299,5 +299,5 @@ export function PointOfContactForm({
                 </InputGroup>
             </Disclosure.Panel>
         </MetadataAccordion>
-    )
+    );
 }

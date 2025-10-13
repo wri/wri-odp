@@ -1,74 +1,74 @@
-import Search from '@/components/Search'
-import Footer from '@/components/_shared/Footer'
-import Header from '@/components/_shared/Header'
-import Pagination from '@/components/datasets/Pagination'
-import Spinner from '@/components/_shared/Spinner'
-import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard'
-import FilteredSearchLayout from '@/components/search/FilteredSearchLayout'
-import FiltersSelected from '@/components/search/FiltersSelected'
-import SortBy from '@/components/search/SortBy'
-import { type Filter } from '@/interfaces/search.interface'
-import { type SearchInput } from '@/schema/search.schema'
-import { api } from '@/utils/api'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { NextSeo } from 'next-seo'
-import { env } from '@/env.mjs'
-import { appRouter } from '@/server/api/root'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import superjson from 'superjson'
+import Search from '@/components/Search';
+import Footer from '@/components/_shared/Footer';
+import Header from '@/components/_shared/Header';
+import Pagination from '@/components/datasets/Pagination';
+import Spinner from '@/components/_shared/Spinner';
+import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard';
+import FilteredSearchLayout from '@/components/search/FilteredSearchLayout';
+import FiltersSelected from '@/components/search/FiltersSelected';
+import SortBy from '@/components/search/SortBy';
+import { type Filter } from '@/interfaces/search.interface';
+import { type SearchInput } from '@/schema/search.schema';
+import { api } from '@/utils/api';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { NextSeo } from 'next-seo';
+import { env } from '@/env.mjs';
+import { appRouter } from '@/server/api/root';
+import { createServerSideHelpers } from '@trpc/react-query/server';
+import superjson from 'superjson';
 import {
     type GetServerSidePropsContext,
     type InferGetServerSidePropsType,
-} from 'next'
-import { getServerAuthSession } from '@/server/auth'
-import { advance_search_query } from '@/utils/apiUtils'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
+} from 'next';
+import { getServerAuthSession } from '@/server/auth';
+import { advance_search_query } from '@/utils/apiUtils';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2';
 
 interface Option {
-    value: string
-    label: string
+    value: string;
+    label: string;
 }
 
 function filterCount(key: string, filters: Filter[]): number {
-    return filters.filter((f) => f.key === key).length
+    return filters.filter((f) => f.key === key).length;
 }
 
 function defaultSelectedTagOptions(filters: Filter[]): string[] {
-    const f = filters.filter((f) => f.key === 'tags').map((f) => f.label)
-    return f
+    const f = filters.filter((f) => f.key === 'tags').map((f) => f.label);
+    return f;
 }
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ query: any }>
 ) {
-    const { query } = context
+    const { query } = context;
     const initialFilters = query.search
         ? JSON.parse(query.search as string)
-        : []
+        : [];
     const initialPage = query.page
         ? JSON.parse(query.page as string)
-        : { start: 0, rows: 10 }
+        : { start: 0, rows: 10 };
     const initialSortBy = query.sort_by
         ? JSON.parse(query.sort_by as string)
-        : 'score desc'
+        : 'score desc';
 
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
     const helpers = createServerSideHelpers({
         router: appRouter,
         ctx: { session, ip: undefined },
         transformer: superjson,
-    })
+    });
 
-    const searchQuery = advance_search_query(initialFilters as Filter[])
+    const searchQuery = advance_search_query(initialFilters as Filter[]);
 
     await helpers.dataset.getAllDataset.prefetch({
         ...searchQuery,
         page: initialPage,
         sortBy: initialSortBy,
         removeUnecessaryDataInResources: true,
-    })
+    });
 
     return {
         props: {
@@ -77,15 +77,15 @@ export async function getServerSideProps(
             initialPage,
             initialSortBy,
         },
-    }
+    };
 }
 
 export default function SearchPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const { initialFilters, initialPage, initialSortBy } = props
-    const router = useRouter()
-    const session = useSession()
+    const { initialFilters, initialPage, initialSortBy } = props;
+    const router = useRouter();
+    const session = useSession();
 
     /**
      * Query used to show results
@@ -100,8 +100,8 @@ export default function SearchPage(
         page: initialPage,
         sortBy: initialSortBy,
         removeUnecessaryDataInResources: true,
-    })
-    const [filters, setFilters] = useState<Filter[]>(initialFilters)
+    });
+    const [filters, setFilters] = useState<Filter[]>(initialFilters);
 
     const [facetSelectedCount, setFacetSelectedCount] = useState<
         Record<string, number>
@@ -116,12 +116,12 @@ export default function SearchPage(
         language: filterCount('language', filters) || 0,
         wri_data: filterCount('wri_data', filters) || 0,
         visibility_type: filterCount('visibility_type', filters) || 0,
-    })
+    });
     const [value, setValue] = useState<string[]>(
         defaultSelectedTagOptions(filters) || []
-    )
+    );
 
-    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query);
 
     /*
      * Whenever filters is updated, update the query's fq
@@ -130,26 +130,26 @@ export default function SearchPage(
     useEffect(() => {
         const keys = [...new Set(filters.map((f) => f.key))].filter(
             (key) => key != 'search'
-        )
+        );
 
-        const fq: any = {}
-        let extLocationQ = ''
-        let extAddressQ = ''
-        const extGlobalQ = 'include'
+        const fq: any = {};
+        let extLocationQ = '';
+        let extAddressQ = '';
+        const extGlobalQ = 'include';
 
         keys.forEach((key) => {
-            let keyFq
+            let keyFq;
 
-            const keyFilters = filters.filter((f) => f.key == key)
+            const keyFilters = filters.filter((f) => f.key == key);
 
             if (key == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
-                    const temporalCoverageStart = keyFilters[0]
+                    const temporalCoverageStart = keyFilters[0];
                     const temporalCoverageEnd = filters.find(
                         (f) => f.key == 'temporal_coverage_end'
-                    )?.value
+                    )?.value;
 
-                    keyFq = `[${temporalCoverageStart?.value} TO *]`
+                    keyFq = `[${temporalCoverageStart?.value} TO *]`;
 
                     // if (temporalCoverageEnd) {
                     //     keyFq = `[* TO ${temporalCoverageEnd}]`
@@ -157,12 +157,12 @@ export default function SearchPage(
                 }
             } else if (key == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
-                    const temporalCoverageEnd = keyFilters[0]
+                    const temporalCoverageEnd = keyFilters[0];
                     const temporalCoverageStart = filters.find(
                         (f) => f.key == 'temporal_coverage_start'
-                    )?.value
+                    )?.value;
 
-                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`
+                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`;
 
                     // if (temporalCoverageStart) {
                     //     keyFq = `[${temporalCoverageStart} TO *]`
@@ -174,47 +174,47 @@ export default function SearchPage(
             ) {
                 const metadataModifiedSinceFilter = filters.find(
                     (f) => f.key === 'metadata_modified_since'
-                )
+                );
                 const metadataModifiedSince = metadataModifiedSinceFilter
                     ? metadataModifiedSinceFilter.value + 'T00:00:00Z'
-                    : '*'
+                    : '*';
 
                 const metadataModifiedBeforeFilter = filters.find(
                     (f) => f.key === 'metadata_modified_before'
-                )
+                );
                 const metadataModifiedBefore = metadataModifiedBeforeFilter
                     ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
-                    : '*'
+                    : '*';
 
-                fq.metadata_modified = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+                fq.metadata_modified = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`;
             } else if (key == 'spatial') {
-                const coordinates = keyFilters[0]?.value
-                const address = keyFilters[0]?.label
+                const coordinates = keyFilters[0]?.value;
+                const address = keyFilters[0]?.label;
 
                 // @ts-ignore
-                if (coordinates) extLocationQ = coordinates.join(',')
-                if (address) extAddressQ = address
+                if (coordinates) extLocationQ = coordinates.join(',');
+                if (address) extAddressQ = address;
             } else if (key == 'extGlobalQ') {
                 const extGlobalQFilter = filters.find(
                     (f) => f.key == 'extGlobalQ'
-                )
+                );
                 if (extGlobalQFilter && extGlobalQFilter.value === 'exclude') {
-                    fq['!spatial_address'] = 'Global'
+                    fq['!spatial_address'] = 'Global';
                 }
                 if (extGlobalQFilter && extGlobalQFilter.value === 'only') {
-                    fq.spatial_address = 'Global'
+                    fq.spatial_address = 'Global';
                 }
             } else {
-                keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
+                keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ');
             }
 
-            if (keyFq) fq[key] = keyFq
-        })
+            if (keyFq) fq[key] = keyFq;
+        });
 
-        delete fq.metadata_modified_since
-        delete fq.metadata_modified_before
-        delete fq.spatial
-        delete fq.extGlobalQ
+        delete fq.metadata_modified_since;
+        delete fq.metadata_modified_before;
+        delete fq.spatial;
+        delete fq.extGlobalQ;
 
         setQuery((prev) => {
             return {
@@ -228,9 +228,9 @@ export default function SearchPage(
                         | 'only'
                         | 'exclude'
                         | 'include') ?? 'include',
-            }
-        })
-    }, [filters])
+            };
+        });
+    }, [filters]);
 
     /*
      * Update URL query params when page or filters change
@@ -250,9 +250,9 @@ export default function SearchPage(
             {
                 shallow: true,
             }
-        )
-    }, [filters, query.page, query.sortBy])
-    const links = [{ label: 'Search', url: '/search', current: true }]
+        );
+    }, [filters, query.page, query.sortBy]);
+    const links = [{ label: 'Search', url: '/search', current: true }];
 
     return (
         <>
@@ -329,5 +329,5 @@ export default function SearchPage(
                 }}
             />
         </>
-    )
+    );
 }

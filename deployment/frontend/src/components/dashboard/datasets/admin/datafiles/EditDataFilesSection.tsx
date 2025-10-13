@@ -1,29 +1,32 @@
-import { type UseFormReturn, useFieldArray } from 'react-hook-form'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { type DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
-import { v4 as uuidv4 } from 'uuid'
-import { AddDataFile } from './AddDataFile'
-import { EditDataFile } from './EditDataFile'
-import { api } from '@/utils/api'
-import { type WriDataset } from '@/schema/ckan.schema'
-import SortableList, { SortableItem } from 'react-easy-sort'
+import { type UseFormReturn, useFieldArray } from 'react-hook-form';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import {
+    type DatasetFormType,
+    ResourceFormType,
+} from '@/schema/dataset.schema';
+import { v4 as uuidv4 } from 'uuid';
+import { AddDataFile } from './AddDataFile';
+import { EditDataFile } from './EditDataFile';
+import { api } from '@/utils/api';
+import { type WriDataset } from '@/schema/ckan.schema';
+import SortableList, { SortableItem } from 'react-easy-sort';
 
 export function EditDataFilesSection({
     formObj,
     dataset,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    dataset: WriDataset
+    formObj: UseFormReturn<DatasetFormType>;
+    dataset: WriDataset;
 }) {
-    const { control, watch } = formObj
+    const { control, watch } = formObj;
     const { fields, append, prepend, remove, swap, move, insert } =
         useFieldArray({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
-        })
+        });
 
-    const rwId = watch('rw_id')
-    const provider = watch('provider')
+    const rwId = watch('rw_id');
+    const provider = watch('provider');
     const {
         data: datasetViews,
         isLoading: isDatasetViewsLoading,
@@ -31,20 +34,20 @@ export function EditDataFilesSection({
     } = api.rw.getDatasetViews.useQuery(
         { rwDatasetId: rwId ?? '' },
         { enabled: !!rwId }
-    )
+    );
 
     const datafiles = fields.filter(
         (r) =>
             r.type !== 'layer' &&
             r.type !== 'layer-raw' &&
             r.type !== 'empty-layer'
-    )
+    );
 
     return (
         <>
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
-                    swap(oldIdx, newIdx)
+                    swap(oldIdx, newIdx);
                 }}
                 className="list"
                 lockAxis="y"
@@ -74,7 +77,7 @@ export function EditDataFilesSection({
                                 )}
                             </div>
                         </SortableItem>
-                    )
+                    );
                 })}
             </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
@@ -100,5 +103,5 @@ export function EditDataFilesSection({
                 </button>
             </div>
         </>
-    )
+    );
 }

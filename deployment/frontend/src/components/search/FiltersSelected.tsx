@@ -1,6 +1,6 @@
-import { type Filter } from '@/interfaces/search.interface'
-import { XCircleIcon } from '@heroicons/react/24/outline'
-import { type Dispatch, type SetStateAction } from 'react'
+import { type Filter } from '@/interfaces/search.interface';
+import { XCircleIcon } from '@heroicons/react/24/outline';
+import { type Dispatch, type SetStateAction } from 'react';
 
 export default function FiltersSelected({
     filters,
@@ -8,10 +8,10 @@ export default function FiltersSelected({
     setFacetSelectedCount,
     setValue,
 }: {
-    filters: Filter[]
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    setFacetSelectedCount?: Dispatch<SetStateAction<Record<string, number>>>
-    setValue?: Dispatch<SetStateAction<string[]>>
+    filters: Filter[];
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    setFacetSelectedCount?: Dispatch<SetStateAction<Record<string, number>>>;
+    setValue?: Dispatch<SetStateAction<string[]>>;
 }) {
     return (
         <div className="flex flex-col lg:flex-row gap-y-4 lg:items-center justify-between">
@@ -26,7 +26,7 @@ export default function FiltersSelected({
                             <button
                                 onClick={() => {
                                     setFilters((prev) => {
-                                        const newFilters = [...prev]
+                                        const newFilters = [...prev];
                                         newFilters.splice(
                                             newFilters.findIndex(
                                                 (of) =>
@@ -34,25 +34,25 @@ export default function FiltersSelected({
                                                     of.value == f.value
                                             ),
                                             1
-                                        )
-                                        return newFilters
-                                    })
+                                        );
+                                        return newFilters;
+                                    });
                                     if (setFacetSelectedCount)
                                         setFacetSelectedCount((prev) => {
                                             const newFacetSelectedCount = {
                                                 ...prev,
-                                            }
+                                            };
                                             //@ts-ignore
-                                            newFacetSelectedCount[f.key] -= 1
-                                            return newFacetSelectedCount
-                                        })
+                                            newFacetSelectedCount[f.key] -= 1;
+                                            return newFacetSelectedCount;
+                                        });
 
                                     if (setValue)
                                         setValue((prev) => {
                                             return prev.filter(
                                                 (value) => value !== f.label
-                                            )
-                                        })
+                                            );
+                                        });
                                 }}
                             >
                                 <XCircleIcon className="h-4 w-4 text-red-600 cursor-pointer" />
@@ -63,7 +63,7 @@ export default function FiltersSelected({
             {filters.length ? (
                 <button
                     onClick={() => {
-                        setFilters([])
+                        setFilters([]);
                     }}
                     className="font-['Acumin Pro SemiCondensed'] text-sm font-normal text-black underline"
                 >
@@ -71,5 +71,5 @@ export default function FiltersSelected({
                 </button>
             ) : null}
         </div>
-    )
+    );
 }

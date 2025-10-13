@@ -1,38 +1,38 @@
-import React, { useState } from 'react'
-import { Input } from '@/components/_shared/SimpleInput'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import Link from 'next/link'
-import { api } from '@/utils/api'
-import { type User } from '@portaljs/ckan'
-import { ImageUploader } from '../_shared/ImageUploader'
+import React, { useState } from 'react';
+import { Input } from '@/components/_shared/SimpleInput';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import Link from 'next/link';
+import { api } from '@/utils/api';
+import { type User } from '@portaljs/ckan';
+import { ImageUploader } from '../_shared/ImageUploader';
 import {
     GlobeAltIcon,
     CloudArrowUpIcon,
     MinusCircleIcon,
-} from '@heroicons/react/24/outline'
-import { type UploadResult } from '@uppy/core'
-import { UserFormSchema } from '@/schema/user.schema'
-import type { UserFormInput, UserSchema } from '@/schema/user.schema'
-import notify from '@/utils/notify'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { useRouter } from 'next/router'
-import dynamic from 'next/dynamic'
+} from '@heroicons/react/24/outline';
+import { type UploadResult } from '@uppy/core';
+import { UserFormSchema } from '@/schema/user.schema';
+import type { UserFormInput, UserSchema } from '@/schema/user.schema';
+import notify from '@/utils/notify';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
+});
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
 
 export default function UserForm({ user }: { user: User }) {
-    const [open, setOpen] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [upload, setUpload] = useState({ url: false, file: false })
-    const [isDeleting, setIsDeleting] = useState(false)
-    const router = useRouter()
-    const utils = api.useUtils()
+    const [open, setOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [upload, setUpload] = useState({ url: false, file: false });
+    const [isDeleting, setIsDeleting] = useState(false);
+    const router = useRouter();
+    const utils = api.useUtils();
     const form = useForm<UserFormInput>({
         defaultValues: {
             id: user.id!,
@@ -46,30 +46,30 @@ export default function UserForm({ user }: { user: User }) {
         },
         resolver: zodResolver(UserFormSchema),
         mode: 'onSubmit',
-    })
+    });
     const { register, handleSubmit, formState, watch, setError, setValue } =
-        form
-    const { errors } = formState
+        form;
+    const { errors } = formState;
     const userUpdateApi = api.user.updateUser.useMutation({
         onSuccess: async (data) => {
-            await utils.user.getUser.invalidate(user.name)
-            notify(`Successfully updated user: ${data.name}`, 'success')
-            router.push('/dashboard/users')
+            await utils.user.getUser.invalidate(user.name);
+            notify(`Successfully updated user: ${data.name}`, 'success');
+            router.push('/dashboard/users');
         },
         onError: (error) => setErrorMessage(error.message),
-    })
+    });
 
     const deleteUser = api.user.deleteUser.useMutation({
         onSuccess: async (data) => {
-            await utils.user.getUser.invalidate(user.name)
+            await utils.user.getUser.invalidate(user.name);
             await utils.user.getAllUsers.invalidate({
                 search: '',
                 page: { start: 0, rows: 100 },
-            })
-            notify(`Successfully deleted user: ${user.name}`, 'error')
-            router.push('/dashboard/users')
+            });
+            notify(`Successfully deleted user: ${user.name}`, 'error');
+            router.push('/dashboard/users');
         },
-    })
+    });
 
     const onSubmit = (data: UserFormInput) => {
         if (!isDeleting) {
@@ -77,16 +77,16 @@ export default function UserForm({ user }: { user: User }) {
                 setError('confirm', {
                     type: 'manual',
                     message: 'Password does not match',
-                })
-                return
+                });
+                return;
             }
 
             if (data.oldpassword == null && data.password !== null) {
                 setError('oldpassword', {
                     type: 'manual',
                     message: 'Old password is required',
-                })
-                return
+                });
+                return;
             }
 
             const payload: UserFormInput = {
@@ -95,14 +95,14 @@ export default function UserForm({ user }: { user: User }) {
                 email: data.email,
                 fullname: data.fullname ? data.fullname : '',
                 image_url: data.image_url ? data.image_url : '',
-            }
+            };
             if (data.password !== null) {
-                payload.password = data.password
+                payload.password = data.password;
             }
 
-            userUpdateApi.mutate(payload)
+            userUpdateApi.mutate(payload);
         }
-    }
+    };
 
     return (
         <>
@@ -177,12 +177,14 @@ export default function UserForm({ user }: { user: User }) {
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
                                         response.successful[0]?.uploadURL ??
-                                        null
-                                    const name = url ? url.split('/').pop() : ''
+                                        null;
+                                    const name = url
+                                        ? url.split('/').pop()
+                                        : '';
                                     setValue(
                                         'image_url',
                                         `ckanuploadimage:${name}`
-                                    )
+                                    );
                                 }}
                             />
                             <button
@@ -251,8 +253,8 @@ export default function UserForm({ user }: { user: User }) {
                         aria-label="delete user"
                         variant="destructive"
                         onClick={() => {
-                            setIsDeleting(true)
-                            setOpen(true)
+                            setIsDeleting(true);
+                            setOpen(true);
                         }}
                         id={user.name}
                     >
@@ -303,8 +305,8 @@ export default function UserForm({ user }: { user: User }) {
                         variant="destructive"
                         loading={deleteUser.isLoading}
                         onClick={() => {
-                            setIsDeleting(true)
-                            deleteUser.mutate(user.id!)
+                            setIsDeleting(true);
+                            deleteUser.mutate(user.id!);
                         }}
                         id={user.name}
                     >
@@ -320,5 +322,5 @@ export default function UserForm({ user }: { user: User }) {
                 </div>
             </Modal>
         </>
-    )
+    );
 }

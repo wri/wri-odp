@@ -1,8 +1,8 @@
-import React from 'react'
-import { Tab } from '@headlessui/react'
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import ApplicationCard from './ApplicationCard'
+import React from 'react';
+import { Tab } from '@headlessui/react';
+import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import ApplicationCard from './ApplicationCard';
 
 const tabs = [
     {
@@ -10,7 +10,7 @@ const tabs = [
         content: <ApplicationCard />,
         title: 'All Applications',
     },
-]
+];
 
 export default function ApplicationList() {
     return (
@@ -57,5 +57,5 @@ export default function ApplicationList() {
                 </Tab.Panels>
             </Tab.Group>
         </section>
-    )
+    );
 }

@@ -2,21 +2,21 @@ import {
     ChevronDownIcon,
     MinusCircleIcon,
     Squares2X2Icon,
-} from '@heroicons/react/24/outline'
-import { Disclosure, Transition } from '@headlessui/react'
-import classNames from '@/utils/classnames'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { SortableKnob } from 'react-easy-sort'
-import { useEffect, useState } from 'react'
+} from '@heroicons/react/24/outline';
+import { Disclosure, Transition } from '@headlessui/react';
+import classNames from '@/utils/classnames';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { SortableKnob } from 'react-easy-sort';
+import { useEffect, useState } from 'react';
 
 interface DataFileAccordionProps {
-    title: string
-    children: React.ReactNode
-    icon: React.ReactNode
-    className?: string
-    preview: React.ReactNode
-    id?: string
-    remove: () => void
+    title: string;
+    children: React.ReactNode;
+    icon: React.ReactNode;
+    className?: string;
+    preview: React.ReactNode;
+    id?: string;
+    remove: () => void;
 }
 
 export function DataFileAccordion({
@@ -28,13 +28,13 @@ export function DataFileAccordion({
     id = '',
     remove,
 }: DataFileAccordionProps) {
-    const [canSort, setCanSort] = useState(false)
+    const [canSort, setCanSort] = useState(false);
 
     useEffect(() => {
         setTimeout(() => {
-            setCanSort(true)
-        }, 3000)
-    }, [])
+            setCanSort(true);
+        }, 3000);
+    }, []);
 
     return (
         <Disclosure
@@ -104,5 +104,5 @@ export function DataFileAccordion({
                 </>
             )}
         </Disclosure>
-    )
+    );
 }

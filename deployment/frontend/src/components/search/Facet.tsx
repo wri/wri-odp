@@ -1,16 +1,16 @@
-import { type Filter } from '@/interfaces/search.interface'
-import { SearchInput } from '@/schema/search.schema'
-import { Disclosure, Transition } from '@headlessui/react'
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { set } from 'lodash'
-import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { type Filter } from '@/interfaces/search.interface';
+import { SearchInput } from '@/schema/search.schema';
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { set } from 'lodash';
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 interface Option {
-    value: string
-    label: string
+    value: string;
+    label: string;
 }
 
 export default function Facet({
@@ -22,35 +22,35 @@ export default function Facet({
     facetSelectedCount,
     setFacetSelectedCount,
 }: {
-    text: string
-    options: Option[]
-    fqKey: string
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    filters: Filter[]
-    facetSelectedCount?: Record<string, number>
-    setFacetSelectedCount?: Dispatch<SetStateAction<Record<string, number>>>
+    text: string;
+    options: Option[];
+    fqKey: string;
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    filters: Filter[];
+    facetSelectedCount?: Record<string, number>;
+    setFacetSelectedCount?: Dispatch<SetStateAction<Record<string, number>>>;
 }) {
     // console.log('Facetselect79000: ', facetSelectedCount)
     const getUpdatedOptionsState = () => {
         return options.reduce((a, v) => {
             const checked = filters.find(
                 (f) => f?.key == fqKey && f?.value == v.value
-            )
+            );
 
             return {
                 ...a,
                 [v.value]: checked,
-            }
-        }, {})
-    }
+            };
+        }, {});
+    };
 
     const [optionsState, setOptionsState] = useState<Record<string, boolean>>(
         getUpdatedOptionsState()
-    )
+    );
 
     useEffect(() => {
-        setOptionsState(getUpdatedOptionsState)
-    }, [filters])
+        setOptionsState(getUpdatedOptionsState);
+    }, [filters]);
 
     return (
         <Disclosure
@@ -105,12 +105,12 @@ export default function Facet({
                                                     }
                                                     onChange={(e) => {
                                                         const checked =
-                                                            e.target.checked
+                                                            e.target.checked;
 
                                                         setFilters((prev) => {
                                                             const newFilters = [
                                                                 ...prev,
-                                                            ]
+                                                            ];
 
                                                             if (checked) {
                                                                 newFilters.push(
@@ -120,7 +120,7 @@ export default function Facet({
                                                                         value: option.value,
                                                                         label: option.label,
                                                                     }
-                                                                )
+                                                                );
                                                             } else {
                                                                 newFilters.splice(
                                                                     newFilters.findIndex(
@@ -131,11 +131,11 @@ export default function Facet({
                                                                                 option.value
                                                                     ),
                                                                     1
-                                                                )
+                                                                );
                                                             }
 
-                                                            return newFilters
-                                                        })
+                                                            return newFilters;
+                                                        });
 
                                                         if (
                                                             setFacetSelectedCount
@@ -153,7 +153,7 @@ export default function Facet({
                                                                                 ] ??
                                                                                     0) +
                                                                                 1,
-                                                                        }
+                                                                        };
                                                                     } else {
                                                                         return {
                                                                             ...prev,
@@ -166,10 +166,10 @@ export default function Facet({
                                                                                         1,
                                                                                     0
                                                                                 ),
-                                                                        }
+                                                                        };
                                                                     }
                                                                 }
-                                                            )
+                                                            );
                                                         }
                                                     }}
                                                 />
@@ -192,5 +192,5 @@ export default function Facet({
                 </>
             )}
         </Disclosure>
-    )
+    );
 }

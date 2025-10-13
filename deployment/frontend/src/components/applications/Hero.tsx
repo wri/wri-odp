@@ -1,23 +1,23 @@
-import Image from 'next/image'
-import { Button } from '../_shared/Button'
-import { ChevronLeftIcon } from '@heroicons/react/20/solid'
-import { useState } from 'react'
-import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
+import Image from 'next/image';
+import { Button } from '../_shared/Button';
+import { ChevronLeftIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
+import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 import {
     type Application,
     GroupTree,
     GroupsmDetails,
-} from '@/schema/ckan.schema'
-import Link from 'next/link'
-import { useSession } from 'next-auth/react'
-import { api } from '@/utils/api'
+} from '@/schema/ckan.schema';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { api } from '@/utils/api';
 import {
     ArrowTurnLeftUpIcon,
     ArrowUpRightIcon,
-} from '@heroicons/react/24/solid'
+} from '@heroicons/react/24/solid';
 
 export function Hero({ application }: { application: Application }) {
-    const { data: session } = useSession()
+    const { data: session } = useSession();
     return (
         <div className="mx-auto mb-8 mt-10 grid max-w-[1440px] font-acumin lg:mb-16 lg:max-h-[18.5rem] lg:grid-cols-5">
             <div className="relative h-[18.5rem] lg:col-span-2">
@@ -87,5 +87,5 @@ export function Hero({ application }: { application: Application }) {
                 </div>
             </div>
         </div>
-    )
+    );
 }

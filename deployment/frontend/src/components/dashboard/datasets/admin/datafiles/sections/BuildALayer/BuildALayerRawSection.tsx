@@ -1,79 +1,79 @@
-import { useState, useRef } from 'react'
-import ReactMapGL, { type MapRef } from 'react-map-gl'
-import { type UseFormReturn } from 'react-hook-form'
-import { type DatasetFormType } from '@/schema/dataset.schema'
-import { Button } from '@/components/_shared/Button'
-import { Legends } from './preview/Legends'
-import { getInteractiveLayers } from '@/utils/queryHooks'
-import Tooltip from './preview/Tooltip'
+import { useState, useRef } from 'react';
+import ReactMapGL, { type MapRef } from 'react-map-gl';
+import { type UseFormReturn } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { Button } from '@/components/_shared/Button';
+import { Legends } from './preview/Legends';
+import { getInteractiveLayers } from '@/utils/queryHooks';
+import Tooltip from './preview/Tooltip';
 import {
     type LngLat,
     type MapGeoJSONFeature,
-} from 'react-map-gl/dist/esm/types'
-import { type APILayerSpec } from '@/interfaces/layer.interface'
-import LayerManagerPreview from './preview/LayerManagerPreview'
-import { Accordion } from './Accordion'
-import { CodeEditor } from '@/components/dashboard/_shared/CodeEditor'
-import { v4 as uuidv4 } from 'uuid'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { convertLayerObjToForm, getApiSpecFromRawObj } from './convertObjects'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
+} from 'react-map-gl/dist/esm/types';
+import { type APILayerSpec } from '@/interfaces/layer.interface';
+import LayerManagerPreview from './preview/LayerManagerPreview';
+import { Accordion } from './Accordion';
+import { CodeEditor } from '@/components/dashboard/_shared/CodeEditor';
+import { v4 as uuidv4 } from 'uuid';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { convertLayerObjToForm, getApiSpecFromRawObj } from './convertObjects';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import Image from 'next/image'
-import { SimpleEditor } from '../../../metadata/RTE/SimpleEditor'
+} from '@/components/_shared/Popover';
+import Image from 'next/image';
+import { SimpleEditor } from '../../../metadata/RTE/SimpleEditor';
 
 export function BuildALayerRaw({
     formObj,
     index,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    index: number
+    formObj: UseFormReturn<DatasetFormType>;
+    index: number;
 }) {
     const {
         register,
         getValues,
         setValue,
         formState: { errors },
-    } = formObj
+    } = formObj;
 
     const getLayerObj = () => {
         try {
             const apiSpec = getApiSpecFromRawObj(
                 getValues(`resources.${index}.layerObjRaw`)
-            )
+            );
             return getValues(`resources.${index}.layerObjRaw`)
                 ? {
                       ...apiSpec,
                   }
-                : null
+                : null;
         } catch (e) {
-            return null
+            return null;
         }
-    }
+    };
 
     const convertToForm = () => {
-        const layerObj = getLayerObj()
+        const layerObj = getLayerObj();
         if (layerObj) {
-            setValue(`resources.${index}.type`, 'layer')
-            setValue(`resources.${index}.layerObjRaw`, null)
+            setValue(`resources.${index}.type`, 'layer');
+            setValue(`resources.${index}.layerObjRaw`, null);
             setValue(
                 `resources.${index}.layerObj`,
                 convertLayerObjToForm(layerObj)
-            )
+            );
         }
-    }
+    };
 
-    const [preview, setPreview] = useState<APILayerSpec | null>(getLayerObj())
+    const [preview, setPreview] = useState<APILayerSpec | null>(getLayerObj());
     const updatePreview = () => {
-        setPreview(getLayerObj())
-    }
+        setPreview(getLayerObj());
+    };
 
     return (
         <>
@@ -326,59 +326,59 @@ export function BuildALayerRaw({
                 </div>
             </div>
         </>
-    )
+    );
 }
 
 function PreviewMap({
     layerFormObj,
     updatePreview,
 }: {
-    layerFormObj: APILayerSpec | null
-    updatePreview?: () => void
+    layerFormObj: APILayerSpec | null;
+    updatePreview?: () => void;
 }) {
     const [viewState, setViewState] = useState({
         longitude: -100,
         latitude: 40,
         zoom: 1,
-    })
+    });
 
-    const [isReady, setReady] = useState(false)
-    const mapRef = useRef<MapRef | null>(null)
+    const [isReady, setReady] = useState(false);
+    const mapRef = useRef<MapRef | null>(null);
     const interactiveLayerIds = layerFormObj
         ? getInteractiveLayers([layerFormObj])
-        : []
+        : [];
     const [coordinates, setCoordinates] = useState<{
-        longitude: number
-        latitude: number
-    } | null>(null)
-    const [layersInfo, setLayersInfo] = useState<any>([])
+        longitude: number;
+        latitude: number;
+    } | null>(null);
+    const [layersInfo, setLayersInfo] = useState<any>([]);
     const close = () => {
-        setCoordinates(null)
-        setLayersInfo([])
-    }
+        setCoordinates(null);
+        setLayersInfo([]);
+    };
 
-    const layers = layerFormObj ? [layerFormObj] : []
+    const layers = layerFormObj ? [layerFormObj] : [];
 
     const onClickLayer = ({
         features,
         lngLat,
     }: {
-        features?: MapGeoJSONFeature[]
-        lngLat: LngLat
+        features?: MapGeoJSONFeature[];
+        lngLat: LngLat;
     }) => {
-        setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
-        const layersInfo = []
+        setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat });
+        const layersInfo = [];
         for (const layer of layers) {
             const feature = features?.find(
                 //  @ts-ignore
                 (f) => (f?.source || f.layer?.source) === layer.id
-            )
-            const { interactionConfig } = layer
+            );
+            const { interactionConfig } = layer;
 
             const layerInfo = {
                 id: layer.id,
                 name: layer.name ?? 'sample-name',
-            }
+            };
 
             if (feature && interactionConfig?.output) {
                 //  TODO: output is supposed to be an array
@@ -390,15 +390,15 @@ function PreviewMap({
                             //  TODO: c.column is supposed to be a string
                             //  @ts-ignore
                             value: feature.properties[c.column],
-                        }
+                        };
                     }
-                )
+                );
             }
 
-            layersInfo.push(layerInfo)
+            layersInfo.push(layerInfo);
         }
-        setLayersInfo(layersInfo)
-    }
+        setLayersInfo(layersInfo);
+    };
 
     return (
         <div className="relative">
@@ -415,7 +415,7 @@ function PreviewMap({
                 {...viewState}
                 ref={(_map) => {
                     if (_map)
-                        mapRef.current = _map.getMap() as unknown as MapRef
+                        mapRef.current = _map.getMap() as unknown as MapRef;
                 }}
                 mapStyle="mapbox://styles/mapbox/light-v9"
                 dragRotate={false}
@@ -425,7 +425,7 @@ function PreviewMap({
                 onClick={onClickLayer}
                 interactiveLayerIds={interactiveLayerIds ?? []}
                 onLoad={() => {
-                    setReady(true)
+                    setReady(true);
                 }}
                 style={{
                     height: '450px',
@@ -444,5 +444,5 @@ function PreviewMap({
                 )}
             </ReactMapGL>
         </div>
-    )
+    );
 }

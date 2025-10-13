@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import LegendItemButtonBBox from './legend-item-button-bbox'
-import LegendItemButtonLayers from './legend-item-button-layers'
-import LegendItemButtonOpacity from './legend-item-button-opacity'
-import LegendItemButtonVisibility from './legend-item-button-visibility'
-import LegendItemButtonInfo from './legend-item-button-info'
-import LegendItemButtonRemove from './legend-item-button-remove'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import LegendItemButtonBBox from './legend-item-button-bbox';
+import LegendItemButtonLayers from './legend-item-button-layers';
+import LegendItemButtonOpacity from './legend-item-button-opacity';
+import LegendItemButtonVisibility from './legend-item-button-visibility';
+import LegendItemButtonInfo from './legend-item-button-info';
+import LegendItemButtonRemove from './legend-item-button-remove';
 
 class LegendItemToolbar extends PureComponent {
     static propTypes = {
@@ -24,7 +24,7 @@ class LegendItemToolbar extends PureComponent {
         onChangeVisibility: PropTypes.func,
         onRemoveLayer: PropTypes.func,
         onChangeInfo: PropTypes.func,
-    }
+    };
 
     static defaultProps = {
         // Props
@@ -49,24 +49,24 @@ class LegendItemToolbar extends PureComponent {
         onChangeVisibility: (l, v) => console.info(l, v),
         onChangeOpacity: (l, o) => console.info(l, o),
         onRemoveLayer: (l) => console.info(l),
-    }
+    };
 
     state = {
         tooltipOpened: false,
-    }
+    };
 
     onTooltipVisibilityChange = (tooltipOpened) => {
-        this.setState({ tooltipOpened })
-    }
+        this.setState({ tooltipOpened });
+    };
 
     render() {
-        const { children, ...rest } = this.props
-        const { tooltipOpened } = this.state
+        const { children, ...rest } = this.props;
+        const { tooltipOpened } = this.state;
         const props = {
             ...rest,
             tooltipOpened,
             onTooltipVisibilityChange: this.onTooltipVisibilityChange,
-        }
+        };
 
         return (
             <div className="c-legend-item-toolbar flex items-center shrink mt-[4px] mb-0 mr-0 ml-[20px]">
@@ -98,6 +98,6 @@ class LegendItemToolbar extends PureComponent {
                     <LegendItemButtonRemove {...props} />
                 )}
             </div>
-        )
+        );
     }
 }

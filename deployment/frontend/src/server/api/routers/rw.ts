@@ -1,36 +1,36 @@
-import { type FieldsResponse } from '@/components/data-explorer/queryHooks'
-import { filterObj } from '@/components/data-explorer/search.schema'
-import { createViewFormSchema, editViewFormSchema } from '@/schema/view.schema'
+import { type FieldsResponse } from '@/components/data-explorer/queryHooks';
+import { filterObj } from '@/components/data-explorer/search.schema';
+import { createViewFormSchema, editViewFormSchema } from '@/schema/view.schema';
 import {
     createTRPCRouter,
     protectedProcedure,
     publicProcedure,
-} from '@/server/api/trpc'
+} from '@/server/api/trpc';
 import {
     createDatasetView,
     deleteDatasetView,
     editDatasetView,
     getDatasetViews,
     updateDatasetHasChartsFlag,
-} from '@/utils/apiUtils'
-import { z } from 'zod'
+} from '@/utils/apiUtils';
+import { z } from 'zod';
 
 interface NumOfRowsResponse {
-    data: Array<{ count: number } | number>
+    data: Array<{ count: number } | number>;
 }
 
 interface DataResponse {
-    data: Array<Record<string, any>>
+    data: Array<Record<string, any>>;
 }
 
 interface GfwColumn {
-    name: string
-    alias: string
-    description: string | null
-    data_type: string
-    unit: string | null
-    is_feature_info: boolean
-    is_filter: boolean
+    name: string;
+    alias: string;
+    description: string | null;
+    data_type: string;
+    unit: string | null;
+    is_feature_info: boolean;
+    is_filter: boolean;
 }
 
 export const rwRouter = createTRPCRouter({
@@ -48,11 +48,11 @@ export const rwRouter = createTRPCRouter({
                 'geom',
                 'geom_wm',
                 'gfw_geojson',
-            ]
+            ];
             const fieldsRes = await fetch(
                 `https://api.resourcewatch.org/v1/fields/${input.id}`
-            )
-            const fields: FieldsResponse = await fieldsRes.json()
+            );
+            const fields: FieldsResponse = await fieldsRes.json();
             if (input.provider === 'gfw') {
                 const columns = {
                     tableName: 'gfw',
@@ -68,10 +68,10 @@ export const rwRouter = createTRPCRouter({
                             default: '',
                         })),
                 } as {
-                    tableName: string
-                    columns: { key: string; name: string; type: string }[]
-                }
-                return columns
+                    tableName: string;
+                    columns: { key: string; name: string; type: string }[];
+                };
+                return columns;
             }
 
             const columns = {
@@ -84,8 +84,8 @@ export const rwRouter = createTRPCRouter({
                         type: 'any',
                         default: '',
                     })),
-            }
-            return columns
+            };
+            return columns;
         }),
     getData: publicProcedure
         .input(
@@ -121,10 +121,10 @@ export const rwRouter = createTRPCRouter({
                 provider,
                 sorting,
                 filters,
-            } = input
+            } = input;
             const paginationSql = `LIMIT ${
                 pagination.pageIndex * pagination.pageSize + pagination.pageSize
-            }`
+            }`;
             const sortSql =
                 sorting.length > 0
                     ? 'ORDER BY ' +
@@ -134,7 +134,7 @@ export const rwRouter = createTRPCRouter({
                                   `${sort.id} ${sort.desc ? 'DESC' : 'ASC'}`
                           )
                           .join(', ')
-                    : ''
+                    : '';
             const filtersSql =
                 filters.length > 0
                     ? 'WHERE ' +
@@ -152,20 +152,20 @@ export const rwRouter = createTRPCRouter({
                                       .join('')} )`
                           )
                           .join(' AND ')
-                    : ''
+                    : '';
             const url = `https://api.resourcewatch.org/v1/query/${datasetId}?sql=SELECT ${columns.join(
                 ' , '
-            )} FROM ${tableName} ${sortSql} ${filtersSql} ${paginationSql}`
+            )} FROM ${tableName} ${sortSql} ${filtersSql} ${paginationSql}`;
 
-            const tableDataRes = await fetch(url)
-            const tableData: DataResponse = await tableDataRes.json()
-            const data = tableData.data
+            const tableDataRes = await fetch(url);
+            const tableData: DataResponse = await tableDataRes.json();
+            const data = tableData.data;
             if (provider === 'cartodb' || provider === 'gfw')
                 return data.slice(
                     pagination.pageIndex * pagination.pageSize,
                     data.length
-                )
-            return data
+                );
+            return data;
         }),
     getNumberOfRows: publicProcedure
         .input(
@@ -183,7 +183,7 @@ export const rwRouter = createTRPCRouter({
         )
         .query(async ({ input }) => {
             try {
-                const { datasetId, tableName, filters, provider } = input
+                const { datasetId, tableName, filters, provider } = input;
                 const filtersSql =
                     filters.length > 0
                         ? 'WHERE ' +
@@ -203,7 +203,7 @@ export const rwRouter = createTRPCRouter({
                                           .join('')} )`
                               )
                               .join(' AND ')
-                        : ''
+                        : '';
                 const numRowsRes = await fetch(
                     `https://api.resourcewatch.org/v1/query/${datasetId}?sql=SELECT COUNT(*) FROM ${tableName} ${filtersSql}`,
                     {
@@ -211,20 +211,20 @@ export const rwRouter = createTRPCRouter({
                             'Content-Type': 'application/json',
                         },
                     }
-                )
-                const numRows: NumOfRowsResponse = await numRowsRes.json()
+                );
+                const numRows: NumOfRowsResponse = await numRowsRes.json();
                 if (typeof numRows.data[0] === 'number') {
-                    return numRows.data[0]
+                    return numRows.data[0];
                 }
                 if (numRows.data[0]) {
-                    return numRows.data[0].count
+                    return numRows.data[0].count;
                 }
-                throw new Error('Could not get number of rows')
+                throw new Error('Could not get number of rows');
             } catch (e) {
                 let error =
-                    'Something went wrong please contact the system administrator'
-                if (e instanceof Error) error = e.message
-                throw Error(error)
+                    'Something went wrong please contact the system administrator';
+                if (e instanceof Error) error = e.message;
+                throw Error(error);
             }
         }),
     createDatasetView: protectedProcedure
@@ -236,9 +236,9 @@ export const rwRouter = createTRPCRouter({
                 await updateDatasetHasChartsFlag({
                     ckanDatasetId: input.ckanDatasetId,
                     session: ctx.session,
-                })
-                return res
-            })
+                });
+                return res;
+            });
         }),
     updateDatasetView: protectedProcedure
         .input(
@@ -249,9 +249,9 @@ export const rwRouter = createTRPCRouter({
                 await updateDatasetHasChartsFlag({
                     ckanDatasetId: input.ckanDatasetId,
                     session: ctx.session,
-                })
-                return res
-            })
+                });
+                return res;
+            });
         }),
     deleteDatasetView: protectedProcedure
         .input(
@@ -267,14 +267,14 @@ export const rwRouter = createTRPCRouter({
                     await updateDatasetHasChartsFlag({
                         ckanDatasetId: input.ckanDatasetId,
                         session: ctx.session,
-                    })
-                    return res
+                    });
+                    return res;
                 }
-            )
+            );
         }),
     getDatasetViews: publicProcedure
         .input(z.object({ rwDatasetId: z.string() }))
         .query(async ({ input }) => {
-            return await getDatasetViews({ rwDatasetId: input.rwDatasetId })
+            return await getDatasetViews({ rwDatasetId: input.rwDatasetId });
         }),
-})
+});

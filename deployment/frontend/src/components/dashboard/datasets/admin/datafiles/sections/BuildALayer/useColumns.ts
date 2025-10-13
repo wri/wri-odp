@@ -1,4 +1,4 @@
-import { UseQueryOptions, useQuery } from 'react-query'
+import { UseQueryOptions, useQuery } from 'react-query';
 
 export function useColumns(
     type: string,
@@ -11,14 +11,14 @@ export function useColumns(
     const queryObj = useQuery(
         ['columns', connector_url],
         async () => {
-            const response = await fetch(encodeURI(connector_url))
-            const data = await response.json()
-            if (type === 'carto') return Object.keys(data.rows[0])
+            const response = await fetch(encodeURI(connector_url));
+            const data = await response.json();
+            if (type === 'carto') return Object.keys(data.rows[0]);
             if (type === 'featureservice')
-                return data.fields.map((field: any) => field.name) as string[]
-            return [] as string[]
+                return data.fields.map((field: any) => field.name) as string[];
+            return [] as string[];
         },
         { enabled, onSuccess: (data) => onSuccess?.(data) }
-    )
-    return queryObj
+    );
+    return queryObj;
 }

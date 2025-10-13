@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { type LegendTypeProps } from '../interfaces/legend-types'
+import { type LegendTypeProps } from '../interfaces/legend-types';
 
 export default function LegendTypeChoropleth(
     { activeLayer }: Readonly<LegendTypeProps> = {
@@ -11,7 +11,7 @@ export default function LegendTypeChoropleth(
         },
     }
 ) {
-    const { legendConfig } = activeLayer
+    const { legendConfig } = activeLayer;
 
     return !legendConfig || legendConfig.type !== 'choropleth' ? null : (
         <div className="pt-[10px] px-0 pb-0 flex-col mt-[10px] xs:flex-row xs:mt-[initial]">
@@ -88,5 +88,5 @@ export default function LegendTypeChoropleth(
                     ))}
             </ul>
         </div>
-    )
+    );
 }

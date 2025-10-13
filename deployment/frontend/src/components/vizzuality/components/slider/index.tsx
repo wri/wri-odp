@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import classnames from 'classnames'
-import RCSlider, { Range, Handle } from 'rc-slider'
-import fill from 'lodash/fill'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
+import RCSlider, { Range, Handle } from 'rc-slider';
+import fill from 'lodash/fill';
 
 // components
-import Tooltip from '../../components/tooltip'
+import Tooltip from '../../components/tooltip';
 
 class Slider extends PureComponent {
     static propTypes = {
@@ -27,7 +27,7 @@ class Slider extends PureComponent {
         railStyle: PropTypes.shape({}),
         dotStyle: PropTypes.shape({}),
         pushable: PropTypes.oneOfType([PropTypes.bool, PropTypes.number]),
-    }
+    };
 
     static defaultProps = {
         customClass: null,
@@ -48,13 +48,13 @@ class Slider extends PureComponent {
         railStyle: { backgroundColor: '#d9d9d9' },
         dotStyle: { visibility: 'hidden', border: '0px' },
         pushable: true,
-    }
+    };
 
     renderHandle = (props) => {
-        const { formatValue, showTooltip } = this.props
-        const { value, dragging, index, ...restProps } = props
-        const formattedValue = formatValue ? formatValue(value) : value
-        const tooltipVisible = showTooltip ? showTooltip(index) : false
+        const { formatValue, showTooltip } = this.props;
+        const { value, dragging, index, ...restProps } = props;
+        const formattedValue = formatValue ? formatValue(value) : value;
+        const tooltipVisible = showTooltip ? showTooltip(index) : false;
 
         return (
             <Tooltip
@@ -69,14 +69,14 @@ class Slider extends PureComponent {
             >
                 <Handle className="drag-handle" value={value} {...restProps} />
             </Tooltip>
-        )
-    }
+        );
+    };
 
     render() {
-        const { customClass, range, handleStyle, value, ...rest } = this.props
+        const { customClass, range, handleStyle, value, ...rest } = this.props;
 
-        const Component = range ? Range : RCSlider
-        const handleNum = Array.isArray(value) ? value.length : 1
+        const Component = range ? Range : RCSlider;
+        const handleNum = Array.isArray(value) ? value.length : 1;
         const handleStyles = fill(Array(handleNum), {
             width: '1px',
             height: '10px',
@@ -88,13 +88,13 @@ class Slider extends PureComponent {
             zIndex: 1,
             pointerEvents: 'none',
             touchAction: 'none',
-        })
-        handleStyles[0] = handleStyle
-        handleStyles[handleNum - 1] = handleStyle
+        });
+        handleStyles[0] = handleStyle;
+        handleStyles[handleNum - 1] = handleStyle;
 
         const externalClass = classnames('vizzuality-slider', {
             [customClass]: !!customClass,
-        })
+        });
 
         return (
             <div className={externalClass}>
@@ -105,8 +105,8 @@ class Slider extends PureComponent {
                     {...rest}
                 />
             </div>
-        )
+        );
     }
 }
 
-export default Slider
+export default Slider;

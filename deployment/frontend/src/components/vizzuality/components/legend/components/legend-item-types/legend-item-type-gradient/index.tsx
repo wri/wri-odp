@@ -1,4 +1,4 @@
-import { type LegendTypeProps } from '../interfaces/legend-types'
+import { type LegendTypeProps } from '../interfaces/legend-types';
 
 export default function LegendTypeGradient(
     { activeLayer }: Readonly<LegendTypeProps> = {
@@ -10,15 +10,15 @@ export default function LegendTypeGradient(
         },
     }
 ) {
-    const { legendConfig } = activeLayer
+    const { legendConfig } = activeLayer;
 
     const items = legendConfig?.items.filter(
         (item) => item.color !== 'transparent'
-    )
+    );
     const itemTransparent = legendConfig?.items.find(
         (item) => item.color === 'transparent'
-    )
-    const gradient = items?.map((item) => item.color)
+    );
+    const gradient = items?.map((item) => item.color);
 
     return !legendConfig || legendConfig.type !== 'gradient' ? null : (
         <div className="c-legend-type-gradient">
@@ -58,5 +58,5 @@ export default function LegendTypeGradient(
                 )}
             </ul>
         </div>
-    )
+    );
 }

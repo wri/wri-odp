@@ -1,27 +1,27 @@
-import { Fragment, useState } from 'react'
-import { Dialog, Disclosure, Transition } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import UserProfile from './UserProfile'
-import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import { api } from '@/utils/api'
-import Spinner from '../_shared/Spinner'
+import { Fragment, useState } from 'react';
+import { Dialog, Disclosure, Transition } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import UserProfile from './UserProfile';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { api } from '@/utils/api';
+import Spinner from '../_shared/Spinner';
 export default function Layout({ children }: { children: React.ReactNode }) {
-    const { asPath } = useRouter()
-    const [sidebarOpen, setSidebarOpen] = useState(false)
-    const { data: session } = useSession()
+    const { asPath } = useRouter();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { data: session } = useSession();
     const { data, isLoading } = api.notification.getAllNotifications.useQuery(
         {}
-    )
+    );
     const { data: pendingData, isLoading: isLoadingPending } =
         api.dataset.getPendingDatasets.useQuery({
             search: '',
             page: { start: 0, rows: 100 },
             sortBy: 'metadata_modified desc',
-        })
+        });
     const { data: userIdentity, isLoading: isLoadingIUser } =
-        api.user.getUserCapacity.useQuery()
+        api.user.getUserCapacity.useQuery();
 
     const routes = [
         {
@@ -94,18 +94,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             count: 0,
             isSysAdmin: false,
         },
-    ]
+    ];
 
     const navigation = routes.map((item) => {
-        const isPath = asPath.split('/dashboard')[1]
+        const isPath = asPath.split('/dashboard')[1];
         if (isPath && isPath.split('/').length > 1) {
-            const pathExist = isPath.includes(item.href)
-            return { ...item, active: pathExist }
+            const pathExist = isPath.includes(item.href);
+            return { ...item, active: pathExist };
         }
-        return item
-    })
+        return item;
+    });
 
-    const notificationCount = data ? (data as { count: number }).count : 0
+    const notificationCount = data ? (data as { count: number }).count : 0;
 
     return (
         <>
@@ -189,7 +189,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                         item.isSysAdmin &&
                                                         !session?.user.sysadmin
                                                     ) {
-                                                        return <></>
+                                                        return <></>;
                                                     }
                                                     return (
                                                         <Fragment
@@ -298,7 +298,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                 </li>
                                                             )}
                                                         </Fragment>
-                                                    )
+                                                    );
                                                 })}
                                             </ul>
                                         </nav>
@@ -331,7 +331,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                 item.isSysAdmin &&
                                                 !session?.user.sysadmin
                                             ) {
-                                                return <></>
+                                                return <></>;
                                             }
                                             return (
                                                 <Fragment key={item.name}>
@@ -435,7 +435,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                         </li>
                                                     )}
                                                 </Fragment>
-                                            )
+                                            );
                                         })}
                                     </ul>
                                 </nav>
@@ -467,5 +467,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </div>
             </div>
         </>
-    )
+    );
 }

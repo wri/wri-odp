@@ -5,11 +5,11 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/_shared/Table'
-import { type RouterOutput } from '@/server/api/root'
-import Image from 'next/image'
+} from '@/components/_shared/Table';
+import { type RouterOutput } from '@/server/api/root';
+import Image from 'next/image';
 
-type DatasetMembers = RouterOutput['dataset']['getDatasetCollaborators']
+type DatasetMembers = RouterOutput['dataset']['getDatasetCollaborators'];
 
 export function Members({ members }: { members: DatasetMembers }) {
     return (
@@ -71,5 +71,5 @@ export function Members({ members }: { members: DatasetMembers }) {
                 </Table>
             )}{' '}
         </>
-    )
+    );
 }

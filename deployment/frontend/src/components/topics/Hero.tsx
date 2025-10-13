@@ -1,35 +1,35 @@
-import Image from 'next/image'
-import { Button } from '../_shared/Button'
-import { ChevronLeftIcon } from '@heroicons/react/20/solid'
-import { useState } from 'react'
-import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
-import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
-import Link from 'next/link'
-import { useSession } from 'next-auth/react'
-import { api } from '@/utils/api'
-import { PencilSquareIcon } from '@heroicons/react/24/outline'
-import EditCard from './EditCard'
-import { type Group } from '@portaljs/ckan'
-import Topic from '@/interfaces/topic.interface'
+import Image from 'next/image';
+import { Button } from '../_shared/Button';
+import { ChevronLeftIcon } from '@heroicons/react/20/solid';
+import { useState } from 'react';
+import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { api } from '@/utils/api';
+import { PencilSquareIcon } from '@heroicons/react/24/outline';
+import EditCard from './EditCard';
+import { type Group } from '@portaljs/ckan';
+import Topic from '@/interfaces/topic.interface';
 
 export function Hero({
     topics,
     topicsDetails,
 }: {
-    topics?: GroupTree[]
-    topicsDetails: Record<string, GroupsmDetails>
+    topics?: GroupTree[];
+    topicsDetails: Record<string, GroupsmDetails>;
 }) {
-    topics = topics!
-    const topic = topics[0]!
-    const { data: session } = useSession()
-    const authorized = session && session.user?.sysadmin ? true : false
-    const enableQuery = session && !authorized
+    topics = topics!;
+    const topic = topics[0]!;
+    const { data: session } = useSession();
+    const authorized = session && session.user?.sysadmin ? true : false;
+    const enableQuery = session && !authorized;
     const topicdetails = api.topics.getTopicV2.useQuery(
         { id: topic.id },
         {
             enabled: !!enableQuery,
         }
-    )
+    );
     return (
         <section className="flex flex-col">
             <div className="w-full max-w-[1380px] mx-auto flex  space-x-4 px-4 sm:px-6 xxl:px-0 font-acumin mt-[25px]">
@@ -106,11 +106,11 @@ export function Hero({
                 </div>
             </div>
         </section>
-    )
+    );
 }
 
 function CopyLink() {
-    const [clicked, setClicked] = useState(false)
+    const [clicked, setClicked] = useState(false);
     return (
         <>
             {!clicked ? (
@@ -118,11 +118,11 @@ function CopyLink() {
                     onClick={async () => {
                         await navigator.clipboard.writeText(
                             window.location.href
-                        )
-                        setClicked(!clicked)
+                        );
+                        setClicked(!clicked);
                         setTimeout(() => {
-                            setClicked(false)
-                        }, 3000)
+                            setClicked(false);
+                        }, 3000);
                     }}
                     variant="default"
                     className="mr-auto mt-3"
@@ -147,5 +147,5 @@ function CopyLink() {
                 </button>
             )}
         </>
-    )
+    );
 }

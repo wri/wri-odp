@@ -1,7 +1,7 @@
-import { Option } from '@/components/_shared/SimpleSelect'
-import z from 'zod'
+import { Option } from '@/components/_shared/SimpleSelect';
+import z from 'zod';
 
-const capacitySchema = z.enum(['admin', 'editor', 'member'])
+const capacitySchema = z.enum(['admin', 'editor', 'member']);
 
 export const MemberSchema = z.object({
     user: z.object({ value: z.string(), label: z.string() }),
@@ -10,7 +10,7 @@ export const MemberSchema = z.object({
         value: capacitySchema,
         label: z.string(),
     }),
-})
+});
 
 export const TeamSchema = z.object({
     id: z.string().optional(),
@@ -43,7 +43,7 @@ export const TeamSchema = z.object({
             value: 'public',
             label: 'Public',
         }),
-})
+});
 
-export type TeamFormType = z.infer<typeof TeamSchema>
-type MemberFormType = z.infer<typeof MemberSchema>
+export type TeamFormType = z.infer<typeof TeamSchema>;
+type MemberFormType = z.infer<typeof MemberSchema>;

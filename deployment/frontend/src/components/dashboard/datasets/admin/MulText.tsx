@@ -1,37 +1,37 @@
-import { Fragment, useRef, useState } from 'react'
-import { Combobox, Listbox, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import classNames from '@/utils/classnames'
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Fragment, useRef, useState } from 'react';
+import { Combobox, Listbox, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import classNames from '@/utils/classnames';
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import { Button } from '@/components/_shared/Button'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { DatasetFormType } from '@/schema/dataset.schema'
+} from '@/components/_shared/Popover';
+import { Button } from '@/components/_shared/Button';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { DatasetFormType } from '@/schema/dataset.schema';
 import {
     Controller,
     type FieldValues,
     type Path,
     type PathValue,
     type UseFormReturn,
-} from 'react-hook-form'
+} from 'react-hook-form';
 
 interface MulTextProps<T extends FieldValues> {
-    options?: Option[]
-    formObj: UseFormReturn<T>
-    name: Path<T>
-    title: string
-    tooltip?: string
-    allowsCreationOfItems?: boolean
+    options?: Option[];
+    formObj: UseFormReturn<T>;
+    name: Path<T>;
+    title: string;
+    tooltip?: string;
+    allowsCreationOfItems?: boolean;
 }
 
-type Option = string | { label: string; value: string }
+type Option = string | { label: string; value: string };
 
 function isString(option: Option): option is string {
-    return typeof option === 'string'
+    return typeof option === 'string';
 }
 
 export default function MulText<T extends FieldValues>({
@@ -42,19 +42,19 @@ export default function MulText<T extends FieldValues>({
     tooltip = 'Remove item',
     allowsCreationOfItems = false,
 }: MulTextProps<T>) {
-    const { control } = formObj
-    const [open, setOpen] = useState(false)
-    const ref = useRef<HTMLButtonElement>(null)
-    const [selected, setSelected] = useState<string[]>([])
-    const [query, setQuery] = useState('')
+    const { control } = formObj;
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLButtonElement>(null);
+    const [selected, setSelected] = useState<string[]>([]);
+    const [query, setQuery] = useState('');
 
     const filteredOptions =
         query === ''
             ? options
             : options.filter((_item) => {
-                  const item = isString(_item) ? _item : _item.label
-                  return item.toLowerCase().includes(query.toLowerCase())
-              })
+                  const item = isString(_item) ? _item : _item.label;
+                  return item.toLowerCase().includes(query.toLowerCase());
+              });
 
     return (
         <Controller
@@ -105,7 +105,7 @@ export default function MulText<T extends FieldValues>({
                                                     >
                                                         <XMarkIcon
                                                             onClick={(e) => {
-                                                                e.stopPropagation()
+                                                                e.stopPropagation();
                                                                 onChange(
                                                                     value.filter(
                                                                         (
@@ -114,7 +114,7 @@ export default function MulText<T extends FieldValues>({
                                                                             option !==
                                                                             item
                                                                     )
-                                                                )
+                                                                );
                                                             }}
                                                             className="mt-0.5 h-3 w-3 cursor-pointer text-red-600"
                                                         />
@@ -216,5 +216,5 @@ export default function MulText<T extends FieldValues>({
                 </Popover>
             )}
         />
-    )
+    );
 }

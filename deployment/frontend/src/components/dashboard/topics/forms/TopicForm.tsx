@@ -1,36 +1,36 @@
-import { type UseFormReturn } from 'react-hook-form'
-import { type TopicFormType } from '@/schema/topic.schema'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { ImageUploader } from '../../_shared/ImageUploader'
-import { type UploadResult } from '@uppy/core'
-import { env } from '@/env.mjs'
-import { api } from '@/utils/api'
-import { P, match } from 'ts-pattern'
-import Spinner from '@/components/_shared/Spinner'
-import DefaultTooltip from '@/components/_shared/Tooltip'
+import { type UseFormReturn } from 'react-hook-form';
+import { type TopicFormType } from '@/schema/topic.schema';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { ImageUploader } from '../../_shared/ImageUploader';
+import { type UploadResult } from '@uppy/core';
+import { env } from '@/env.mjs';
+import { api } from '@/utils/api';
+import { P, match } from 'ts-pattern';
+import Spinner from '@/components/_shared/Spinner';
+import DefaultTooltip from '@/components/_shared/Tooltip';
 import {
     ArrowsPointingInIcon,
     ExclamationCircleIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 
 export default function TopicForm({
     formObj,
     editing = false,
 }: {
-    formObj: UseFormReturn<TopicFormType>
-    editing?: boolean
+    formObj: UseFormReturn<TopicFormType>;
+    editing?: boolean;
 }) {
     const {
         register,
         setValue,
         watch,
         formState: { errors, isSubmitting },
-    } = formObj
-    const possibleParents = api.topics.getAllTopics.useQuery()
+    } = formObj;
+    const possibleParents = api.topics.getAllTopics.useQuery();
     return (
         <div
             id="topicsForm"
@@ -80,9 +80,11 @@ export default function TopicForm({
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
                                         response.successful[0]?.uploadURL ??
-                                        null
-                                    const name = url ? url.split('/').pop() : ''
-                                    setValue('image_url', name)
+                                        null;
+                                    const name = url
+                                        ? url.split('/').pop()
+                                        : '';
+                                    setValue('image_url', name);
                                 }}
                             />
                         </div>
@@ -152,5 +154,5 @@ export default function TopicForm({
                 </InputGroup>
             </div>
         </div>
-    )
+    );
 }

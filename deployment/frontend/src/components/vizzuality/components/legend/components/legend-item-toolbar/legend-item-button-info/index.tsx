@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import Tooltip from '../../../../tooltip'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import Tooltip from '../../../../tooltip';
 
 class LegendItemButtonInfo extends PureComponent {
     static propTypes = {
@@ -15,7 +15,7 @@ class LegendItemButtonInfo extends PureComponent {
 
         // ACTIONS
         onChangeInfo: PropTypes.func,
-    }
+    };
 
     static defaultProps = {
         activeLayer: {},
@@ -27,17 +27,17 @@ class LegendItemButtonInfo extends PureComponent {
         scrolling: false,
 
         onChangeInfo: () => {},
-    }
+    };
 
     state = {
         visible: false,
-    }
+    };
 
     componentWillReceiveProps(nextProps) {
-        const { scrolling } = nextProps
+        const { scrolling } = nextProps;
 
         if (scrolling) {
-            this.setState({ visible: false })
+            this.setState({ visible: false });
         }
     }
 
@@ -49,8 +49,8 @@ class LegendItemButtonInfo extends PureComponent {
             focusStyle,
             defaultStyle,
             tooltipText,
-        } = this.props
-        const { visible } = this.state
+        } = this.props;
+        const { visible } = this.state;
 
         return (
             <Tooltip
@@ -76,8 +76,8 @@ class LegendItemButtonInfo extends PureComponent {
                     />
                 </button>
             </Tooltip>
-        )
+        );
     }
 }
 
-export default LegendItemButtonInfo
+export default LegendItemButtonInfo;

@@ -1,6 +1,6 @@
-import Document, { Html, Head, Main, NextScript } from 'next/document'
-import Script from 'next/script'
-import { env } from '@/env.mjs'
+import Document, { Html, Head, Main, NextScript } from 'next/document';
+import Script from 'next/script';
+import { env } from '@/env.mjs';
 
 export default class CustomDocument extends Document {
     render() {
@@ -106,6 +106,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe>`,
                 </body>
                 <NextScript />
             </Html>
-        )
+        );
     }
 }

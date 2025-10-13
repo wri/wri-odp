@@ -1,36 +1,36 @@
-import { Button } from '@/components/_shared/Button'
-import dynamic from 'next/dynamic'
+import { Button } from '@/components/_shared/Button';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import Map from '@/components/_shared/map/Map'
-import { type APILayerSpec } from '@/interfaces/layer.interface'
-import { type ActiveLayerGroup } from '@/interfaces/state.interface'
-import { type WriDataset } from '@/schema/ckan.schema'
-import classNames from '@/utils/classnames'
-import { getFormatColor } from '@/utils/formatColors'
-import { useActiveLayerGroups, useRelatedDatasets } from '@/utils/storeHooks'
+});
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import Map from '@/components/_shared/map/Map';
+import { type APILayerSpec } from '@/interfaces/layer.interface';
+import { type ActiveLayerGroup } from '@/interfaces/state.interface';
+import { type WriDataset } from '@/schema/ckan.schema';
+import classNames from '@/utils/classnames';
+import { getFormatColor } from '@/utils/formatColors';
+import { useActiveLayerGroups, useRelatedDatasets } from '@/utils/storeHooks';
 import {
     ExclamationTriangleIcon,
     MagnifyingGlassIcon,
-} from '@heroicons/react/20/solid'
-import { ArrowPathIcon } from '@heroicons/react/24/outline'
-import { Index } from 'flexsearch'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import MapViewIcon from '../view-icons/MapViewIcon'
-import TabularViewIcon from '../view-icons/TabularViewIcon'
-import ChartViewIcon from '../view-icons/ChartViewIcon'
+} from '@heroicons/react/20/solid';
+import { ArrowPathIcon } from '@heroicons/react/24/outline';
+import { Index } from 'flexsearch';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import MapViewIcon from '../view-icons/MapViewIcon';
+import TabularViewIcon from '../view-icons/TabularViewIcon';
+import ChartViewIcon from '../view-icons/ChartViewIcon';
 
 export function RelatedDatasets() {
-    const { relatedDatasets: datasets } = useRelatedDatasets()
+    const { relatedDatasets: datasets } = useRelatedDatasets();
     if (datasets.length === 0) {
         return (
             <div className="flex flex-col gap-y-4 py-2">
                 No related Datasets found
             </div>
-        )
+        );
     }
     return (
         <div className="flex flex-col gap-y-4 py-2">
@@ -41,40 +41,40 @@ export function RelatedDatasets() {
                 />
             ))}
         </div>
-    )
+    );
 }
 
 export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
     const { activeLayerGroups, replaceLayersForLayerGroup } =
-        useActiveLayerGroups()
+        useActiveLayerGroups();
 
     const activeLayerGroup = activeLayerGroups.find(
         (lg: any) => lg.datasetId == dataset.id
-    )
+    );
 
     const activeDataFiles = dataset.resources.filter((df: any) =>
         activeLayerGroup?.layers?.includes(df.rw_id)
-    )
+    );
 
-    const activeDataFilesIds = activeDataFiles.map((df) => df.id)
+    const activeDataFilesIds = activeDataFiles.map((df) => df.id);
 
-    const [layers, setLayers] = useState<APILayerSpec[]>([])
-    const [addDatasetModalOpen, setAddDatasetModalOpen] = useState(false)
+    const [layers, setLayers] = useState<APILayerSpec[]>([]);
+    const [addDatasetModalOpen, setAddDatasetModalOpen] = useState(false);
     const [selectedDataFileIds, setSelectedDataFileIds] = useState<
         Array<string>
-    >(activeDataFilesIds || [])
+    >(activeDataFilesIds || []);
 
     useEffect(() => {
-        const countdown = 10
+        const countdown = 10;
         Promise.all(
             selectedDataFileIds.map(async (dfId) => {
-                const df = dataFiles.find((df) => df.id == dfId)
-                const layer = df?.url?.split('/').at(-1)
+                const df = dataFiles.find((df) => df.id == dfId);
+                const layer = df?.url?.split('/').at(-1);
                 const response = await fetch(
                     `https://api.resourcewatch.org/v1/layer/${layer}`
-                )
-                const layerData = await response.json()
-                const { id, attributes } = layerData.data
+                );
+                const layerData = await response.json();
+                const { id, attributes } = layerData.data;
                 return {
                     id: id,
                     ...attributes,
@@ -85,40 +85,40 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                             layers.length > 1 ? attributes.default : true,
                     },
                     active: layers.length > 1 ? attributes.default : true,
-                }
+                };
             })
         ).then((layers) => {
-            setLayers(layers)
-        })
-    }, [selectedDataFileIds])
+            setLayers(layers);
+        });
+    }, [selectedDataFileIds]);
 
-    const dataFiles = dataset.resources.filter((r) => r.rw_id)
+    const dataFiles = dataset.resources.filter((r) => r.rw_id);
 
-    const [q, setQ] = useState('')
+    const [q, setQ] = useState('');
     const index = new Index({
         tokenize: 'full',
-    })
+    });
     dataFiles?.forEach((resource) => {
         index.add(
             resource.id,
             `${resource.description} ${resource.format} ${resource.url} ${resource.name}`
-        )
-    })
+        );
+    });
 
     const filteredDatafiles =
         q !== ''
             ? dataFiles?.filter((datafile) =>
                   index.search(q).includes(datafile.id)
               )
-            : dataFiles
+            : dataFiles;
 
-    const created_at = new Date(dataset?.metadata_created ?? '')
-    const last_updated = new Date(dataset?.metadata_modified ?? '')
+    const created_at = new Date(dataset?.metadata_created ?? '');
+    const last_updated = new Date(dataset?.metadata_modified ?? '');
     const options = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-    } as const
+    } as const;
 
     return (
         <div className="font-acumin gap-y-3 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100">
@@ -184,8 +184,8 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                     }
                     size="sm"
                     onClick={(e) => {
-                        e.stopPropagation()
-                        setAddDatasetModalOpen(true)
+                        e.stopPropagation();
+                        setAddDatasetModalOpen(true);
                     }}
                 >
                     {activeLayerGroups.some(
@@ -267,15 +267,15 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                                                             ].filter(
                                                                 (i) =>
                                                                     i != df.id
-                                                            )
+                                                            );
                                                         } else {
                                                             return [
                                                                 ...prev,
                                                                 df.id,
-                                                            ]
+                                                            ];
                                                         }
                                                     }
-                                                )
+                                                );
                                             }}
                                         >
                                             <div className="basis-4/5">
@@ -309,7 +309,7 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                                                 ) && <CheckIcon />}
                                             </div>
                                         </button>
-                                    )
+                                    );
                                 })}
                             </div>
                             <Button
@@ -320,15 +320,15 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                                         //     selectedDataFileIds.includes(df.id)
                                         // ) //ask Lucas what this line is doing
                                         .map((df) => df?.url?.split('/').at(-1))
-                                        .filter((l) => l != undefined)
+                                        .filter((l) => l != undefined);
 
                                     replaceLayersForLayerGroup(
                                         // @ts-ignore
                                         layerIds,
                                         dataset.id
-                                    )
+                                    );
 
-                                    setAddDatasetModalOpen(false)
+                                    setAddDatasetModalOpen(false);
                                 }}
                                 className="float-right my-5"
                             >
@@ -351,7 +351,7 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
                 </div>
             </Modal>
         </div>
-    )
+    );
 }
 
 function CheckIcon() {
@@ -372,5 +372,5 @@ function CheckIcon() {
                 strokeLinejoin="round"
             />
         </svg>
-    )
+    );
 }

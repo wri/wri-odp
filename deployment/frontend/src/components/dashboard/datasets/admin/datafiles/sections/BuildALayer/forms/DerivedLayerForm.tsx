@@ -1,23 +1,23 @@
-import { type UseFormReturn, useFormContext } from 'react-hook-form'
-import { Button } from '@/components/_shared/Button'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import { LayerFormType } from '../layer.schema'
-import { type DatasetFormType } from '@/schema/dataset.schema'
+import { type UseFormReturn, useFormContext } from 'react-hook-form';
+import { Button } from '@/components/_shared/Button';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import { LayerFormType } from '../layer.schema';
+import { type DatasetFormType } from '@/schema/dataset.schema';
 
 export default function DerivedLayerForm({
     formObj,
     index,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    index: number
+    formObj: UseFormReturn<DatasetFormType>;
+    index: number;
 }) {
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = formObj
+    } = formObj;
 
     return (
         <div className="space-y-6">
@@ -76,5 +76,5 @@ export default function DerivedLayerForm({
                 <ErrorDisplay name="description" errors={errors} />
             </InputGroup>
         </div>
-    )
+    );
 }

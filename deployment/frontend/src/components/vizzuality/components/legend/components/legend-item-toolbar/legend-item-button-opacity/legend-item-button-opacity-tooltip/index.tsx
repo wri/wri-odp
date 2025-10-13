@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import Slider from '../../../../../slider'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import Slider from '../../../../../slider';
 class LegendOpacityTooltip extends PureComponent {
     static propTypes = {
         // Layers
@@ -12,53 +12,53 @@ class LegendOpacityTooltip extends PureComponent {
         // Callback to call when the layer changes with
         // the ID of the dataset and the ID of the layer
         onChangeOpacity: PropTypes.func.isRequired,
-    }
+    };
 
     static defaultProps = {
         min: 0,
         max: 1,
         step: 0.01,
-    }
+    };
 
     constructor(props) {
-        super(props)
+        super(props);
 
-        const { activeLayer = {} } = this.props
-        const { opacity } = activeLayer
+        const { activeLayer = {} } = this.props;
+        const { opacity } = activeLayer;
 
         this.state = {
             opacity: typeof opacity !== 'undefined' ? opacity : 1,
-        }
+        };
     }
 
     componentDidUpdate(prevProps, prevState) {
         const {
             activeLayer: { opacity },
-        } = this.props
+        } = this.props;
         const {
             activeLayer: { opacity: prevOpacity },
-        } = prevProps
-        const { opacity: stateOpacity } = this.state
-        const { opacity: prevStateOpacity } = prevState
+        } = prevProps;
+        const { opacity: stateOpacity } = this.state;
+        const { opacity: prevStateOpacity } = prevState;
 
         if (opacity !== prevOpacity && stateOpacity === prevStateOpacity) {
-            this.setState({ opacity })
+            this.setState({ opacity });
         }
     }
 
     onChange = (v) => {
-        const { activeLayer, onChangeOpacity } = this.props
-        onChangeOpacity(activeLayer, v)
-    }
+        const { activeLayer, onChangeOpacity } = this.props;
+        onChangeOpacity(activeLayer, v);
+    };
 
     render() {
-        const { min, max, step, ...rest } = this.props
-        const { opacity } = this.state
+        const { min, max, step, ...rest } = this.props;
+        const { opacity } = this.state;
 
         return (
             <div
                 ref={(node) => {
-                    this.el = node
+                    this.el = node;
                 }}
             >
                 Opacity
@@ -83,8 +83,8 @@ class LegendOpacityTooltip extends PureComponent {
                     />
                 </div>
             </div>
-        )
+        );
     }
 }
 
-export default LegendOpacityTooltip
+export default LegendOpacityTooltip;

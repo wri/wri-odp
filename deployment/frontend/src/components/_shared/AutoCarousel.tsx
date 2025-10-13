@@ -1,9 +1,9 @@
-import { Navigation } from 'swiper/modules'
-import { Swiper } from 'swiper/react'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-import { type ReactNode } from 'react'
+import { Navigation } from 'swiper/modules';
+import { Swiper } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { type ReactNode } from 'react';
 
 export function AutoCarousel({
     children,
@@ -11,13 +11,13 @@ export function AutoCarousel({
     prevButton,
     nextButton,
 }: {
-    children: ReactNode
-    name: string
-    prevButton: ReactNode
-    nextButton: ReactNode
+    children: ReactNode;
+    name: string;
+    prevButton: ReactNode;
+    nextButton: ReactNode;
 }) {
-    const prevEl = `nav-prev-button--${name}`
-    const nextEl = `nav-next-button--${name}`
+    const prevEl = `nav-prev-button--${name}`;
+    const nextEl = `nav-next-button--${name}`;
     return (
         <div className="relative auto-carousel">
             <div className="peer">
@@ -37,5 +37,5 @@ export function AutoCarousel({
             {prevButton}
             {nextButton}
         </div>
-    )
+    );
 }

@@ -3,7 +3,7 @@ export const visibilityTypeLabels = {
     private: 'Private',
     internal: 'Internal Use',
     public: 'Public',
-}
+};
 
 export const updateFrequencyLabels = {
     annually: 'Annually',
@@ -15,4 +15,4 @@ export const updateFrequencyLabels = {
     hourly: 'Hourly',
     as_needed: 'As Needed',
     not_planned: 'Not Planned',
-}
+};

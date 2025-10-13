@@ -1,16 +1,16 @@
-import React, { useState } from 'react'
-import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard'
-import { api } from '@/utils/api'
-import Spinner from '../_shared/Spinner'
-import { type GroupTree } from '@/schema/ckan.schema'
-import Pagination from '@/components/datasets/Pagination'
-import type { SearchInput } from '@/schema/search.schema'
+import React, { useState } from 'react';
+import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard';
+import { api } from '@/utils/api';
+import Spinner from '../_shared/Spinner';
+import { type GroupTree } from '@/schema/ckan.schema';
+import Pagination from '@/components/datasets/Pagination';
+import type { SearchInput } from '@/schema/search.schema';
 
 export default function DatasetTeams({ teams }: { teams: GroupTree[] }) {
-    teams = teams
-    const team = teams[0]!
-    const teamName = team.name
-    const topicTitle = team.title
+    teams = teams;
+    const team = teams[0]!;
+    const teamName = team.name;
+    const topicTitle = team.title;
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         fq: {
@@ -20,8 +20,8 @@ export default function DatasetTeams({ teams }: { teams: GroupTree[] }) {
             start: 0,
             rows: 100,
         },
-    })
-    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+    });
+    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query);
 
     return (
         <section>
@@ -40,5 +40,5 @@ export default function DatasetTeams({ teams }: { teams: GroupTree[] }) {
                 </>
             )}
         </section>
-    )
+    );
 }

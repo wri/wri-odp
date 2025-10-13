@@ -1,19 +1,19 @@
-import Card from './Card'
-import Carousel from './Carousel'
-import { SwiperSlide } from 'swiper/react'
-import CarouselNavButton from './_shared/CarouselNavButton'
-import React from 'react'
-import Link from 'next/link'
-import { type WriDataset } from '@/schema/ckan.schema'
+import Card from './Card';
+import Carousel from './Carousel';
+import { SwiperSlide } from 'swiper/react';
+import CarouselNavButton from './_shared/CarouselNavButton';
+import React from 'react';
+import Link from 'next/link';
+import { type WriDataset } from '@/schema/ckan.schema';
 
 export default function Recent({
     title,
     datasets,
 }: {
-    title: string
-    datasets: WriDataset[]
+    title: string;
+    datasets: WriDataset[];
 }) {
-    const identifier = title.toLowerCase().replace(' ', '-')
+    const identifier = title.toLowerCase().replace(' ', '-');
     return (
         <div className="relative ">
             <div className="peer">
@@ -23,7 +23,7 @@ export default function Recent({
                             <SwiperSlide key={index} className="">
                                 <Card dataset={recent} key={index} />
                             </SwiperSlide>
-                        )
+                        );
                     })}
                 </Carousel>
             </div>
@@ -38,5 +38,5 @@ export default function Recent({
                 <CarouselNavButton orientation="right" />
             </div>
         </div>
-    )
+    );
 }

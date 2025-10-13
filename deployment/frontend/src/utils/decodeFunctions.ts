@@ -1,7 +1,7 @@
 // https://www.khronos.org/files/opengles_shading_language.pdf
-import { type LayerState } from '@/interfaces/state.interface'
-import { type layerConfigSpec } from '@/interfaces/layer.interface'
-import { differenceInDays } from 'date-fns'
+import { type LayerState } from '@/interfaces/state.interface';
+import { type layerConfigSpec } from '@/interfaces/layer.interface';
+import { differenceInDays } from 'date-fns';
 
 //interface DecodeParam {
 //  key: string,
@@ -59,33 +59,33 @@ const getDayRange = (params: any) => {
         maxDate,
         weeks,
         minDateAbsolut = null,
-    } = params || {}
+    } = params || {};
     // If min date absolut, always take its value (dynamic timeline)
-    const minDateTime = new Date(minDateAbsolut || minDate)
-    const maxDateTime = new Date(maxDate)
-    const numberOfDays = differenceInDays(maxDateTime, minDateTime)
+    const minDateTime = new Date(minDateAbsolut || minDate);
+    const maxDateTime = new Date(maxDate);
+    const numberOfDays = differenceInDays(maxDateTime, minDateTime);
 
     // timeline or hover effect active range
-    const startDateTime = new Date(startDate)
-    const endDateTime = new Date(endDate)
+    const startDateTime = new Date(startDate);
+    const endDateTime = new Date(endDate);
     const activeStartDay =
-        numberOfDays - differenceInDays(maxDateTime, startDateTime)
+        numberOfDays - differenceInDays(maxDateTime, startDateTime);
     const activeEndDay =
-        numberOfDays - differenceInDays(maxDateTime, endDateTime)
+        numberOfDays - differenceInDays(maxDateTime, endDateTime);
 
     // show specified weeks from end date
-    const rangeStartDate = weeks && numberOfDays - 7 * weeks
+    const rangeStartDate = weeks && numberOfDays - 7 * weeks;
 
     // get start and end day
-    const startDayIndex = activeStartDay || rangeStartDate || 0
-    const endDayIndex = activeEndDay || numberOfDays
+    const startDayIndex = activeStartDay || rangeStartDate || 0;
+    const endDayIndex = activeEndDay || numberOfDays;
     const obj = {
         startDayIndex,
         endDayIndex,
         numberOfDays,
-    }
-    return obj
-}
+    };
+    return obj;
+};
 
 export const getDecodeParams = {
     '3c4225a4-a8d8-4d73-b12d-0c47dec84c76': async () => ({
@@ -107,13 +107,13 @@ export const getDecodeParams = {
     '1e7f2868-7fcd-46b2-bbc8-64ec78f95cca': async () => {
         const endDateRes = await fetch(
             'https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest'
-        )
-        const endDateJson = await endDateRes.json()
+        );
+        const endDateJson = await endDateRes.json();
         const {
             metadata: {
                 content_date_range: { end_date },
             },
-        } = endDateJson.data
+        } = endDateJson.data;
         const dayRange = getDayRange({
             endDate: end_date,
             endDateAbsolute: end_date,
@@ -125,19 +125,19 @@ export const getDecodeParams = {
             startDate: '2022-08-01',
             startDateAbsolute: '2022-08-01',
             trimEndDate: 549,
-        })
-        return { ...dayRange, confirmedOnly: 0 }
+        });
+        return { ...dayRange, confirmedOnly: 0 };
     },
     'ff797c8d-0c1b-4df5-beb3-20a9b900716a': async () => {
         const endDateRes = await fetch(
             'https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest'
-        )
-        const endDateJson = await endDateRes.json()
+        );
+        const endDateJson = await endDateRes.json();
         const {
             metadata: {
                 content_date_range: { end_date },
             },
-        } = endDateJson.data
+        } = endDateJson.data;
         const dayRange = getDayRange({
             endDate: end_date,
             endDateAbsolute: end_date,
@@ -148,19 +148,19 @@ export const getDecodeParams = {
             startDate: '2022-08-01',
             startDateAbsolute: '2022-08-01',
             trimEndDate: 549,
-        })
-        return { ...dayRange, confirmedOnly: 0 }
+        });
+        return { ...dayRange, confirmedOnly: 0 };
     },
     'e969a15c-f06b-40f6-9a3e-f206277dc216': async () => {
         const endDateRes = await fetch(
             'https://data-api.globalforestwatch.org/dataset/umd_glad_landsat_alerts/latest'
-        )
-        const endDateJson = await endDateRes.json()
+        );
+        const endDateJson = await endDateRes.json();
         const {
             metadata: {
                 content_date_range: { end_date },
             },
-        } = endDateJson.data
+        } = endDateJson.data;
         const dayRange = getDayRange({
             endDate: end_date,
             endDateAbsolute: end_date,
@@ -171,19 +171,19 @@ export const getDecodeParams = {
             startDate: '2022-08-01',
             startDateAbsolute: '2022-08-01',
             trimEndDate: 549,
-        })
-        return { ...dayRange, confirmedOnly: 0 }
+        });
+        return { ...dayRange, confirmedOnly: 0 };
     },
     'cb184858-4501-4e18-bdf4-8fc4150b9f6e': async () => {
         const endDateRes = await fetch(
             'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
-        )
-        const endDateJson = await endDateRes.json()
+        );
+        const endDateJson = await endDateRes.json();
         const {
             metadata: {
                 content_date_range: { end_date },
             },
-        } = endDateJson.data
+        } = endDateJson.data;
         const dayRange = getDayRange({
             endDate: end_date,
             maxDate: end_date,
@@ -193,19 +193,19 @@ export const getDecodeParams = {
             startDate: '2022-08-01',
             startDateAbsolute: '2022-08-01',
             trimEndDate: 549,
-        })
-        return { ...dayRange, confirmedOnly: 0 }
+        });
+        return { ...dayRange, confirmedOnly: 0 };
     },
     'ff8e8721-c66e-42eb-9738-f1ba6990b8cc': async () => {
         const endDateRes = await fetch(
             'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
-        )
-        const endDateJson = await endDateRes.json()
+        );
+        const endDateJson = await endDateRes.json();
         const {
             metadata: {
                 content_date_range: { end_date },
             },
-        } = endDateJson.data
+        } = endDateJson.data;
         const dayRange = getDayRange({
             endDate: end_date,
             maxDate: end_date,
@@ -215,20 +215,20 @@ export const getDecodeParams = {
             startDate: '2022-08-01',
             startDateAbsolute: '2022-08-01',
             trimEndDate: 549,
-        })
-        console.log('day range', dayRange)
-        return { ...dayRange, confirmedOnly: 0 }
+        });
+        console.log('day range', dayRange);
+        return { ...dayRange, confirmedOnly: 0 };
     },
     '512d9984-2965-484a-b72c-de0f4d24237e': async () => {
         const endDateRes = await fetch(
             'https://data-api.globalforestwatch.org/dataset/wur_radd_alerts/latest'
-        )
-        const endDateJson = await endDateRes.json()
+        );
+        const endDateJson = await endDateRes.json();
         const {
             metadata: {
                 content_date_range: { end_date },
             },
-        } = endDateJson.data
+        } = endDateJson.data;
         const dayRange = getDayRange({
             endDate: end_date,
             endDateAbsolute: end_date,
@@ -240,19 +240,19 @@ export const getDecodeParams = {
             startDate: '2022-08-01',
             startDateAbsolute: '2022-08-01',
             trimEndDate: 549,
-        })
-        return { ...dayRange, confirmedOnly: 0 }
+        });
+        return { ...dayRange, confirmedOnly: 0 };
     },
     '5f6819a7-ad89-4c40-8715-9f859cb5e827': async () => {
         const endDateRes = await fetch(
             'https://data-api.globalforestwatch.org/dataset/wur_radd_alerts/latest'
-        )
-        const endDateJson = await endDateRes.json()
+        );
+        const endDateJson = await endDateRes.json();
         const {
             metadata: {
                 content_date_range: { end_date },
             },
-        } = endDateJson.data
+        } = endDateJson.data;
         const dayRange = getDayRange({
             endDate: end_date,
             endDateAbsolute: end_date,
@@ -264,10 +264,10 @@ export const getDecodeParams = {
             startDate: '2022-08-01',
             startDateAbsolute: '2022-08-01',
             trimEndDate: 549,
-        })
-        return { ...dayRange, confirmedOnly: 0 }
+        });
+        return { ...dayRange, confirmedOnly: 0 };
     },
-} as const
+} as const;
 
 export function createDeckLayer(
     layer: layerConfigSpec,
@@ -275,12 +275,12 @@ export function createDeckLayer(
     layerState?: LayerState
 ) {
     // @ts-ignore
-    let tileUrl = layer.source.tiles[0] ?? ''
+    let tileUrl = layer.source.tiles[0] ?? '';
     const threshold =
         layer.params_config &&
         (layer.params_config as unknown as Array<any>).find(
             (p) => p.key === 'threshold' || p.key === 'thresh'
-        )
+        );
     tileUrl = tileUrl
         .replace(
             '{thresh}',
@@ -293,7 +293,7 @@ export function createDeckLayer(
             layerState?.threshold
                 ? layerState?.threshold
                 : (threshold?.default ?? 30)
-        )
+        );
     let obj = {
         ...layer,
         source: {
@@ -303,7 +303,7 @@ export function createDeckLayer(
         visibility: true,
         decodeFunction: decodes[layer.decode_function as keyof typeof decodes],
         decodeParams: layer.decodeParams ?? {},
-    }
+    };
     if (layerState) {
         obj = {
             ...obj,
@@ -313,9 +313,9 @@ export function createDeckLayer(
                     ? layerState.visibility
                     : true
                 : false,
-        }
+        };
     }
-    return obj
+    return obj;
 }
 
 const decodes = {
@@ -1364,4 +1364,4 @@ const decodes = {
       alpha = 0.;
     }
   `,
-}
+};

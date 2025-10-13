@@ -170,4 +170,4 @@ export const temperature = {
     },
     applicationConfig: {},
     staticImageConfig: {},
-}
+};

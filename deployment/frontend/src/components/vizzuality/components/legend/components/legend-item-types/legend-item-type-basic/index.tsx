@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { type LegendTypeProps } from '../interfaces/legend-types'
-import LegendItem from './legend-item-type-basic-item'
+import { type LegendTypeProps } from '../interfaces/legend-types';
+import LegendItem from './legend-item-type-basic-item';
 
 export default function LegendTypeBasic(
     { activeLayer, mode }: Readonly<LegendTypeProps & { mode?: string }> = {
@@ -12,7 +12,7 @@ export default function LegendTypeBasic(
         },
     }
 ) {
-    const { legendConfig } = activeLayer
+    const { legendConfig } = activeLayer;
 
     return !legendConfig || legendConfig.type !== 'basic' ? null : (
         <div className="c-legend-type-basic">
@@ -36,5 +36,5 @@ export default function LegendTypeBasic(
                 ))}
             </ul>
         </div>
-    )
+    );
 }

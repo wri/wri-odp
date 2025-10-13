@@ -1,5 +1,5 @@
-import { Accordion } from '../Accordion'
-import { Tab } from '@headlessui/react'
+import { Accordion } from '../Accordion';
+import { Tab } from '@headlessui/react';
 import {
     ArrowUpTrayIcon,
     FolderPlusIcon,
@@ -9,56 +9,56 @@ import {
     PaperClipIcon,
     MinusCircleIcon,
     Squares2X2Icon,
-} from '@heroicons/react/24/outline'
-import classNames from '@/utils/classnames'
-import { LinkExternalForm } from './sections/LinkExternalForm'
-import { UploadForm } from './sections/UploadForm'
-import { Fragment, useMemo, useRef, useState } from 'react'
-import { type UseFormReturn, useFieldArray } from 'react-hook-form'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { DataFileAccordion } from './DatafileAccordion'
-import { P, match } from 'ts-pattern'
-import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
+} from '@heroicons/react/24/outline';
+import classNames from '@/utils/classnames';
+import { LinkExternalForm } from './sections/LinkExternalForm';
+import { UploadForm } from './sections/UploadForm';
+import { Fragment, useMemo, useRef, useState } from 'react';
+import { type UseFormReturn, useFieldArray } from 'react-hook-form';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { DataFileAccordion } from './DatafileAccordion';
+import { P, match } from 'ts-pattern';
+import { BuildALayer } from './sections/BuildALayer/BuildALayerSection';
 import {
     type DatasetFormType,
     type ResourceFormType,
-} from '@/schema/dataset.schema'
-import Uppy, { type UppyFile } from '@uppy/core'
-import AwsS3 from '@uppy/aws-s3'
-import { getUploadParameters } from '@/utils/uppyFunctions'
-import { v4 as uuidv4 } from 'uuid'
-import { convertBytes } from '@/utils/convertBytes'
-import { useDataDictionary } from '@/utils/getDataDictionary'
-import { type Field } from 'tableschema'
-import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
-import SortableList, { SortableItem } from 'react-easy-sort'
-import { TileCacheForm } from './sections/TileCacheForm'
-import { GeeAssetForm } from './sections/GeeAssetForm'
+} from '@/schema/dataset.schema';
+import Uppy, { type UppyFile } from '@uppy/core';
+import AwsS3 from '@uppy/aws-s3';
+import { getUploadParameters } from '@/utils/uppyFunctions';
+import { v4 as uuidv4 } from 'uuid';
+import { convertBytes } from '@/utils/convertBytes';
+import { useDataDictionary } from '@/utils/getDataDictionary';
+import { type Field } from 'tableschema';
+import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection';
+import SortableList, { SortableItem } from 'react-easy-sort';
+import { TileCacheForm } from './sections/TileCacheForm';
+import { GeeAssetForm } from './sections/GeeAssetForm';
 
 export function CreateDataFilesSection({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { control, watch } = formObj
+    const { control, watch } = formObj;
     const { fields, append, prepend, remove, swap, move, insert } =
         useFieldArray({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
-        })
+        });
 
     const datafiles = fields.filter(
         (r) =>
             r.type !== 'layer' &&
             r.type !== 'layer-raw' &&
             r.type !== 'empty-layer'
-    )
+    );
 
     return (
         <>
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
-                    swap(oldIdx, newIdx)
+                    swap(oldIdx, newIdx);
                 }}
                 className="list"
                 lockAxis="y"
@@ -76,7 +76,7 @@ export function CreateDataFilesSection({
                                 />
                             </div>
                         </SortableItem>
-                    )
+                    );
                 })}
             </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
@@ -101,7 +101,7 @@ export function CreateDataFilesSection({
                 </button>
             </div>
         </>
-    )
+    );
 }
 
 function AddDataFile({
@@ -110,14 +110,14 @@ function AddDataFile({
     index,
     formObj,
 }: {
-    remove: () => void
-    index: number
-    field: ResourceFormType
-    formObj: UseFormReturn<DatasetFormType>
+    remove: () => void;
+    index: number;
+    field: ResourceFormType;
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { setValue, watch } = formObj
-    const datafile = watch(`resources.${index}`)
-    const uploadInputRef = useRef<HTMLInputElement>(null)
+    const { setValue, watch } = formObj;
+    const datafile = watch(`resources.${index}`);
+    const uploadInputRef = useRef<HTMLInputElement>(null);
     const { isLoading: dataDictionaryLoading } = useDataDictionary(
         watch(`resources.${index}.fileBlob`),
         watch(`resources.${index}.resourceId`),
@@ -134,7 +134,7 @@ function AddDataFile({
                     year: 'numeric',
                     yearmonth: 'timestamp',
                     duration: 'numeric',
-                } as const
+                } as const;
                 const dataDictionary = data.map(
                     (item: Field, index: number) => ({
                         _id: index,
@@ -146,12 +146,12 @@ function AddDataFile({
                             default: '',
                         },
                     })
-                )
-                setValue(`resources.${index}.schema`, dataDictionary)
+                );
+                setValue(`resources.${index}.schema`, dataDictionary);
             }
         },
         watch(`resources.${index}.fileBlob`)?.type === 'text/csv'
-    )
+    );
 
     const uppy = useMemo(() => {
         const uppy = new Uppy({
@@ -170,67 +170,67 @@ function AddDataFile({
                           }`
                         : `ckan/resources/${datafile.resourceId}`
                 ),
-        })
-        return uppy
-    }, [])
+        });
+        return uppy;
+    }, []);
 
     function upload() {
         uppy.upload().then((result) => {
             if (result?.successful[0]) {
                 const paths = new URL(result.successful[0].uploadURL).pathname
                     .substring(1)
-                    .split('/')
-                const url = result.successful[0]?.uploadURL ?? null
-                const name = url ? url.split('/').pop() : ''
-                const format = result.successful[0].extension
-                const size = result.successful[0].size
-                const key = paths.slice(0, paths.length).join('/')
-                uppy.setState({ ...uppy.getState(), files: [] })
-                setValue(`resources.${index}.key`, key)
-                setValue(`resources.${index}.name`, name)
-                setValue(`resources.${index}.size`, size)
-                setValue(`resources.${index}.format`, format)
+                    .split('/');
+                const url = result.successful[0]?.uploadURL ?? null;
+                const name = url ? url.split('/').pop() : '';
+                const format = result.successful[0].extension;
+                const size = result.successful[0].size;
+                const key = paths.slice(0, paths.length).join('/');
+                uppy.setState({ ...uppy.getState(), files: [] });
+                setValue(`resources.${index}.key`, key);
+                setValue(`resources.${index}.name`, name);
+                setValue(`resources.${index}.size`, size);
+                setValue(`resources.${index}.format`, format);
                 if (uploadInputRef && uploadInputRef.current)
-                    uploadInputRef.current.value = ''
+                    uploadInputRef.current.value = '';
             }
 
             if (result.failed.length > 0) {
                 result.failed.forEach((file) => {
-                    console.error(file.error)
-                })
+                    console.error(file.error);
+                });
             }
-        })
+        });
     }
 
     uppy.on('progress', (progress) => {
         if (typeof window !== 'undefined') {
             const progressBar = document.getElementById(
                 `${datafile.resourceId}_upload_progress`
-            )
+            );
             if (progressBar) {
-                progressBar.textContent = progress + '%'
+                progressBar.textContent = progress + '%';
             }
         }
-    })
+    });
 
     uppy.on('upload', (_result) => {
-        setValue(`resources.${index}.type`, 'upload')
-    })
+        setValue(`resources.${index}.type`, 'upload');
+    });
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const files = e.target.files
-        if (!files?.[0]) return
-        const slice = files[0].slice(0, 1000000)
+        const files = e.target.files;
+        if (!files?.[0]) return;
+        const slice = files[0].slice(0, 1000000);
         const slicedFile = new File([slice], files[0].name, {
             type: files[0].type,
-        })
-        setValue(`resources.${index}.fileBlob`, slicedFile)
+        });
+        setValue(`resources.${index}.fileBlob`, slicedFile);
         uppy.addFile({
             name: files[0].name,
             type: files[0].type,
             data: files[0],
-        })
-        upload()
+        });
+        upload();
     }
 
     return (
@@ -359,15 +359,15 @@ function AddDataFile({
                                     setValue(
                                         `resources.${index}.type`,
                                         'tile-cache'
-                                    )
+                                    );
                                     setValue(
                                         `resources.${index}.asset_type`,
                                         null
-                                    )
+                                    );
                                     setValue(
                                         `resources.${index}.cache_type`,
                                         null
-                                    )
+                                    );
                                 }}
                             >
                                 {({ selected }) => (
@@ -398,15 +398,15 @@ function AddDataFile({
                                     setValue(
                                         `resources.${index}.type`,
                                         'gee-asset'
-                                    )
+                                    );
                                     setValue(
                                         `resources.${index}.cache_type`,
                                         null
-                                    )
+                                    );
                                     setValue(
                                         `resources.${index}.asset_type`,
                                         null
-                                    )
+                                    );
                                 }}
                             >
                                 {({ selected }) => (
@@ -473,5 +473,5 @@ function AddDataFile({
                 </div>
             </DataFileAccordion>
         </>
-    )
+    );
 }

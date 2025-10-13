@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { NodeType, closest } from '../utils'
+import { NodeType, closest } from '../utils';
 
 export default function defaultShouldCancelStart(event) {
     // Cancel sorting if the event target is an `input`, `textarea`, `select` or `option`
@@ -9,16 +9,16 @@ export default function defaultShouldCancelStart(event) {
         NodeType.Select,
         NodeType.Option,
         NodeType.Button,
-    ]
+    ];
 
     if (interactiveElements.includes(event.target.tagName)) {
         // Return true to cancel sorting
-        return true
+        return true;
     }
 
     if (closest(event.target, (el) => el.contentEditable === 'true')) {
-        return true
+        return true;
     }
 
-    return false
+    return false;
 }

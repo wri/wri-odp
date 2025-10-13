@@ -1,10 +1,10 @@
 // @ts-nocheck
-import { arrayMoveImmutable } from 'array-move'
-import classnames from 'classnames'
-import PropTypes from 'prop-types'
-import React, { PureComponent } from 'react'
+import { arrayMoveImmutable } from 'array-move';
+import classnames from 'classnames';
+import PropTypes from 'prop-types';
+import React, { PureComponent } from 'react';
 
-import LegendList from './components/legend-list'
+import LegendList from './components/legend-list';
 
 class Legend extends PureComponent {
     static propTypes = {
@@ -26,7 +26,7 @@ class Legend extends PureComponent {
         onChangeOrder: PropTypes.func,
         /** Children for render */
         children: PropTypes.node,
-    }
+    };
 
     static defaultProps = {
         title: 'Legend',
@@ -37,12 +37,12 @@ class Legend extends PureComponent {
         maxHeight: null,
         children: [],
         onChangeOrder: (ids) => console.info(ids),
-    }
+    };
 
     constructor(props) {
-        super(props)
-        const { expanded } = props
-        this.state = { expanded }
+        super(props);
+        const { expanded } = props;
+        this.state = { expanded };
     }
 
     /**
@@ -51,25 +51,25 @@ class Legend extends PureComponent {
      * onSortEnd
      */
     onToggleLegend = (bool) => {
-        this.setState({ expanded: bool })
-    }
+        this.setState({ expanded: bool });
+    };
 
     onSortEnd = ({ oldIndex, newIndex }) => {
-        const { onChangeOrder, children } = this.props
-        const layers = [...children.map((c) => c.props.layerGroup.dataset)]
-        const layersDatasets = arrayMoveImmutable(layers, oldIndex, newIndex)
+        const { onChangeOrder, children } = this.props;
+        const layers = [...children.map((c) => c.props.layerGroup.dataset)];
+        const layersDatasets = arrayMoveImmutable(layers, oldIndex, newIndex);
 
-        onChangeOrder(layersDatasets)
-    }
+        onChangeOrder(layersDatasets);
+    };
 
     render() {
         const { title, sortable, collapsable, maxWidth, maxHeight, children } =
-            this.props
+            this.props;
 
-        const { expanded } = this.state
+        const { expanded } = this.state;
 
         if (!children || !React.Children.count(children)) {
-            return null
+            return null;
         }
 
         return (
@@ -229,6 +229,6 @@ class Legend extends PureComponent {
                     </h1>
                 </button>
             </div>
-        )
+        );
     }
 }

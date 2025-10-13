@@ -1,19 +1,19 @@
-import { Hero } from '../home/Hero'
-import { HomeFooter } from '../home/HomeFooter'
-import Header from './Header'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import { NextSeo } from 'next-seo'
-import { env } from '@/env.mjs'
+import { Hero } from '../home/Hero';
+import { HomeFooter } from '../home/HomeFooter';
+import Header from './Header';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import { NextSeo } from 'next-seo';
+import { env } from '@/env.mjs';
 export default function MdxLayout({
     children,
     label,
     url,
     title,
 }: {
-    children: React.ReactNode
-    label: string
-    url: string
-    title: string
+    children: React.ReactNode;
+    label: string;
+    url: string;
+    title: string;
 }) {
     let links = [
         {
@@ -21,7 +21,7 @@ export default function MdxLayout({
             url: url,
             current: true,
         },
-    ]
+    ];
 
     if (label !== 'User Guide') {
         links = [
@@ -35,7 +35,7 @@ export default function MdxLayout({
                 url: url,
                 current: true,
             },
-        ]
+        ];
     }
 
     return (
@@ -71,5 +71,5 @@ export default function MdxLayout({
 
             <HomeFooter />
         </>
-    )
+    );
 }

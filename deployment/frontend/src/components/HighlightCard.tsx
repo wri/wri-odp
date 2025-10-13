@@ -1,15 +1,15 @@
-import React from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { type WriDatasetWithoutDetails } from '@/schema/ckan.schema'
-import MapViewIcon from './datasets/view-icons/MapViewIcon'
-import TabularViewIcon from './datasets/view-icons/TabularViewIcon'
-import ChartViewIcon from './datasets/view-icons/ChartViewIcon'
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { type WriDatasetWithoutDetails } from '@/schema/ckan.schema';
+import MapViewIcon from './datasets/view-icons/MapViewIcon';
+import TabularViewIcon from './datasets/view-icons/TabularViewIcon';
+import ChartViewIcon from './datasets/view-icons/ChartViewIcon';
 
 export default function HighlightCard({
     highlight,
 }: {
-    highlight: WriDatasetWithoutDetails
+    highlight: WriDatasetWithoutDetails;
 }) {
     return (
         <Link
@@ -64,5 +64,5 @@ export default function HighlightCard({
                 <TabularViewIcon dataset={highlight} />
             </div>
         </Link>
-    )
+    );
 }

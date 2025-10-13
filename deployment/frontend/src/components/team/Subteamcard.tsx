@@ -1,22 +1,22 @@
-import React from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
-import { visibilityTypeLabels } from '@/utils/constants'
-import Chip from '@/components/_shared/Chip'
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
+import { visibilityTypeLabels } from '@/utils/constants';
+import Chip from '@/components/_shared/Chip';
 
 interface SubtopicProps {
-    title: string
-    numOfDatasets: number
-    img: string
+    title: string;
+    numOfDatasets: number;
+    img: string;
 }
 
 export default function Subteamcard({
     team,
     teamsDetails,
 }: {
-    team: GroupTree
-    teamsDetails: Record<string, GroupsmDetails>
+    team: GroupTree;
+    teamsDetails: Record<string, GroupsmDetails>;
 }) {
     return (
         <Link
@@ -50,5 +50,5 @@ export default function Subteamcard({
                 {teamsDetails[team.id]?.package_count} Datasets
             </div>
         </Link>
-    )
+    );
 }

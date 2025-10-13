@@ -1,4 +1,4 @@
-import classNames from '@/utils/classnames'
+import classNames from '@/utils/classnames';
 
 export function InputGroup({
     label,
@@ -6,10 +6,10 @@ export function InputGroup({
     children,
     required = false,
 }: {
-    label: string
-    className?: string
-    children: React.ReactNode
-    required?: boolean
+    label: string;
+    className?: string;
+    children: React.ReactNode;
+    required?: boolean;
 }) {
     return (
         <div
@@ -23,5 +23,5 @@ export function InputGroup({
             </span>
             {children}
         </div>
-    )
+    );
 }

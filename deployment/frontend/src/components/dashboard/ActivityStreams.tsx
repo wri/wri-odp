@@ -1,26 +1,26 @@
-import React from 'react'
-import { ArrowRightIcon } from '@heroicons/react/24/outline'
-import ActivityStreamCard from '../_shared/ActivityStreamCard'
-import type { activity } from '../_shared/ActivityStreamCard'
-import { activity as activitydata } from '../_shared/ActivityStreamList'
-import { Squares2X2Icon } from '@heroicons/react/24/outline'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import Link from 'next/link'
+import React from 'react';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import ActivityStreamCard from '../_shared/ActivityStreamCard';
+import type { activity } from '../_shared/ActivityStreamCard';
+import { activity as activitydata } from '../_shared/ActivityStreamList';
+import { Squares2X2Icon } from '@heroicons/react/24/outline';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import Link from 'next/link';
 
 function ActivityStreamUser({ activity }: { activity: activity }) {
     return (
         <div className=" hover:bg-slate-100 mb-2 pb-2 pt-2 px-2 rounded-md">
             <ActivityStreamCard activity={activity} />
         </div>
-    )
+    );
 }
 export default function UserActivityStreams({ drag }: { drag: boolean }) {
     const { data, isLoading } =
         api.dashboardActivity.listActivityStreamDashboard.useQuery({
             search: '',
             page: { start: 0, rows: 6 },
-        })
+        });
 
     return (
         <section
@@ -55,9 +55,9 @@ export default function UserActivityStreams({ drag }: { drag: boolean }) {
                             key={index}
                             activity={items as activity}
                         />
-                    )
+                    );
                 })
             )}
         </section>
-    )
+    );
 }

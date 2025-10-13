@@ -1,12 +1,12 @@
-import { Fragment, useState } from 'react'
-import { Listbox, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import classNames from '@/utils/classnames'
-import type { SearchInput } from '@/schema/search.schema'
+import { Fragment, useState } from 'react';
+import { Listbox, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import classNames from '@/utils/classnames';
+import type { SearchInput } from '@/schema/search.schema';
 
 interface Option {
-    id: string
-    label: string
+    id: string;
+    label: string;
 }
 
 export default function SelectFilter({
@@ -16,11 +16,11 @@ export default function SelectFilter({
     filtername,
     reset,
 }: {
-    options: { id: string; label: string | undefined }[]
-    filtername: string
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
-    reset?: React.Dispatch<React.SetStateAction<SearchInput>>
+    options: { id: string; label: string | undefined }[];
+    filtername: string;
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
+    reset?: React.Dispatch<React.SetStateAction<SearchInput>>;
 }) {
     const [selected, setSelected] = useState(
         query.fq?.[filtername]
@@ -28,51 +28,51 @@ export default function SelectFilter({
             : options[0]
               ? options[0]
               : { id: '0', label: '' }
-    )
+    );
 
     const handleSelect = (option: Option) => {
-        setSelected(option)
+        setSelected(option);
         if (option.id === 'reset' && filtername == 'selectEntity') {
             const updateQuery: SearchInput = {
                 search: '',
                 page: { start: 0, rows: 1000 },
                 fq: {},
-            }
-            reset?.(updateQuery)
+            };
+            reset?.(updateQuery);
             setQuery((prev) => {
                 return {
                     ...prev,
                     search: 'None',
-                }
-            })
+                };
+            });
         } else if (filtername === 'selectEntity') {
             if (option.id === 'None') {
                 setQuery((prev) => {
                     return {
                         ...prev,
                         search: 'None',
-                    }
-                })
+                    };
+                });
             } else {
                 setQuery((prev) => {
                     return {
                         ...prev,
                         search: option.id,
-                    }
-                })
+                    };
+                });
             }
         } else {
-            let updateQuery: SearchInput
+            let updateQuery: SearchInput;
 
             if (['orgId', 'packageId', 'groupId'].includes(filtername)) {
-                const action = query.fq?.action
-                const timestamp = query.fq?.timestamp
-                const prev: Record<string, string> = {}
+                const action = query.fq?.action;
+                const timestamp = query.fq?.timestamp;
+                const prev: Record<string, string> = {};
                 if (action) {
-                    prev.action = action
+                    prev.action = action;
                 }
                 if (timestamp) {
-                    prev.timestamp = timestamp
+                    prev.timestamp = timestamp;
                 }
 
                 if (
@@ -82,7 +82,7 @@ export default function SelectFilter({
                     updateQuery = {
                         page: { ...query?.page, start: 0 },
                         search: query.search,
-                    }
+                    };
                 } else {
                     updateQuery = {
                         page: { ...query?.page, start: 0 },
@@ -91,7 +91,7 @@ export default function SelectFilter({
                             ...prev,
                             [filtername]: option.id,
                         },
-                    }
+                    };
                 }
             } else {
                 if (
@@ -101,7 +101,7 @@ export default function SelectFilter({
                     updateQuery = {
                         page: { ...query?.page, start: 0 },
                         search: query.search,
-                    }
+                    };
                 } else {
                     updateQuery = {
                         page: { ...query?.page, start: 0 },
@@ -110,13 +110,13 @@ export default function SelectFilter({
                             ...query.fq,
                             [filtername]: option.id,
                         },
-                    }
+                    };
                 }
             }
 
-            setQuery && setQuery(updateQuery)
+            setQuery && setQuery(updateQuery);
         }
-    }
+    };
 
     return (
         <Listbox value={selected} onChange={handleSelect}>
@@ -178,5 +178,5 @@ export default function SelectFilter({
                 </>
             )}
         </Listbox>
-    )
+    );
 }

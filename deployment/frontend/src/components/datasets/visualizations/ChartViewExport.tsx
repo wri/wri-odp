@@ -1,26 +1,26 @@
-import { useState } from 'react'
-import { DocumentDuplicateIcon } from '@heroicons/react/20/solid'
-import { useActiveCharts, useDataset } from '@/utils/storeHooks'
-import IconButton from '@/components/_shared/map/controls/IconButton'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { Button } from '@/components/_shared/Button'
-import dynamic from 'next/dynamic'
+import { useState } from 'react';
+import { DocumentDuplicateIcon } from '@heroicons/react/20/solid';
+import { useActiveCharts, useDataset } from '@/utils/storeHooks';
+import IconButton from '@/components/_shared/map/controls/IconButton';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { Button } from '@/components/_shared/Button';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { type View } from '@/interfaces/dataset.interface'
+});
+import { type View } from '@/interfaces/dataset.interface';
 
 export default function ChartViewExport() {
-    const { selectedChart } = useActiveCharts()
-    const { activeCharts } = useActiveCharts()
-    const { dataset } = useDataset()
-    const [open, setOpen] = useState(false)
-    const chartsId = activeCharts.map((df: View) => df.id).join(',')
+    const { selectedChart } = useActiveCharts();
+    const { activeCharts } = useActiveCharts();
+    const { dataset } = useDataset();
+    const [open, setOpen] = useState(false);
+    const chartsId = activeCharts.map((df: View) => df.id).join(',');
 
-    const embedUrl = `${window.location.origin}/datasets/${dataset.name}/embed/chart?chart_provider=${selectedChart?.config_obj?.config?.provider}&chart_id=${selectedChart?.id}`
+    const embedUrl = `${window.location.origin}/datasets/${dataset.name}/embed/chart?chart_provider=${selectedChart?.config_obj?.config?.provider}&chart_id=${selectedChart?.id}`;
 
-    const iFrameHtml = `<iframe src="${embedUrl}" width="1000" height="800" />`
+    const iFrameHtml = `<iframe src="${embedUrl}" width="1000" height="800" />`;
     return (
         <IconButton tooltip="Embed this view" onClick={() => setOpen(true)}>
             <ExportIcon />
@@ -49,7 +49,7 @@ export default function ChartViewExport() {
                                         onClick={() => {
                                             navigator.clipboard.writeText(
                                                 iFrameHtml
-                                            )
+                                            );
                                         }}
                                     >
                                         <DocumentDuplicateIcon className="w-5 text-white" />
@@ -61,7 +61,7 @@ export default function ChartViewExport() {
                 </div>
             </Modal>
         </IconButton>
-    )
+    );
 }
 
 function ExportIcon() {
@@ -81,5 +81,5 @@ function ExportIcon() {
                 strokeLinejoin="round"
             />
         </svg>
-    )
+    );
 }

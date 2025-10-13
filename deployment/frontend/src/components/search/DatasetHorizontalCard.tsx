@@ -1,49 +1,49 @@
-import { type WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema';
 import {
     ExclamationCircleIcon,
     ExclamationTriangleIcon,
     GlobeAltIcon,
     TableCellsIcon,
-} from '@heroicons/react/20/solid'
+} from '@heroicons/react/20/solid';
 import {
     ArrowPathIcon,
     ClockIcon,
     MapPinIcon,
     UserGroupIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 
-import { ChevronRightIcon } from '@heroicons/react/24/solid'
-import Link from 'next/link'
+import { ChevronRightIcon } from '@heroicons/react/24/solid';
+import Link from 'next/link';
 import {
     Tooltip,
     TooltipContent,
     TooltipPortal,
     TooltipProvider,
     TooltipTrigger,
-} from '../_shared/Tooltip'
-import Chip from '../_shared/Chip'
-import { useSession } from 'next-auth/react'
-import { visibilityTypeLabels } from '@/utils/constants'
-import { getFormatColor, formatColors } from '@/utils/formatColors'
-import TabularViewIcon from '../datasets/view-icons/TabularViewIcon'
-import MapViewIcon from '../datasets/view-icons/MapViewIcon'
-import ChartViewIcon from '../datasets/view-icons/ChartViewIcon'
+} from '../_shared/Tooltip';
+import Chip from '../_shared/Chip';
+import { useSession } from 'next-auth/react';
+import { visibilityTypeLabels } from '@/utils/constants';
+import { getFormatColor, formatColors } from '@/utils/formatColors';
+import TabularViewIcon from '../datasets/view-icons/TabularViewIcon';
+import MapViewIcon from '../datasets/view-icons/MapViewIcon';
+import ChartViewIcon from '../datasets/view-icons/ChartViewIcon';
 
 export default function DatasetHorizontalCard({
     dataset,
 }: {
-    dataset: WriDataset
+    dataset: WriDataset;
 }) {
-    const session = useSession()
+    const session = useSession();
 
     const formats = [
         ...new Set(dataset.resources.map((r) => r.format).filter((f) => f)),
-    ]
+    ];
 
-    const hasMapView = dataset?.resources?.some((r) => r.format == 'Layer')
+    const hasMapView = dataset?.resources?.some((r) => r.format == 'Layer');
 
     const hasTabularView =
-        dataset?.rw_id || dataset?.resources?.some((r) => r.datastore_active)
+        dataset?.rw_id || dataset?.resources?.some((r) => r.datastore_active);
 
     return (
         <Link href={`/datasets/${dataset.name}`}>
@@ -184,5 +184,5 @@ export default function DatasetHorizontalCard({
                 </div>
             </div>
         </Link>
-    )
+    );
 }

@@ -1,4 +1,4 @@
-import z from 'zod'
+import z from 'zod';
 
 export const CommentSchema = z.object({
     issue_number: z.number(),
@@ -8,7 +8,7 @@ export const CommentSchema = z.object({
     creator_id: z.string().nullable(),
     owner_org: z.string().nullable(),
     issuetitle: z.string(),
-})
+});
 
 export const IssueSchema = z.object({
     title: z.string().min(1, { message: 'Title is required' }),
@@ -16,7 +16,7 @@ export const IssueSchema = z.object({
     dataset_id: z.string(),
     creator_id: z.string().nullable(),
     owner_org: z.string().nullable(),
-})
+});
 
-export type CommentIssueType = z.infer<typeof CommentSchema>
-export type IssueSchemaType = z.infer<typeof IssueSchema>
+export type CommentIssueType = z.infer<typeof CommentSchema>;
+export type IssueSchemaType = z.infer<typeof IssueSchema>;

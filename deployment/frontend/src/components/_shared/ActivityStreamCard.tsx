@@ -1,6 +1,6 @@
-import React from 'react'
-import Image from 'next/image'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import React from 'react';
+import Image from 'next/image';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 import {
     TrashIcon,
@@ -9,13 +9,13 @@ import {
     UserGroupIcon,
     BuildingLibraryIcon,
     UserIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 
 export interface activity {
-    description: string
-    time: string
-    icon: string
-    actionType: string
+    description: string;
+    time: string;
+    icon: string;
+    actionType: string;
 }
 
 const IconB: Record<string, React.ReactNode> = {
@@ -37,18 +37,18 @@ const IconB: Record<string, React.ReactNode> = {
     new_user: <UserIcon className="w-4 h-4 text-green-500" />,
     deleted_user: <UserIcon className="w-4 h-4 text-red-500" />,
     changed_user: <UserIcon className="w-4 h-4 text-blue-500" />,
-}
+};
 
 export default function ActivityStreamCard({
     activity,
 }: {
-    activity: activity
+    activity: activity;
 }) {
     const iconMap: Record<string, string> = {
         changed: 'edit',
         new: 'add',
         deleted: 'update',
-    }
+    };
 
     return (
         <div className="w-full flex gap-x-3">
@@ -72,5 +72,5 @@ export default function ActivityStreamCard({
                 </span>
             </div>
         </div>
-    )
+    );
 }

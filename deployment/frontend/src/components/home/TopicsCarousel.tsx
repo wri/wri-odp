@@ -1,26 +1,26 @@
-import { Navigation } from 'swiper/modules'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-import CarouselNavButton from '../_shared/CarouselNavButton'
-import SubtopicCard from '../topics/SubtopicCard'
-import Image from 'next/image'
-import { AutoCarousel } from '../_shared/AutoCarousel'
-import Link from 'next/link'
-import { api } from '@/utils/api'
-import { ErrorAlert } from '../_shared/Alerts'
-import Spinner from '../_shared/Spinner'
-import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import CarouselNavButton from '../_shared/CarouselNavButton';
+import SubtopicCard from '../topics/SubtopicCard';
+import Image from 'next/image';
+import { AutoCarousel } from '../_shared/AutoCarousel';
+import Link from 'next/link';
+import { api } from '@/utils/api';
+import { ErrorAlert } from '../_shared/Alerts';
+import Spinner from '../_shared/Spinner';
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
 
 function TopicCard({
     topic,
     topicDetails,
 }: {
-    topic: GroupTree
-    topicDetails: Record<string, GroupsmDetails>
+    topic: GroupTree;
+    topicDetails: Record<string, GroupsmDetails>;
 }) {
-    const datasetCount = topicDetails[topic.id]?.package_count
+    const datasetCount = topicDetails[topic.id]?.package_count;
     return (
         <Link
             href={`/topics/${topic.name}`}
@@ -47,11 +47,11 @@ function TopicCard({
                     : `${datasetCount} Dataset`}
             </p>
         </Link>
-    )
+    );
 }
 
 export function TopicsCarousel() {
-    const { data, isLoading, error } = api.topics.getTopicsHomePage.useQuery()
+    const { data, isLoading, error } = api.topics.getTopicsHomePage.useQuery();
     return (
         <div className="relative">
             <div className="peer">
@@ -76,8 +76,8 @@ export function TopicsCarousel() {
                     {data?.topics
                         .filter((topic) => {
                             const datasetCount =
-                                data.topicDetails[topic.id]?.package_count ?? 0
-                            return datasetCount > 0
+                                data.topicDetails[topic.id]?.package_count ?? 0;
+                            return datasetCount > 0;
                         })
                         .map((topic, index) => (
                             <SwiperSlide key={index} className="">
@@ -92,7 +92,7 @@ export function TopicsCarousel() {
                 </AutoCarousel>
             </div>
         </div>
-    )
+    );
 }
 
 const PrevButton = () => (
@@ -101,7 +101,7 @@ const PrevButton = () => (
     >
         <CarouselNavButton orientation="left" />
     </div>
-)
+);
 
 const NextButton = () => (
     <div
@@ -109,4 +109,4 @@ const NextButton = () => (
     >
         <CarouselNavButton orientation="right" />
     </div>
-)
+);

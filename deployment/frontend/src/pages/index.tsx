@@ -1,31 +1,31 @@
-import { Button } from '@/components/_shared/Button'
-import { Hero } from '@/components/home/Hero'
-import { HighlightsCarousel } from '@/components/home/HighlightsCarousel'
-import { HomeFooter } from '@/components/home/HomeFooter'
-import { TopicsCarousel } from '@/components/home/TopicsCarousel'
-import Head from 'next/head'
-import { env } from '@/env.mjs'
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
-import { api } from '@/utils/api'
-import { useState } from 'react'
+import { Button } from '@/components/_shared/Button';
+import { Hero } from '@/components/home/Hero';
+import { HighlightsCarousel } from '@/components/home/HighlightsCarousel';
+import { HomeFooter } from '@/components/home/HomeFooter';
+import { TopicsCarousel } from '@/components/home/TopicsCarousel';
+import Head from 'next/head';
+import { env } from '@/env.mjs';
+import { NextSeo } from 'next-seo';
+import Link from 'next/link';
+import { api } from '@/utils/api';
+import { useState } from 'react';
 import {
     type GetServerSidePropsContext,
     type InferGetServerSidePropsType,
-} from 'next'
-import superjson from 'superjson'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import { appRouter } from '@/server/api/root'
-import { getServerAuthSession } from '@/server/auth'
-import dynamic from 'next/dynamic'
-import Spinner from '@/components/_shared/Spinner'
-import { Tab } from '@headlessui/react'
-import { Fragment } from 'react'
-import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/20/solid'
-import classNames from '@/utils/classnames'
-import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel'
-import { ArrowRightIcon } from '@heroicons/react/24/solid'
-import { type WriDataset } from '@/schema/ckan.schema'
+} from 'next';
+import superjson from 'superjson';
+import { createServerSideHelpers } from '@trpc/react-query/server';
+import { appRouter } from '@/server/api/root';
+import { getServerAuthSession } from '@/server/auth';
+import dynamic from 'next/dynamic';
+import Spinner from '@/components/_shared/Spinner';
+import { Tab } from '@headlessui/react';
+import { Fragment } from 'react';
+import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/20/solid';
+import classNames from '@/utils/classnames';
+import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel';
+import { ArrowRightIcon } from '@heroicons/react/24/solid';
+import { type WriDataset } from '@/schema/ckan.schema';
 
 const ErrorAlert = dynamic<{ text: string; title?: string }>(
     () =>
@@ -35,16 +35,16 @@ const ErrorAlert = dynamic<{ text: string; title?: string }>(
     {
         ssr: false,
     }
-)
-const Recent = dynamic(() => import('@/components/Recent'))
+);
+const Recent = dynamic(() => import('@/components/Recent'));
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
     const helpers = createServerSideHelpers({
         router: appRouter,
         ctx: { session, ip: undefined },
         transformer: superjson,
-    })
+    });
 
     await Promise.all([
         helpers.topics.getTopicsHomePage.prefetch(),
@@ -55,19 +55,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             _isUserSearch: false,
             removeUnecessaryDataInResources: true,
         }),
-    ])
+    ]);
 
     return {
         props: {
             trpcState: helpers.dehydrate(),
         },
-    }
+    };
 }
 
 export default function Home(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const [readmore, setReadmore] = useState(false)
+    const [readmore, setReadmore] = useState(false);
     const {
         data: recentlyAdded,
         isLoading: isLoadingRecentlyAdded,
@@ -77,7 +77,7 @@ export default function Home(
         page: { rows: 8, start: 0 },
         sortBy: 'metadata_created desc',
         removeUnecessaryDataInResources: true,
-    })
+    });
 
     const {
         data: recentlyUpdated,
@@ -88,19 +88,19 @@ export default function Home(
         page: { rows: 8, start: 0 },
         sortBy: 'metadata_modified desc',
         removeUnecessaryDataInResources: true,
-    })
+    });
     const {
         data: featuredDatasets,
         isLoading: isLoadingFeaturedDatasets,
         error: errorFeaturedDatasets,
     } = api.dataset.getFeaturedDatasets.useQuery({
         removeUnecessaryDataInResources: true,
-    })
+    });
     const {
         data: application,
         isLoading,
         error,
-    } = api.applications.getAllApplications.useQuery()
+    } = api.applications.getAllApplications.useQuery();
     return (
         <>
             <Head>
@@ -346,5 +346,5 @@ export default function Home(
             </main>
             <HomeFooter />
         </>
-    )
+    );
 }

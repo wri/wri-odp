@@ -1,24 +1,24 @@
-import { type WriDataset } from '@/schema/ckan.schema'
-import classNames from '@/utils/classnames'
-import Image from 'next/image'
+import { type WriDataset } from '@/schema/ckan.schema';
+import classNames from '@/utils/classnames';
+import Image from 'next/image';
 
 export function Contact({
     dataset,
     isCurrentVersion,
     diffFields,
 }: {
-    dataset: WriDataset
-    isCurrentVersion?: boolean
-    diffFields: string[]
+    dataset: WriDataset;
+    isCurrentVersion?: boolean;
+    diffFields: string[];
 }) {
     const highlighted = (field: string) => {
         if (diffFields && !isCurrentVersion) {
             if (diffFields.find((f) => f.includes(field))) {
-                return 'bg-yellow-200'
+                return 'bg-yellow-200';
             }
         }
-        return ''
-    }
+        return '';
+    };
     return (
         <div className="grid grid-cols-2 gap-4 min-h-[300px] items-start">
             <div>
@@ -52,15 +52,15 @@ export function Contact({
                 ))}
             </div>
         </div>
-    )
+    );
 }
 
 interface TeamMemberProps {
-    name: string
-    img: string
-    title: string
-    email: string
-    highlighted: (field: string) => string
+    name: string;
+    img: string;
+    title: string;
+    email: string;
+    highlighted: (field: string) => string;
 }
 
 function TeamMember({ name, img, title, email, highlighted }: TeamMemberProps) {
@@ -91,5 +91,5 @@ function TeamMember({ name, img, title, email, highlighted }: TeamMemberProps) {
                 </div>
             </div>
         </div>
-    )
+    );
 }

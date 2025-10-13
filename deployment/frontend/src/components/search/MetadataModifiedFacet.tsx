@@ -1,71 +1,71 @@
-import { type Filter } from '@/interfaces/search.interface'
-import { Disclosure, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
-import { Input } from '../_shared/SimpleInput'
-import notify from '@/utils/notify'
+import { type Filter } from '@/interfaces/search.interface';
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
+import { Input } from '../_shared/SimpleInput';
+import notify from '@/utils/notify';
 
 export default function MetadataModifiedFacet({
     setFilters,
     filters,
 }: {
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    filters: Filter[]
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    filters: Filter[];
 }) {
     const getUpdatedState = () => {
         const sinceValue =
             filters.find((f) => f?.key === 'metadata_modified_since')?.value ??
-            ''
+            '';
         const beforeValue =
             filters.find((f) => f?.key === 'metadata_modified_before')?.value ??
-            ''
+            '';
 
         return {
             metadata_modified_since: sinceValue,
             metadata_modified_before: beforeValue,
-        }
-    }
+        };
+    };
 
     const [optionsState, setOptionsState] = useState<{
-        metadata_modified_since?: string
-        metadata_modified_before?: string
-    }>(getUpdatedState())
+        metadata_modified_since?: string;
+        metadata_modified_before?: string;
+    }>(getUpdatedState());
 
     useEffect(() => {
-        setOptionsState(getUpdatedState())
-    }, [filters])
+        setOptionsState(getUpdatedState());
+    }, [filters]);
 
     const handleDateChange = (key: string, value: string) => {
-        setOptionsState((prev) => ({ ...prev, [key]: value }))
+        setOptionsState((prev) => ({ ...prev, [key]: value }));
 
         const newSince =
             key === 'metadata_modified_since'
                 ? value
-                : optionsState.metadata_modified_since
+                : optionsState.metadata_modified_since;
         const newBefore =
             key === 'metadata_modified_before'
                 ? value
-                : optionsState.metadata_modified_before
+                : optionsState.metadata_modified_before;
 
         if (newSince && newBefore && new Date(newSince) > new Date(newBefore)) {
             notify(
                 'Invalid date range: "Since" date must be before the "Before" date.',
                 'error'
-            )
-            setOptionsState((prev) => ({ ...prev, [key]: '' }))
-            return
+            );
+            setOptionsState((prev) => ({ ...prev, [key]: '' }));
+            return;
         }
 
         if (newSince && new Date(newSince) > new Date()) {
             notify(
                 'Invalid date range: "Since" date must be today or in the past.',
                 'error'
-            )
-            setOptionsState((prev) => ({ ...prev, [key]: '' }))
-            return
+            );
+            setOptionsState((prev) => ({ ...prev, [key]: '' }));
+            return;
         }
 
-        const newFilters = filters.filter((f) => f.key !== key)
+        const newFilters = filters.filter((f) => f.key !== key);
 
         if (value) {
             newFilters.push({
@@ -75,10 +75,10 @@ export default function MetadataModifiedFacet({
                     (key.endsWith('_since') ? 'After' : 'Before'),
                 value,
                 label: value,
-            })
+            });
         }
-        setFilters(newFilters)
-    }
+        setFilters(newFilters);
+    };
 
     return (
         <Disclosure
@@ -170,5 +170,5 @@ export default function MetadataModifiedFacet({
                 </>
             )}
         </Disclosure>
-    )
+    );
 }

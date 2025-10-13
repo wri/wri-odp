@@ -1,11 +1,11 @@
-import { ReactNode } from 'react'
+import { ReactNode } from 'react';
 
 export default function Chip({
     text,
     className = 'ml-2',
 }: {
-    text: string
-    className?: string
+    text: string;
+    className?: string;
 }) {
     return (
         <div>
@@ -15,5 +15,5 @@ export default function Chip({
                 {text}
             </span>
         </div>
-    )
+    );
 }

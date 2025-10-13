@@ -1,22 +1,22 @@
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-import { Swiper } from 'swiper/react'
-import { Navigation } from 'swiper/modules'
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Swiper } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
 
 type CarouselProps = {
-    children: React.ReactNode
-    identifier: string
-    breakpoints?: any
-}
+    children: React.ReactNode;
+    identifier: string;
+    breakpoints?: any;
+};
 
 export default function Carousel({
     children,
     identifier,
     breakpoints,
 }: CarouselProps) {
-    const prevEl = `.nav-prev-button${identifier ? '--' + identifier : ''}`
-    const nextEl = `.nav-next-button${identifier ? '--' + identifier : ''}`
+    const prevEl = `.nav-prev-button${identifier ? '--' + identifier : ''}`;
+    const nextEl = `.nav-next-button${identifier ? '--' + identifier : ''}`;
     // const [swiper, setSwiper] = useState<Swiper | null>(null);;
     return (
         <>
@@ -55,5 +55,5 @@ export default function Carousel({
                 {children}
             </Swiper>
         </>
-    )
+    );
 }

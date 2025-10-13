@@ -1,5 +1,5 @@
-import React from 'react'
-import ReactModal, { type Props } from 'react-modal'
+import React from 'react';
+import ReactModal, { type Props } from 'react-modal';
 
 // Modal setting.
 const modalStyles = {
@@ -18,16 +18,16 @@ const modalStyles = {
         border: '2px solid var(--color-gray-4)',
         borderRadius: '4px',
     },
-}
+};
 
-ReactModal.setAppElement('#__next')
+ReactModal.setAppElement('#__next');
 
 export function Modal(props: Props) {
-    const { style, ...rest } = props
+    const { style, ...rest } = props;
 
     return (
         <ReactModal style={{ ...modalStyles, ...style }} {...rest}>
             {props.children}
         </ReactModal>
-    )
+    );
 }

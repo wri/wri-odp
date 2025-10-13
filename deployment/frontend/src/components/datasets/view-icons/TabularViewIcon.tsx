@@ -1,14 +1,17 @@
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { WriDataset, type WriDatasetWithoutDetails } from '@/schema/ckan.schema'
-import { TableCellsIcon } from '@heroicons/react/20/solid'
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import {
+    WriDataset,
+    type WriDatasetWithoutDetails,
+} from '@/schema/ckan.schema';
+import { TableCellsIcon } from '@heroicons/react/20/solid';
 
 export default function TabularViewIcon({
     dataset,
 }: {
-    dataset: WriDatasetWithoutDetails
+    dataset: WriDatasetWithoutDetails;
 }) {
     const hasTabularView =
-        dataset?.rw_id || dataset?.resources?.some((r) => r.datastore_active)
+        dataset?.rw_id || dataset?.resources?.some((r) => r.datastore_active);
 
     return hasTabularView ? (
         <DefaultTooltip content="Tabular view">
@@ -16,5 +19,5 @@ export default function TabularViewIcon({
                 <TableCellsIcon className="h-5 w-5 text-green-600" />
             </div>
         </DefaultTooltip>
-    ) : null
+    ) : null;
 }

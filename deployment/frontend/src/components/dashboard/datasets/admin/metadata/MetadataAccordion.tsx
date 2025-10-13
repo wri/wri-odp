@@ -1,10 +1,10 @@
-import { Disclosure, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 interface MetadataAccordion {
-    label: React.ReactNode
-    children: React.ReactNode
-    defaultOpen?: boolean
+    label: React.ReactNode;
+    children: React.ReactNode;
+    defaultOpen?: boolean;
 }
 
 export function MetadataAccordion({
@@ -49,5 +49,5 @@ export function MetadataAccordion({
                 </>
             )}
         </Disclosure>
-    )
+    );
 }

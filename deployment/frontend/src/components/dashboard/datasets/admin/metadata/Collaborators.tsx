@@ -3,21 +3,21 @@ import {
     UseFormRegister,
     type UseFormReturn,
     useFieldArray,
-} from 'react-hook-form'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { type DatasetFormType } from '@/schema/dataset.schema'
-import { api } from '@/utils/api'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { MinusCircleIcon } from '@heroicons/react/24/outline'
-import { InputGroup } from './InputGroup'
-import { match, P } from 'ts-pattern'
-import Spinner from '@/components/_shared/Spinner'
-import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { capacityOptions } from '../formOptions'
-import { type WriDataset } from '@/schema/ckan.schema'
-import notify from '@/utils/notify'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
+} from 'react-hook-form';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { api } from '@/utils/api';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { MinusCircleIcon } from '@heroicons/react/24/outline';
+import { InputGroup } from './InputGroup';
+import { match, P } from 'ts-pattern';
+import Spinner from '@/components/_shared/Spinner';
+import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { capacityOptions } from '../formOptions';
+import { type WriDataset } from '@/schema/ckan.schema';
+import notify from '@/utils/notify';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 function Collabtooltip() {
     return (
@@ -33,22 +33,22 @@ function Collabtooltip() {
                 <b>Members</b> can view the Dataset.
             </p>
         </>
-    )
+    );
 }
 
 export function Collaborators({
     dataset,
     formObj,
 }: {
-    dataset: WriDataset
-    formObj: UseFormReturn<DatasetFormType>
+    dataset: WriDataset;
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { control, watch, register } = formObj
+    const { control, watch, register } = formObj;
     const { fields, append, prepend, remove, swap, move, insert } =
         useFieldArray({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'collaborators',
-        })
+        });
     return (
         <div className="mx-auto w-full max-w-[1380px] sm:px-6 xxl:px-0">
             <div className="w-full border-b border-blue-800 bg-white shadow">
@@ -103,7 +103,7 @@ export function Collaborators({
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 function CollaboratorForm({
@@ -112,22 +112,22 @@ function CollaboratorForm({
     remove,
     dataset,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    index: number
-    remove: UseFieldArrayRemove
-    dataset: WriDataset
+    formObj: UseFormReturn<DatasetFormType>;
+    index: number;
+    remove: UseFieldArrayRemove;
+    dataset: WriDataset;
 }) {
-    const { register, watch } = formObj
-    const allUsers = api.dataset.getPossibleCollaborators.useQuery()
+    const { register, watch } = formObj;
+    const allUsers = api.dataset.getPossibleCollaborators.useQuery();
     const removeCollaborator = api.dataset.removeCollaborator.useMutation({
         onSuccess: async () => {
-            notify(`Successfully removed the collaborator`, 'success')
-            remove(index)
+            notify(`Successfully removed the collaborator`, 'success');
+            remove(index);
         },
         onError: (error) => {
-            notify(`Couldnt remove collaborator: ${error.message}`, 'error')
+            notify(`Couldnt remove collaborator: ${error.message}`, 'error');
         },
-    })
+    });
     return (
         <div className="flex items-center gap-x-2">
             <div className="grid grow grid-cols-1 items-start gap-x-24 md:grid-cols-2">
@@ -190,5 +190,5 @@ function CollaboratorForm({
                 />
             </DefaultTooltip>
         </div>
-    )
+    );
 }

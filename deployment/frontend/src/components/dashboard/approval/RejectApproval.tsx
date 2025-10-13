@@ -1,26 +1,26 @@
-import { type WriDataset } from '@/schema/ckan.schema'
-import React, { useState } from 'react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import type { IssueSchemaType } from '@/schema/issue.schema'
-import { IssueSchema } from '@/schema/issue.schema'
-import { api } from '@/utils/api'
-import notify from '@/utils/notify'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { SimpleEditor } from '../../dashboard/datasets/admin/metadata/RTE/SimpleEditor'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, LoaderButton } from '@/components/_shared/Button'
+import { type WriDataset } from '@/schema/ckan.schema';
+import React, { useState } from 'react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import type { IssueSchemaType } from '@/schema/issue.schema';
+import { IssueSchema } from '@/schema/issue.schema';
+import { api } from '@/utils/api';
+import notify from '@/utils/notify';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { SimpleEditor } from '../../dashboard/datasets/admin/metadata/RTE/SimpleEditor';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, LoaderButton } from '@/components/_shared/Button';
 
 export default function RejectApproval({
     dataset,
     setRejectOpen,
 }: {
-    dataset: WriDataset
-    setRejectOpen: () => void
+    dataset: WriDataset;
+    setRejectOpen: () => void;
 }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const utils = api.useUtils()
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const utils = api.useUtils();
     const formObj = useForm<IssueSchemaType>({
         resolver: zodResolver(IssueSchema),
         mode: 'onBlur',
@@ -31,34 +31,37 @@ export default function RejectApproval({
             owner_org: dataset.owner_org ? dataset.owner_org : null,
             creator_id: dataset.creator_user_id,
         },
-    })
-    const { errors } = formObj.formState
+    });
+    const { errors } = formObj.formState;
 
     const createIssueApi = api.dataset.createIssue.useMutation({
         onSuccess: async (data) => {
             await utils.dataset.getDatasetIssues.invalidate({
                 id: dataset.name,
-            })
+            });
             await utils.dataset.getPendingDatasets.invalidate({
                 search: '',
                 page: { start: 0, rows: 100 },
                 sortBy: 'metadata_modified desc',
-            })
+            });
             await utils.dataset.getPendingDatasets.invalidate({
                 search: '',
                 page: { start: 0, rows: 10 },
                 sortBy: 'metadata_modified desc',
-            })
-            formObj.reset()
-            setRejectOpen()
-            notify(`Dataset ${dataset.title} is successfully rejected`, 'error')
+            });
+            formObj.reset();
+            setRejectOpen();
+            notify(
+                `Dataset ${dataset.title} is successfully rejected`,
+                'error'
+            );
         },
         onError: (error) => {
-            formObj.reset()
-            setErrorMessage(error.message)
-            setRejectOpen()
+            formObj.reset();
+            setErrorMessage(error.message);
+            setRejectOpen();
         },
-    })
+    });
 
     return (
         <div className="flex flex-col px-4">
@@ -67,7 +70,7 @@ export default function RejectApproval({
             </p>
             <form
                 onSubmit={formObj.handleSubmit((data) => {
-                    createIssueApi.mutate(data)
+                    createIssueApi.mutate(data);
                 })}
             >
                 <ErrorDisplay name="title" errors={errors} />
@@ -110,5 +113,5 @@ export default function RejectApproval({
                 )}
             </form>
         </div>
-    )
+    );
 }

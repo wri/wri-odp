@@ -1,13 +1,13 @@
-import React from 'react'
-import { ArrowPathIcon, StarIcon } from '@heroicons/react/24/outline'
-import Row from '../_shared/Row'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
-import type { WriDataset } from '@/schema/ckan.schema'
-import { formatDate } from '@/utils/general'
-import { useRouter } from 'next/router'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { visibilityTypeLabels } from '@/utils/constants'
-import Chip from '@/components/_shared/Chip'
+import React from 'react';
+import { ArrowPathIcon, StarIcon } from '@heroicons/react/24/outline';
+import Row from '../_shared/Row';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import type { WriDataset } from '@/schema/ckan.schema';
+import { formatDate } from '@/utils/general';
+import { useRouter } from 'next/router';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { visibilityTypeLabels } from '@/utils/constants';
+import Chip from '@/components/_shared/Chip';
 
 function subFields(dataset: WriDataset) {
     return [
@@ -36,11 +36,11 @@ function subFields(dataset: WriDataset) {
             description: dataset?.release_notes,
             isHtml: true,
         },
-    ]
+    ];
 }
 
 function ApprovalDatasetCardProfile({ dataset }: { dataset: WriDataset }) {
-    const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
+    const created = dataset?.metadata_modified ? dataset.metadata_modified : '';
 
     return (
         <div className="flex  py-3 rounded-md pl-4 sm:pl-14 gap-x-2">
@@ -67,11 +67,11 @@ function ApprovalDatasetCardProfile({ dataset }: { dataset: WriDataset }) {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
-    const created = dataset?.metadata_modified ? dataset.metadata_modified : ''
+    const created = dataset?.metadata_modified ? dataset.metadata_modified : '';
 
     return (
         <div className="flex  py-3 rounded-md pl-4 sm:pl-14 gap-x-2">
@@ -97,11 +97,11 @@ function DatasetCardProfile({ dataset }: { dataset: WriDataset }) {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 function SubCardProfile({ dataset }: { dataset: WriDataset }) {
-    const status = subFields(dataset)
+    const status = subFields(dataset);
     return (
         <div>
             <div className="ml-14  w-[90%] outline outline-1 outline-wri-gray"></div>
@@ -125,11 +125,11 @@ function SubCardProfile({ dataset }: { dataset: WriDataset }) {
                                 )}
                             </p>
                         </div>
-                    )
+                    );
                 })}
             </div>
         </div>
-    )
+    );
 }
 
 export default function DatasetRow({
@@ -138,12 +138,12 @@ export default function DatasetRow({
     handleOpenModal,
     authorized,
 }: {
-    className?: string
-    dataset: WriDataset
-    authorized?: boolean
-    handleOpenModal: (dataset: WriDataset) => void
+    className?: string;
+    dataset: WriDataset;
+    authorized?: boolean;
+    handleOpenModal: (dataset: WriDataset) => void;
 }) {
-    const router = useRouter()
+    const router = useRouter();
     return (
         <Row
             authorized={authorized}
@@ -159,7 +159,7 @@ export default function DatasetRow({
                         content: 'Edit Dataset',
                     },
                     onClick: () => {
-                        router.push(`/dashboard/datasets/${dataset.name}/edit`)
+                        router.push(`/dashboard/datasets/${dataset.name}/edit`);
                     },
                 },
                 {
@@ -180,7 +180,7 @@ export default function DatasetRow({
             rowSub={<SubCardProfile dataset={dataset} />}
             isDropDown
         />
-    )
+    );
 }
 
 export function ApprovalDatasetRow({
@@ -189,12 +189,12 @@ export function ApprovalDatasetRow({
     handleOpenModal,
     authorized,
 }: {
-    className?: string
-    dataset: WriDataset
-    authorized?: boolean
-    handleOpenModal: (dataset: WriDataset) => void
+    className?: string;
+    dataset: WriDataset;
+    authorized?: boolean;
+    handleOpenModal: (dataset: WriDataset) => void;
 }) {
-    const router = useRouter()
+    const router = useRouter();
     return (
         <Row
             authorized={authorized}
@@ -210,7 +210,7 @@ export function ApprovalDatasetRow({
                         content: 'Edit Dataset',
                     },
                     onClick: () => {
-                        router.push(`/dashboard/datasets/${dataset.name}/edit`)
+                        router.push(`/dashboard/datasets/${dataset.name}/edit`);
                     },
                 },
                 {
@@ -231,7 +231,7 @@ export function ApprovalDatasetRow({
             rowSub={<SubCardProfile dataset={dataset} />}
             isDropDown
         />
-    )
+    );
 }
 
 export function FavouriteRow({
@@ -239,9 +239,9 @@ export function FavouriteRow({
     dataset,
     handleOpenModal,
 }: {
-    className?: string
-    dataset: WriDataset
-    handleOpenModal: (dataset: WriDataset) => void
+    className?: string;
+    dataset: WriDataset;
+    handleOpenModal: (dataset: WriDataset) => void;
 }) {
     return (
         <Row
@@ -268,7 +268,7 @@ export function FavouriteRow({
             rowSub={<SubCardProfile dataset={dataset} />}
             isDropDown
         />
-    )
+    );
 }
 
 export function DraftRow({
@@ -276,11 +276,11 @@ export function DraftRow({
     dataset,
     handleOpenModal,
 }: {
-    className?: string
-    dataset: WriDataset
-    handleOpenModal: (dataset: WriDataset) => void
+    className?: string;
+    dataset: WriDataset;
+    handleOpenModal: (dataset: WriDataset) => void;
 }) {
-    const router = useRouter()
+    const router = useRouter();
     return (
         <Row
             authorized={true}
@@ -296,7 +296,7 @@ export function DraftRow({
                         content: 'Edit Dataset',
                     },
                     onClick: () => {
-                        router.push(`/dashboard/datasets/${dataset.name}/edit`)
+                        router.push(`/dashboard/datasets/${dataset.name}/edit`);
                     },
                 },
                 {
@@ -313,5 +313,5 @@ export function DraftRow({
             rowSub={<SubCardProfile dataset={dataset} />}
             isDropDown
         />
-    )
+    );
 }

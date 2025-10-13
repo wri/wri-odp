@@ -1,7 +1,7 @@
-import React from 'react'
-import ActivityStreamCard from './ActivityStreamCard'
-import Pagination from '@/components/_shared/Pagination'
-import type { activity as IActivity } from './ActivityStreamCard'
+import React from 'react';
+import ActivityStreamCard from './ActivityStreamCard';
+import Pagination from '@/components/_shared/Pagination';
+import type { activity as IActivity } from './ActivityStreamCard';
 
 export const activity: IActivity[] = [
     {
@@ -67,7 +67,7 @@ export const activity: IActivity[] = [
         icon: 'add',
         actionType: 'new_package',
     },
-]
+];
 export default function ActivityStreamList() {
     return (
         <section
@@ -79,5 +79,5 @@ export default function ActivityStreamList() {
             ))}
             <Pagination />
         </section>
-    )
+    );
 }

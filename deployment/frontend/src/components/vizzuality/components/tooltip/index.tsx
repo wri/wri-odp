@@ -1,6 +1,6 @@
 // @ts-nocheck
-import RCTooltip from 'rc-tooltip/lib'
-import { type TooltipProps } from 'rc-tooltip/lib/Tooltip'
+import RCTooltip from 'rc-tooltip/lib';
+import { type TooltipProps } from 'rc-tooltip/lib/Tooltip';
 
 export default function Tooltip(props: Readonly<TooltipProps>) {
     return (
@@ -12,5 +12,5 @@ export default function Tooltip(props: Readonly<TooltipProps>) {
         >
             {props.children}
         </RCTooltip>
-    )
+    );
 }

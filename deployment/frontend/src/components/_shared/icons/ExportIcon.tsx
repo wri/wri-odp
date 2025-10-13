@@ -15,5 +15,5 @@ export function ExportIcon() {
                 strokeLinejoin="round"
             />
         </svg>
-    )
+    );
 }

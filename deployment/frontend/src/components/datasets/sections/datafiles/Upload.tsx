@@ -1,7 +1,7 @@
-import { ArrowUpTrayIcon } from '@heroicons/react/24/outline'
+import { ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 
 export interface UploadProps {
-    text?: string
+    text?: string;
 }
 
 export default function UploadButton(props: UploadProps) {
@@ -14,5 +14,5 @@ export default function UploadButton(props: UploadProps) {
                 </div>
             </button>
         </>
-    )
+    );
 }

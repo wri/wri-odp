@@ -1,7 +1,7 @@
-import React from 'react'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
-import type { SearchInput } from '@/schema/search.schema'
-import Spinner from '@/components/_shared/Spinner'
+import React from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import type { SearchInput } from '@/schema/search.schema';
+import Spinner from '@/components/_shared/Spinner';
 
 export default function Pagination({
     setQuery,
@@ -9,10 +9,10 @@ export default function Pagination({
     isLoading,
     count,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
-    isLoading?: boolean
-    count?: number
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
+    isLoading?: boolean;
+    count?: number;
 }) {
     const handlePageChange = (page: number) => {
         if (setQuery && query && page >= 0 && page < count!) {
@@ -20,10 +20,10 @@ export default function Pagination({
                 ...query,
                 page: { ...query.page, start: page },
                 search: query.search,
-            }
-            setQuery(updateQuery)
+            };
+            setQuery(updateQuery);
         }
-    }
+    };
 
     return (
         <div className="flex font-acumin gap-x-2 items-center self-end">
@@ -52,5 +52,5 @@ export default function Pagination({
                 <ChevronRightIcon className="w-5 h-5 text-wri-black" />
             </button>
         </div>
-    )
+    );
 }

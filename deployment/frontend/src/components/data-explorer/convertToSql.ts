@@ -1,16 +1,16 @@
-import { type filterObj } from '@/components/data-explorer/search.schema'
-import type z from 'zod'
+import { type filterObj } from '@/components/data-explorer/search.schema';
+import type z from 'zod';
 
-type FilterObjType = z.infer<typeof filterObj>
+type FilterObjType = z.infer<typeof filterObj>;
 
 interface SortingObj {
-    id: string
-    desc: boolean
+    id: string;
+    desc: boolean;
 }
 
 interface FilterObj {
-    id: string
-    value: FilterObjType[]
+    id: string;
+    value: FilterObjType[];
 }
 
 export function convertToSql({
@@ -19,10 +19,10 @@ export function convertToSql({
     sorting,
     filters,
 }: {
-    tableName: string
-    columns: string[]
-    sorting: SortingObj[]
-    filters: FilterObj[]
+    tableName: string;
+    columns: string[];
+    sorting: SortingObj[];
+    filters: FilterObj[];
 }) {
     const sortSql =
         sorting.length > 0
@@ -30,7 +30,7 @@ export function convertToSql({
               sorting
                   .map((sort) => `"${sort.id}" ${sort.desc ? 'DESC' : 'ASC'}`)
                   .join(', ')
-            : ''
+            : '';
     const filtersSql =
         filters.length > 0
             ? 'WHERE ' +
@@ -48,6 +48,6 @@ export function convertToSql({
                               .join('')} )`
                   )
                   .join(' AND ')
-            : ''
-    return `SELECT * FROM "${tableName}" ${filtersSql} ${sortSql}`
+            : '';
+    return `SELECT * FROM "${tableName}" ${filtersSql} ${sortSql}`;
 }

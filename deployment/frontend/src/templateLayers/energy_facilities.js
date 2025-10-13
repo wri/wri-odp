@@ -193,4 +193,4 @@ export const energy_facilities = {
     staticImageConfig: {},
     createdAt: '2021-03-04T21:37:28.562Z',
     updatedAt: '2021-12-22T17:08:12.956Z',
-}
+};

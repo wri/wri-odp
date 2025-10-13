@@ -1,4 +1,4 @@
-import { Resource, type View } from '@/interfaces/dataset.interface'
+import { Resource, type View } from '@/interfaces/dataset.interface';
 import {
     type ActiveLayerGroup,
     type Basemap,
@@ -6,22 +6,22 @@ import {
     type LayerState,
     type State,
     type Bounds,
-} from '@/interfaces/state.interface'
-import { template } from 'lodash'
-import { useLayoutEffect } from 'react'
-import { type ViewState } from 'react-map-gl'
-import { create, type UseBoundStore } from 'zustand'
-import { createContext } from 'zustand-utils'
-import { combine } from 'zustand/middleware'
+} from '@/interfaces/state.interface';
+import { template } from 'lodash';
+import { useLayoutEffect } from 'react';
+import { type ViewState } from 'react-map-gl';
+import { create, type UseBoundStore } from 'zustand';
+import { createContext } from 'zustand-utils';
+import { combine } from 'zustand/middleware';
 
-let store: any
+let store: any;
 
-type InitialState = ReturnType<typeof getDefaultInitialState>
+type InitialState = ReturnType<typeof getDefaultInitialState>;
 type UseStoreState = typeof initializeStore extends (
     ...args: never
 ) => UseBoundStore<infer T>
     ? T
-    : never
+    : never;
 
 const getDefaultInitialState = () => {
     const initialState: State = {
@@ -64,13 +64,13 @@ const getDefaultInitialState = () => {
         },
         activeCharts: [],
         selectedChart: undefined,
-    }
-    return initialState
-}
+    };
+    return initialState;
+};
 
-const zustandContext = createContext<UseStoreState>()
-export const Provider = zustandContext.Provider
-export const useStore = zustandContext.useStore
+const zustandContext = createContext<UseStoreState>();
+export const Provider = zustandContext.Provider;
+export const useStore = zustandContext.useStore;
 
 export const initializeStore = (preloadedState: any = {}) => {
     return create(
@@ -89,127 +89,127 @@ export const initializeStore = (preloadedState: any = {}) => {
             },
             (set, get) => ({
                 setStoreDirtyFields: (storeDirtyFieldsFunc: () => string[]) => {
-                    const storeDirtyFields = storeDirtyFieldsFunc()
-                    const prev = get()
-                    set({ ...prev, storeDirtyFields })
+                    const storeDirtyFields = storeDirtyFieldsFunc();
+                    const prev = get();
+                    set({ ...prev, storeDirtyFields });
                 },
                 setVizIndex: (vizIndex: number) => {
-                    const prev = get()
-                    set({ ...prev, vizIndex })
+                    const prev = get();
+                    set({ ...prev, vizIndex });
                 },
                 setThreshold: (threshold: number) => {
-                    const prev = get()
-                    set({ ...prev, mapView: { ...prev.mapView, threshold } })
+                    const prev = get();
+                    set({ ...prev, mapView: { ...prev.mapView, threshold } });
                 },
                 setIsEmbedding: (isEmbedding: boolean) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         ...prev,
                         mapView: {
                             ...prev.mapView,
                             isEmbedding,
                         },
-                    })
+                    });
                 },
                 setIsAddingLayers: (isAddingLayers: boolean) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         mapView: {
                             ...prev.mapView,
                             isAddingLayers,
                         },
-                    })
+                    });
                 },
                 setViewState: (newViewState: ViewState) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         mapView: {
                             ...prev.mapView,
                             viewState: newViewState,
                         },
-                    })
+                    });
                 },
                 setBaseMap: (newBasemap: Basemap) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         mapView: {
                             ...prev.mapView,
                             basemap: newBasemap,
                         },
-                    })
+                    });
                 },
                 setBounds: (newBounds: Bounds) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         mapView: {
                             ...prev.mapView,
                             bounds: newBounds,
                         },
-                    })
+                    });
                 },
                 setLabels: (newLabels: Labels) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         mapView: {
                             ...prev.mapView,
                             labels: newLabels,
                         },
-                    })
+                    });
                 },
                 setBoundaries: (newBoundaries: boolean) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         mapView: {
                             ...prev.mapView,
                             boundaries: newBoundaries,
                         },
-                    })
+                    });
                 },
                 setIsDrawing: (newIsDrawing?: boolean) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         mapView: {
                             ...prev.mapView,
                             isDrawing: newIsDrawing,
                         },
-                    })
+                    });
                 },
                 replaceLayerGroups: (layerGroups: ActiveLayerGroup[]) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         mapView: {
                             ...prev.mapView,
                             activeLayerGroups: layerGroups,
                         },
-                    })
+                    });
                 },
                 updateLayerGroup: (
                     datasetId: string,
                     layers: ActiveLayerGroup
                 ) => {
-                    const activeLayerGroups = get().mapView.activeLayerGroups
+                    const activeLayerGroups = get().mapView.activeLayerGroups;
 
                     const layerGroupIndex = activeLayerGroups.findIndex(
                         (lg: any) => lg.datasetId == datasetId
-                    )
+                    );
 
                     if (layerGroupIndex != -1) {
                         // @ts-ignore
-                        activeLayerGroups[layerGroupIndex].layers = layers
+                        activeLayerGroups[layerGroupIndex].layers = layers;
                     }
 
-                    const prev = get()
+                    const prev = get();
                     set({
                         ...prev,
                         mapView: {
                             ...prev.mapView,
                             activeLayerGroups: activeLayerGroups,
                         },
-                    })
+                    });
                 },
                 addLayerGroup: (layerGroup: ActiveLayerGroup) => {
-                    const activeLayerGroups = get().mapView.activeLayerGroups
-                    const prev = get()
+                    const activeLayerGroups = get().mapView.activeLayerGroups;
+                    const prev = get();
                     set({
                         ...prev,
                         mapView: {
@@ -219,11 +219,11 @@ export const initializeStore = (preloadedState: any = {}) => {
                                 ...activeLayerGroups,
                             ],
                         },
-                    })
+                    });
                 },
                 removeLayerGroup: (layerGroup: ActiveLayerGroup) => {
-                    const activeLayerGroups = get().mapView.activeLayerGroups
-                    const prev = get()
+                    const activeLayerGroups = get().mapView.activeLayerGroups;
+                    const prev = get();
                     set({
                         ...prev,
                         mapView: {
@@ -234,31 +234,31 @@ export const initializeStore = (preloadedState: any = {}) => {
                                     JSON.stringify(layerGroup)
                             ),
                         },
-                    })
+                    });
                 },
                 toggleActiveLayerGroup: (
                     prevLayerGroups: ActiveLayerGroup[],
                     tempLayerAsLayerobj: Map<string, string>
                 ) => {
-                    let activeLayerGroups = get().mapView.activeLayerGroups
-                    const prev = get()
-                    let layerAsLayerObj = prev.layerAsLayerObj
+                    let activeLayerGroups = get().mapView.activeLayerGroups;
+                    const prev = get();
+                    let layerAsLayerObj = prev.layerAsLayerObj;
 
-                    const temp = structuredClone(activeLayerGroups)
-                    const temp2 = new Map<string, string>([...layerAsLayerObj])
-                    activeLayerGroups = structuredClone(prevLayerGroups)
-                    prevLayerGroups = structuredClone(temp)
-                    layerAsLayerObj = new Map(tempLayerAsLayerobj)
-                    tempLayerAsLayerobj = new Map([...temp2])
+                    const temp = structuredClone(activeLayerGroups);
+                    const temp2 = new Map<string, string>([...layerAsLayerObj]);
+                    activeLayerGroups = structuredClone(prevLayerGroups);
+                    prevLayerGroups = structuredClone(temp);
+                    layerAsLayerObj = new Map(tempLayerAsLayerobj);
+                    tempLayerAsLayerobj = new Map([...temp2]);
 
                     // switch prevRelatedDatasets and relatedDatasets
-                    let prevRelatedDatasets = prev.prevRelatedDatasets
-                    let relatedDatasets = prev.relatedDatasets
+                    let prevRelatedDatasets = prev.prevRelatedDatasets;
+                    let relatedDatasets = prev.relatedDatasets;
 
                     const tempRelatedDataset =
-                        structuredClone(prevRelatedDatasets)
-                    prevRelatedDatasets = structuredClone(relatedDatasets)
-                    relatedDatasets = structuredClone(tempRelatedDataset)
+                        structuredClone(prevRelatedDatasets);
+                    prevRelatedDatasets = structuredClone(relatedDatasets);
+                    relatedDatasets = structuredClone(tempRelatedDataset);
 
                     set({
                         ...prev,
@@ -271,30 +271,30 @@ export const initializeStore = (preloadedState: any = {}) => {
                             ...prev.mapView,
                             activeLayerGroups: activeLayerGroups,
                         },
-                    })
+                    });
                 },
                 removeLayerFromLayerGroup: (
                     layerId: string,
                     datasetId: string
                 ) => {
-                    const prev = get()
-                    const activeLayerGroups = get().mapView.activeLayerGroups
+                    const prev = get();
+                    const activeLayerGroups = get().mapView.activeLayerGroups;
                     let newActiveLayerGroups =
-                        structuredClone(activeLayerGroups)
+                        structuredClone(activeLayerGroups);
                     const layerGroup = newActiveLayerGroups.find(
                         (lg: ActiveLayerGroup) => lg.datasetId == datasetId
-                    )
+                    );
 
                     if (layerGroup) {
                         layerGroup.layers = layerGroup.layers.filter(
                             (l: string) => l != layerId
-                        )
+                        );
 
                         if (!layerGroup.layers?.length) {
                             newActiveLayerGroups = newActiveLayerGroups.filter(
                                 (lg: ActiveLayerGroup) =>
                                     lg.datasetId != datasetId
-                            )
+                            );
                         }
                     }
 
@@ -304,7 +304,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                             ...prev.mapView,
                             activeLayerGroups: newActiveLayerGroups || [],
                         },
-                    })
+                    });
                 },
                 addLayerToLayerGroup: (
                     layerId: string,
@@ -312,32 +312,32 @@ export const initializeStore = (preloadedState: any = {}) => {
                     layerSource?: string,
                     first?: boolean
                 ) => {
-                    const prev = get()
-                    const activeLayerGroups = get().mapView.activeLayerGroups
+                    const prev = get();
+                    const activeLayerGroups = get().mapView.activeLayerGroups;
                     const newActiveLayerGroups =
-                        structuredClone(activeLayerGroups)
-                    const initialrender = first || false
+                        structuredClone(activeLayerGroups);
+                    const initialrender = first || false;
                     const lg = newActiveLayerGroups.find(
                         (lg: any) => lg.datasetId == datasetId
-                    )
+                    );
 
                     if (lg) {
-                        lg.layers = [...(lg.layers || []), layerId]
+                        lg.layers = [...(lg.layers || []), layerId];
                     } else {
                         newActiveLayerGroups.push({
                             datasetId,
                             layers: [layerId],
-                        })
+                        });
                     }
                     //set default view state
-                    const currentLayers = get().mapView.layers
+                    const currentLayers = get().mapView.layers;
                     currentLayers.set(layerId, {
                         visibility: true,
                         active: true,
                         opacity: 1,
                         layerSource: layerSource ? layerSource : null,
                         zIndex: Object.keys(currentLayers).length + 11,
-                    })
+                    });
 
                     set({
                         ...prev,
@@ -346,35 +346,35 @@ export const initializeStore = (preloadedState: any = {}) => {
                             activeLayerGroups: newActiveLayerGroups || [],
                             initialrender: initialrender,
                         },
-                    })
+                    });
                 },
                 replaceLayersForLayerGroup: (
                     layerIds: string[],
                     datasetId: string
                 ) => {
-                    const prev = get()
-                    const activeLayerGroups = get().mapView.activeLayerGroups
+                    const prev = get();
+                    const activeLayerGroups = get().mapView.activeLayerGroups;
                     let newActiveLayerGroups =
-                        structuredClone(activeLayerGroups)
+                        structuredClone(activeLayerGroups);
 
                     const lg = newActiveLayerGroups.find(
                         (lg: any) => lg.datasetId == datasetId
-                    )
+                    );
 
                     if (lg && layerIds?.length) {
-                        lg.layers = layerIds
+                        lg.layers = layerIds;
                     } else if (layerIds?.length) {
                         newActiveLayerGroups.push({
                             datasetId,
                             layers: layerIds,
-                        })
+                        });
                     } else {
                         newActiveLayerGroups = newActiveLayerGroups.filter(
                             (lg: ActiveLayerGroup) => lg.datasetId != datasetId
-                        )
+                        );
                     }
                     //set default view state
-                    const currentLayers = get().mapView.layers
+                    const currentLayers = get().mapView.layers;
                     layerIds.forEach((_id: string, index: number) => {
                         currentLayers.set(_id, {
                             visibility: index === 0,
@@ -382,8 +382,8 @@ export const initializeStore = (preloadedState: any = {}) => {
                             opacity: 1,
                             zIndex:
                                 Object.keys(currentLayers).length + 11 + index,
-                        })
-                    })
+                        });
+                    });
 
                     set({
                         ...prev,
@@ -391,66 +391,66 @@ export const initializeStore = (preloadedState: any = {}) => {
                             ...prev.mapView,
                             activeLayerGroups: newActiveLayerGroups || [],
                         },
-                    })
+                    });
                 },
                 updateLayerState: (
                     layerId: string,
                     keyName: string,
                     newValue: number | boolean
                 ) => {
-                    const currentLayers = get().mapView.layers
+                    const currentLayers = get().mapView.layers;
                     if (!currentLayers.has(layerId))
-                        currentLayers.set(layerId, {})
-                    const currentLayer = currentLayers.get(layerId)
+                        currentLayers.set(layerId, {});
+                    const currentLayer = currentLayers.get(layerId);
                     currentLayers.set(layerId, {
                         ...currentLayer,
                         [keyName]: newValue,
-                    } as LayerState)
-                    const prev = get()
+                    } as LayerState);
+                    const prev = get();
                     set({
                         ...prev,
                         mapView: {
                             ...prev.mapView,
                             layers: currentLayers,
                         },
-                    })
+                    });
                 },
                 addCharts: (views: View[]) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         ...prev,
                         activeCharts: [...prev.activeCharts, ...views],
-                    })
+                    });
                 },
                 removeCharts: (chartIds: string[]) => {
-                    const prev = get()
+                    const prev = get();
                     set({
                         activeCharts: [
                             ...prev.activeCharts.filter(
                                 (c: View) => !chartIds.includes(c.id ?? '')
                             ),
                         ],
-                    })
+                    });
                 },
                 selectChart: (view: View | null) => {
                     set({
                         selectedChart: view,
-                    })
+                    });
                 },
             })
         )
-    )
-}
+    );
+};
 
 export const useCreateStore = (serverInitialState: Partial<InitialState>) => {
     // For SSR & SSG, always use a new store.
     if (typeof window === 'undefined') {
-        return () => initializeStore(serverInitialState)
+        return () => initializeStore(serverInitialState);
     }
 
-    const isReusingStore = Boolean(store)
+    const isReusingStore = Boolean(store);
     // For CSR, always re-use same store.
-    store = store ?? initializeStore(serverInitialState)
+    store = store ?? initializeStore(serverInitialState);
     // And if initialState changes, then merge states in the next render cycle.
     //
     // eslint complaining "React Hooks must be called in the exact same order in every component render"
@@ -469,9 +469,9 @@ export const useCreateStore = (serverInitialState: Partial<InitialState>) => {
                     ...serverInitialState,
                 },
                 true // replace states, rather than shallow merging
-            )
+            );
         }
-    })
+    });
 
-    return () => store
-}
+    return () => store;
+};

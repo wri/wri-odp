@@ -1,9 +1,9 @@
-import React from 'react'
-import { Tab } from '@headlessui/react'
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import TopicCard from './TopicCard'
-import { useSession } from 'next-auth/react'
+import React from 'react';
+import { Tab } from '@headlessui/react';
+import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import TopicCard from './TopicCard';
+import { useSession } from 'next-auth/react';
 
 const tabs = [
     {
@@ -11,10 +11,10 @@ const tabs = [
         content: <TopicCard />,
         title: 'All Topics',
     },
-]
+];
 
 export default function TopicList() {
-    const { data: session } = useSession()
+    const { data: session } = useSession();
 
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
@@ -62,5 +62,5 @@ export default function TopicList() {
                 </Tab.Panels>
             </Tab.Group>
         </section>
-    )
+    );
 }

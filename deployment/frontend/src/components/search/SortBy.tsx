@@ -1,29 +1,29 @@
-import { type Dispatch, type SetStateAction, useState } from 'react'
-import SimpleSelect from '../_shared/SimpleSelect'
-import { type SearchInput } from '@/schema/search.schema'
+import { type Dispatch, type SetStateAction, useState } from 'react';
+import SimpleSelect from '../_shared/SimpleSelect';
+import { type SearchInput } from '@/schema/search.schema';
 
 export default function SortBy({
     count,
     setQuery,
     query,
 }: {
-    count: number
-    setQuery: Dispatch<SetStateAction<SearchInput>>
-    query: SearchInput
+    count: number;
+    setQuery: Dispatch<SetStateAction<SearchInput>>;
+    query: SearchInput;
 }) {
-    const [initialQuery] = useState(query)
+    const [initialQuery] = useState(query);
 
-    type Option = { value: string; label: string; default?: boolean }
+    type Option = { value: string; label: string; default?: boolean };
 
     const showOptions: Option[] = [
         { value: '10', label: '10' },
         { value: '20', label: '20' },
         { value: '30', label: '30' },
-    ]
+    ];
 
     showOptions.forEach((o) => {
-        if (o.value == initialQuery.page.rows.toString()) o.default = true
-    })
+        if (o.value == initialQuery.page.rows.toString()) o.default = true;
+    });
 
     const sortByOptions: Option[] = [
         {
@@ -41,10 +41,10 @@ export default function SortBy({
             label: 'Featured',
         },
         { value: 'wri_data desc', label: 'WRI Data' },
-    ]
+    ];
     sortByOptions.forEach((o) => {
-        if (o.value == initialQuery.sortBy) o.default = true
-    })
+        if (o.value == initialQuery.sortBy) o.default = true;
+    });
 
     return (
         <div className="flex gap-y-2 lg:items-center items-start flex-col lg:flex-row justify-between mb-5 mt-6">
@@ -85,5 +85,5 @@ export default function SortBy({
                 </div>
             </div>
         </div>
-    )
+    );
 }
