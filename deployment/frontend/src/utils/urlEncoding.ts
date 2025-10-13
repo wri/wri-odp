@@ -1,4 +1,4 @@
-import { LayerState, Layers, type State } from '@/interfaces/state.interface';
+import { type State } from '@/interfaces/state.interface';
 
 export function decodeMapParam(map?: string): State['mapView'] | null {
     if (!map) return null;
