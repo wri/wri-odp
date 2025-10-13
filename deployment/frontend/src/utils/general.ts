@@ -59,7 +59,7 @@ export function getKeyValues<T, K extends keyof T>(
     const o: {
         id: string;
         label: string;
-    }[] = array.map((item, i) => ({
+    }[] = array.map((item) => ({
         id: item[index] as string,
         label: item[key] as string,
     }));
@@ -75,7 +75,7 @@ export function getKeyValues2<T, K extends keyof T>(
     const keyValueMap = new Map<string, string>();
     const result: { id: string; label: string }[] = [];
 
-    array.forEach((item, i) => {
+    array.forEach((item) => {
         const keyValue = item[key];
         if (!keyValueMap.has(keyValue as string)) {
             keyValueMap.set(keyValue as string, item[index] as string);

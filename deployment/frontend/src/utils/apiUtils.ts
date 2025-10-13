@@ -124,7 +124,6 @@ export async function searchHierarchy({
 export async function getGroups({
     apiKey,
     group_type = 'group',
-    isSysadmin,
 }: {
     apiKey: string;
     group_type?: string;
@@ -254,7 +253,6 @@ export async function getAllOrganizations({
 }
 
 export async function getUserGroups({
-    userId,
     apiKey,
 }: {
     userId: string;
@@ -402,7 +400,6 @@ export async function getAllDatasetFq({
 }
 
 export async function getUserOrganizations({
-    userId,
     apiKey,
 }: {
     userId: string;
@@ -580,7 +577,6 @@ export async function getOneDataset(
     session: Session | null,
     noLayer?: boolean
 ) {
-    const user = session?.user;
     const datasetRes = await fetch(
         `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
         {
@@ -663,7 +659,7 @@ export async function getOneDataset(
                             id: r.id,
                             session: session,
                         });
-                    } catch (e) {
+                    } catch {
                         _views = [];
                     }
                 }
@@ -744,7 +740,6 @@ export async function getOnePendingDataset(
     session: Session | null,
     noLayer?: boolean
 ) {
-    const user = session?.user;
     const response = await fetch(
         `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_name=${datasetName}`,
         {
@@ -1214,7 +1209,7 @@ export async function getDatasetDetails({
             throw Error(JSON.stringify(dataset.error));
         }
         return dataset.result;
-    } catch (e) {
+    } catch {
         return {
             id,
             name: id,
@@ -1630,62 +1625,10 @@ async function createNotification(
     }
 }
 
-async function getTeamDetails({
-    id,
-    session,
-}: {
-    id: string;
-    session: Session | null;
-}) {
-    const user = session?.user;
-    const teamRes = await fetch(
-        `${env.CKAN_URL}/api/action/organization_show?id=${id}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `${user?.apikey ?? ''}`,
-            },
-        }
-    );
-    const team: CkanResponse<Team> = await teamRes.json();
-    if (!team.success && team.error) {
-        if (team.error.message) throw Error(team.error.message);
-        throw Error(JSON.stringify(team.error));
-    }
-    return team.result;
-}
-
-async function getTopicDetails({
-    id,
-    session,
-}: {
-    id: string;
-    session: Session | null;
-}) {
-    const user = session?.user;
-    const topicRes = await fetch(
-        `${env.CKAN_URL}/api/action/group_show?id=${id}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `${user?.apikey ?? ''}`,
-            },
-        }
-    );
-    const topic: CkanResponse<Topic> = await topicRes.json();
-    if (!topic.success && topic.error) {
-        if (topic.error.message) throw Error(topic.error.message);
-        throw Error(JSON.stringify(topic.error));
-    }
-    return topic.result;
-}
-
 export async function getRecipient({
     owner_org,
-    session,
 }: {
     owner_org: string;
-    session: Session;
 }): Promise<WriUser[]> {
     try {
         const response = await fetch(
@@ -2107,33 +2050,6 @@ export async function sendGroupNotification({
         console.error(error);
         throw Error('Error in sending issue/comment notification');
     }
-}
-
-async function getPackageDiff({
-    id,
-    session,
-}: {
-    id: string;
-    session: Session | null;
-}) {
-    const user = session?.user;
-    const packageRes = await fetch(
-        `${env.CKAN_URL}/api/action/pending_diff_show?id=${id}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `${user?.apikey ?? ''}`,
-            },
-        }
-    );
-    const packageData = (await packageRes.json()) as CkanResponse<
-        Record<string, Record<string, never>>
-    >;
-    if (!packageData.success && packageData.error) {
-        if (packageData.error.message) throw Error(packageData.error.message);
-        throw Error(JSON.stringify(packageData.error));
-    }
-    return packageData.result;
 }
 
 export async function getDatasetViews({

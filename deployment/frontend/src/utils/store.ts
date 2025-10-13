@@ -1,4 +1,4 @@
-import { Resource, type View } from '@/interfaces/dataset.interface';
+import { type View } from '@/interfaces/dataset.interface';
 import {
     type ActiveLayerGroup,
     type Basemap,
@@ -7,7 +7,6 @@ import {
     type State,
     type Bounds,
 } from '@/interfaces/state.interface';
-import { template } from 'lodash';
 import { useLayoutEffect } from 'react';
 import { type ViewState } from 'react-map-gl';
 import { create, type UseBoundStore } from 'zustand';

@@ -22,28 +22,8 @@ import {
 import { env } from '@/env.mjs';
 import { useSession } from 'next-auth/react';
 import { type Session } from 'next-auth';
-import { convertFormToLayerObj } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects';
 import { type Resource } from '@/interfaces/dataset.interface';
 import { getDecodeParams } from './decodeFunctions';
-
-async function packageSearch() {
-    const ckan = new CKAN('https://ckan.x.demo.datopian.com');
-    return await ckan.packageSearch({
-        query: '',
-        offset: 0,
-        limit: 30,
-        groups: [],
-        orgs: [],
-        tags: [],
-    });
-}
-
-const useDatasetsQuery = () => {
-    return useQuery({
-        queryKey: ['datasets'],
-        queryFn: packageSearch,
-    });
-};
 
 async function getLayersFromRW(
     queryKey: any,

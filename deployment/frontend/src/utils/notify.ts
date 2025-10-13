@@ -1,4 +1,4 @@
-import { toast, type ToastContent, ToastOptions } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 export default function notify(
     text: any,
@@ -9,6 +9,7 @@ export default function notify(
      * can be set
      *
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const options = {};
 
     switch (severity) {
