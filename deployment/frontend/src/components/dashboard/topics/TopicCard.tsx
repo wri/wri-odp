@@ -369,10 +369,7 @@ export default function TopicCard() {
                                         <TopicProfile
                                             team={topic}
                                             topic2Image={
-                                                data?.topic2Image as Record<
-                                                    string,
-                                                    string
-                                                >
+                                                data?.topic2Image!
                                             }
                                         />
                                     }
@@ -416,10 +413,7 @@ export default function TopicCard() {
                                             teams={topic.children}
                                             highlighted={topic?.highlighted}
                                             topic2Image={
-                                                data?.topic2Image as Record<
-                                                    string,
-                                                    string
-                                                >
+                                                data?.topic2Image!
                                             }
                                         />
                                     }

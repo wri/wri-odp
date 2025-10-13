@@ -22,10 +22,10 @@ import {
 } from '@heroicons/react/24/outline'
 import { match, P } from 'ts-pattern'
 import { Button } from '@/components/_shared/Button'
-import { TopicHierarchy } from '@/interfaces/topic.interface'
+import { type TopicHierarchy } from '@/interfaces/topic.interface'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { Controller, UseFormReturn } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { Controller, type UseFormReturn } from 'react-hook-form'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 import { Group } from '@portaljs/ckan'
 
 export function TopicsSelect({

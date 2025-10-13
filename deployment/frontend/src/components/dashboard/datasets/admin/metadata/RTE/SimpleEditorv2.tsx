@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 // => Tiptap packages
-import { useEditor, EditorContent, Editor, BubbleMenu } from '@tiptap/react'
+import { useEditor, EditorContent, type Editor, BubbleMenu } from '@tiptap/react'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
@@ -17,10 +17,10 @@ import { LinkModal } from './LinkModal'
 import classNames from '@/utils/classnames'
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
-    UseFormReturn,
+    type FieldValues,
+    type Path,
+    type PathValue,
+    type UseFormReturn,
 } from 'react-hook-form'
 import { Button } from '@/components/_shared/Button'
 
@@ -98,7 +98,7 @@ function TipTapEditor({
             Strike,
             Code,
         ],
-    }) as Editor
+    })
 
     useEffect(() => {
         if (isSubmitting) {

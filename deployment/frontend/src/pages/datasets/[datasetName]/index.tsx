@@ -23,7 +23,7 @@ import {
 } from '@/utils/apiUtils'
 import { Tab } from '@headlessui/react'
 import { Index } from 'flexsearch'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
 import { useSession } from 'next-auth/react'
 import { NextSeo, DatasetJsonLd } from 'next-seo'
 import dynamic from 'next/dynamic'
@@ -31,10 +31,10 @@ import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { env } from '@/env.mjs'
 import SyncUrl from '@/components/_shared/map/SyncUrl'
-import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
+import { type TabularResource } from '@/components/datasets/visualizations/Visualizations'
 import { useIsAddingLayers } from '@/utils/storeHooks'
 import { decodeMapParam } from '@/utils/urlEncoding'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 
 import { matchesAnyPattern } from '@/utils/general'
 
@@ -88,7 +88,7 @@ export async function getServerSideProps(
     const { map } = query
     const mapState = decodeMapParam(map as string)
 
-    const datasetName = context.params?.datasetName as string
+    const datasetName = context.params?.datasetName!
     const session = await getServerAuthSession(context)
     if (!session) {
         try {
@@ -128,7 +128,7 @@ export async function getServerSideProps(
         }
     }
     try {
-        let [prevdataset, pendingDataset] = await Promise.all([
+        const [prevdataset, pendingDataset] = await Promise.all([
             getOneDataset(datasetName, session, true),
             getOnePendingDataset(datasetName, session, true),
         ])
@@ -141,7 +141,7 @@ export async function getServerSideProps(
         if (prevdataset.owner_org) {
             const orgdetails = await getRecipient({
                 owner_org: prevdataset.owner_org,
-                session: session!,
+                session: session,
             })
             userAuthorize = !!orgdetails?.find((x) => x.id === session?.user.id)
             approvalAuth = !!orgdetails
@@ -167,7 +167,7 @@ export async function getServerSideProps(
 
         let relatedDatasets: WriDataset[] = []
         if (dataset.groups?.length) {
-            let groupDatasets = await getAllDatasetFq({
+            const groupDatasets = await getAllDatasetFq({
                 apiKey: session?.user.apikey ?? '',
                 query: { search: '', page: { start: 0, rows: 50 } },
                 fq:
@@ -190,7 +190,7 @@ export async function getServerSideProps(
         let prevRelatedDatasets: WriDataset[] = []
         if (pendingExist) {
             if (prevdataset.groups?.length) {
-                let groupDatasets = await getAllDatasetFq({
+                const groupDatasets = await getAllDatasetFq({
                     apiKey: session?.user.apikey ?? '',
                     query: { search: '', page: { start: 0, rows: 50 } },
                     fq:
@@ -271,7 +271,7 @@ export default function DatasetPage(
     const [selectedIndex, setSelectedIndex] = useState(0)
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
         useActiveLayerGroups()
-    const datasetName = props.datasetName as string
+    const datasetName = props.datasetName!
     const datasetId = props.datasetId!
     const pendingExist = props.pendingExist!
     const datasetAuth = props.generalAuthorized!
@@ -369,8 +369,7 @@ export default function DatasetPage(
     }
 
     const openIssueLength =
-        issues.data &&
-        issues.data.filter((issue) => issue.status === 'open').length
+        issues.data?.filter((issue) => issue.status === 'open').length
             ? issues.data.filter((issue) => issue.status === 'open').length
             : undefined
 
@@ -383,7 +382,6 @@ export default function DatasetPage(
         session.data?.user.sysadmin === false
     ) {
         teamAuthorized = !!(
-            teamsDetails.data &&
             teamsDetails.data?.users?.find(
                 (user) =>
                     user.id === session.data?.user.id &&
@@ -551,7 +549,7 @@ export default function DatasetPage(
                 (d) => d.format === 'Layer' || d.rw_id
             )
             if (LayerResource) {
-                removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id!)
+                removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id)
                 setMapDisplayPreview(true)
                 addLayerToLayerGroup(
                     LayerResource.rw_id!,
@@ -567,10 +565,10 @@ export default function DatasetPage(
             } else if (dataset?.provider && dataset?.rw_id) {
                 setDisplayNoPreview(false)
                 setTabularResource({
-                    provider: dataset.provider as string,
+                    provider: dataset.provider,
                     datasetName: dataset.title ?? dataset.name,
-                    id: dataset.rw_id as string,
-                    name: dataset.name as string,
+                    id: dataset.rw_id,
+                    name: dataset.name,
                 })
                 customDataLayer({
                     event: 'table_view_event',
@@ -583,15 +581,15 @@ export default function DatasetPage(
                 setDisplayNoPreview(false)
                 setTabularResource({
                     provider: 'datastore',
-                    id: resource?.id as string,
+                    id: resource?.id!,
                     apiKey: apikey,
                     datasetName: dataset.title ?? dataset.name,
-                    name: resource?.title ?? (resource?.name as string),
+                    name: resource?.title ?? (resource?.name!),
                 })
                 customDataLayer({
                     event: 'table_view_event',
                     resource_name:
-                        resource?.title ?? (resource?.name as string),
+                        resource?.title ?? (resource?.name!),
                 })
             } else {
                 setTabularResource(null)
@@ -869,7 +867,7 @@ export default function DatasetPage(
 
 function canVisualizeDataset(dataset: WriDataset) {
     // If dataset or its resources are not available, it cannot be visualized
-    if (!dataset || !dataset.resources) {
+    if (!dataset?.resources) {
         return false
     }
 

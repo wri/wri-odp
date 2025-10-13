@@ -2,19 +2,19 @@ import { useMemo, useState } from 'react'
 import { ListOfFilters, Table, TopBar } from './Table'
 import {
     ColumnFilter,
-    ColumnFiltersState,
-    ColumnSort,
+    type ColumnFiltersState,
+    type ColumnSort,
     getCoreRowModel,
-    PaginationState,
-    Updater,
+    type PaginationState,
+    type Updater,
     useReactTable,
-    VisibilityState,
-    RowData,
+    type VisibilityState,
+    type RowData,
 } from '@tanstack/react-table'
 import { useFields, useNumberOfRows, useTableData } from './queryHooks'
 import Spinner from '../_shared/Spinner'
-import { TabularResource } from '../datasets/visualizations/Visualizations'
-import { FilterObjType } from './search.schema'
+import { type TabularResource } from '../datasets/visualizations/Visualizations'
+import { type FilterObjType } from './search.schema'
 import '@tanstack/react-table'
 import { DownloadButton } from './DownloadButton'
 import { convertToSql } from './convertToSql'

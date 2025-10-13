@@ -151,7 +151,7 @@ export default function Favourite({
                                 variant="destructive"
                                 onClick={() => {
                                     removeFromFavorites.mutate(
-                                        selectDataset?.id as string
+                                        selectDataset?.id
                                     )
                                 }}
                                 loading={removeFromFavorites.isLoading}

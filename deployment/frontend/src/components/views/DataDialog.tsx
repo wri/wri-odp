@@ -3,7 +3,7 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 })
 import { Dialog } from '@headlessui/react'
-import { Dispatch, SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction } from 'react'
 
 export default function DataDialog({
     isOpen,

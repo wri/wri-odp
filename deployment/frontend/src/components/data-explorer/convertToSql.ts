@@ -1,5 +1,5 @@
-import { filterObj } from '@/components/data-explorer/search.schema'
-import z from 'zod'
+import { type filterObj } from '@/components/data-explorer/search.schema'
+import type z from 'zod'
 
 type FilterObjType = z.infer<typeof filterObj>
 

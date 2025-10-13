@@ -1,4 +1,4 @@
-import { Dataset, Resource } from '@/interfaces/dataset.interface'
+import { type Dataset, type Resource } from '@/interfaces/dataset.interface'
 import type {
     Tag,
     Activity as CkanActivity,

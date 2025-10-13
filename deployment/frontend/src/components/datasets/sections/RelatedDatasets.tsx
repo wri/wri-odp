@@ -5,9 +5,9 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 })
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import Map from '@/components/_shared/map/Map'
-import { APILayerSpec } from '@/interfaces/layer.interface'
-import { ActiveLayerGroup } from '@/interfaces/state.interface'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type APILayerSpec } from '@/interfaces/layer.interface'
+import { type ActiveLayerGroup } from '@/interfaces/state.interface'
+import { type WriDataset } from '@/schema/ckan.schema'
 import classNames from '@/utils/classnames'
 import { getFormatColor } from '@/utils/formatColors'
 import { useActiveLayerGroups, useRelatedDatasets } from '@/utils/storeHooks'
@@ -65,7 +65,7 @@ export default function DatasetCard({ dataset }: { dataset: WriDataset }) {
     >(activeDataFilesIds || [])
 
     useEffect(() => {
-        let countdown = 10
+        const countdown = 10
         Promise.all(
             selectedDataFileIds.map(async (dfId) => {
                 const df = dataFiles.find((df) => df.id == dfId)

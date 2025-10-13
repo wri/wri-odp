@@ -9,18 +9,18 @@ import { useQuery } from 'react-query'
 import flatten from 'lodash/flatten'
 import compact from 'lodash/compact'
 import isEmpty from 'lodash/isEmpty'
-import { APILayerSpec } from '@/interfaces/layer.interface'
+import { type APILayerSpec } from '@/interfaces/layer.interface'
 import {
     useActiveLayerGroups,
     useLayerStates,
     useLayerAsLayerObj,
 } from './storeHooks'
-import { ActiveLayerGroup, LayerState } from '@/interfaces/state.interface'
+import { type ActiveLayerGroup, type LayerState } from '@/interfaces/state.interface'
 import { env } from '@/env.mjs'
 import { useSession } from 'next-auth/react'
 import { type Session } from 'next-auth'
 import { convertFormToLayerObj } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
-import { Resource } from '@/interfaces/dataset.interface'
+import { type Resource } from '@/interfaces/dataset.interface'
 import { getDecodeParams } from './decodeFunctions'
 
 async function packageSearch() {
@@ -50,7 +50,7 @@ async function getLayersFromRW(
 ) {
     const [, activeLayerGroups] = queryKey
     if (activeLayerGroups.length === 0) return []
-    let countdown = 10
+    const countdown = 10
     const apikey = session?.user?.apikey ?? ''
 
     return await Promise.all(
@@ -121,9 +121,7 @@ async function getLayersFromRW(
                             )
                             const responseData = await fieldsRes.json()
 
-                            const resourcePackage = responseData.result[
-                                'package_data'
-                            ]['resources'] as Resource[]
+                            const resourcePackage = responseData.result.package_data.resources as Resource[]
                             const layerdata = resourcePackage.filter(
                                 (l) => l.id === layer
                             )

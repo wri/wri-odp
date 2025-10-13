@@ -1,10 +1,10 @@
-import { UseFormReturn } from 'react-hook-form'
-import { ApplicationFormType } from '@/schema/application.schema'
+import { type UseFormReturn } from 'react-hook-form'
+import { type ApplicationFormType } from '@/schema/application.schema'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import { ImageUploader } from '../../_shared/ImageUploader'
-import { UploadResult } from '@uppy/core'
+import { type UploadResult } from '@uppy/core'
 import DefaultTooltip from '@/components/_shared/Tooltip'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 

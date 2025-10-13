@@ -7,7 +7,7 @@ import {
     EnvelopeIcon,
 } from '@heroicons/react/24/outline'
 import { Menu, Transition } from '@headlessui/react'
-import { NotificationType } from '@/schema/notification.schema'
+import { type NotificationType } from '@/schema/notification.schema'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'

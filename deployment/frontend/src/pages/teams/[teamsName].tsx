@@ -12,10 +12,10 @@ import SubTeams from '@/components/team/SubTeams'
 import DatasetTopic from '@/components/topics/DatasetTopic'
 import DatasetTeams from '@/components/team/DatasetTeams'
 import GroupBreadcrumb from '@/components/team/GroupBreadcrumb'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
 import { getOrganizationTreeDetails } from '@/utils/apiUtils'
 import { getServerAuthSession } from '@/server/auth'
-import { GroupsmDetails, GroupTree } from '@/schema/ckan.schema'
+import { type GroupsmDetails, type GroupTree } from '@/schema/ckan.schema'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
@@ -29,7 +29,7 @@ const links = [
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ teamsName: string }>
 ) {
-    const teamsName = context.params?.teamsName as string
+    const teamsName = context.params?.teamsName!
     const query = {
         search: teamsName,
         page: { start: 0, rows: 100 },
@@ -51,7 +51,7 @@ export async function getServerSideProps(
             throw new Error('Teams not found')
         }
 
-        const team = teams.teams[0] as GroupTree
+        const team = teams.teams[0]!
         const teamTitle = team.title ?? team.name
 
         await helpers.dataset.getAllDataset.prefetch({
@@ -92,8 +92,8 @@ export default function teams(
         teamsDetails: Record<string, GroupsmDetails>
         count: number
     }
-    const teamName = props.teamsName as string
-    const teamTitle = props.teamTitle as string
+    const teamName = props.teamsName!
+    const teamTitle = props.teamTitle!
 
     const links = [
         {
@@ -124,11 +124,11 @@ export default function teams(
 
             <TeamHeaderCard
                 teams={data?.teams}
-                teamsDetails={data?.teamsDetails!}
+                teamsDetails={data?.teamsDetails}
             />
-            <SubTeams teams={data?.teams} teamsDetails={data?.teamsDetails!} />
+            <SubTeams teams={data?.teams} teamsDetails={data?.teamsDetails} />
             <div className="mx-auto grid w-full max-w-[1380px] gap-y-4 px-4 mt-20 font-acumin sm:px-6 xxl:px-0">
-                <DatasetTeams teams={data?.teams!} key={router.asPath} />
+                <DatasetTeams teams={data?.teams} key={router.asPath} />
             </div>
 
             <Footer

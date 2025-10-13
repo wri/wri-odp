@@ -7,7 +7,7 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import DatasetApplication from '@/components/applications/DatasetApplication'
 import { getServerAuthSession } from '@/server/auth'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
@@ -23,7 +23,7 @@ export async function getServerSideProps(
         transformer: superjson,
     })
     try {
-        const applicationName = context.params?.applicationName as string
+        const applicationName = context.params?.applicationName!
         const [_datasets, _application] = await Promise.all([
             await helpers.dataset.getAllDataset.fetch({
                 search: '',
@@ -63,7 +63,7 @@ export default function ApplicationPage(
     })
     const router = useRouter()
 
-    const applicationName = props.applicationName as string
+    const applicationName = props.applicationName!
     const applicationTitle =
         application?.title ?? application?.name ?? 'Application'
 

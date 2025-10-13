@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { WriDatasetWithoutDetails } from '@/schema/ckan.schema'
+import { type WriDatasetWithoutDetails } from '@/schema/ckan.schema'
 import MapViewIcon from './datasets/view-icons/MapViewIcon'
 import TabularViewIcon from './datasets/view-icons/TabularViewIcon'
 import ChartViewIcon from './datasets/view-icons/ChartViewIcon'

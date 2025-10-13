@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import React, { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -7,7 +7,7 @@ import { SearchInput } from '@/schema/search.schema'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Filter } from '@/interfaces/search.interface'
+import { type Filter } from '@/interfaces/search.interface'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 
 export default function Search({

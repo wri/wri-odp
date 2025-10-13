@@ -1,4 +1,4 @@
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import React, { useState } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import type { IssueSchemaType } from '@/schema/issue.schema'

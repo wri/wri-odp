@@ -16,30 +16,30 @@ import type {
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
-import { Facets, FacetsCount, Filter } from '@/interfaces/search.interface'
+import { type Facets, type FacetsCount, type Filter } from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
-import { Session } from 'next-auth'
+import { type Session } from 'next-auth'
 import nodemailer from 'nodemailer'
 import { randomBytes } from 'crypto'
 import {
-    RwDatasetResp,
-    RwErrorResponse,
+    type RwDatasetResp,
+    type RwErrorResponse,
     isRwError,
 } from '@/interfaces/rw.interface'
-import Team from '@/interfaces/team.interface'
-import Topic from '@/interfaces/topic.interface'
+import type Team from '@/interfaces/team.interface'
+import type Topic from '@/interfaces/topic.interface'
 import type {
     NewNotificationInputType,
     NotificationType,
 } from '@/schema/notification.schema'
-import { Resource, View } from '@/interfaces/dataset.interface'
-import { CreateViewFormSchema, EditViewFormSchema } from '@/schema/view.schema'
+import { type Resource, type View } from '@/interfaces/dataset.interface'
+import { type CreateViewFormSchema, type EditViewFormSchema } from '@/schema/view.schema'
 import { getLayerRw } from '@/server/api/routers/dataset'
 import {
     convertLayerObjToForm,
     getRawObjFromApiSpec,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
-import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema'
 import { TRPCError } from '@trpc/server'
 import {
     editLayerRw,
@@ -539,17 +539,17 @@ export function activityDetails(activity: Activity): ActivityDisplay {
     let groupId = ''
     let packageGroup: string[] = []
     if (object === 'package') {
-        orgId = activity.data?.package?.owner_org as string
-        packageId = activity.object_id as string
+        orgId = activity.data?.package?.owner_org!
+        packageId = activity.object_id!
         //get all groups id
         const groups = activity.data?.package?.groups as { id: string }[]
         packageGroup = groups.map((group) => group.id)
     } else if (object === 'team') {
-        orgId = activity.object_id as string
+        orgId = activity.object_id!
     } else if (object === 'topic') {
-        groupId = activity.object_id as string
+        groupId = activity.object_id!
     } else if (object === 'application') {
-        groupId = activity.object_id as string
+        groupId = activity.object_id!
     }
     return {
         description,
@@ -1037,7 +1037,7 @@ export async function getOrganizationTreeDetails({
     }
     const allGroups = (await getAllOrganizations({
         apiKey: session?.user.apikey ?? '',
-    }))!
+    }))
 
     const teamDetails = allGroups.reduce(
         (acc, org) => {
@@ -1046,7 +1046,7 @@ export async function getOrganizationTreeDetails({
                 description: org.description ?? '',
                 package_count: org.package_count!,
                 name: org.name,
-                visibility: org.visibility!,
+                visibility: org.visibility,
             }
             return acc
         },
@@ -1223,7 +1223,7 @@ function cryptoRandomFloat(): number {
 export async function getRandomUsernameFromEmail(
     email: string
 ): Promise<string> {
-    const localpart = email.split('@')[0] as string
+    const localpart = email.split('@')[0]!
     const cleanedLocalpart = localpart.replace(/[^\w]/g, '-').toLowerCase()
 
     const maxNameCreationAttempts = 100
@@ -1522,7 +1522,7 @@ async function sendNotification(
             userId: user.name,
             apiKey: env.SYS_ADMIN_API_KEY,
         })
-        if (userObj && userObj.id !== undefined) {
+        if (userObj?.id !== undefined) {
             const notification = await createNotification(
                 userObj.id,
                 currentUserId,
@@ -1834,7 +1834,7 @@ export async function getResourceViews({
     } as any
 
     if (session) {
-        headers['Authorization'] = session.user.apikey
+        headers.Authorization = session.user.apikey
     }
 
     const url = `${env.CKAN_URL}/api/action/resource_view_list?id=${id}`
@@ -1862,7 +1862,7 @@ export async function getResourceView({
     } as any
 
     if (session) {
-        headers['Authorization'] = session.user.apikey
+        headers.Authorization = session.user.apikey
     }
 
     const viewsRes = await fetch(
@@ -1891,7 +1891,7 @@ export async function createResourceView({
     } as any
 
     if (session) {
-        headers['Authorization'] = session.user.apikey
+        headers.Authorization = session.user.apikey
     }
 
     const viewsRes = await fetch(
@@ -1924,7 +1924,7 @@ export async function updateResourceView({
     } as any
 
     if (session) {
-        headers['Authorization'] = session.user.apikey
+        headers.Authorization = session.user.apikey
     }
 
     const viewsRes = await fetch(
@@ -1957,7 +1957,7 @@ export async function deleteResourceView({
     } as any
 
     if (session) {
-        headers['Authorization'] = session.user.apikey
+        headers.Authorization = session.user.apikey
     }
 
     const viewsRes = await fetch(
@@ -2701,7 +2701,7 @@ export async function generateDataSiteMap() {
         apiKey: '',
         fq: `is_approved:true`,
         query: { search: '', page: { start: 0, rows: 100000 } },
-    }))!
+    }))
 
     const getAllOrg = await getAllOrganizations({ apiKey: '' })
     const orgs = getAllOrg.map((org) => {
@@ -2758,7 +2758,7 @@ export function advance_search_query(filters: Filter[]) {
         let keyFq
 
         const keyFilters = filters.filter((f) => f.key == key)
-        if ((key as string) == 'temporal_coverage_start') {
+        if ((key) == 'temporal_coverage_start') {
             if (keyFilters.length > 0) {
                 const temporalCoverageStart = keyFilters[0]
                 const temporalCoverageEnd = filters.find(
@@ -2771,7 +2771,7 @@ export function advance_search_query(filters: Filter[]) {
                     keyFq = `[* TO ${temporalCoverageEnd}]`
                 }
             }
-        } else if ((key as string) == 'temporal_coverage_end') {
+        } else if ((key) == 'temporal_coverage_end') {
             if (keyFilters.length > 0) {
                 const temporalCoverageEnd = keyFilters[0]
                 const temporalCoverageStart = filters.find(
@@ -2802,7 +2802,7 @@ export function advance_search_query(filters: Filter[]) {
                 ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                 : '*'
 
-            fq['metadata_modified'] =
+            fq.metadata_modified =
                 `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
         } else if (key == 'spatial') {
             const coordinates = keyFilters[0]?.value
@@ -2815,7 +2815,7 @@ export function advance_search_query(filters: Filter[]) {
             keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
         }
 
-        if (keyFq) fq[key as string] = keyFq
+        if (keyFq) fq[key] = keyFq
     })
 
     delete fq.metadata_modified_since

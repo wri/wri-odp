@@ -1,7 +1,7 @@
 import { env } from '@/env.mjs'
 import { createTRPCRouter, protectedProcedure } from '../trpc'
 import { z } from 'zod'
-import { CkanResponse } from '@/schema/ckan.schema'
+import { type CkanResponse } from '@/schema/ckan.schema'
 
 export interface Log {
     id: string

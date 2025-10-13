@@ -1,4 +1,4 @@
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import classNames from '@/utils/classnames'
 import Image from 'next/image'
 

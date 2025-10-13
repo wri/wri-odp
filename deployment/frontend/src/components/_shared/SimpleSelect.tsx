@@ -4,10 +4,10 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames'
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
-    UseFormReturn,
+    type FieldValues,
+    type Path,
+    type PathValue,
+    type UseFormReturn,
     useForm,
 } from 'react-hook-form'
 
@@ -18,7 +18,7 @@ export interface Option<V> {
     disbaled?: boolean
 }
 
-interface SimpleSelectProps<T extends FieldValues, V extends Object> {
+interface SimpleSelectProps<T extends FieldValues, V extends object> {
     options: PathValue<T, Path<T> & Option<V>>[]
     placeholder?: string
     className?: string
@@ -28,7 +28,7 @@ interface SimpleSelectProps<T extends FieldValues, V extends Object> {
     id?: string
 }
 
-export default function SimpleSelect<T extends FieldValues, V extends Object>({
+export default function SimpleSelect<T extends FieldValues, V extends object>({
     options,
     placeholder,
     className,

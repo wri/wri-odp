@@ -6,8 +6,8 @@ import { NotificationInput } from '@/schema/notification.schema'
 import type { NotificationType } from '@/schema/notification.schema'
 import { timeAgo } from '@/utils/apiUtils'
 import { replaceNames } from '@/utils/replaceNames'
-import Team from '@/interfaces/team.interface'
-import Topic from '@/interfaces/topic.interface'
+import type Team from '@/interfaces/team.interface'
+import type Topic from '@/interfaces/topic.interface'
 import { z } from 'zod'
 
 export const notificationRouter = createTRPCRouter({
@@ -35,7 +35,7 @@ export const notificationRouter = createTRPCRouter({
                 }
             }
 
-            let activities: NotificationType[] = []
+            const activities: NotificationType[] = []
 
             // Used to fix object capitalization
             const titleCase = (str: string) =>
@@ -47,7 +47,7 @@ export const notificationRouter = createTRPCRouter({
             for (const notification of data.result) {
                 if (notification.state === 'deleted') continue
 
-                let user_data = notification.sender_obj!
+                const user_data = notification.sender_obj!
 
                 let objectName = ''
                 let objectIdName = ''

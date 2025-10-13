@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard'
 import { api } from '@/utils/api'
 import Spinner from '../_shared/Spinner'
-import { Application } from '@/schema/ckan.schema'
+import { type Application } from '@/schema/ckan.schema'
 import Pagination from '@/components/datasets/Pagination'
 import type { SearchInput } from '@/schema/search.schema'
 

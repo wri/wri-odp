@@ -1,7 +1,7 @@
 import React from 'react'
 import DatasetHorizontalCard from '../search/DatasetHorizontalCard'
 import Pagination from '@/components/_shared/Pagination'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 
 export default function DatasetList({ datasets }: { datasets: WriDataset[] }) {
     return (

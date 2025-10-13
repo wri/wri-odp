@@ -125,8 +125,8 @@ const CopyButton = ({ content }: { content: string }) => {
 
 export const getJsSnippet = (
     url: string,
-    method: string = 'GET',
-    body: string = '',
+    method = 'GET',
+    body = '',
     gfw?: boolean
 ) => {
     return `const response = await fetch(
@@ -150,8 +150,8 @@ console.log(data);
 
 export const getPythonSnippet = (
     url: string,
-    method: string = 'GET',
-    body: string = '',
+    method = 'GET',
+    body = '',
     gfw?: boolean
 ) => {
     return `import requests
@@ -176,8 +176,8 @@ print(data)
 
 export const getRSnippet = (
     url: string,
-    method: string = 'GET',
-    body: string = '',
+    method = 'GET',
+    body = '',
     gfw?: boolean
 ) => {
     return `library(httr)

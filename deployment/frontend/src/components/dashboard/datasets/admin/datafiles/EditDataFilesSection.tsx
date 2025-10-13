@@ -1,11 +1,11 @@
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
+import { type UseFormReturn, useFieldArray } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { AddDataFile } from './AddDataFile'
 import { EditDataFile } from './EditDataFile'
 import { api } from '@/utils/api'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import SortableList, { SortableItem } from 'react-easy-sort'
 
 export function EditDataFilesSection({

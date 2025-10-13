@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { LegendTypeProps } from '../interfaces/legend-types'
+import { type LegendTypeProps } from '../interfaces/legend-types'
 
 export default function LegendTypeChoropleth(
     { activeLayer }: Readonly<LegendTypeProps> = {

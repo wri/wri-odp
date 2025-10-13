@@ -1,5 +1,5 @@
 import { useFormContext } from 'react-hook-form'
-import { LayerFormType } from './layer.schema'
+import { type LayerFormType } from './layer.schema'
 import classNames from '@/utils/classnames'
 
 export function Steps({ state }: { state: string }) {

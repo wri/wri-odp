@@ -1,17 +1,17 @@
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/20/solid'
 import DatasetCard from '../sections/RelatedDatasets'
 import Select from '@/components/_shared/Select'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Filter } from '@/interfaces/search.interface'
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
+import { type Filter } from '@/interfaces/search.interface'
 import { useRouter } from 'next/router'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import FiltersSelected from '@/components/search/FiltersSelected'
 import { Pagination } from 'swiper/modules'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { SearchInput } from '@/schema/search.schema'
+import { type SearchInput } from '@/schema/search.schema'
 
 export default function SearchPanel({
     filters,

@@ -4,12 +4,12 @@ import { Input } from '@/components/_shared/SimpleInput'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { MetadataAccordion } from './MetadataAccordion'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 import {
-    FieldErrors,
-    UseFieldArrayRemove,
-    UseFormRegister,
-    UseFormReturn,
+    type FieldErrors,
+    type UseFieldArrayRemove,
+    type UseFormRegister,
+    type UseFormReturn,
     useFieldArray,
 } from 'react-hook-form'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'

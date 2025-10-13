@@ -4,7 +4,7 @@ import {
     getServerSession,
     type NextAuthOptions,
     type DefaultSession,
-    User,
+    type User,
 } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { env } from '@/env.mjs'
@@ -65,8 +65,8 @@ export const authOptions: NextAuthOptions = {
                 // token.teams = user.teams
                 token.sysadmin = user.sysadmin
             }
-            let isAzureAd = account?.provider === 'azure-ad'
-            let isOkta = account?.provider === 'okta'
+            const isAzureAd = account?.provider === 'azure-ad'
+            const isOkta = account?.provider === 'okta'
             if (isAzureAd || isOkta) {
                 const reqBody: any = {
                     email: user?.email,
@@ -79,7 +79,7 @@ export const authOptions: NextAuthOptions = {
                 if (isOkta) {
                     reqBody.from_okta = true
                 }
-                if (account && account.access_token) {
+                if (account?.access_token) {
                     const userRes = await fetch(
                         `${process.env.CKAN_URL}/api/3/action/user_login`,
                         {

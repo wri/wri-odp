@@ -1,6 +1,6 @@
 import { type Session } from 'next-auth'
 import { SessionProvider } from 'next-auth/react'
-import { AppProps, type AppType } from 'next/app'
+import { type AppProps, type AppType } from 'next/app'
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query'
 import { Provider, useCreateStore } from '@/utils/store'
 import { useState, useEffect } from 'react'
@@ -18,7 +18,7 @@ import '@/styles/globals.scss'
 import '@/styles/rte.scss'
 import ReactToastContainer from '@/components/_shared/ReactToastContainer'
 import { DefaultSeo } from 'next-seo'
-import { LayerState } from '@/interfaces/state.interface'
+import { type LayerState } from '@/interfaces/state.interface'
 import { env } from '@/env.mjs'
 import NProgress from 'nprogress'
 import Router from 'next/router'
@@ -83,7 +83,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     }
 
     const newLayersState = new Map()
-    if (initialZustandState && initialZustandState?.mapView?.layersParsed) {
+    if (initialZustandState?.mapView?.layersParsed) {
         initialZustandState.mapView?.layersParsed?.forEach(
             (layer: [string, LayerState]) => {
                 newLayersState.set(layer[0], layer[1])
@@ -91,7 +91,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         )
     }
 
-    let activeLayerGroups =
+    const activeLayerGroups =
         initialZustandState?.mapView?.activeLayerGroups || []
 
     const layerAsLayerObj = new Map()
@@ -101,7 +101,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         for (const resource of dataset?.resources) {
             if (resource.format == 'Layer') {
                 if (
-                    (resource['layerObj'] || resource['layerObjRaw']) &&
+                    (resource.layerObj || resource.layerObjRaw) &&
                     (resource.rw_id == '' || !resource.rw_id)
                 ) {
                     layerAsLayerObj.set(resource.id, 'pending')
@@ -112,13 +112,13 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }
     }
 
-    if (initialZustandState && initialZustandState?.relatedDatasets?.length) {
+    if (initialZustandState?.relatedDatasets?.length) {
         const datasets = initialZustandState?.relatedDatasets
         for (const dataset of datasets) {
             for (const resource of dataset?.resources) {
                 if (resource.format == 'Layer') {
                     if (
-                        (resource['layerObj'] || resource['layerObjRaw']) &&
+                        (resource.layerObj || resource.layerObjRaw) &&
                         (resource.rw_id == '' || !resource.rw_id)
                     ) {
                         layerAsLayerObj.set(resource.rw_id, 'pending')
@@ -131,7 +131,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
     }
 
     if (
-        initialZustandState &&
         initialZustandState?.prevRelatedDatasets?.length
     ) {
         const datasets = initialZustandState?.prevRelatedDatasets
@@ -139,7 +138,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
             for (const resource of dataset?.resources) {
                 if (resource.format == 'Layer') {
                     if (
-                        (resource['layerObj'] || resource['layerObjRaw']) &&
+                        (resource.layerObj || resource.layerObjRaw) &&
                         (resource.rw_id == '' || !resource.rw_id)
                     ) {
                         tempLayerAsLayerobj.set(resource.rw_id, 'pending')
@@ -155,7 +154,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         for (const resource of prevdataset?.resources) {
             if (resource.format == 'Layer') {
                 if (
-                    (resource['layerObj'] || resource['layerObjRaw']) &&
+                    (resource.layerObj || resource.layerObjRaw) &&
                     (resource.rw_id == '' || !resource.rw_id)
                 ) {
                     tempLayerAsLayerobj.set(resource.rw_id, 'prevdataset')

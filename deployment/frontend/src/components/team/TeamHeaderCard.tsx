@@ -4,14 +4,14 @@ import { ChevronLeftIcon } from '@heroicons/react/20/solid'
 import { Button } from '../_shared/Button'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
 import { useSession } from 'next-auth/react'
 import { api } from '@/utils/api'
 import Spinner from '../_shared/Spinner'
 import EditCard from './EditCard'
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
 import { useEffect } from 'react'
-import { WriUser } from '@/schema/ckan.schema'
+import { type WriUser } from '@/schema/ckan.schema'
 import Chip from '../_shared/Chip'
 import { visibilityTypeLabels } from '@/utils/constants'
 
@@ -41,9 +41,9 @@ export default function TeamHeaderCard({
 }) {
     const { data: session } = useSession()
 
-    teams = teams as GroupTree[]
-    const team = teams[0] as GroupTree
-    let authorized = session && session.user?.sysadmin ? true : false
+    teams = teams!
+    const team = teams[0]!
+    const authorized = session && session.user?.sysadmin ? true : false
     const enableQuery = session && !authorized
     const orgdetails = api.teams.getTeam.useQuery(
         { id: team.id },
@@ -80,7 +80,7 @@ export default function TeamHeaderCard({
         fallback().catch(console.error)
     }, [session?.user?.name, team?.id, orgdetails.data])
 
-    let canEdit = currentUserCapacity === 'admin'
+    const canEdit = currentUserCapacity === 'admin'
 
     return (
         <section id="team-header-card" className="flex flex-col">
@@ -129,7 +129,7 @@ export default function TeamHeaderCard({
                         )}
                         {enableQuery ? (
                             <EditCard
-                                userName={session?.user?.name as string}
+                                userName={session?.user?.name!}
                                 orgDetails={orgdetails?.data!}
                                 isLoading={orgdetails?.isLoading}
                                 teamName={team.name}
@@ -163,7 +163,7 @@ export default function TeamHeaderCard({
                                 <div className="text-base font-light text-black">
                                     {teamsDetails[team.id]?.package_count &&
                                     (teamsDetails[team.id]
-                                        ?.package_count as number) <= 1
+                                        ?.package_count!) <= 1
                                         ? `${
                                               teamsDetails[team.id]
                                                   ?.package_count

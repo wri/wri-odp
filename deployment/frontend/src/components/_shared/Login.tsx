@@ -1,7 +1,7 @@
 import React, {
-    Dispatch,
+    type Dispatch,
     FormEvent,
-    SetStateAction,
+    type SetStateAction,
     useEffect,
     useState,
 } from 'react'
@@ -19,9 +19,9 @@ import { getCsrfToken, signIn } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { useForm } from 'react-hook-form'
 import {
-    RequestResetPasswordFormType,
+    type RequestResetPasswordFormType,
     RequestResetPasswordSchema,
-    SignInFormType,
+    type SignInFormType,
     SignInSchema,
 } from '@/schema/auth.schema'
 import { ErrorAlert } from './Alerts'

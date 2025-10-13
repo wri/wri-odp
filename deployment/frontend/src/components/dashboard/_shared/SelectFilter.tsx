@@ -23,10 +23,10 @@ export default function SelectFilter({
     reset?: React.Dispatch<React.SetStateAction<SearchInput>>
 }) {
     const [selected, setSelected] = useState(
-        query.fq && query.fq[filtername]
+        query.fq?.[filtername]
             ? options.find(
                   (o) =>
-                      o.id === (query.fq as Record<string, string>)[filtername]
+                      o.id === (query.fq!)[filtername]
               )
             : options[0]
               ? options[0]
@@ -41,7 +41,7 @@ export default function SelectFilter({
                 page: { start: 0, rows: 1000 },
                 fq: {},
             }
-            reset && reset(updateQuery)
+            reset?.(updateQuery)
             setQuery((prev) => {
                 return {
                     ...prev,
@@ -72,10 +72,10 @@ export default function SelectFilter({
                 const timestamp = query.fq?.timestamp
                 const prev: Record<string, string> = {}
                 if (action) {
-                    prev['action'] = action
+                    prev.action = action
                 }
                 if (timestamp) {
-                    prev['timestamp'] = timestamp
+                    prev.timestamp = timestamp
                 }
 
                 if (

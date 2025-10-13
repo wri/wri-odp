@@ -1,6 +1,6 @@
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
+import { type UseFormReturn, useFieldArray } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { EditDataFile } from './EditDataFile'
 import { MetadataAccordion } from '../metadata/MetadataAccordion'
@@ -8,7 +8,7 @@ import { RWDatasetForm } from '../metadata/RWDataset'
 import { api } from '@/utils/api'
 import ViewsList from '@/components/views/ViewsList'
 import { AddLayer } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import SortableList, { SortableItem } from 'react-easy-sort'
 
 export function EditRwSection({

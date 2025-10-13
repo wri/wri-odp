@@ -4,7 +4,7 @@ import { SwiperSlide } from 'swiper/react'
 import CarouselNavButton from './_shared/CarouselNavButton'
 import React from 'react'
 import Link from 'next/link'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 
 export default function Recent({
     title,

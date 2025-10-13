@@ -31,7 +31,7 @@ export default function UserMenu({
                         {
                             method: 'POST',
                             body: new URLSearchParams({
-                                id: session.data?.user.id as string,
+                                id: session.data?.user.id!,
                             }),
                         }
                     )

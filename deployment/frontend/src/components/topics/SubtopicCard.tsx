@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
 
 interface SubtopicProps {
     title: string

@@ -1,6 +1,6 @@
-import { InteractionFormType } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/layer.schema'
+import { type InteractionFormType } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/layer.schema'
 //@ts-ignore
-import { TileLayer } from '@deck.gl/geo-layers'
+import { type TileLayer } from '@deck.gl/geo-layers'
 import type { Source, LayerType } from '@vizzuality/layer-manager'
 
 interface DeckProps {

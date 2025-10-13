@@ -63,7 +63,7 @@ class LegendListItem extends PureComponent {
                                           layers,
                                           activeLayer,
                                       })
-                                    : activeLayer && activeLayer.name}
+                                    : activeLayer?.name}
                             </h3>
                             {React.isValidElement(toolbar) &&
                                 typeof toolbar.type !== 'string' &&

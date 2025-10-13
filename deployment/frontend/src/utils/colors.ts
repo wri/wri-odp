@@ -15,18 +15,18 @@ export const getGradientColor = (start_color, end_color, percent) => {
     }
 
     // get colors
-    var start_red = parseInt(start_color.substr(0, 2), 16),
+    const start_red = parseInt(start_color.substr(0, 2), 16),
         start_green = parseInt(start_color.substr(2, 2), 16),
         start_blue = parseInt(start_color.substr(4, 2), 16)
 
-    var end_red = parseInt(end_color.substr(0, 2), 16),
+    const end_red = parseInt(end_color.substr(0, 2), 16),
         end_green = parseInt(end_color.substr(2, 2), 16),
         end_blue = parseInt(end_color.substr(4, 2), 16)
 
     // calculate new color
-    var diff_red = end_red - start_red
-    var diff_green = end_green - start_green
-    var diff_blue = end_blue - start_blue
+    let diff_red = end_red - start_red
+    let diff_green = end_green - start_green
+    let diff_blue = end_blue - start_blue
 
     diff_red = (diff_red * percent + start_red).toString(16).split('.')[0]
     diff_green = (diff_green * percent + start_green).toString(16).split('.')[0]

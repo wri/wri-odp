@@ -1,6 +1,6 @@
 import classNames from '@/utils/classnames'
 import { ErrorMessage } from '@hookform/error-message'
-import { FieldErrors } from 'react-hook-form'
+import { type FieldErrors } from 'react-hook-form'
 import { DefaultTooltip } from './Tooltip'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { InformationCircleIcon as InformationSolidCircle } from '@heroicons/react/24/solid'

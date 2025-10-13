@@ -1,6 +1,6 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { type Dispatch, type SetStateAction, useState } from 'react'
 import SimpleSelect from '../_shared/SimpleSelect'
-import { SearchInput } from '@/schema/search.schema'
+import { type SearchInput } from '@/schema/search.schema'
 
 export default function SortBy({
     count,

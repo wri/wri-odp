@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
 import Container from '@/components/_shared/Container'
-import { TopicFormType, TopicSchema } from '@/schema/topic.schema'
+import { type TopicFormType, TopicSchema } from '@/schema/topic.schema'
 import { LoaderButton, Button } from '@/components/_shared/Button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import notify from '@/utils/notify'
@@ -17,7 +17,7 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 })
 import Link from 'next/link'
-import { RouterOutput } from '@/server/api/root'
+import { type RouterOutput } from '@/server/api/root'
 import { Fragment } from 'react'
 import { Members } from '../metadata/Members'
 import classNames from '@/utils/classnames'
@@ -51,8 +51,8 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                 },
                 topic_id: topic.id,
                 capacity: {
-                    value: (member as any).capacity,
-                    label: (member as any).capacity,
+                    value: (member).capacity,
+                    label: (member).capacity,
                 },
             })),
         },

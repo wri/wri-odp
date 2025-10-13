@@ -1,10 +1,10 @@
-import { UseFormReturn, useFormContext } from 'react-hook-form'
+import { type UseFormReturn, useFormContext } from 'react-hook-form'
 import { Button } from '@/components/_shared/Button'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import { LayerFormType } from '../layer.schema'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 
 export default function DerivedLayerForm({
     formObj,

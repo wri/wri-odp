@@ -1,10 +1,10 @@
-import { Collaborator, WriDataset } from '@/schema/ckan.schema'
+import { Collaborator, type WriDataset } from '@/schema/ckan.schema'
 import {
     CapacityUnion,
-    DataDictionaryFormType,
-    DatasetFormType,
+    type DataDictionaryFormType,
+    type DatasetFormType,
     DatasetSchema,
-    ResourceFormType,
+    type ResourceFormType,
 } from '@/schema/dataset.schema'
 import classNames from '@/utils/classnames'
 import { Tab } from '@headlessui/react'
@@ -209,7 +209,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                     ...resource,
                     title: resource.title ?? resource.name,
                     type: resource.url_type as any,
-                    resourceId: resource.id as string,
+                    resourceId: resource.id!,
                     schema: resource.schema ? schema.value : undefined,
                 }
             }),

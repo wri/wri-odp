@@ -1,6 +1,6 @@
-import { MutableRefObject } from 'react'
+import { type MutableRefObject } from 'react'
 import IconButton from './IconButton'
-import { MapRef } from 'react-map-gl'
+import { type MapRef } from 'react-map-gl'
 
 export default function Zoom({
     mapRef,

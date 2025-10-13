@@ -1,13 +1,13 @@
 import { useState, useRef } from 'react'
-import ReactMapGL, { MapRef } from 'react-map-gl'
-import { UseFormReturn } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import ReactMapGL, { type MapRef } from 'react-map-gl'
+import { type UseFormReturn } from 'react-hook-form'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 import { Button } from '@/components/_shared/Button'
 import { Legends } from './preview/Legends'
 import { getInteractiveLayers } from '@/utils/queryHooks'
 import Tooltip from './preview/Tooltip'
-import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
-import { APILayerSpec } from '@/interfaces/layer.interface'
+import { type LngLat, type MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
+import { type APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
 import { Accordion } from './Accordion'
 import { CodeEditor } from '@/components/dashboard/_shared/CodeEditor'
@@ -365,7 +365,7 @@ function PreviewMap({
     }) => {
         setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
         const layersInfo = []
-        for (let layer of layers) {
+        for (const layer of layers) {
             const feature = features?.find(
                 //  @ts-ignore
                 (f) => (f?.source || f.layer?.source) === layer.id

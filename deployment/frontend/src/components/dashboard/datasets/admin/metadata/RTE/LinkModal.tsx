@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactModal from 'react-modal'
+import type ReactModal from 'react-modal'
 import * as Icons from './Icons'
 import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {

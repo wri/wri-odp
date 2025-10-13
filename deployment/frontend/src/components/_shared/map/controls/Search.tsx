@@ -2,7 +2,7 @@ import React, {
     useState,
     useRef,
     useCallback,
-    MutableRefObject,
+    type MutableRefObject,
     useEffect,
 } from 'react'
 // import Geosuggest, { Suggest } from 'react-geosuggest';
@@ -63,7 +63,7 @@ export default function Search({
     const handleFitBounds = useCallback(() => {
         const bbox = bounds.bbox as number[]
         const options = bounds.options
-        const mapContainer = mapContainerRef.current as HTMLDivElement
+        const mapContainer = mapContainerRef.current!
         if (mapContainer.offsetWidth <= 0 || mapContainer.offsetHeight <= 0) {
             throw new Error("mapContainerRef doesn't have any dimensions")
         }

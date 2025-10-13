@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState, Dispatch, SetStateAction } from 'react'
+import { Fragment, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { Combobox, Listbox, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames'
@@ -10,9 +10,9 @@ import {
 } from '@/components/_shared/Popover'
 import { Button } from '@/components/_shared/Button'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { Controller, Path, UseFormReturn } from 'react-hook-form'
-import { Filter } from '@/interfaces/search.interface'
+import { type DatasetFormType } from '@/schema/dataset.schema'
+import { Controller, type Path, UseFormReturn } from 'react-hook-form'
+import { type Filter } from '@/interfaces/search.interface'
 import { set } from 'lodash'
 
 interface Option {

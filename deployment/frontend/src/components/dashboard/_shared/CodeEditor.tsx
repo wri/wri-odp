@@ -1,9 +1,9 @@
 import Editor from '@monaco-editor/react'
 import {
     Controller,
-    FieldValues,
-    Path,
-    UseFormReturn,
+    type FieldValues,
+    type Path,
+    type UseFormReturn,
     useForm,
 } from 'react-hook-form'
 

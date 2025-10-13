@@ -1,19 +1,19 @@
-import { Resource, View } from '@/interfaces/dataset.interface'
+import { type Resource, View } from '@/interfaces/dataset.interface'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
     Layer,
     Map,
-    MapLayerMouseEvent,
-    MapRef,
+    type MapLayerMouseEvent,
+    type MapRef,
     Marker,
     Source,
     useMap,
 } from 'react-map-gl'
 import GeocoderControl from '@/components/search/GeocoderControl'
 import { useQuery } from 'react-query'
-import { UseFormReturn, useForm } from 'react-hook-form'
+import { type UseFormReturn, useForm } from 'react-hook-form'
 import DrawControl from '@/components/search/Draw'
-import { LocationSearchFormType } from './DataFiles'
+import { type LocationSearchFormType } from './DataFiles'
 import { HideBoundaries } from '@/components/_shared/HideBoundaries'
 
 export default function LocationSearch({
@@ -168,8 +168,7 @@ export default function LocationSearch({
                     setValue('location', '')
                 }}
             />
-            {markers &&
-                markers.map((m, index) => (
+            {markers?.map((m, index) => (
                     <Marker key={index} longitude={m[0]} latitude={m[1]} />
                 ))}
             {geojsons

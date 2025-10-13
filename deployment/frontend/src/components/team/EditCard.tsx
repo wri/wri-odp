@@ -1,8 +1,8 @@
-import { WriOrganization, WriUser } from '@/schema/ckan.schema'
+import { type WriOrganization, type WriUser } from '@/schema/ckan.schema'
 import React from 'react'
 import Link from 'next/link'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
-import { Organization } from '@/schema/ckan.schema'
+import { type Organization } from '@/schema/ckan.schema'
 import Spinner from '../_shared/Spinner'
 
 export default function EditCard({
@@ -17,12 +17,12 @@ export default function EditCard({
     teamName: string
 }) {
     if (isLoading) return <Spinner className="mx-auto" />
-    let user = orgDetails?.users?.find((user) => user.name === userName)
+    const user = orgDetails?.users?.find((user) => user.name === userName)
 
     if (user) {
-        const user2 = user as WriUser
+        const user2 = user
 
-        if (user2?.capacity && ['admin'].includes(user2?.capacity as string))
+        if (user2?.capacity && ['admin'].includes(user2?.capacity))
             return (
                 <Link
                     href={`/dashboard/teams/${teamName}/edit`}

@@ -1,7 +1,7 @@
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
 import { z } from 'zod'
-import { CkanResponse } from '@/schema/ckan.schema'
+import { type CkanResponse } from '@/schema/ckan.schema'
 import { filterObj } from '@/components/data-explorer/search.schema'
 
 export type DataResponse = CkanResponse<{
@@ -76,7 +76,7 @@ export const datastoreRouter = createTRPCRouter({
                           .join(' AND ')
                     : ''
             const groupBySql =
-                groupBy && groupBy.length
+                groupBy?.length
                     ? 'GROUP BY ' +
                       groupBy.map((item) => `"${item}"`).join(', ')
                     : ''
@@ -152,8 +152,7 @@ export const datastoreRouter = createTRPCRouter({
                     throw Error(JSON.stringify(numRows.error))
                 }
                 if (
-                    numRows.result &&
-                    numRows.result.records[0] &&
+                    numRows.result?.records[0] &&
                     (numRows.result.records[0].count ||
                         numRows.result.records[0].count === 0)
                 ) {

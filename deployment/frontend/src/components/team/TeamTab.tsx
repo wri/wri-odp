@@ -3,7 +3,7 @@ import { Tab } from '@headlessui/react'
 import DatasetList from './DatasetList'
 import ActivityStreamList from '../_shared/ActivityStreamList'
 import { api } from '@/utils/api'
-import { SearchInput } from '@/schema/search.schema'
+import { type SearchInput } from '@/schema/search.schema'
 
 export default function TeamTab() {
     const [query, setQuery] = useState<SearchInput>({

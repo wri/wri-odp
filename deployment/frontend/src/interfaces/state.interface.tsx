@@ -1,6 +1,6 @@
-import { WriDataset } from '@/schema/ckan.schema'
-import { ViewState } from 'react-map-gl'
-import { View } from './dataset.interface'
+import { type WriDataset } from '@/schema/ckan.schema'
+import { type ViewState } from 'react-map-gl'
+import { type View } from './dataset.interface'
 
 export interface State {
     vizIndex: number

@@ -6,7 +6,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/_shared/Table'
-import { RouterOutput } from '@/server/api/root'
+import { type RouterOutput } from '@/server/api/root'
 import Image from 'next/image'
 
 type DatasetMembers = RouterOutput['dataset']['getDatasetCollaborators']

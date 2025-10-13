@@ -1,4 +1,4 @@
-import { MutableRefObject, useLayoutEffect } from 'react'
+import { type MutableRefObject, useLayoutEffect } from 'react'
 
 type Target = MutableRefObject<HTMLElement | null>
 
@@ -30,11 +30,9 @@ const handleResize = (key: string) => {
 const add = (key: string, element: Target) => {
     if (!store) return
     // create store if missing
-    if (!store[key]) {
-        store[key] = []
-    }
+    store[key] ??= [];
 
-    if (store && store[key]) {
+    if (store?.[key]) {
         const item = store[key]
         if (item) {
             item.push(element)

@@ -1,8 +1,8 @@
-import { WriOrganization, WriUser } from '@/schema/ckan.schema'
+import { WriOrganization, type WriUser } from '@/schema/ckan.schema'
 import React from 'react'
 import Link from 'next/link'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
-import { Organization, Group, User } from '@portaljs/ckan'
+import { Organization, type Group, User } from '@portaljs/ckan'
 import Spinner from '../_shared/Spinner'
 import Topic from '@/interfaces/topic.interface'
 
@@ -19,11 +19,11 @@ export default function EditCard({
 }) {
     if (isLoading) return <Spinner className="mx-auto" />
     const users = topicDetails?.users!
-    let user = topicDetails?.users?.find((user) => user.name === userName)
+    const user = topicDetails?.users?.find((user) => user.name === userName)
     if (user) {
         const user2 = user as WriUser
 
-        if (user2?.capacity && ['admin'].includes(user2?.capacity as string))
+        if (user2?.capacity && ['admin'].includes(user2?.capacity))
             return (
                 <Link
                     href={`/dashboard/topics/${topicName}/edit`}

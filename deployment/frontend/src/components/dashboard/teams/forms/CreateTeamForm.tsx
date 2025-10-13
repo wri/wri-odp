@@ -4,7 +4,7 @@ import { slugify } from '@/utils/slugify'
 import TeamForm from './TeamForm'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
 import Container from '@/components/_shared/Container'
-import { TeamFormType, TeamSchema } from '@/schema/team.schema'
+import { type TeamFormType, TeamSchema } from '@/schema/team.schema'
 import { LoaderButton } from '@/components/_shared/Button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@/utils/api'
@@ -89,7 +89,7 @@ export default function CreateTeamForm() {
     } = formObj
 
     useEffect(() => {
-        if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
+        if (!dirtyFields.name) setValue('name', slugify(watch('title')))
     }, [watch('title')])
 
     return (

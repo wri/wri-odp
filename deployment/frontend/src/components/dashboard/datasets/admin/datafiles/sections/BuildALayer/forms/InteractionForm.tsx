@@ -3,13 +3,13 @@ import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { MinusCircleIcon } from '@heroicons/react/24/outline'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-    Control,
-    UseFormRegister,
+    type Control,
+    type UseFormRegister,
     useFieldArray,
     useForm,
     useFormContext,
 } from 'react-hook-form'
-import { LayerFormType } from '../layer.schema'
+import { type LayerFormType } from '../layer.schema'
 import { InputGroup } from '@/components/_shared/InputGroup'
 import { Input } from '@/components/_shared/SimpleInput'
 import { Button } from '@/components/_shared/Button'

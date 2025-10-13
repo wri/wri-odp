@@ -219,7 +219,7 @@ export function formatDiff(
                 }
             } else if (
                 !key.startsWith('resource') &&
-                (key.match(/\[\d+\]\.\w+/) || key.match(/\[\d+\]/))
+                ((/\[\d+\]\.\w+/.exec(key)) || (/\[\d+\]/.exec(key)))
             ) {
                 const keyoldNew = data[key]?.old_value ?? data[key]?.new_value
                 if (
@@ -240,7 +240,7 @@ export function formatDiff(
                     if (Object.keys(keyoldNew).includes('name')) {
                         if (data[key]?.old_value) {
                             outputDiff[newKey].old_value.push(
-                                data[key]?.old_value['name']
+                                data[key]?.old_value.name
                             )
                         } else {
                             outputDiff[newKey].old_value.push(
@@ -250,7 +250,7 @@ export function formatDiff(
 
                         if (data[key]?.new_value) {
                             outputDiff[newKey].new_value.push(
-                                data[key]?.new_value['name']
+                                data[key]?.new_value.name
                             )
                         } else {
                             outputDiff[newKey].new_value.push(
@@ -266,7 +266,7 @@ export function formatDiff(
             } else if (key.startsWith('resources[')) {
                 if (matchesAnyPattern(key)) {
                     const mainKey = key.split('.')[0]!
-                    const subKey = key.split('.').slice(1).join('.')!
+                    const subKey = key.split('.').slice(1).join('.')
                     if (subKey) {
                         if (subKey === 'title') {
                             if (
@@ -306,14 +306,14 @@ export function formatDiff(
                                     outputDiff[mainKey].old_value.push(layerold)
 
                                     outputDiff[mainKey].new_value.push(
-                                        layerNew['name']
+                                        layerNew.name
                                     )
                                 } else if (
                                     layerNew === null ||
                                     layerNew === 'null'
                                 ) {
                                     outputDiff[mainKey].old_value.push(
-                                        layerold['name']
+                                        layerold.name
                                     )
 
                                     outputDiff[mainKey].new_value.push(layerNew)
@@ -334,15 +334,15 @@ export function formatDiff(
                                 data[key]?.old_value === null ||
                                 data[key]?.old_value === 'null'
                                     ? null
-                                    : (data[key]?.old_value['name'] ??
-                                      data[key]?.old_value['title']),
+                                    : (data[key]?.old_value.name ??
+                                      data[key]?.old_value.title),
 
                             new_value:
                                 data[key]?.new_value === null ||
                                 data[key]?.new_value === 'null'
                                     ? null
-                                    : (data[key]?.new_value['name'] ??
-                                      data[key]?.new_value['title']),
+                                    : (data[key]?.new_value.name ??
+                                      data[key]?.new_value.title),
                         }
                     }
                 }

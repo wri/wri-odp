@@ -5,7 +5,7 @@ import ApplicationForm from './ApplicationForm'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
 import Container from '@/components/_shared/Container'
 import {
-    ApplicationFormType,
+    type ApplicationFormType,
     ApplicationSchema,
 } from '@/schema/application.schema'
 import { LoaderButton } from '@/components/_shared/Button'
@@ -62,7 +62,7 @@ export default function CreateApplicationForm() {
     } = formObj
 
     useEffect(() => {
-        if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
+        if (!dirtyFields.name) setValue('name', slugify(watch('title')))
     }, [watch('title')])
 
     return (

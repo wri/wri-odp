@@ -3,7 +3,7 @@ import { Swiper } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
-import { ReactNode } from 'react'
+import { type ReactNode } from 'react'
 
 export function AutoCarousel({
     children,

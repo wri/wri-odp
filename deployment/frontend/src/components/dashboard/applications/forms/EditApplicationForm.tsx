@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
 import Container from '@/components/_shared/Container'
 import {
-    ApplicationFormType,
+    type ApplicationFormType,
     ApplicationSchema,
 } from '@/schema/application.schema'
 import { LoaderButton, Button } from '@/components/_shared/Button'
@@ -20,7 +20,7 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 })
 import Link from 'next/link'
-import { RouterOutput } from '@/server/api/root'
+import { type RouterOutput } from '@/server/api/root'
 import { Fragment } from 'react'
 import classNames from '@/utils/classnames'
 

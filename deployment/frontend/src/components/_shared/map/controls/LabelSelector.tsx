@@ -1,5 +1,5 @@
 import React from 'react'
-import { Labels } from '@/interfaces/state.interface'
+import { type Labels } from '@/interfaces/state.interface'
 import { useLabels } from '@/utils/storeHooks'
 
 const LabelSelector = () => {

@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { DefaultTooltip } from '../_shared/Tooltip'
 import { api } from '@/utils/api'
 import Spinner from '../_shared/Spinner'
-import { NotificationType } from '@/schema/notification.schema'
+import { type NotificationType } from '@/schema/notification.schema'
 
 function Notification({ items }: { items: NotificationType }) {
     return (

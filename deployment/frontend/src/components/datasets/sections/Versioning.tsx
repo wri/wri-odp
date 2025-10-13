@@ -1,6 +1,6 @@
 import Loading from '@/components/_shared/Loading'
 import { Accordion } from '@/components/dashboard/datasets/admin/Accordion'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import { api } from '@/utils/api'
 import { ClockIcon } from '@heroicons/react/24/outline'
 

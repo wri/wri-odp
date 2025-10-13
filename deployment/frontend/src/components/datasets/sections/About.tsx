@@ -1,6 +1,6 @@
 import { Button } from '@/components/_shared/Button'
 import { TextWithReadMore } from '@/components/_shared/TextWithReadMore'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import classNames from '@/utils/classnames'
 import { LinkIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'

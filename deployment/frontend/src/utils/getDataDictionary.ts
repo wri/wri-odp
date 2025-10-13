@@ -22,7 +22,7 @@ export const useDataDictionary = (
     return useQuery(
         [file, resourceId],
         async () => {
-            const rows = await parseCsv(file as File)
+            const rows = await parseCsv(file)
             const schema = await SchemaFn.load({})
             await schema.infer(rows.data)
             const descriptor: Descriptor =

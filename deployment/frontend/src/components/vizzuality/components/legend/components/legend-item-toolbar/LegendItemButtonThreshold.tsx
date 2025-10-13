@@ -7,9 +7,9 @@ import {
 import classNames from '@/utils/classnames'
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
+    type FieldValues,
+    type Path,
+    type PathValue,
     UseFormReturn,
     useForm,
 } from 'react-hook-form'
@@ -23,7 +23,7 @@ interface Option<V> {
 
 export default function LegendItemButtonThreshold<
     T extends FieldValues,
-    V extends Object,
+    V extends object,
 >(props: any) {
     const { onChangeThreshold } = props
 

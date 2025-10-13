@@ -1,5 +1,5 @@
 import {
-    UseFormReturn,
+    type UseFormReturn,
     useFieldArray,
     useForm,
     useFormContext,
@@ -18,7 +18,7 @@ import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { layerTypeOptions, providerOptions } from '../../../../formOptions'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { LayerFormType } from '../layer.schema'
+import { type LayerFormType } from '../layer.schema'
 import { useState } from 'react'
 import { useColumns } from '../useColumns'
 import classNames from '@/utils/classnames'
@@ -26,7 +26,7 @@ import { ChooseTemplates } from './ChooseTemplates'
 import { ScrollArea } from '@/components/_shared/ScrollArea'
 import { DatafileLocation } from '../../../DatafileLocation'
 import { SimpleEditor } from '../../../../metadata/RTE/SimpleEditor'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 
 export default function SourceForm({
     onNext,
@@ -58,7 +58,7 @@ export default function SourceForm({
     })
     const columns = useColumns(
         watch('layerConfig.source.provider.type.value'),
-        watch('connectorUrl') as string,
+        watch('connectorUrl')!,
         columnsFetchEnabled,
         (data) => {
             if (data && watch('interactionConfig.output').length === 0) {

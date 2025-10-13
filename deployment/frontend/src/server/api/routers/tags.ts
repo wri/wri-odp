@@ -1,6 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { CkanResponse } from '@/schema/ckan.schema'
+import { type CkanResponse } from '@/schema/ckan.schema'
 
 export const tagsRouter = createTRPCRouter({
     getAllTags: protectedProcedure.query(async ({ ctx }) => {

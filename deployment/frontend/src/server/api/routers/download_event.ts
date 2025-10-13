@@ -4,9 +4,9 @@ import {
     publicProcedure,
 } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { CkanResponse } from '@/schema/ckan.schema'
+import { type CkanResponse } from '@/schema/ckan.schema'
 import { z } from 'zod'
-import { DownloadEvent } from '@/interfaces/downloadEvent.interface'
+import { type DownloadEvent } from '@/interfaces/downloadEvent.interface'
 import { downloadEventSchema } from '@/components/_shared/DownloadPopup'
 import qs from 'query-string'
 

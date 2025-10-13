@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { LegendTypeProps } from '../interfaces/legend-types'
+import { type LegendTypeProps } from '../interfaces/legend-types'
 import LegendItem from './legend-item-type-basic-item'
 
 export default function LegendTypeBasic(

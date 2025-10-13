@@ -9,7 +9,7 @@ import type {
     WriDataset,
     WriOrganization,
 } from '@/schema/ckan.schema'
-import { Group } from '@portaljs/ckan'
+import { type Group } from '@portaljs/ckan'
 import Topic from '@/interfaces/topic.interface'
 
 function LeftNode({
@@ -114,7 +114,7 @@ function LeftNode({
                 <SelectFilter
                     options={[{ id: 'all', label: 'All Datasets' }].concat(
                         getKeyValues(
-                            dataset?.datasets as WriDataset[],
+                            dataset?.datasets!,
                             'title',
                             'id'
                         )
@@ -130,7 +130,7 @@ function LeftNode({
                 <SelectFilter
                     options={[{ id: 'all', label: 'All Teams' }].concat(
                         getKeyValues(
-                            organization as WriOrganization[],
+                            organization!,
                             'title',
                             'id'
                         )
@@ -146,7 +146,7 @@ function LeftNode({
             {selectEntity.search === 'topics' ? (
                 <SelectFilter
                     options={[{ id: 'all', label: 'All Topics' }].concat(
-                        getKeyValues(group as Group[], 'title', 'id')
+                        getKeyValues(group!, 'title', 'id')
                     )}
                     filtername="groupId"
                     setQuery={setServerQuery}

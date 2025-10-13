@@ -1,4 +1,4 @@
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { type GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
 import React from 'react'
 import Spinner from '../_shared/Spinner'
@@ -13,7 +13,7 @@ export default function GroupBreadcrumb({
     groupType: 'teams' | 'topics'
 }) {
     if (isLoading) return <Spinner className="mx-auto" />
-    const group = groups[0] as GroupTree
+    const group = groups[0]!
 
     const links = [
         {

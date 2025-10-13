@@ -5,7 +5,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover'
-import { Resource } from '@/interfaces/dataset.interface'
+import { type Resource } from '@/interfaces/dataset.interface'
 import { api } from '@/utils/api'
 import { convertBytes } from '@/utils/convertBytes'
 import {
@@ -19,10 +19,10 @@ import { useState } from 'react'
 import { toast } from 'react-toastify'
 import {
     DirectDownloadPopup,
-    DownloadEventForm,
+    type DownloadEventForm,
     DownloadPopup,
 } from '@/components/_shared/DownloadPopup'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 
 export function DownloadButton({
     datafile,
@@ -35,7 +35,7 @@ export function DownloadButton({
     const [open, setOpen] = useState(false)
     const { data: signedUrl, isLoading } = api.uploads.getPresignedUrl.useQuery(
         {
-            key: datafile.key as string,
+            key: datafile.key!,
         },
         { enabled: !!datafile.key }
     )
@@ -108,7 +108,7 @@ export function DownloadButton({
         createDownloadEvent.mutate(_data)
     }
 
-    let sql = `SELECT * FROM "${datafile.id}"`
+    const sql = `SELECT * FROM "${datafile.id}"`
     const handleFormSubmitConvertion = (data: any) => {
         const _data = {
             ...data,

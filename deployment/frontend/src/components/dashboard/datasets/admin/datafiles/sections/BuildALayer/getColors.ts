@@ -1,8 +1,8 @@
 import { P, match } from 'ts-pattern'
-import { LegendsFormType, RenderFormType } from './layer.schema'
+import { type LegendsFormType, type RenderFormType } from './layer.schema'
 
 export function getColors(renderItem?: RenderFormType | null) {
-    if (!renderItem || !renderItem.layers) return []
+    if (!renderItem?.layers) return []
     const paintObjs = renderItem.layers
         .flatMap((item) => {
             return [

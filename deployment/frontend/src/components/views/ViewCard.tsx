@@ -2,9 +2,9 @@ import { ChartBarIcon } from '@heroicons/react/20/solid'
 import ChartViewEditor from './ChartViewEditor'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { View, ViewState } from '@/interfaces/dataset.interface'
-import { Dispatch, SetStateAction } from 'react'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type View, type ViewState } from '@/interfaces/dataset.interface'
+import { type Dispatch, type SetStateAction } from 'react'
+import { type WriDataset } from '@/schema/ckan.schema'
 
 export default function ViewCard({
     view,

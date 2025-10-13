@@ -11,7 +11,7 @@ import Link from 'next/link'
 import { api } from '@/utils/api'
 import { ErrorAlert } from '../_shared/Alerts'
 import Spinner from '../_shared/Spinner'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
 
 function TopicCard({
     topic,

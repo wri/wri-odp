@@ -6,8 +6,8 @@ import {
     useMemo,
     useState,
 } from 'react'
-import { Map, MapLayerMouseEvent } from 'mapbox-gl'
-import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
+import { Map, type MapLayerMouseEvent } from 'mapbox-gl'
+import { type LngLat, type MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
 import { Popup } from 'react-map-gl'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import numeral from 'numeral'
@@ -37,7 +37,7 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
         }) => {
             setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
             const layersInfo = []
-            for (let layer of layers) {
+            for (const layer of layers) {
                 const feature = features?.find(
                     //  @ts-ignore
                     (f) => (f?.source || f.layer?.source) === layer.id

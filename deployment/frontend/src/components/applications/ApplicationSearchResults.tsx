@@ -1,7 +1,7 @@
 import CardsGrid from '../_shared/CardsGrid'
 import Container from '../_shared/Container'
 import ApplicationCard from './ApplicationCard'
-import { Application } from '@/schema/ckan.schema'
+import { type Application } from '@/schema/ckan.schema'
 
 export default function ApplicationSearchResults({
     applications,

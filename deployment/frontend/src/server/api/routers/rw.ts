@@ -1,4 +1,4 @@
-import { FieldsResponse } from '@/components/data-explorer/queryHooks'
+import { type FieldsResponse } from '@/components/data-explorer/queryHooks'
 import { filterObj } from '@/components/data-explorer/search.schema'
 import { createViewFormSchema, editViewFormSchema } from '@/schema/view.schema'
 import {

@@ -1,6 +1,6 @@
-import { Filter } from '@/interfaces/search.interface'
+import { type Filter } from '@/interfaces/search.interface'
 import { XCircleIcon } from '@heroicons/react/24/outline'
-import { Dispatch, SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction } from 'react'
 
 export default function FiltersSelected({
     filters,

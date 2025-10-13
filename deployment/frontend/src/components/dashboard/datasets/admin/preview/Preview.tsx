@@ -18,10 +18,10 @@ import {
 } from '@/components/_shared/Table'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { match } from 'ts-pattern'
-import { UseFormReturn } from 'react-hook-form'
+import { type UseFormReturn } from 'react-hook-form'
 import {
-    DataDictionaryFormType,
-    DatasetFormType,
+    type DataDictionaryFormType,
+    type DatasetFormType,
 } from '@/schema/dataset.schema'
 import { formatDate } from '@/utils/formatDate'
 import { convertBytes } from '@/utils/convertBytes'
@@ -31,8 +31,8 @@ import {
     getApiSpecFromRawObj,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
 import {
-    LayerFormType,
-    RawLayerFormType,
+    type LayerFormType,
+    type RawLayerFormType,
 } from '../datafiles/sections/BuildALayer/layer.schema'
 import { InfoAlert } from '@/components/_shared/Alerts'
 

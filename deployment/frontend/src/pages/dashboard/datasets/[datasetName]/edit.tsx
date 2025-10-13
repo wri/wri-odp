@@ -1,7 +1,7 @@
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
 import { NextSeo } from 'next-seo'
 import Header from '@/components/_shared/Header'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
@@ -30,7 +30,7 @@ export async function getServerSideProps(
         ctx: { session, ip: undefined },
         transformer: superjson,
     })
-    const datasetName = context.params?.datasetName as string
+    const datasetName = context.params?.datasetName!
     try {
         const prevdataset = await getOneDataset(datasetName, session)
 

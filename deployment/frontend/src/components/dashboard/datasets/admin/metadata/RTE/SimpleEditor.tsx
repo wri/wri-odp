@@ -4,7 +4,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import {
     useEditor,
     EditorContent,
-    Editor,
+    type Editor,
     BubbleMenu,
     ReactNodeViewRenderer,
 } from '@tiptap/react'
@@ -27,10 +27,10 @@ import { LinkModal } from './LinkModal'
 import classNames from '@/utils/classnames'
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
-    UseFormReturn,
+    type FieldValues,
+    type Path,
+    type PathValue,
+    type UseFormReturn,
 } from 'react-hook-form'
 import { Button } from '@/components/_shared/Button'
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
@@ -133,7 +133,7 @@ function TipTapEditor({
                 },
             }),
         ],
-    }) as Editor
+    })
 
     const [modalIsOpen, setIsOpen] = useState(false)
     const [url, setUrl] = useState<string>('')

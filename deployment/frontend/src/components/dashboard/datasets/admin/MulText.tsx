@@ -13,10 +13,10 @@ import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { DatasetFormType } from '@/schema/dataset.schema'
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
-    UseFormReturn,
+    type FieldValues,
+    type Path,
+    type PathValue,
+    type UseFormReturn,
 } from 'react-hook-form'
 
 interface MulTextProps<T extends FieldValues> {

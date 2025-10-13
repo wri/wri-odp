@@ -15,8 +15,8 @@ import {
     MinusCircleIcon,
     PaperClipIcon,
 } from '@heroicons/react/24/outline'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
+import { type DatasetFormType } from '@/schema/dataset.schema'
+import { type UseFormReturn, useFieldArray } from 'react-hook-form'
 import { convertBytes } from '@/utils/convertBytes'
 import Spinner from '@/components/_shared/Spinner'
 import FormatInput from '../FormatInput'

@@ -4,7 +4,7 @@ import { slugify } from '@/utils/slugify'
 import TopicForm from './TopicForm'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
 import Container from '@/components/_shared/Container'
-import { TopicFormType, TopicSchema } from '@/schema/topic.schema'
+import { type TopicFormType, TopicSchema } from '@/schema/topic.schema'
 import { LoaderButton } from '@/components/_shared/Button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '@/utils/api'
@@ -50,7 +50,7 @@ export default function CreateTopicForm() {
     } = formObj
 
     useEffect(() => {
-        if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
+        if (!dirtyFields.name) setValue('name', slugify(watch('title')))
     }, [watch('title')])
 
     return (

@@ -10,13 +10,13 @@ import { SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { GroupTree } from '@/schema/ckan.schema'
+import { type GroupTree } from '@/schema/ckan.schema'
 import DatasetTopic from '@/components/topics/DatasetTopic'
 import { getServerAuthSession } from '@/server/auth'
 import Spinner from '@/components/_shared/Spinner'
 import GroupBreadcrumb from '@/components/team/GroupBreadcrumb'
 import { getTopicTreeDetails } from '@/utils/apiUtils'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
@@ -25,7 +25,7 @@ import { env } from '@/env.mjs'
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ topicName: string }>
 ) {
-    const topicName = context.params?.topicName as string
+    const topicName = context.params?.topicName!
     const query = {
         search: topicName,
         page: { start: 0, rows: 100 },
@@ -47,7 +47,7 @@ export async function getServerSideProps(
             throw new Error('Topic not found')
         }
 
-        const topic = topics!.topics[0] as GroupTree
+        const topic = topics.topics[0]!
         const topicTitle = topic.title ?? topic.name
 
         await helpers.dataset.getAllDataset.prefetch({
@@ -85,8 +85,8 @@ export default function TopicPage(
     const router = useRouter()
     const { topics: data } = props
 
-    const topicName = props.topicName as string
-    const topicTitle = props.topicTitle as string
+    const topicName = props.topicName!
+    const topicTitle = props.topicTitle!
 
     const links = [
         {

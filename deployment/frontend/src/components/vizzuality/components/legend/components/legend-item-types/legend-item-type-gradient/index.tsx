@@ -1,4 +1,4 @@
-import { LegendTypeProps } from '../interfaces/legend-types'
+import { type LegendTypeProps } from '../interfaces/legend-types'
 
 export default function LegendTypeGradient(
     { activeLayer }: Readonly<LegendTypeProps> = {

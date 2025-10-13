@@ -25,7 +25,7 @@ export class TileProvider implements ProviderMaker {
                 ...layer,
                 source: {
                     ...omit(layer.source, 'provider'),
-                    tiles: [this.getTilerUrl(layer)!],
+                    tiles: [this.getTilerUrl(layer)],
                 } as Source,
             }
             if (resolve) {

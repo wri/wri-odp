@@ -1,6 +1,6 @@
 // https://www.khronos.org/files/opengles_shading_language.pdf
-import { LayerState } from '@/interfaces/state.interface'
-import { layerConfigSpec } from '@/interfaces/layer.interface'
+import { type LayerState } from '@/interfaces/state.interface'
+import { type layerConfigSpec } from '@/interfaces/layer.interface'
 import { differenceInDays } from 'date-fns'
 
 //interface DecodeParam {

@@ -14,19 +14,19 @@ import classNames from '@/utils/classnames'
 import { LinkExternalForm } from './sections/LinkExternalForm'
 import { UploadForm } from './sections/UploadForm'
 import { Fragment, useMemo, useRef, useState } from 'react'
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
+import { type UseFormReturn, useFieldArray } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { DataFileAccordion } from './DatafileAccordion'
 import { P, match } from 'ts-pattern'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
-import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
-import Uppy, { UppyFile } from '@uppy/core'
+import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema'
+import Uppy, { type UppyFile } from '@uppy/core'
 import AwsS3 from '@uppy/aws-s3'
 import { getUploadParameters } from '@/utils/uppyFunctions'
 import { v4 as uuidv4 } from 'uuid'
 import { convertBytes } from '@/utils/convertBytes'
 import { useDataDictionary } from '@/utils/getDataDictionary'
-import { Field } from 'tableschema'
+import { type Field } from 'tableschema'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import SortableList, { SortableItem } from 'react-easy-sort'
 import { TileCacheForm } from './sections/TileCacheForm'
@@ -173,8 +173,8 @@ function AddDataFile({
 
     function upload() {
         uppy.upload().then((result) => {
-            if (result && result.successful[0]) {
-                let paths = new URL(result.successful[0].uploadURL).pathname
+            if (result?.successful[0]) {
+                const paths = new URL(result.successful[0].uploadURL).pathname
                     .substring(1)
                     .split('/')
                 const url = result.successful[0]?.uploadURL ?? null
@@ -216,7 +216,7 @@ function AddDataFile({
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         const files = e.target.files
-        if (!files || !files[0]) return
+        if (!files?.[0]) return
         const slice = files[0].slice(0, 1000000)
         const slicedFile = new File([slice], files[0].name, {
             type: files[0].type,

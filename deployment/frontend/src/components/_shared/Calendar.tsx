@@ -2,7 +2,7 @@ import * as React from 'react'
 import { buttonVariants } from '@/components/_shared/Button'
 import { ScrollArea } from '@/components/_shared/ScrollArea'
 import { cn } from '@/utils/classnames'
-import { DayPicker, DropdownProps } from 'react-day-picker'
+import { DayPicker, type DropdownProps } from 'react-day-picker'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import {
     CaretSortIcon,

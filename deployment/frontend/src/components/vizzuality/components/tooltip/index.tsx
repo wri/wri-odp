@@ -1,6 +1,6 @@
 // @ts-nocheck
 import RCTooltip from 'rc-tooltip/lib'
-import { TooltipProps } from 'rc-tooltip/lib/Tooltip'
+import { type TooltipProps } from 'rc-tooltip/lib/Tooltip'
 
 export default function Tooltip(props: Readonly<TooltipProps>) {
     return (

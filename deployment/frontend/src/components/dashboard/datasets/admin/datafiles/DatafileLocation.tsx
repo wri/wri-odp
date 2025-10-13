@@ -4,7 +4,7 @@ import {
     InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 import { Disclosure, Tab } from '@headlessui/react'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 import { MapPinIcon } from '@heroicons/react/20/solid'
 import { useEffect, useRef, useState } from 'react'
 import classNames from '@/utils/classnames'
@@ -13,7 +13,7 @@ import GeocoderControl from '@/components/search/GeocoderControl'
 import { Layer, Map, Source } from 'react-map-gl'
 import notify from '@/utils/notify'
 import Spinner from '@/components/_shared/Spinner'
-import { UseFormReturn } from 'react-hook-form'
+import { type UseFormReturn } from 'react-hook-form'
 import * as turf from '@turf/turf'
 import { HideBoundaries } from '@/components/_shared/HideBoundaries'
 import DefaultTooltip from '@/components/_shared/Tooltip'
@@ -84,7 +84,7 @@ export function DatafileLocation({
                     geometries.push(json.geometry)
                 } else if (geojsonType == 'FeatureCollection') {
                     const features = json.features
-                    for (let feature of features) {
+                    for (const feature of features) {
                         geometries.push(feature.geometry)
                     }
                 } else {

@@ -5,7 +5,7 @@ import SimpleSelect from '@/components/_shared/SimpleSelect'
 import classNames from '@/utils/classnames'
 import { MinusCircleIcon } from '@heroicons/react/24/outline'
 import { useRef, useState } from 'react'
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
+import { type UseFormReturn, useFieldArray } from 'react-hook-form'
 
 export default function ChartFilters({
     formObj,

@@ -16,7 +16,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/_shared/Table'
-import { User, WriDataset } from '@/schema/ckan.schema'
+import { type User, type WriDataset } from '@/schema/ckan.schema'
 import { formatDate, formatDiff } from '@/utils/general'
 import Spinner from '@/components/_shared/Spinner'
 
@@ -82,7 +82,7 @@ function filteredDataset(dataset: WriDataset) {
 }
 
 function Card({ approvalInfo }: { approvalInfo: WriDataset }) {
-    const user = (approvalInfo.user as User) ?? { email: '', name: '' }
+    const user = (approvalInfo.user!) ?? { email: '', name: '' }
     user.name = user?.email ?? user?.name ?? 'Unknown'
     user.image_display_url = user?.image_display_url
         ? user?.image_display_url
@@ -286,12 +286,12 @@ function SubCardProfile({
         diff2 = Object.fromEntries(
             Object.entries(diff2).filter(([key]) => !key.includes('Authors'))
         )
-        let oldAuthors =
+        const oldAuthors =
             diff.old_dataset?.authors &&
             typeof diff.old_dataset?.authors === 'string'
                 ? JSON.parse(diff.old_dataset?.authors)
                 : (diff.old_dataset?.authors ?? [])
-        let newAuthors =
+        const newAuthors =
             diff.new_dataset?.authors &&
             typeof diff.new_dataset?.authors === 'string'
                 ? JSON.parse(diff.new_dataset?.authors)
@@ -313,12 +313,12 @@ function SubCardProfile({
                 ([key]) => !key.includes('Maintainers')
             )
         )
-        let oldMaintainers =
+        const oldMaintainers =
             diff.old_dataset?.maintainers &&
             typeof diff.old_dataset?.maintainers === 'string'
                 ? JSON.parse(diff.old_dataset?.maintainers)
                 : (diff.old_dataset?.maintainers ?? [])
-        let newMaintainers =
+        const newMaintainers =
             diff.new_dataset?.maintainers &&
             typeof diff.new_dataset?.maintainers === 'string'
                 ? JSON.parse(diff.new_dataset?.maintainers)

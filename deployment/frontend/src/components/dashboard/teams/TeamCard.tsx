@@ -501,10 +501,7 @@ export default function TeamCard() {
                                     <TeamProfile
                                         team={team}
                                         org2img={
-                                            data?.org2Image as Record<
-                                                string,
-                                                string
-                                            >
+                                            data?.org2Image!
                                         }
                                     />
                                 }
@@ -564,10 +561,7 @@ export default function TeamCard() {
                                         teams={team.children}
                                         highlighted={team?.highlighted}
                                         org2img={
-                                            data?.org2Image as Record<
-                                                string,
-                                                string
-                                            >
+                                            data?.org2Image!
                                         }
                                     />
                                 }
@@ -611,7 +605,7 @@ export default function TeamCard() {
                             variant="destructive"
                             loading={deleteTeam.isLoading}
                             onClick={() =>
-                                deleteTeam.mutate(selectedTeam.name!)
+                                deleteTeam.mutate(selectedTeam.name)
                             }
                             id={selectedTeam.name}
                         >

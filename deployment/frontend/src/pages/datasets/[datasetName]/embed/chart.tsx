@@ -1,7 +1,7 @@
-import { View } from '@/interfaces/dataset.interface'
+import { type View } from '@/interfaces/dataset.interface'
 import { getServerAuthSession } from '@/server/auth'
 import { getDatasetView, getResourceView } from '@/utils/apiUtils'
-import { GetServerSidePropsContext } from 'next'
+import { type GetServerSidePropsContext } from 'next'
 import dynamic from 'next/dynamic'
 
 const Chart = dynamic(

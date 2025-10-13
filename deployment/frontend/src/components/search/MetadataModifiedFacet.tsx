@@ -1,7 +1,7 @@
-import { Filter } from '@/interfaces/search.interface'
+import { type Filter } from '@/interfaces/search.interface'
 import { Disclosure, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
 import { Input } from '../_shared/SimpleInput'
 import notify from '@/utils/notify'
 

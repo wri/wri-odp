@@ -14,8 +14,8 @@ import {
 } from '@heroicons/react/24/outline'
 import { useState } from 'react'
 import { DatasetTabs } from '../../DatasetTabs'
-import { WriDataset } from '@/schema/ckan.schema'
-import { Resource } from '@/interfaces/dataset.interface'
+import { type WriDataset } from '@/schema/ckan.schema'
+import { type Resource } from '@/interfaces/dataset.interface'
 import classNames from '@/utils/classnames'
 import { getFormatColor } from '@/utils/formatColors'
 

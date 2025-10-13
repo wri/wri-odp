@@ -1,8 +1,8 @@
-import { DataDictionaryFormType } from '@/schema/dataset.schema'
-import { Activity, Group } from '@portaljs/ckan'
-import { Organization } from '@/schema/ckan.schema'
-import { APILayerSpec } from './layer.interface'
-import { PlotParams } from 'react-plotly.js'
+import { type DataDictionaryFormType } from '@/schema/dataset.schema'
+import { type Activity, type Group } from '@portaljs/ckan'
+import { type Organization } from '@/schema/ckan.schema'
+import { type APILayerSpec } from './layer.interface'
+import { type PlotParams } from 'react-plotly.js'
 
 export interface Dataset {
     author?: string

@@ -9,7 +9,7 @@ import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 })
-import { View } from '@/interfaces/dataset.interface'
+import { type View } from '@/interfaces/dataset.interface'
 
 export default function ChartViewExport() {
     const { selectedChart } = useActiveCharts()

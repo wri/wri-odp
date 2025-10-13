@@ -15,7 +15,7 @@ import {
     TrophyIcon,
 } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import { OpenIn, WriDataset } from '@/schema/ckan.schema'
+import { type OpenIn, type WriDataset } from '@/schema/ckan.schema'
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment, useEffect } from 'react'
 import classNames from '@/utils/classnames'
@@ -34,16 +34,16 @@ import { Dialog } from '@headlessui/react'
 import { useState } from 'react'
 import Spinner from '../_shared/Spinner'
 import { ErrorAlert } from '@/components/_shared/Alerts'
-import { TabularResource } from './visualizations/Visualizations'
+import { type TabularResource } from './visualizations/Visualizations'
 import TabularViewIcon from './view-icons/TabularViewIcon'
 import MapViewIcon from './view-icons/MapViewIcon'
 import ToggleVersion from './ToogleVersion'
 import { useToggleLayergroups } from '@/utils/storeHooks'
 import { useActiveCharts } from '@/utils/storeHooks'
-import { View } from '@/interfaces/dataset.interface'
+import { type View } from '@/interfaces/dataset.interface'
 import ChartViewIcon from './view-icons/ChartViewIcon'
 import { useQuery } from 'react-query'
-import { RwDatasetResp, isRwError } from '@/interfaces/rw.interface'
+import { type RwDatasetResp, isRwError } from '@/interfaces/rw.interface'
 import { match } from 'ts-pattern'
 import Image from 'next/image'
 import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover'
@@ -407,7 +407,7 @@ export function DatasetHeader({
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const session = useSession()
     const { data, isLoading, refetch } = api.dataset.isFavoriteDataset.useQuery(
-        dataset?.id as string,
+        dataset?.id!,
         { retry: false, enabled: !!session.data?.user }
     )
     const { data: adminUsers } = api.teams.getTeamUsers.useQuery(
@@ -629,7 +629,7 @@ export function DatasetHeader({
                                     className="bg-wri-gold "
                                     onClick={() => {
                                         addToFavorites.mutate(
-                                            dataset?.id as string
+                                            dataset?.id!
                                         )
                                     }}
                                     loading={addToFavorites.isLoading}
@@ -681,7 +681,7 @@ export function DatasetHeader({
                                     variant="destructive"
                                     onClick={() => {
                                         removeFromFavorites.mutate(
-                                            dataset?.id as string
+                                            dataset?.id!
                                         )
                                     }}
                                     loading={removeFromFavorites.isLoading}
@@ -956,9 +956,9 @@ export function DatasetHeader({
                                                 datasetName:
                                                     dataset.title ??
                                                     dataset.name,
-                                                id: dataset.rw_id as string,
+                                                id: dataset.rw_id!,
                                                 connectorUrl:
-                                                    dataset.connectorUrl as string,
+                                                    dataset.connectorUrl!,
                                                 name: dataset.name,
                                             })
                                             if (

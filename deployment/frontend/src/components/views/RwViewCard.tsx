@@ -1,9 +1,9 @@
-import { Resource, View, ViewState } from '@/interfaces/dataset.interface'
+import { Resource, type View, type ViewState } from '@/interfaces/dataset.interface'
 import ViewCard from './ViewCard'
 import { useState } from 'react'
 import { api } from '@/utils/api'
 import { toast } from 'react-toastify'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 
 export function RwViewCard({
     view: _ogView,

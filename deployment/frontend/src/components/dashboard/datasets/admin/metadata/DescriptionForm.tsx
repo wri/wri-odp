@@ -4,8 +4,8 @@ import { Disclosure } from '@headlessui/react'
 import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
 import { MetadataAccordion } from './MetadataAccordion'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { UseFormReturn } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { type UseFormReturn } from 'react-hook-form'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 
 export function DescriptionForm({

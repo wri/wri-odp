@@ -412,7 +412,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     )
     .refine(
         (obj) => {
-            if (!obj.team || !obj.team.value) return false
+            if (!obj.team?.value) return false
             return true
         },
         {

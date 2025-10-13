@@ -9,8 +9,8 @@ import {
     TableCell,
     TableBody,
 } from '@/components/_shared/Table'
-import { ResourceFormType } from '@/schema/dataset.schema'
-import { Log } from '@/server/api/routers/prefect'
+import { type ResourceFormType } from '@/schema/dataset.schema'
+import { type Log } from '@/server/api/routers/prefect'
 import { api } from '@/utils/api'
 import notify from '@/utils/notify'
 import { match } from 'ts-pattern'
@@ -110,8 +110,7 @@ export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {flowState &&
-                            flowState.logs?.map((log: Log, index: number) => (
+                        {flowState?.logs?.map((log: Log, index: number) => (
                                 <TableRow
                                     key={log.id}
                                     className={

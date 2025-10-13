@@ -1,4 +1,4 @@
-import { SearchInput } from '@/schema/search.schema'
+import { type SearchInput } from '@/schema/search.schema'
 import {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
@@ -6,9 +6,9 @@ import {
     ChevronRightIcon,
 } from '@heroicons/react/20/solid'
 import {
-    Dispatch,
+    type Dispatch,
     Fragment,
-    SetStateAction,
+    type SetStateAction,
     useEffect,
     useRef,
     useState,

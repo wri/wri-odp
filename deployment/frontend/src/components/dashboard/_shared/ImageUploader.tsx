@@ -31,7 +31,7 @@ export function ImageUploader({
     const [uploading, setIsUploading] = useState(false)
     const uploadInputRef = useRef<HTMLInputElement>(null)
     const presignedGetUrl = api.uploads.getPresignedUrl.useQuery(
-        { key: key as string },
+        { key: key! },
         {
             enabled: !!key,
             onSuccess: (data) => {
@@ -56,8 +56,8 @@ export function ImageUploader({
     function upload() {
         uppy.upload().then((result) => {
             setIsUploading(false)
-            if (result && result.successful[0]) {
-                let paths = new URL(result.successful[0].uploadURL).pathname
+            if (result?.successful[0]) {
+                const paths = new URL(result.successful[0].uploadURL).pathname
                     .substring(1)
                     .split('/')
                 const key = paths.slice(0, paths.length).join('/')
@@ -77,7 +77,7 @@ export function ImageUploader({
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         const files = e.target.files
-        if (!files || !files[0]) return
+        if (!files?.[0]) return
         try {
             uppy.addFile({
                 name: files[0].name,

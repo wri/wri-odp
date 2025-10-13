@@ -1,11 +1,11 @@
 import {
-    UseFieldArrayRemove,
+    type UseFieldArrayRemove,
     UseFormRegister,
-    UseFormReturn,
+    type UseFormReturn,
     useFieldArray,
 } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 import { api } from '@/utils/api'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { MinusCircleIcon } from '@heroicons/react/24/outline'
@@ -15,7 +15,7 @@ import Spinner from '@/components/_shared/Spinner'
 import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { capacityOptions } from '../formOptions'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import notify from '@/utils/notify'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 

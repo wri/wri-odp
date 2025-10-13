@@ -7,8 +7,8 @@ import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard'
 import FilteredSearchLayout from '@/components/search/FilteredSearchLayout'
 import FiltersSelected from '@/components/search/FiltersSelected'
 import SortBy from '@/components/search/SortBy'
-import { Filter } from '@/interfaces/search.interface'
-import { SearchInput } from '@/schema/search.schema'
+import { type Filter } from '@/interfaces/search.interface'
+import { type SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -18,7 +18,7 @@ import { env } from '@/env.mjs'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
 import { getServerAuthSession } from '@/server/auth'
 import { advance_search_query } from '@/utils/apiUtils'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
@@ -132,14 +132,14 @@ export default function SearchPage(
         const fq: any = {}
         let extLocationQ = ''
         let extAddressQ = ''
-        let extGlobalQ = 'include'
+        const extGlobalQ = 'include'
 
         keys.forEach((key) => {
             let keyFq
 
             const keyFilters = filters.filter((f) => f.key == key)
 
-            if ((key as string) == 'temporal_coverage_start') {
+            if ((key) == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageStart = keyFilters[0]
                     const temporalCoverageEnd = filters.find(
@@ -152,7 +152,7 @@ export default function SearchPage(
                     //     keyFq = `[* TO ${temporalCoverageEnd}]`
                     // }
                 }
-            } else if ((key as string) == 'temporal_coverage_end') {
+            } else if ((key) == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageEnd = keyFilters[0]
                     const temporalCoverageStart = filters.find(
@@ -183,7 +183,7 @@ export default function SearchPage(
                     ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                     : '*'
 
-                fq['metadata_modified'] =
+                fq.metadata_modified =
                     `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
             } else if (key == 'spatial') {
                 const coordinates = keyFilters[0]?.value
@@ -200,13 +200,13 @@ export default function SearchPage(
                     fq['!spatial_address'] = 'Global'
                 }
                 if (extGlobalQFilter && extGlobalQFilter.value === 'only') {
-                    fq['spatial_address'] = 'Global'
+                    fq.spatial_address = 'Global'
                 }
             } else {
                 keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
             }
 
-            if (keyFq) fq[key as string] = keyFq
+            if (keyFq) fq[key] = keyFq
         })
 
         delete fq.metadata_modified_since

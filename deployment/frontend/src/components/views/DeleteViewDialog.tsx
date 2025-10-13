@@ -4,11 +4,11 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 })
 import { Dialog } from '@headlessui/react'
-import { Dispatch, SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction } from 'react'
 import { Button, LoaderButton } from '@/components/_shared/Button'
 import { api } from '@/utils/api'
 import { toast } from 'react-toastify'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 
 export default function DeleteViewDialog({
     isOpen,

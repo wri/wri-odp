@@ -1,5 +1,5 @@
-import { UseFormReturn } from 'react-hook-form'
-import { TeamFormType } from '@/schema/team.schema'
+import { type UseFormReturn } from 'react-hook-form'
+import { type TeamFormType } from '@/schema/team.schema'
 import {
     ErrorDisplay,
     InputGroup,
@@ -9,7 +9,7 @@ import { Input } from '@/components/_shared/SimpleInput'
 import { TextArea } from '@/components/_shared/SimpleTextArea'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { ImageUploader } from '../../_shared/ImageUploader'
-import { UploadResult } from '@uppy/core'
+import { type UploadResult } from '@uppy/core'
 import { api } from '@/utils/api'
 import { P, match } from 'ts-pattern'
 import Spinner from '@/components/_shared/Spinner'

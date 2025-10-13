@@ -3,13 +3,13 @@ import { Button } from '../_shared/Button'
 import { ChevronLeftIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { api } from '@/utils/api'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
 import EditCard from './EditCard'
-import { Group } from '@portaljs/ckan'
+import { type Group } from '@portaljs/ckan'
 import Topic from '@/interfaces/topic.interface'
 
 export function Hero({
@@ -19,10 +19,10 @@ export function Hero({
     topics?: GroupTree[]
     topicsDetails: Record<string, GroupsmDetails>
 }) {
-    topics = topics as GroupTree[]
-    const topic = topics[0] as GroupTree
+    topics = topics!
+    const topic = topics[0]!
     const { data: session } = useSession()
-    let authorized = session && session.user?.sysadmin ? true : false
+    const authorized = session && session.user?.sysadmin ? true : false
     const enableQuery = session && !authorized
     const topicdetails = api.topics.getTopicV2.useQuery(
         { id: topic.id },
@@ -77,8 +77,8 @@ export function Hero({
                         )}
                         {enableQuery ? (
                             <EditCard
-                                userName={session?.user?.name as string}
-                                topicDetails={topicdetails.data?.topic as Group}
+                                userName={session?.user?.name!}
+                                topicDetails={topicdetails.data?.topic!}
                                 isLoading={topicdetails?.isLoading}
                                 topicName={topic.name}
                             />

@@ -2,13 +2,13 @@ import React, { useState } from 'react'
 import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard'
 import { api } from '@/utils/api'
 import Spinner from '../_shared/Spinner'
-import { GroupTree } from '@/schema/ckan.schema'
+import { type GroupTree } from '@/schema/ckan.schema'
 import Pagination from '@/components/datasets/Pagination'
 import type { SearchInput } from '@/schema/search.schema'
 
 export default function DatasetTopic({ topics }: { topics: GroupTree[] }) {
-    topics = topics as GroupTree[]
-    const topic = topics[0] as GroupTree
+    topics = topics
+    const topic = topics[0]!
     const topicName = topic.name
     const topicTitle = topic.title
     const [query, setQuery] = useState<SearchInput>({

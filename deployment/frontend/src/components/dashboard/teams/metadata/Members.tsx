@@ -1,6 +1,6 @@
 import {
-    UseFieldArrayRemove,
-    UseFormReturn,
+    type UseFieldArrayRemove,
+    type UseFormReturn,
     useFieldArray,
 } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
@@ -14,8 +14,8 @@ import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { capacityOptions } from '../../datasets/admin/formOptions'
 import notify from '@/utils/notify'
-import { TeamFormType } from '@/schema/team.schema'
-import { RouterOutput } from '@/server/api/root'
+import { type TeamFormType } from '@/schema/team.schema'
+import { type RouterOutput } from '@/server/api/root'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 
 type TeamOutput = RouterOutput['teams']['getTeam']

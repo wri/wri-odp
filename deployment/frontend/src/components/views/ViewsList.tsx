@@ -4,12 +4,12 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover'
-import { Resource, View, ViewState } from '@/interfaces/dataset.interface'
+import { type Resource, type View, type ViewState } from '@/interfaces/dataset.interface'
 import { PopoverClose } from '@radix-ui/react-popover'
 import { useState } from 'react'
 import { DatastoreViewCard } from './DatastoreViewCard'
 import { RwViewCard } from './RwViewCard'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import { DefaultTooltip } from '../_shared/Tooltip'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 
@@ -85,7 +85,7 @@ export default function ViewsList(props: ViewsListProps) {
     }
 
     const isCanCreateChartview = !!(
-        (datafile && datafile.datastore_active) ||
+        (datafile?.datastore_active) ||
         rwDatasetId
     )
 

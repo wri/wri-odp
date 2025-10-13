@@ -4,9 +4,9 @@ import {
     ChatBubbleLeftIcon,
     ClockIcon,
 } from '@heroicons/react/24/outline'
-import { Issue } from '@/schema/ckan.schema'
+import { type Issue } from '@/schema/ckan.schema'
 import { Disclosure, Transition } from '@headlessui/react'
-import { Index } from 'flexsearch'
+import { type Index } from 'flexsearch'
 import classNames from '@/utils/classnames'
 import { SimpleEditorV2 } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditorv2'
 import { useForm } from 'react-hook-form'

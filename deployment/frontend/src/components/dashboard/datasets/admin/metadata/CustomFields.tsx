@@ -8,11 +8,11 @@ import { Input } from '@/components/_shared/SimpleInput'
 import { InputGroup } from '@/components/_shared/InputGroup'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { MetadataAccordion } from './MetadataAccordion'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 import {
-    UseFieldArrayRemove,
-    UseFormRegister,
-    UseFormReturn,
+    type UseFieldArrayRemove,
+    type UseFormRegister,
+    type UseFormReturn,
     useFieldArray,
 } from 'react-hook-form'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'

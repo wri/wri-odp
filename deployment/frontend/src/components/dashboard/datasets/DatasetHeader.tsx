@@ -57,7 +57,7 @@ function LeftNode({
             <SelectFilter
                 key="teamselect"
                 options={[{ id: 'None', label: 'All Teams' }].concat(
-                    getKeyValues(team as WriOrganization[], 'title', 'name')
+                    getKeyValues(team!, 'title', 'name')
                 )}
                 filtername="organization"
                 setQuery={setQuery}
@@ -66,7 +66,7 @@ function LeftNode({
             <SelectFilter
                 key="topicselect"
                 options={[{ id: 'None', label: 'All Topics' }].concat(
-                    getKeyValues(topics as Group[], 'name', 'name')
+                    getKeyValues(topics!, 'name', 'name')
                 )}
                 setQuery={setQuery}
                 query={query}

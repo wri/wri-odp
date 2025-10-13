@@ -13,12 +13,12 @@ export function useColumns(
         async () => {
             const response = await fetch(encodeURI(connector_url))
             const data = await response.json()
-            if (type === 'carto') return Object.keys(data.rows[0]) as string[]
+            if (type === 'carto') return Object.keys(data.rows[0])
             if (type === 'featureservice')
                 return data.fields.map((field: any) => field.name) as string[]
             return [] as string[]
         },
-        { enabled, onSuccess: (data) => onSuccess && onSuccess(data) }
+        { enabled, onSuccess: (data) => onSuccess?.(data) }
     )
     return queryObj
 }

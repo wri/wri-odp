@@ -1,6 +1,6 @@
 import {
-    UseFieldArrayRemove,
-    UseFormReturn,
+    type UseFieldArrayRemove,
+    type UseFormReturn,
     useFieldArray,
 } from 'react-hook-form'
 import { PlusCircleIcon } from '@heroicons/react/20/solid'
@@ -14,8 +14,8 @@ import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { capacityOptions } from '../../datasets/admin/formOptions'
 import notify from '@/utils/notify'
-import { RouterOutput } from '@/server/api/root'
-import { TopicFormType } from '@/schema/topic.schema'
+import { type RouterOutput } from '@/server/api/root'
+import { type TopicFormType } from '@/schema/topic.schema'
 import { watch } from 'fs'
 
 type TopicOutput = RouterOutput['topics']['getTopic']
@@ -58,7 +58,7 @@ export function Members({
                             type="button"
                             onClick={() =>
                                 append({
-                                    topic_id: topic.id as string,
+                                    topic_id: topic.id!,
                                     user: {
                                         value: '',
                                         label: '',

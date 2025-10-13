@@ -2,7 +2,7 @@ import { SwiperSlide } from 'swiper/react'
 import Carousel from '../Carousel'
 import Subteamcard from './Subteamcard'
 import CarouselNavButton from '../_shared/CarouselNavButton'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
 
 export default function SubTeams({
     teams,
@@ -11,8 +11,8 @@ export default function SubTeams({
     teams?: GroupTree[]
     teamsDetails: Record<string, GroupsmDetails>
 }) {
-    teams = teams as GroupTree[]
-    const team = teams[0] as GroupTree
+    teams = teams!
+    const team = teams[0]!
     return (
         <section
             id="subtopics"

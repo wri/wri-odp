@@ -5,13 +5,13 @@ import Tooltip from '../../../../tooltip'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 
 interface LegendItemButtonVisibilityProps {
-    activeLayer: Object
+    activeLayer: object
     visibility: boolean
     onChangeVisibility: (activeLayer, visibility: boolean) => void
     iconShow: string
     iconHide: string
-    focusStyle: Object
-    defaultStyle: Object
+    focusStyle: object
+    defaultStyle: object
     tooltipOpened: boolean
     tooltipText: string
     scrolling: boolean

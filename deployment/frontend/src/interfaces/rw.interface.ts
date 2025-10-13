@@ -1,4 +1,4 @@
-import { APILayerSpec } from './layer.interface'
+import { type APILayerSpec } from './layer.interface'
 
 export const isRwError = (
     resp: RwLayerResp | RwDatasetResp | RwErrorResponse

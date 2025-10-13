@@ -25,7 +25,7 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 })
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { Dialog } from '@headlessui/react'
-import { WriOrganization } from '@/schema/ckan.schema'
+import { type WriOrganization } from '@/schema/ckan.schema'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 
 export default function AddUserForm({

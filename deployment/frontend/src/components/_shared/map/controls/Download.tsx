@@ -1,11 +1,11 @@
 import { useLayersFromRW } from '@/utils/queryHooks'
 import {
-    AnyLayer,
-    RasterLayer,
-    FillLayer,
-    LineLayer,
-    SymbolLayer,
-    CircleLayer,
+    type AnyLayer,
+    type RasterLayer,
+    type FillLayer,
+    type LineLayer,
+    type SymbolLayer,
+    type CircleLayer,
 } from 'mapbox-gl'
 import { useMap } from 'react-map-gl'
 import IconButton from './IconButton'

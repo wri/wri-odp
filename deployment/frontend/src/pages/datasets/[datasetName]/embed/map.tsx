@@ -3,7 +3,7 @@ import Header from '@/components/_shared/Header'
 import { useRouter } from 'next/router'
 import { api } from '@/utils/api'
 import dynamic from 'next/dynamic'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
 import Spinner from '@/components/_shared/Spinner'
 import { useSession } from 'next-auth/react'
 import { getOneDataset } from '@/utils/apiUtils'
@@ -32,7 +32,7 @@ export async function getServerSideProps(
     const { map } = query
     const mapState = decodeMapParam(map as string)
 
-    const datasetName = context.params?.datasetName as string
+    const datasetName = context.params?.datasetName!
     const session = await getServerAuthSession(context)
     try {
         let dataset = await getOneDataset(datasetName, session)
@@ -75,7 +75,7 @@ export default function DatasetPage(
 ) {
     const { dataset } = props
 
-    const datasetName = props.datasetName as string
+    const datasetName = props.datasetName!
     const router = useRouter()
     const { query } = router
     const isApprovalRequest = query?.approval === 'true'

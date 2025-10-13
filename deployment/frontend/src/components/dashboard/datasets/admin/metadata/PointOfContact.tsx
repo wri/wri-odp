@@ -7,8 +7,8 @@ import { Input } from '@/components/_shared/SimpleInput'
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
 import { Disclosure, Transition } from '@headlessui/react'
 import { MetadataAccordion } from './MetadataAccordion'
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { type UseFormReturn, useFieldArray } from 'react-hook-form'
+import { type DatasetFormType } from '@/schema/dataset.schema'
 import {
     MinusCircleIcon,
     PlusCircleIcon,

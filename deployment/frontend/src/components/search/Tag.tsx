@@ -1,7 +1,7 @@
-import { Filter } from '@/interfaces/search.interface'
+import { type Filter } from '@/interfaces/search.interface'
 import { Disclosure, Transition } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
 import TagMulText from './Tagmultext'
 
 interface Option {
@@ -42,7 +42,7 @@ export default function Tags({
         }, {})
     }
 
-    const [optionsState, setOptionsState] = useState<{ [k: string]: boolean }>(
+    const [optionsState, setOptionsState] = useState<Record<string, boolean>>(
         getUpdatedOptionsState()
     )
 

@@ -1,7 +1,7 @@
 import { env } from '@/env.mjs'
 import {
     RwLayerResp,
-    RwResponse,
+    type RwResponse,
     isRwError,
     isRwLayerResp,
 } from '@/interfaces/rw.interface'
@@ -9,7 +9,7 @@ import {
     convertFormToLayerObj,
     getApiSpecFromRawObj,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
-import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
+import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema'
 
 export const assertFullfilled = <T>(
     input: PromiseSettledResult<T>
@@ -18,7 +18,7 @@ export const assertFullfilled = <T>(
 }
 
 function isUUID(uuid: string) {
-    let s = '' + uuid
+    const s = '' + uuid
     return /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i.test(
         s
     )

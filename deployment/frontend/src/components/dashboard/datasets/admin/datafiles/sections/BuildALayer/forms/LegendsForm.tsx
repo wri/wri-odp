@@ -13,7 +13,7 @@ import {
     useForm,
     useFormContext,
 } from 'react-hook-form'
-import { LayerFormType } from '../layer.schema'
+import { type LayerFormType } from '../layer.schema'
 import { getColors, legendsToAdd } from '../getColors'
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
 import { ScrollArea } from '@/components/_shared/ScrollArea'

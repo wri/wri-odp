@@ -3,7 +3,7 @@ import { Input } from '@/components/_shared/SimpleInput'
 import SimpleSelect from '@/components/_shared/SimpleSelect'
 import { useFields } from '@/components/data-explorer/queryHooks'
 import {
-    ViewState,
+    type ViewState,
     type ChartViewConfig,
     type View,
 } from '@/interfaces/dataset.interface'
@@ -14,7 +14,7 @@ import { type Dispatch, type SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { ErrorAlert } from '@/components/_shared/Alerts'
 
-import { ChartFormType, chartSchema } from '@/schema/view.schema'
+import { type ChartFormType, chartSchema } from '@/schema/view.schema'
 import DeleteViewDialog from './DeleteViewDialog'
 import {
     InformationCircleIcon,
@@ -28,7 +28,7 @@ import DataDialog from './DataDialog'
 import { Accordion } from '../dashboard/datasets/admin/datafiles/sections/BuildALayer/Accordion'
 import { queryRw } from '@/utils/rw'
 import { DefaultTooltip } from '../_shared/Tooltip'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import { Button, LoaderButton } from '../_shared/Button'
 import { Transform } from 'plotly.js'
 const Chart = dynamic(
@@ -162,7 +162,7 @@ export default function ChartViewEditor({
             if (categoryColName) {
                 columns.push(categoryColName)
             }
-            let aggregate = formData.config.query.aggregate?.value
+            const aggregate = formData.config.query.aggregate?.value
             const filters = formData.config.query.filters
 
             const query = {
@@ -314,15 +314,15 @@ export default function ChartViewEditor({
                 layout.colorway = colors
             }
 
-            let categories = []
+            const categories = []
             if (categoryColName) {
                 const categoryNames = tableData.map(
                     (row: any) => row[categoryColName]
                 )
                 const uniqueCategoryNames = [...new Set(categoryNames)]
 
-                for (let categoryName of uniqueCategoryNames) {
-                    let categoryData = tableData.filter(
+                for (const categoryName of uniqueCategoryNames) {
+                    const categoryData = tableData.filter(
                         (row: any) => row[categoryColName] == categoryName
                     )
 
@@ -354,7 +354,7 @@ export default function ChartViewEditor({
                 categories.push(category)
             }
 
-            for (let category of categories) {
+            for (const category of categories) {
                 const trace: Plotly.Data = { type: chartType, transforms: [] }
                 trace.name = category.name || measureColName
 

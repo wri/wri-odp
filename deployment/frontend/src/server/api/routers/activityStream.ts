@@ -20,12 +20,12 @@ export const activityStreamRouter = createTRPCRouter({
     listPackageActivity: publicProcedure
         .input(z.object({ id: z.string() }))
         .query(async ({ input, ctx }) => {
-            let url = `${env.CKAN_URL}/api/3/action/package_activity_list?id=${input.id}`
+            const url = `${env.CKAN_URL}/api/3/action/package_activity_list?id=${input.id}`
             const fetchOps: any = { headers: {} }
 
             const user = ctx.session?.user
             if (user) {
-                fetchOps.headers['Authorization'] = user.apikey
+                fetchOps.headers.Authorization = user.apikey
             }
 
             const response = await fetch(url, fetchOps)
@@ -42,22 +42,22 @@ export const activityStreamRouter = createTRPCRouter({
 
             if (input.fq) {
                 if ('packageId' in input.fq) {
-                    if (input.fq['packageId'] === 'all') {
+                    if (input.fq.packageId === 'all') {
                         search = 'packageId'
                     } else {
-                        url = `${env.CKAN_URL}/api/3/action/package_activity_list_wri?id=${input.fq['packageId']}`
+                        url = `${env.CKAN_URL}/api/3/action/package_activity_list_wri?id=${input.fq.packageId}`
                     }
                 } else if ('orgId' in input.fq) {
-                    if (input.fq['orgId'] === 'all') {
+                    if (input.fq.orgId === 'all') {
                         search = 'orgId'
                     } else {
-                        url = `${env.CKAN_URL}/api/3/action/organization_activity_list_wri?id=${input.fq['orgId']}`
+                        url = `${env.CKAN_URL}/api/3/action/organization_activity_list_wri?id=${input.fq.orgId}`
                     }
                 } else if ('groupId' in input.fq) {
-                    if (input.fq['groupId'] === 'all') {
+                    if (input.fq.groupId === 'all') {
                         search = 'groupId'
                     } else {
-                        url = `${env.CKAN_URL}/api/3/action/group_activity_list_wri?id=${input.fq['groupId']}`
+                        url = `${env.CKAN_URL}/api/3/action/group_activity_list_wri?id=${input.fq.groupId}`
                     }
                 }
             }
@@ -69,7 +69,7 @@ export const activityStreamRouter = createTRPCRouter({
 
             const data = (await response.json()) as CkanResponse<Activity[]>
             const activities = data.result.map((activity: Activity) => {
-                let user_data = activity.user_data as User
+                const user_data = activity.user_data!
                 const activityDetailsObj = activityDetails(activity)
                 const parts = activityDetailsObj.description.split(' ')
 

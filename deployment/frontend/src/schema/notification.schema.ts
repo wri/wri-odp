@@ -1,7 +1,7 @@
 import { z } from 'zod'
-import { User, WriDataset, WriOrganization } from './ckan.schema'
-import Team from '@/interfaces/team.interface'
-import Topic from '@/interfaces/topic.interface'
+import { type User, type WriDataset, WriOrganization } from './ckan.schema'
+import type Team from '@/interfaces/team.interface'
+import type Topic from '@/interfaces/topic.interface'
 
 const NotificationSchema = z.object({
     id: z.string(),

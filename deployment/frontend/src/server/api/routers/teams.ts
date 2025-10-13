@@ -4,8 +4,8 @@ import {
     publicProcedure,
 } from '@/server/api/trpc'
 import { env } from '@/env.mjs'
-import { CkanResponse, Collaborator } from '@/schema/ckan.schema'
-import { Organization } from '@/schema/ckan.schema'
+import { type CkanResponse, Collaborator } from '@/schema/ckan.schema'
+import { type Organization } from '@/schema/ckan.schema'
 import { TeamSchema } from '@/schema/team.schema'
 import { z } from 'zod'
 import { replaceNames } from '@/utils/replaceNames'
@@ -81,7 +81,7 @@ export const teamRouter = createTRPCRouter({
             try {
                 const user = ctx.session.user
 
-                var newMembers = []
+                const newMembers = []
                 for (const member of input.members) {
                     newMembers.push({
                         name: member.user.value,
@@ -319,7 +319,7 @@ export const teamRouter = createTRPCRouter({
                         description: org.description ?? '',
                         package_count: org.package_count!,
                         name: org.name,
-                        visibility: org.visibility!,
+                        visibility: org.visibility,
                     }
                     return acc
                 },

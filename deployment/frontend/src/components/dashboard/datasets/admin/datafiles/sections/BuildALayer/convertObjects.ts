@@ -1,14 +1,14 @@
 import { match, P } from 'ts-pattern'
 import {
-    ColorPatternType,
+    type ColorPatternType,
     InteractionFormType,
-    LayerFormType,
+    type LayerFormType,
     layerSchema,
-    LegendsFormType,
-    RawLayerFormType,
+    type LegendsFormType,
+    type RawLayerFormType,
 } from './layer.schema'
 import { v4 as uuidv4 } from 'uuid'
-import { APILayerSpec } from '@/interfaces/layer.interface'
+import { type APILayerSpec } from '@/interfaces/layer.interface'
 import { rampTypes } from '../../../formOptions'
 
 export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
@@ -36,8 +36,7 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
               }
             : undefined,
         legendConfig:
-            formData.legendConfig &&
-            formData.legendConfig.items &&
+            formData.legendConfig?.items &&
             formData.legendConfig.items.length > 0
                 ? formData.legendConfig
                 : {},
@@ -223,9 +222,8 @@ export function convertLayerObjToForm(layerObj: APILayerSpec): LayerFormType {
                 ...layerObj.layerConfig.source,
                 tiles:
                     'tiles' in layerObj.layerConfig.source &&
-                    layerObj.layerConfig.source?.tiles &&
-                    layerObj.layerConfig.source?.tiles[0]
-                        ? (layerObj.layerConfig.source.tiles[0] as string)
+                    layerObj.layerConfig.source?.tiles?.[0]
+                        ? (layerObj.layerConfig.source.tiles[0])
                         : undefined,
                 provider: {
                     ...layerObj.layerConfig.source.provider,

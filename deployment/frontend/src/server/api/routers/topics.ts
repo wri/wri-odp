@@ -24,7 +24,8 @@ import type {
 import { searchArrayForKeyword } from '@/utils/general'
 import type { CkanResponse, User } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
-import Topic, { TopicHierarchy } from '@/interfaces/topic.interface'
+import {type TopicHierarchy} from '@/interfaces/topic.interface';
+import type Topic from '@/interfaces/topic.interface'
 
 import { TopicSchema } from '@/schema/topic.schema'
 import { replaceNames } from '@/utils/replaceNames'
@@ -155,7 +156,7 @@ export const TopicRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             try {
                 const user = ctx.session.user
-                var newMembers = []
+                const newMembers = []
                 for (const member of input.members) {
                     newMembers.push({
                         name: member.user.value,

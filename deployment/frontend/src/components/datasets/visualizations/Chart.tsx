@@ -1,5 +1,5 @@
 import Plot from 'react-plotly.js'
-import { ChartViewConfig } from '@/interfaces/dataset.interface'
+import { type ChartViewConfig } from '@/interfaces/dataset.interface'
 
 export default function Chart({
     config,

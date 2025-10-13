@@ -8,7 +8,7 @@ import {
     InformationCircleIcon,
     PlusCircleIcon,
 } from '@heroicons/react/24/outline'
-import { Path, useFieldArray, useFormContext } from 'react-hook-form'
+import { type Path, useFieldArray, useFormContext } from 'react-hook-form'
 import { match } from 'ts-pattern'
 import {
     filterOperationOptions,
@@ -16,7 +16,7 @@ import {
     renderTypeOptions,
 } from '../../../../formOptions'
 import { Disclosure, Switch, Transition } from '@headlessui/react'
-import { FilterFormType, LayerFormType } from '../layer.schema'
+import { type FilterFormType, type LayerFormType } from '../layer.schema'
 import { useState } from 'react'
 import classNames from '@/utils/classnames'
 import { useColumns } from '../useColumns'
@@ -418,7 +418,7 @@ function FilterExpression({
         return <></>
     const columns = useColumns(
         watch('layerConfig.source.provider.type.value'),
-        watch('connectorUrl') as string,
+        watch('connectorUrl')!,
         !!watch('connectorUrl')
     )
 
@@ -557,7 +557,7 @@ function RampObj({
     })
     const columns = useColumns(
         watch('layerConfig.source.provider.type.value'),
-        watch('connectorUrl') as string,
+        watch('connectorUrl')!,
         !!watch('connectorUrl')
     )
     return (

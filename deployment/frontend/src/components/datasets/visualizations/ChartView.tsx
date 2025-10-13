@@ -1,5 +1,5 @@
 import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { View } from '@/interfaces/dataset.interface'
+import { type View } from '@/interfaces/dataset.interface'
 import { useActiveCharts } from '@/utils/storeHooks'
 import { useEffect, useState } from 'react'
 import ChartViewExport from './ChartViewExport'

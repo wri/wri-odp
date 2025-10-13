@@ -1,10 +1,10 @@
 import { env } from '@/env.mjs'
-import { User } from '@/interfaces/user.interface'
+import { type User } from '@/interfaces/user.interface'
 import {
     RequestResetPasswordSchema,
     ResetPasswordSchema,
 } from '@/schema/auth.schema'
-import { CkanResponse } from '@/schema/ckan.schema'
+import { type CkanResponse } from '@/schema/ckan.schema'
 import {
     createTRPCRouter,
     protectedProcedure,

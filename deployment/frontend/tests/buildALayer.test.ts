@@ -8,7 +8,7 @@ import {
     convertFormToLayerObj,
     convertLayerObjToForm,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
-import { APILayerSpec } from '@/interfaces/layer.interface'
+import { type APILayerSpec } from '@/interfaces/layer.interface'
 
 it('Convert a layer object from RW to our custom format and back - (democracy index)', () => {
     const formObj = convertLayerObjToForm(

@@ -22,11 +22,11 @@ function addButtonToNode(node: HTMLElement, textToCopy: string) {
 
 export function addCopyButton(id: string) {
     // Create a temporary div element to hold the parsed HTML
-    var tempDiv = document.getElementById(id)
+    const tempDiv = document.getElementById(id)
     if (!tempDiv) return
 
     // Retrieve all <code> elements
-    var codeElements = tempDiv.querySelectorAll('code')
+    const codeElements = tempDiv.querySelectorAll('code')
 
     // Loop through each <code> element
     codeElements.forEach(function (codeElement) {

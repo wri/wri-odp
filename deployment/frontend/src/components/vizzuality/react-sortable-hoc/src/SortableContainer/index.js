@@ -119,7 +119,7 @@ export default function sortableContainer(
         }
 
         componentWillUnmount() {
-            if (this.helper && this.helper.parentNode) {
+            if (this.helper?.parentNode) {
                 this.helper.parentNode.removeChild(this.helper)
             }
             if (!this.container) {
@@ -150,8 +150,7 @@ export default function sortableContainer(
             const node = closest(event.target, (el) => el.sortableInfo != null)
 
             if (
-                node &&
-                node.sortableInfo &&
+                node?.sortableInfo &&
                 this.nodeIsChild(node) &&
                 !this.state.sorting
             ) {
@@ -1136,8 +1135,7 @@ export default function sortableContainer(
             const node = closest(target, (el) => el.sortableInfo != null)
 
             return (
-                node &&
-                node.sortableInfo &&
+                node?.sortableInfo &&
                 !node.sortableInfo.disabled &&
                 (useDragHandle ? isSortableHandle(target) : target.sortableInfo)
             )

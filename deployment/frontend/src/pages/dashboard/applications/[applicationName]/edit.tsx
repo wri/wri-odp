@@ -4,7 +4,7 @@ import Loading from '@/components/_shared/Loading'
 import EditApplicationForm from '@/components/dashboard/applications/forms/EditApplicationForm'
 import { getServerAuthSession } from '@/server/auth'
 import { api } from '@/utils/api'
-import { GetServerSideProps, NextPage } from 'next'
+import { type GetServerSideProps, type NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

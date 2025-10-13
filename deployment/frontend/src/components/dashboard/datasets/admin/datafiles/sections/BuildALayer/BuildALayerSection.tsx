@@ -6,10 +6,10 @@ import LegendForm from './forms/LegendsForm'
 import InteractionForm from './forms/InteractionForm'
 import RenderForm from './forms/RenderForm'
 import { useEffect, useState, useRef } from 'react'
-import ReactMapGL, { MapRef } from 'react-map-gl'
-import { FormProvider, UseFormReturn, useForm } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { LayerFormType, layerSchema } from './layer.schema'
+import ReactMapGL, { type MapRef } from 'react-map-gl'
+import { FormProvider, type UseFormReturn, useForm } from 'react-hook-form'
+import { type DatasetFormType } from '@/schema/dataset.schema'
+import { type LayerFormType, layerSchema } from './layer.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/_shared/Button'
 import { convertFormToLayerObj, getRawObjFromApiSpec } from './convertObjects'
@@ -17,11 +17,11 @@ import { Legends } from './preview/Legends'
 import { Steps } from './Steps'
 import { getInteractiveLayers } from '@/utils/queryHooks'
 import Tooltip from './preview/Tooltip'
-import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
-import { APILayerSpec } from '@/interfaces/layer.interface'
+import { type LngLat, type MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
+import { type APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
 import { slugify } from '@/utils/slugify'
-import { SafeParseSuccess } from 'zod'
+import { type SafeParseSuccess } from 'zod'
 
 export function BuildALayer({
     formObj,
@@ -96,7 +96,7 @@ export function BuildALayer({
         formState: { dirtyFields, touchedFields },
     } = layerFormObj
     useEffect(() => {
-        if (!dirtyFields['connectorUrl'])
+        if (!dirtyFields.connectorUrl)
             setValue(
                 'connectorUrl',
                 `https://${watch(
@@ -112,7 +112,7 @@ export function BuildALayer({
     ])
 
     useEffect(() => {
-        if (!dirtyFields['slug']) setValue('slug', slugify(watch('name')))
+        if (!dirtyFields.slug) setValue('slug', slugify(watch('name')))
     }, [watch('name')])
     useEffect(() => {
         syncValues()
@@ -239,7 +239,7 @@ export function PreviewMap({
     }) => {
         setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
         const layersInfo = []
-        for (let layer of layers) {
+        for (const layer of layers) {
             const feature = features?.find(
                 //  @ts-ignore
                 (f) => (f?.source || f.layer?.source) === layer.id

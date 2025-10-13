@@ -1,16 +1,16 @@
-import { Resource, View } from '@/interfaces/dataset.interface'
+import { Resource, type View } from '@/interfaces/dataset.interface'
 import {
-    ActiveLayerGroup,
-    Basemap,
-    Labels,
-    LayerState,
-    State,
-    Bounds,
+    type ActiveLayerGroup,
+    type Basemap,
+    type Labels,
+    type LayerState,
+    type State,
+    type Bounds,
 } from '@/interfaces/state.interface'
 import { template } from 'lodash'
 import { useLayoutEffect } from 'react'
-import { ViewState } from 'react-map-gl'
-import { create, UseBoundStore } from 'zustand'
+import { type ViewState } from 'react-map-gl'
+import { create, type UseBoundStore } from 'zustand'
 import { createContext } from 'zustand-utils'
 import { combine } from 'zustand/middleware'
 
@@ -245,7 +245,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                     let layerAsLayerObj = prev.layerAsLayerObj
 
                     const temp = structuredClone(activeLayerGroups)
-                    const temp2: Map<string, string> = new Map([
+                    const temp2 = new Map<string, string>([
                         ...layerAsLayerObj,
                     ])
                     activeLayerGroups = structuredClone(prevLayerGroups)

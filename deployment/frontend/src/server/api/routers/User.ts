@@ -22,8 +22,8 @@ import type {
     WriUser,
 } from '@/schema/ckan.schema'
 import { UserFormInviteSchema, UserFormSchema } from '@/schema/user.schema'
-import { User } from '@portaljs/ckan'
-import { ApiToken } from '@/interfaces/user.interface'
+import { type User } from '@portaljs/ckan'
+import { type ApiToken } from '@/interfaces/user.interface'
 
 export const UserRouter = createTRPCRouter({
     getDashboardUser: protectedProcedure.query(async ({ ctx }) => {
@@ -99,10 +99,10 @@ export const UserRouter = createTRPCRouter({
             const data = (await response.json()) as CkanResponse<WriUser[]>
             if (!data.success && data.error) throw Error(data.error.message)
 
-            let users = data.result
+            const users = data.result
 
             let result: IUsers[] = users.map((user) => {
-                let rslt = {
+                const rslt = {
                     title: user.name!,
                     id: user.id!,
                     email_hash: user.email_hash!,
@@ -234,10 +234,10 @@ export const UserRouter = createTRPCRouter({
             }))!
             const allUsers = (await getAllUsers({
                 apiKey: ctx.session.user.apikey,
-            }))!
+            }))
             const orgUsers = orgMembers.users?.map((user) => user.name)
             const nonOrgUsers = allUsers.filter(
-                (user) => !orgUsers?.includes(user.name!)
+                (user) => !orgUsers?.includes(user.name)
             )
             return {
                 users: nonOrgUsers,
@@ -378,7 +378,7 @@ export const UserRouter = createTRPCRouter({
                 if (!data.success && data.error) throw Error(data.error.message)
 
                 try {
-                    const role = input.role?.value as string
+                    const role = input.role?.value!
                     const email = generateInviteEmail(
                         input.email,
                         password,

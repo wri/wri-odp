@@ -1,16 +1,16 @@
 import { api } from '@/utils/api'
 import {
-    ColumnSort,
-    PaginationState,
-    ColumnFilter,
-    Updater,
+    type ColumnSort,
+    type PaginationState,
+    type ColumnFilter,
+    type Updater,
 } from '@tanstack/react-table'
 import { useQuery } from 'react-query'
-import { TabularResource } from '../datasets/visualizations/Visualizations'
+import { type TabularResource } from '../datasets/visualizations/Visualizations'
 import { env } from '@/env.mjs'
-import { CkanResponse } from '@/schema/ckan.schema'
-import { FilterObjType } from './search.schema'
-import { DataExplorerColumnFilter } from './DataExplorer'
+import { type CkanResponse } from '@/schema/ckan.schema'
+import { type FilterObjType } from './search.schema'
+import { type DataExplorerColumnFilter } from './DataExplorer'
 import { useSession } from 'next-auth/react'
 
 export interface FieldsResponse {
@@ -26,9 +26,9 @@ export function useFields({ id, provider, apiKey }: TabularResource) {
     } as any
 
     if (apiKey) {
-        headers['Authorization'] = apiKey
+        headers.Authorization = apiKey
     } else if (session.data?.user.apikey) {
-        headers['Authorization'] = session.data?.user.apikey
+        headers.Authorization = session.data?.user.apikey
     }
 
     const datastoreHook = useQuery(['fields', id], async () => {

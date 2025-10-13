@@ -13,13 +13,13 @@ import { CartoProvider } from '@/utils/providers/cartoProvider'
 import { TileProvider } from '@/utils/providers/tileProvider'
 import { GeeProvider } from '@/utils/providers/geeProvider'
 import { VectorTileProvider } from '@/utils/providers/vectorProvider'
-import { APILayerSpec } from '@/interfaces/layer.interface'
+import { type APILayerSpec } from '@/interfaces/layer.interface'
 import { useMemo } from 'react'
 
 const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
     return layers.map((layer): LayerSpec => {
         const { id, layerConfig } = layer
-        let layerProps: any = pick(layerConfig, [
+        const layerProps: any = pick(layerConfig, [
             'deck',
             'images',
             'interactivity',

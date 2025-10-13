@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import Link from 'next/link'
 import MapViewIcon from './datasets/view-icons/MapViewIcon'
 import TabularViewIcon from './datasets/view-icons/TabularViewIcon'

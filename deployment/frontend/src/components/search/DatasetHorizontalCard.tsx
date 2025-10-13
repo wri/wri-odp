@@ -1,4 +1,4 @@
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import {
     ExclamationCircleIcon,
     ExclamationTriangleIcon,

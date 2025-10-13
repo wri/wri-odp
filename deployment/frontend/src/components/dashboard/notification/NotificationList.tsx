@@ -6,7 +6,7 @@ import Spinner from '@/components/_shared/Spinner'
 import { useQuery } from 'react-query'
 import Pagination from '../_shared/Pagination'
 import type { SearchInput } from '@/schema/search.schema'
-import { NotificationType } from '@/schema/notification.schema'
+import { type NotificationType } from '@/schema/notification.schema'
 
 export default function NotificationList() {
     const { data, isLoading } = api.notification.getAllNotifications.useQuery({

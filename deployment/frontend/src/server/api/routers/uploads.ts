@@ -13,7 +13,7 @@ export const uploadsRouter = createTRPCRouter({
     getPresignedUrl: publicProcedure
         .input(z.object({ key: z.string() }))
         .query(async ({ input }) => {
-            let s3keyPaths = input.key.split('/')
+            const s3keyPaths = input.key.split('/')
             const s3key =
                 env.S3_ACCESS_KEY_ID === 'minioadmin'
                     ? s3keyPaths.slice(1, s3keyPaths.length).join('/')

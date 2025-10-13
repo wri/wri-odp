@@ -9,7 +9,7 @@ import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { api } from '@/utils/api'
 import { useState } from 'react'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
 import superjson from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter } from '@/server/api/root'
@@ -22,7 +22,7 @@ import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/20/solid'
 import classNames from '@/utils/classnames'
 import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel'
 import { ArrowRightIcon } from '@heroicons/react/24/solid'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 
 const ErrorAlert = dynamic<{ text: string; title?: string }>(
     () =>

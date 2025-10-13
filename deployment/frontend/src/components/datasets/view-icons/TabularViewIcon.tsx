@@ -1,5 +1,5 @@
 import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { WriDataset, WriDatasetWithoutDetails } from '@/schema/ckan.schema'
+import { WriDataset, type WriDatasetWithoutDetails } from '@/schema/ckan.schema'
 import { TableCellsIcon } from '@heroicons/react/20/solid'
 
 export default function TabularViewIcon({

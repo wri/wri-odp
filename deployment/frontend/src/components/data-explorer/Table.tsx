@@ -1,8 +1,8 @@
 import {
     flexRender,
-    Table as TableType,
+    type Table as TableType,
     type Column,
-    Header,
+    type Header,
     Updater,
     VisibilityState,
 } from '@tanstack/react-table'
@@ -34,10 +34,10 @@ import {
     useFormContext,
 } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FilterFormType, FilterObjType, filterSchema } from './search.schema'
+import { type FilterFormType, type FilterObjType, filterSchema } from './search.schema'
 import { Button } from '../_shared/Button'
 import SimpleSelect from '../_shared/SimpleSelect'
-import { DataExplorerColumnFilter } from './DataExplorer'
+import { type DataExplorerColumnFilter } from './DataExplorer'
 import { DatePicker } from '../_shared/DatePicker'
 
 type TableProps = {

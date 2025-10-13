@@ -30,7 +30,7 @@ const osanoListeners = () => {
     useEffect(() => {
         const showOsanaDialog = (e: Event) => {
             e.preventDefault()
-            if (window.Osano && window.Osano.cm) {
+            if (window.Osano?.cm) {
                 window.Osano.cm.showDrawer('osano-cm-dom-info-dialog-open')
             } else {
                 console.error('Osano not available!')

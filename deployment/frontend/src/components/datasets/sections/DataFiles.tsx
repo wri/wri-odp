@@ -15,9 +15,9 @@ import {
 } from '@heroicons/react/24/outline'
 import { DownloadButton } from './datafiles/Download'
 import { OpenInButton } from './datafiles/OpenIn'
-import { Resource, View } from '@/interfaces/dataset.interface'
+import { type Resource, type View } from '@/interfaces/dataset.interface'
 import { getFormatColor } from '@/utils/formatColors'
-import { Index } from 'flexsearch'
+import { type Index } from 'flexsearch'
 import {
     Fragment,
     useCallback,
@@ -26,10 +26,10 @@ import {
     useRef,
     useState,
 } from 'react'
-import { WriDataset } from '@/schema/ckan.schema'
+import { type WriDataset } from '@/schema/ckan.schema'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks'
-import { TabularResource } from '../visualizations/Visualizations'
+import { type TabularResource } from '../visualizations/Visualizations'
 import { APIButton } from './datafiles/API'
 import { UseFormReturn, useForm } from 'react-hook-form'
 import { api } from '@/utils/api'
@@ -766,10 +766,10 @@ function DatafileCard({
                                                     datasetName:
                                                         dataset.title ??
                                                         dataset.name,
-                                                    id: datafile.id as string,
+                                                    id: datafile.id,
                                                     name:
                                                         datafile?.title ??
-                                                        (datafile.name as string),
+                                                        (datafile.name!),
                                                 })
 
                                                 customDataLayer({
@@ -947,10 +947,10 @@ function DatafileCard({
                                                         datasetName:
                                                             dataset.title ??
                                                             dataset.name,
-                                                        id: datafile.id as string,
+                                                        id: datafile.id,
                                                         name:
                                                             datafile?.title ??
-                                                            (datafile.name as string),
+                                                            (datafile.name!),
                                                     })
 
                                                     customDataLayer({

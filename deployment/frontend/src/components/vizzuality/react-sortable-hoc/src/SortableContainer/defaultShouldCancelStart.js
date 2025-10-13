@@ -11,7 +11,7 @@ export default function defaultShouldCancelStart(event) {
         NodeType.Button,
     ]
 
-    if (interactiveElements.indexOf(event.target.tagName) !== -1) {
+    if (interactiveElements.includes(event.target.tagName)) {
         // Return true to cancel sorting
         return true
     }

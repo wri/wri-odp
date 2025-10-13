@@ -49,17 +49,16 @@ const vendorPrefix = (function () {
     const styles = window.getComputedStyle(document.documentElement, '') || [
         '-moz-hidden-iframe',
     ]
-    const pre = (Array.prototype.slice
+    const pre = ((/-(moz|webkit|ms)-/.exec(Array.prototype.slice
         .call(styles)
-        .join('')
-        .match(/-(moz|webkit|ms)-/) ||
+        .join(''))) ||
         (styles.OLink === '' && ['', 'o']))[1]
 
     switch (pre) {
         case 'ms':
             return 'ms'
         default:
-            return pre && pre.length ? pre[0].toUpperCase() + pre.substr(1) : ''
+            return pre?.length ? pre[0].toUpperCase() + pre.substr(1) : ''
     }
 })()
 
@@ -132,12 +131,12 @@ export function getScrollAdjustedBoundingClientRect(node, scrollDelta) {
 }
 
 export function getPosition(event) {
-    if (event.touches && event.touches.length) {
+    if (event.touches?.length) {
         return {
             x: event.touches[0].pageX,
             y: event.touches[0].pageY,
         }
-    } else if (event.changedTouches && event.changedTouches.length) {
+    } else if (event.changedTouches?.length) {
         return {
             x: event.changedTouches[0].pageX,
             y: event.changedTouches[0].pageY,
@@ -152,8 +151,8 @@ export function getPosition(event) {
 
 export function isTouchEvent(event) {
     return (
-        (event.touches && event.touches.length) ||
-        (event.changedTouches && event.changedTouches.length)
+        (event.touches?.length) ||
+        (event.changedTouches?.length)
     )
 }
 

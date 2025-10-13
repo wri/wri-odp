@@ -23,7 +23,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const { data: userIdentity, isLoading: isLoadingIUser } =
         api.user.getUserCapacity.useQuery()
 
-    let routes = [
+    const routes = [
         {
             name: 'Dashboard',
             href: 'default',
@@ -203,8 +203,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                     ) : session
                                                                           ?.user
                                                                           .sysadmin ||
-                                                                      (userIdentity &&
-                                                                          userIdentity.isOrgAdmin) ? (
+                                                                      (userIdentity?.isOrgAdmin) ? (
                                                                         <li
                                                                             key={
                                                                                 item.name
@@ -343,8 +342,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                 <Spinner className="w-2 h-2" />
                                                             ) : session?.user
                                                                   .sysadmin ||
-                                                              (userIdentity &&
-                                                                  userIdentity.isOrgAdmin) ? (
+                                                              (userIdentity?.isOrgAdmin) ? (
                                                                 <li
                                                                     key={
                                                                         item.name

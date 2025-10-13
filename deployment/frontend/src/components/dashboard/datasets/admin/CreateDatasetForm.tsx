@@ -9,7 +9,7 @@ import { MoreDetailsForm } from '@/components/dashboard/datasets/admin/metadata/
 import { OverviewForm } from '@/components/dashboard/datasets/admin/metadata/Overview'
 import { PointOfContactForm } from '@/components/dashboard/datasets/admin/metadata/PointOfContact'
 import { Preview } from '@/components/dashboard/datasets/admin/preview/Preview'
-import { DatasetFormType, DatasetSchema } from '@/schema/dataset.schema'
+import { type DatasetFormType, DatasetSchema } from '@/schema/dataset.schema'
 import { api } from '@/utils/api'
 import classNames from '@/utils/classnames'
 import notify from '@/utils/notify'
@@ -113,7 +113,7 @@ export default function CreateDatasetForm() {
 
     console.log('ERRORS', errors)
     useEffect(() => {
-        if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
+        if (!dirtyFields.name) setValue('name', slugify(watch('title')))
     }, [watch('title')])
 
     return (

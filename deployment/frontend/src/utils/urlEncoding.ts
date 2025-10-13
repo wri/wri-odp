@@ -1,4 +1,4 @@
-import { LayerState, Layers, State } from '@/interfaces/state.interface'
+import { LayerState, Layers, type State } from '@/interfaces/state.interface'
 
 export function decodeMapParam(map?: string): State['mapView'] | null {
     if (!map) return null
@@ -22,7 +22,7 @@ function deepSortObject<T>(obj: T): T {
     if (Array.isArray(obj)) {
         return obj.map((el) => deepSortObject(el)) as unknown as T
     }
-    const sortedEntries = (Object.entries(obj) as [string, any][])
+    const sortedEntries = (Object.entries(obj))
         .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
         .map(([key, val]) => [key, deepSortObject(val)])
 

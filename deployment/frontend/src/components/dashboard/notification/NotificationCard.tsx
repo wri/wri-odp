@@ -1,6 +1,6 @@
 import React from 'react'
 import Row from '../_shared/Row'
-import { NotificationType } from '@/schema/notification.schema'
+import { type NotificationType } from '@/schema/notification.schema'
 import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'

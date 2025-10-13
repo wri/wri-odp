@@ -6,8 +6,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/_shared/Table'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
+import { type DatasetFormType } from '@/schema/dataset.schema'
+import { type UseFormReturn, useFieldArray } from 'react-hook-form'
 
 export function DataDictionaryTable({
     formObj,

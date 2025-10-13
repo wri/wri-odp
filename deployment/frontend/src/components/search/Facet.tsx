@@ -1,10 +1,10 @@
-import { Filter } from '@/interfaces/search.interface'
+import { type Filter } from '@/interfaces/search.interface'
 import { SearchInput } from '@/schema/search.schema'
 import { Disclosure, Transition } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { set } from 'lodash'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -44,7 +44,7 @@ export default function Facet({
         }, {})
     }
 
-    const [optionsState, setOptionsState] = useState<{ [k: string]: boolean }>(
+    const [optionsState, setOptionsState] = useState<Record<string, boolean>>(
         getUpdatedOptionsState()
     )
 

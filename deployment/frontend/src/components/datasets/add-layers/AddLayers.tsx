@@ -3,8 +3,8 @@ import { Tab } from '@headlessui/react'
 import { Fragment, useEffect, useState } from 'react'
 import SearchPanel from './SearchPanel'
 import FiltersPanel from './FiltersPanel'
-import { SearchInput } from '@/schema/search.schema'
-import { Filter } from '@/interfaces/search.interface'
+import { type SearchInput } from '@/schema/search.schema'
+import { type Filter } from '@/interfaces/search.interface'
 import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'
 import Pagination from '../Pagination'
@@ -91,7 +91,7 @@ export default function AddLayers() {
                     ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                     : '*'
 
-                fq['metadata_modified'] =
+                fq.metadata_modified =
                     `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
             } else if (key == 'spatial') {
                 const coordinates = keyFilters[0]?.value

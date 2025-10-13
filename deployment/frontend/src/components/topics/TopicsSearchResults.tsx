@@ -2,8 +2,8 @@ import Topic from '@/interfaces/topic.interface'
 import CardsGrid from '../_shared/CardsGrid'
 import Container from '../_shared/Container'
 import TopicCard from './TopicCard'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
-import { Group as CkanGroup } from '@portaljs/ckan'
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema'
+import { type Group as CkanGroup } from '@portaljs/ckan'
 type Group = CkanGroup & { numSubtopics: number }
 
 export default function TopicsSearchResults({

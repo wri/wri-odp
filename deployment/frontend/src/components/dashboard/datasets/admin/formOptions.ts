@@ -1,7 +1,7 @@
 import {
-    CapacityUnion,
-    UpdateFrequencyUnion,
-    VisibilityTypeUnion,
+    type CapacityUnion,
+    type UpdateFrequencyUnion,
+    type VisibilityTypeUnion,
 } from '@/schema/dataset.schema'
 
 export const languageOptions = [
