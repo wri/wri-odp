@@ -144,7 +144,6 @@ export async function getServerSideProps(
         if (prevdataset.owner_org) {
             const orgdetails = await getRecipient({
                 owner_org: prevdataset.owner_org,
-                session: session,
             });
             userAuthorize = !!orgdetails?.find(
                 (x) => x.id === session?.user.id

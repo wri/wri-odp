@@ -1700,7 +1700,6 @@ export async function sendIssueOrCommentNotigication({
         if (owner_org) {
             recipientUsers = (await getRecipient({
                 owner_org: owner_org,
-                session: session,
             }))!;
             recipientIds = recipientUsers.map((user) => user.id!);
         } else if (creator_id) {
@@ -1953,7 +1952,6 @@ export async function sendGroupNotification({
         if (owner_org) {
             recipientUsers = (await getRecipient({
                 owner_org: owner_org,
-                session: session,
             }))!;
             recipientIds = recipientUsers.map((user) => user.id!);
         }
