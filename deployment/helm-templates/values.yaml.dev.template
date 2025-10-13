@@ -67,6 +67,41 @@ ckan:
     service:
       port: 80
       type: ClusterIP
+    enableLocalLogs: true
+    logStorageSize: 2Gi
+    logStorageClass: gp2
+    extraVolumes:
+    - name: ckan-logs
+      persistentVolumeClaim:
+        claimName: ckan-logs-pvc
+    extraVolumeMounts:
+    - name: ckan-logs
+      mountPath: /var/log/ckan
+    extraContainers:
+    - name: ckan-log-writer
+      image: busybox:1.36
+      command:
+      - /bin/sh
+      - -c
+      args:
+      - |
+        echo "[log-writer] Starting log persistence..."
+        tail -n+1 -F /proc/1/fd/1 >> /var/log/ckan/ckan.log
+      volumeMounts:
+      - name: ckan-logs
+        mountPath: /var/log/ckan
+    - name: logrotate
+      image: alpine:3.19
+      command: [ "/bin/sh", "-c" ]
+      args:
+      - |
+        while true; do
+          find /var/log/ckan -type f -name '*.log' -mtime +7 -delete
+          sleep 86400
+        done
+      volumeMounts:
+      - name: ckan-logs
+        mountPath: /var/log/ckan
   datapusher:
     enable: enable
     env:

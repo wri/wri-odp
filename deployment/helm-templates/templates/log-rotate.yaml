@@ -1,0 +1,15 @@
+{{- if .Values.ckan.enableLocalLogs }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ckan-logs-pvc
+  labels:
+    app: ckan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.ckan.logStorageSize | default "2Gi" }}
+  storageClassName: {{ .Values.ckan.logStorageClass | default "gp2" }}
+{{- end }}
