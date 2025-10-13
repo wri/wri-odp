@@ -162,8 +162,7 @@ export default function TeamHeaderCard({
                             <div className="flex items-center gap-3">
                                 <div className="text-base font-light text-black">
                                     {teamsDetails[team.id]?.package_count &&
-                                    (teamsDetails[team.id]
-                                        ?.package_count!) <= 1
+                                    teamsDetails[team.id]?.package_count! <= 1
                                         ? `${
                                               teamsDetails[team.id]
                                                   ?.package_count

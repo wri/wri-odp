@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 // => Tiptap packages
-import { useEditor, EditorContent, type Editor, BubbleMenu } from '@tiptap/react'
+import {
+    useEditor,
+    EditorContent,
+    type Editor,
+    BubbleMenu,
+} from '@tiptap/react'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'

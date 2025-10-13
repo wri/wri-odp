@@ -219,7 +219,7 @@ export function formatDiff(
                 }
             } else if (
                 !key.startsWith('resource') &&
-                ((/\[\d+\]\.\w+/.exec(key)) || (/\[\d+\]/.exec(key)))
+                (/\[\d+\]\.\w+/.exec(key) || /\[\d+\]/.exec(key))
             ) {
                 const keyoldNew = data[key]?.old_value ?? data[key]?.new_value
                 if (

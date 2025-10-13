@@ -7,7 +7,10 @@ import {
     useState,
 } from 'react'
 import { Map, type MapLayerMouseEvent } from 'mapbox-gl'
-import { type LngLat, type MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
+import {
+    type LngLat,
+    type MapGeoJSONFeature,
+} from 'react-map-gl/dist/esm/types'
 import { Popup } from 'react-map-gl'
 import { useLayersFromRW } from '@/utils/queryHooks'
 import numeral from 'numeral'

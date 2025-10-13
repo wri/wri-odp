@@ -91,8 +91,7 @@ export default function AddLayers() {
                     ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                     : '*'
 
-                fq.metadata_modified =
-                    `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+                fq.metadata_modified = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
             } else if (key == 'spatial') {
                 const coordinates = keyFilters[0]?.value
                 const address = keyFilters[0]?.label

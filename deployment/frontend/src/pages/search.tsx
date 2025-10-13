@@ -18,7 +18,10 @@ import { env } from '@/env.mjs'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import { getServerAuthSession } from '@/server/auth'
 import { advance_search_query } from '@/utils/apiUtils'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
@@ -139,7 +142,7 @@ export default function SearchPage(
 
             const keyFilters = filters.filter((f) => f.key == key)
 
-            if ((key) == 'temporal_coverage_start') {
+            if (key == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageStart = keyFilters[0]
                     const temporalCoverageEnd = filters.find(
@@ -152,7 +155,7 @@ export default function SearchPage(
                     //     keyFq = `[* TO ${temporalCoverageEnd}]`
                     // }
                 }
-            } else if ((key) == 'temporal_coverage_end') {
+            } else if (key == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
                     const temporalCoverageEnd = keyFilters[0]
                     const temporalCoverageStart = filters.find(
@@ -183,8 +186,7 @@ export default function SearchPage(
                     ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                     : '*'
 
-                fq.metadata_modified =
-                    `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+                fq.metadata_modified = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
             } else if (key == 'spatial') {
                 const coordinates = keyFilters[0]?.value
                 const address = keyFilters[0]?.label

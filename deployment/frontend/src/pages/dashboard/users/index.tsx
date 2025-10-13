@@ -5,7 +5,10 @@ import UserList from '@/components/dashboard/users/UserList'
 import Footer from '@/components/_shared/Footer'
 import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
 import { getServerAuthSession } from '@/server/auth'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'

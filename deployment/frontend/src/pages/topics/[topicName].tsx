@@ -16,7 +16,10 @@ import { getServerAuthSession } from '@/server/auth'
 import Spinner from '@/components/_shared/Spinner'
 import GroupBreadcrumb from '@/components/team/GroupBreadcrumb'
 import { getTopicTreeDetails } from '@/utils/apiUtils'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'

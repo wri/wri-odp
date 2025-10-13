@@ -61,7 +61,7 @@ export default function TeamCard({
                 {isGroupTree(team) && (
                     <span className="mr-2">
                         {teamsDetails[team.id]?.package_count &&
-                        (teamsDetails[team.id]?.package_count!) <= 1
+                        teamsDetails[team.id]?.package_count! <= 1
                             ? `${teamsDetails[team.id]?.package_count || 0} Dataset`
                             : `${
                                   teamsDetails[team.id]?.package_count || 0
@@ -70,8 +70,7 @@ export default function TeamCard({
                 )}
                 {!isGroupTree(team) && (
                     <span className="mr-2">
-                        {team.package_count &&
-                        (team.package_count) <= 1
+                        {team.package_count && team.package_count <= 1
                             ? `${team.package_count} Dataset`
                             : `${team.package_count} Datasets`}
                     </span>

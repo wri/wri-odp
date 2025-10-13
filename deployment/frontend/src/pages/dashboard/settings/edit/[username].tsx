@@ -3,7 +3,10 @@ import Header from '@/components/_shared/Header'
 import Layout from '@/components/dashboard/Layout'
 import Footer from '@/components/_shared/Footer'
 import { getServerAuthSession } from '../../../../server/auth'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import { NextSeo } from 'next-seo'
 import { api } from '@/utils/api'
 import Spinner from '@/components/_shared/Spinner'

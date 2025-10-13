@@ -130,9 +130,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         }
     }
 
-    if (
-        initialZustandState?.prevRelatedDatasets?.length
-    ) {
+    if (initialZustandState?.prevRelatedDatasets?.length) {
         const datasets = initialZustandState?.prevRelatedDatasets
         for (const dataset of datasets) {
             for (const resource of dataset?.resources) {

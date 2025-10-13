@@ -232,9 +232,9 @@ export const UserRouter = createTRPCRouter({
                 orgId: input,
                 apiKey: ctx.session.user.apikey,
             }))!
-            const allUsers = (await getAllUsers({
+            const allUsers = await getAllUsers({
                 apiKey: ctx.session.user.apikey,
-            }))
+            })
             const orgUsers = orgMembers.users?.map((user) => user.name)
             const nonOrgUsers = allUsers.filter(
                 (user) => !orgUsers?.includes(user.name)

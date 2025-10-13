@@ -9,7 +9,10 @@ import {
     convertFormToLayerObj,
     getApiSpecFromRawObj,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
-import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema'
+import {
+    type DatasetFormType,
+    type ResourceFormType,
+} from '@/schema/dataset.schema'
 
 export const assertFullfilled = <T>(
     input: PromiseSettledResult<T>

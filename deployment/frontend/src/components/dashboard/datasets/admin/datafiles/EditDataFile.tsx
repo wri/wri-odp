@@ -9,7 +9,10 @@ import {
 import { type UseFormReturn } from 'react-hook-form'
 import { DataFileAccordion } from './DatafileAccordion'
 import { match, P } from 'ts-pattern'
-import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema'
+import {
+    type DatasetFormType,
+    type ResourceFormType,
+} from '@/schema/dataset.schema'
 import { convertBytes } from '@/utils/convertBytes'
 import { Tab } from '@headlessui/react'
 import { Fragment, useState } from 'react'

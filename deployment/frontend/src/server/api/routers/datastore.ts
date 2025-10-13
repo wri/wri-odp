@@ -75,11 +75,9 @@ export const datastoreRouter = createTRPCRouter({
                           )
                           .join(' AND ')
                     : ''
-            const groupBySql =
-                groupBy?.length
-                    ? 'GROUP BY ' +
-                      groupBy.map((item) => `"${item}"`).join(', ')
-                    : ''
+            const groupBySql = groupBy?.length
+                ? 'GROUP BY ' + groupBy.map((item) => `"${item}"`).join(', ')
+                : ''
 
             const parsedColumns = columns.map((column) => `"${column}"`)
             const url = `${

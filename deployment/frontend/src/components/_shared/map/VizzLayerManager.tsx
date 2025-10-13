@@ -1,4 +1,9 @@
-import React, { PureComponent, Children, cloneElement, type ReactNode } from 'react'
+import React, {
+    PureComponent,
+    Children,
+    cloneElement,
+    type ReactNode,
+} from 'react'
 import Manager from '@vizzuality/layer-manager'
 import type { Map } from 'mapbox-gl'
 import type {

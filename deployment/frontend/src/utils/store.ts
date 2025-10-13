@@ -245,9 +245,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                     let layerAsLayerObj = prev.layerAsLayerObj
 
                     const temp = structuredClone(activeLayerGroups)
-                    const temp2 = new Map<string, string>([
-                        ...layerAsLayerObj,
-                    ])
+                    const temp2 = new Map<string, string>([...layerAsLayerObj])
                     activeLayerGroups = structuredClone(prevLayerGroups)
                     prevLayerGroups = structuredClone(temp)
                     layerAsLayerObj = new Map(tempLayerAsLayerobj)

@@ -16,7 +16,11 @@ import type {
 } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
 import type { SearchInput } from '@/schema/search.schema'
-import { type Facets, type FacetsCount, type Filter } from '@/interfaces/search.interface'
+import {
+    type Facets,
+    type FacetsCount,
+    type Filter,
+} from '@/interfaces/search.interface'
 import { replaceNames } from '@/utils/replaceNames'
 import { type Session } from 'next-auth'
 import nodemailer from 'nodemailer'
@@ -33,13 +37,19 @@ import type {
     NotificationType,
 } from '@/schema/notification.schema'
 import { type Resource, type View } from '@/interfaces/dataset.interface'
-import { type CreateViewFormSchema, type EditViewFormSchema } from '@/schema/view.schema'
+import {
+    type CreateViewFormSchema,
+    type EditViewFormSchema,
+} from '@/schema/view.schema'
 import { getLayerRw } from '@/server/api/routers/dataset'
 import {
     convertLayerObjToForm,
     getRawObjFromApiSpec,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
-import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema'
+import {
+    type DatasetFormType,
+    type ResourceFormType,
+} from '@/schema/dataset.schema'
 import { TRPCError } from '@trpc/server'
 import {
     editLayerRw,
@@ -1035,9 +1045,9 @@ export async function getOrganizationTreeDetails({
             count: 0,
         }
     }
-    const allGroups = (await getAllOrganizations({
+    const allGroups = await getAllOrganizations({
         apiKey: session?.user.apikey ?? '',
-    }))
+    })
 
     const teamDetails = allGroups.reduce(
         (acc, org) => {
@@ -2697,11 +2707,11 @@ export async function getDatasetReleaseNotes({ id }: { id: string }) {
 }
 
 export async function generateDataSiteMap() {
-    const packagedetails = (await getAllDatasetFq({
+    const packagedetails = await getAllDatasetFq({
         apiKey: '',
         fq: `is_approved:true`,
         query: { search: '', page: { start: 0, rows: 100000 } },
-    }))
+    })
 
     const getAllOrg = await getAllOrganizations({ apiKey: '' })
     const orgs = getAllOrg.map((org) => {
@@ -2758,7 +2768,7 @@ export function advance_search_query(filters: Filter[]) {
         let keyFq
 
         const keyFilters = filters.filter((f) => f.key == key)
-        if ((key) == 'temporal_coverage_start') {
+        if (key == 'temporal_coverage_start') {
             if (keyFilters.length > 0) {
                 const temporalCoverageStart = keyFilters[0]
                 const temporalCoverageEnd = filters.find(
@@ -2771,7 +2781,7 @@ export function advance_search_query(filters: Filter[]) {
                     keyFq = `[* TO ${temporalCoverageEnd}]`
                 }
             }
-        } else if ((key) == 'temporal_coverage_end') {
+        } else if (key == 'temporal_coverage_end') {
             if (keyFilters.length > 0) {
                 const temporalCoverageEnd = keyFilters[0]
                 const temporalCoverageStart = filters.find(
@@ -2802,8 +2812,7 @@ export function advance_search_query(filters: Filter[]) {
                 ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
                 : '*'
 
-            fq.metadata_modified =
-                `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+            fq.metadata_modified = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
         } else if (key == 'spatial') {
             const coordinates = keyFilters[0]?.value
             const address = keyFilters[0]?.label

@@ -10,7 +10,11 @@ import Link from 'next/link'
 import { api } from '@/utils/api'
 import { ErrorAlert } from '../_shared/Alerts'
 import Spinner from '../_shared/Spinner'
-import { type Application, GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import {
+    type Application,
+    GroupTree,
+    GroupsmDetails,
+} from '@/schema/ckan.schema'
 import { Group } from '@portaljs/ckan'
 
 export function ApplicationCard({ application }: { application: Application }) {
@@ -68,18 +72,20 @@ export function ApplicationsCarousel() {
                         </div>
                     )}
 
-                    {data?.filter((application) => {
-                                const datasetCount = application.package_count
-                                return datasetCount > 0
-                            }).map((application, index) => (
-                                <SwiperSlide key={index} className="">
-                                    <div className=" w-80 pr-6">
-                                        <ApplicationCard
-                                            application={application}
-                                        />
-                                    </div>
-                                </SwiperSlide>
-                            ))}
+                    {data
+                        ?.filter((application) => {
+                            const datasetCount = application.package_count
+                            return datasetCount > 0
+                        })
+                        .map((application, index) => (
+                            <SwiperSlide key={index} className="">
+                                <div className=" w-80 pr-6">
+                                    <ApplicationCard
+                                        application={application}
+                                    />
+                                </div>
+                            </SwiperSlide>
+                        ))}
                 </AutoCarousel>
             </div>
         </div>

@@ -19,7 +19,10 @@ import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { DataFileAccordion } from './DatafileAccordion'
 import { P, match } from 'ts-pattern'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
-import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema'
+import {
+    type DatasetFormType,
+    type ResourceFormType,
+} from '@/schema/dataset.schema'
 import Uppy, { type UppyFile } from '@uppy/core'
 import AwsS3 from '@uppy/aws-s3'
 import { getUploadParameters } from '@/utils/uppyFunctions'

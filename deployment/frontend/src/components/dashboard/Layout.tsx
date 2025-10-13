@@ -203,7 +203,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                     ) : session
                                                                           ?.user
                                                                           .sysadmin ||
-                                                                      (userIdentity?.isOrgAdmin) ? (
+                                                                      userIdentity?.isOrgAdmin ? (
                                                                         <li
                                                                             key={
                                                                                 item.name
@@ -342,7 +342,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                 <Spinner className="w-2 h-2" />
                                                             ) : session?.user
                                                                   .sysadmin ||
-                                                              (userIdentity?.isOrgAdmin) ? (
+                                                              userIdentity?.isOrgAdmin ? (
                                                                 <li
                                                                     key={
                                                                         item.name

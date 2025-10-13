@@ -30,7 +30,7 @@ const handleResize = (key: string) => {
 const add = (key: string, element: Target) => {
     if (!store) return
     // create store if missing
-    store[key] ??= [];
+    store[key] ??= []
 
     if (store?.[key]) {
         const item = store[key]

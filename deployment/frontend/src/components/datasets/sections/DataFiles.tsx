@@ -769,7 +769,7 @@ function DatafileCard({
                                                     id: datafile.id,
                                                     name:
                                                         datafile?.title ??
-                                                        (datafile.name!),
+                                                        datafile.name!,
                                                 })
 
                                                 customDataLayer({
@@ -950,7 +950,7 @@ function DatafileCard({
                                                         id: datafile.id,
                                                         name:
                                                             datafile?.title ??
-                                                            (datafile.name!),
+                                                            datafile.name!,
                                                     })
 
                                                     customDataLayer({

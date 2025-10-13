@@ -111,20 +111,20 @@ export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
                     </TableHeader>
                     <TableBody>
                         {flowState?.logs?.map((log: Log, index: number) => (
-                                <TableRow
-                                    key={log.id}
-                                    className={
-                                        index % 2 != 0
-                                            ? 'border-0 bg-[#FDFDFD]'
-                                            : 'border-0'
-                                    }
-                                >
-                                    <TableCell>
-                                        {convertTimestamp(log.timestamp)}
-                                    </TableCell>
-                                    <TableCell>{log.message}</TableCell>
-                                </TableRow>
-                            ))}
+                            <TableRow
+                                key={log.id}
+                                className={
+                                    index % 2 != 0
+                                        ? 'border-0 bg-[#FDFDFD]'
+                                        : 'border-0'
+                                }
+                            >
+                                <TableCell>
+                                    {convertTimestamp(log.timestamp)}
+                                </TableCell>
+                                <TableCell>{log.message}</TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </ScrollArea>

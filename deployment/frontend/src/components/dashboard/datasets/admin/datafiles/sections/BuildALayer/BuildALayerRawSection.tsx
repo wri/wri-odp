@@ -6,7 +6,10 @@ import { Button } from '@/components/_shared/Button'
 import { Legends } from './preview/Legends'
 import { getInteractiveLayers } from '@/utils/queryHooks'
 import Tooltip from './preview/Tooltip'
-import { type LngLat, type MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
+import {
+    type LngLat,
+    type MapGeoJSONFeature,
+} from 'react-map-gl/dist/esm/types'
 import { type APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
 import { Accordion } from './Accordion'

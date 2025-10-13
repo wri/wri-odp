@@ -3,7 +3,10 @@ import Header from '@/components/_shared/Header'
 import { useRouter } from 'next/router'
 import { api } from '@/utils/api'
 import dynamic from 'next/dynamic'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import Spinner from '@/components/_shared/Spinner'
 import { useSession } from 'next-auth/react'
 import { getOneDataset } from '@/utils/apiUtils'

@@ -24,10 +24,7 @@ export default function SelectFilter({
 }) {
     const [selected, setSelected] = useState(
         query.fq?.[filtername]
-            ? options.find(
-                  (o) =>
-                      o.id === (query.fq!)[filtername]
-              )
+            ? options.find((o) => o.id === query.fq![filtername])
             : options[0]
               ? options[0]
               : { id: '0', label: '' }

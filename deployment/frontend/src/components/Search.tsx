@@ -1,4 +1,9 @@
-import React, { type Dispatch, type SetStateAction, useEffect, useState } from 'react'
+import React, {
+    type Dispatch,
+    type SetStateAction,
+    useEffect,
+    useState,
+} from 'react'
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import { useRouter } from 'next/router'

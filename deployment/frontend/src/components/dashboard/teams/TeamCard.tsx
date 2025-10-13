@@ -500,9 +500,7 @@ export default function TeamCard() {
                                 rowMain={
                                     <TeamProfile
                                         team={team}
-                                        org2img={
-                                            data?.org2Image!
-                                        }
+                                        org2img={data?.org2Image!}
                                     />
                                 }
                                 linkButton={{
@@ -560,9 +558,7 @@ export default function TeamCard() {
                                     <SubCardProfile
                                         teams={team.children}
                                         highlighted={team?.highlighted}
-                                        org2img={
-                                            data?.org2Image!
-                                        }
+                                        org2img={data?.org2Image!}
                                     />
                                 }
                                 isDropDown
@@ -604,9 +600,7 @@ export default function TeamCard() {
                         <LoaderButton
                             variant="destructive"
                             loading={deleteTeam.isLoading}
-                            onClick={() =>
-                                deleteTeam.mutate(selectedTeam.name)
-                            }
+                            onClick={() => deleteTeam.mutate(selectedTeam.name)}
                             id={selectedTeam.name}
                         >
                             Delete Team

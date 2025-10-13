@@ -5,7 +5,10 @@ import DatasetList from '@/components/dashboard/datasets/DatasetList'
 import Footer from '@/components/_shared/Footer'
 import { NextSeo } from 'next-seo'
 import { env } from '@/env.mjs'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import superjson from 'superjson'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import { appRouter } from '@/server/api/root'

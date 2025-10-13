@@ -368,9 +368,7 @@ export default function TopicCard() {
                                     rowMain={
                                         <TopicProfile
                                             team={topic}
-                                            topic2Image={
-                                                data?.topic2Image!
-                                            }
+                                            topic2Image={data?.topic2Image!}
                                         />
                                     }
                                     linkButton={{
@@ -412,9 +410,7 @@ export default function TopicCard() {
                                         <SubCardProfile
                                             teams={topic.children}
                                             highlighted={topic?.highlighted}
-                                            topic2Image={
-                                                data?.topic2Image!
-                                            }
+                                            topic2Image={data?.topic2Image!}
                                         />
                                     }
                                     isDropDown

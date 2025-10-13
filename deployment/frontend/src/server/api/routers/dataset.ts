@@ -965,7 +965,7 @@ export const DatasetRouter = createTRPCRouter({
                 }
             }
 
-            const dataset = (await getAllDatasetFq({
+            const dataset = await getAllDatasetFq({
                 apiKey: ctx.session?.user.apikey ?? '',
                 fq: `${fq}${input.appendRawFq ?? ''}`,
                 query: input,
@@ -974,7 +974,7 @@ export const DatasetRouter = createTRPCRouter({
                 extLocationQ: input.extLocationQ,
                 extAddressQ: input.extAddressQ,
                 extGlobalQ: input.extGlobalQ,
-            }))
+            })
 
             const _datasets = input.removeUnecessaryDataInResources
                 ? dataset.datasets.map((d) => ({
@@ -1107,16 +1107,16 @@ export const DatasetRouter = createTRPCRouter({
     getMyDataset: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const dataset = (await getAllDatasetFq({
+            const dataset = await getAllDatasetFq({
                 apiKey: ctx.session.user.apikey,
                 fq: `creator_user_id:${ctx.session.user.id}+draft:false`,
                 query: input,
-            }))
-            const privateDataset = (await getAllDatasetFq({
+            })
+            const privateDataset = await getAllDatasetFq({
                 apiKey: ctx.session.user.apikey,
                 fq: `creator_user_id:${ctx.session.user.id}+draft:true+visibility_type:private`,
                 query: input,
-            }))
+            })
 
             const allMydataset = [
                 ...dataset.datasets,
@@ -1165,11 +1165,11 @@ export const DatasetRouter = createTRPCRouter({
     getDraftDataset: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const dataset = (await getAllDatasetFq({
+            const dataset = await getAllDatasetFq({
                 apiKey: ctx.session.user.apikey,
                 fq: `visibility_type:draft`,
                 query: input,
-            }))
+            })
             return {
                 datasets: dataset.datasets,
                 count: dataset.count,
@@ -1203,11 +1203,11 @@ export const DatasetRouter = createTRPCRouter({
             })
         )
         .query(async ({ input, ctx }) => {
-            const dataset = (await getAllDatasetFq({
+            const dataset = await getAllDatasetFq({
                 apiKey: '',
                 fq: `featured_dataset:true`,
                 query: input,
-            }))
+            })
             //This allows us to send less data to the client
             const _datasets = input.removeUnecessaryDataInResources
                 ? dataset.datasets.map((d) => ({
@@ -1549,12 +1549,12 @@ export const DatasetRouter = createTRPCRouter({
                     fq = `${fq}+${orgsFq}`
                 }
             }
-            const dataset = (await getAllDatasetFq({
+            const dataset = await getAllDatasetFq({
                 apiKey: ctx.session.user.apikey,
                 fq: fq, // TODO: Vverify if organization admin can only see this and sysadmin
                 query: input,
                 user: true,
-            }))
+            })
 
             return {
                 datasets: dataset.datasets,

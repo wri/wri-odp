@@ -12,7 +12,10 @@ import SubTeams from '@/components/team/SubTeams'
 import DatasetTopic from '@/components/topics/DatasetTopic'
 import DatasetTeams from '@/components/team/DatasetTeams'
 import GroupBreadcrumb from '@/components/team/GroupBreadcrumb'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import { getOrganizationTreeDetails } from '@/utils/apiUtils'
 import { getServerAuthSession } from '@/server/auth'
 import { type GroupsmDetails, type GroupTree } from '@/schema/ckan.schema'

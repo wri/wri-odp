@@ -4,7 +4,11 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover'
-import { type Resource, type View, type ViewState } from '@/interfaces/dataset.interface'
+import {
+    type Resource,
+    type View,
+    type ViewState,
+} from '@/interfaces/dataset.interface'
 import { PopoverClose } from '@radix-ui/react-popover'
 import { useState } from 'react'
 import { DatastoreViewCard } from './DatastoreViewCard'
@@ -84,10 +88,7 @@ export default function ViewsList(props: ViewsListProps) {
         ])
     }
 
-    const isCanCreateChartview = !!(
-        (datafile?.datastore_active) ||
-        rwDatasetId
-    )
+    const isCanCreateChartview = !!(datafile?.datastore_active || rwDatasetId)
 
     return (
         <div>

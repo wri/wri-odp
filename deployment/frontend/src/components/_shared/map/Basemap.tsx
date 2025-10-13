@@ -18,7 +18,7 @@ export default function Basemap({
             if (!map) return
             // Destructuring assignment to get the 'map' object from 'mapRef' using useRef hook.
             const BASEMAP_GROUPS = ['basemap'] // An array containing the group names of basemap layers.
-            const { layers, metadata } = (map).getStyle() // Extracting the layers and metadata from the current map style.
+            const { layers, metadata } = map.getStyle() // Extracting the layers and metadata from the current map style.
 
             // Extracting the basemap groups from the metadata.
             const basemapGroups = Object.keys(metadata['mapbox:groups']).filter(
@@ -64,18 +64,10 @@ export default function Basemap({
                     _layer.metadata['mapbox:group'] === basemapToDisplay.id
                 if (!match) {
                     // Setting the visibility of the layer to 'none' if it does not match the selected 'basemap'.
-                    ;(map).setLayoutProperty(
-                        _layer.id,
-                        'visibility',
-                        'none'
-                    )
+                    map.setLayoutProperty(_layer.id, 'visibility', 'none')
                 } else {
                     // Setting the visibility of the layer to 'visible' if it matches the selected 'basemap'.
-                    ;(map).setLayoutProperty(
-                        _layer.id,
-                        'visibility',
-                        'visible'
-                    )
+                    map.setLayoutProperty(_layer.id, 'visibility', 'visible')
                 }
             })
         },

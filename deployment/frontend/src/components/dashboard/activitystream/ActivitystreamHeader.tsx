@@ -113,11 +113,7 @@ function LeftNode({
             {selectEntity.search === 'dataset' ? (
                 <SelectFilter
                     options={[{ id: 'all', label: 'All Datasets' }].concat(
-                        getKeyValues(
-                            dataset?.datasets!,
-                            'title',
-                            'id'
-                        )
+                        getKeyValues(dataset?.datasets!, 'title', 'id')
                     )}
                     filtername="packageId"
                     setQuery={setServerQuery}
@@ -129,11 +125,7 @@ function LeftNode({
             {selectEntity.search === 'teams' ? (
                 <SelectFilter
                     options={[{ id: 'all', label: 'All Teams' }].concat(
-                        getKeyValues(
-                            organization!,
-                            'title',
-                            'id'
-                        )
+                        getKeyValues(organization!, 'title', 'id')
                     )}
                     filtername="orgId"
                     setQuery={setServerQuery}

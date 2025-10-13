@@ -51,8 +51,8 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                 },
                 topic_id: topic.id,
                 capacity: {
-                    value: (member).capacity,
-                    label: (member).capacity,
+                    value: member.capacity,
+                    label: member.capacity,
                 },
             })),
         },

@@ -23,7 +23,10 @@ import {
 } from '@/utils/apiUtils'
 import { Tab } from '@headlessui/react'
 import { Index } from 'flexsearch'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import { useSession } from 'next-auth/react'
 import { NextSeo, DatasetJsonLd } from 'next-seo'
 import dynamic from 'next/dynamic'
@@ -368,10 +371,11 @@ export default function DatasetPage(
         })
     }
 
-    const openIssueLength =
-        issues.data?.filter((issue) => issue.status === 'open').length
-            ? issues.data.filter((issue) => issue.status === 'open').length
-            : undefined
+    const openIssueLength = issues.data?.filter(
+        (issue) => issue.status === 'open'
+    ).length
+        ? issues.data.filter((issue) => issue.status === 'open').length
+        : undefined
 
     let teamAuthorized: boolean | undefined = undefined
     let generalAuthorized = false
@@ -381,12 +385,10 @@ export default function DatasetPage(
         session.data?.user.id !== datasetData.creator_user_id &&
         session.data?.user.sysadmin === false
     ) {
-        teamAuthorized = !!(
-            teamsDetails.data?.users?.find(
-                (user) =>
-                    user.id === session.data?.user.id &&
-                    (user.capacity === 'admin' || user.capacity === 'editor')
-            )
+        teamAuthorized = !!teamsDetails.data?.users?.find(
+            (user) =>
+                user.id === session.data?.user.id &&
+                (user.capacity === 'admin' || user.capacity === 'editor')
         )
     } else {
         generalAuthorized = true
@@ -584,12 +586,11 @@ export default function DatasetPage(
                     id: resource?.id!,
                     apiKey: apikey,
                     datasetName: dataset.title ?? dataset.name,
-                    name: resource?.title ?? (resource?.name!),
+                    name: resource?.title ?? resource?.name!,
                 })
                 customDataLayer({
                     event: 'table_view_event',
-                    resource_name:
-                        resource?.title ?? (resource?.name!),
+                    resource_name: resource?.title ?? resource?.name!,
                 })
             } else {
                 setTabularResource(null)

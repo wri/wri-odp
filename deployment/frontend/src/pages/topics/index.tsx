@@ -10,7 +10,10 @@ import { useQuery } from 'react-query'
 import { type GroupTree } from '@/schema/ckan.schema'
 import Pagination from '@/components/datasets/Pagination'
 import { getServerAuthSession } from '@/server/auth'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'

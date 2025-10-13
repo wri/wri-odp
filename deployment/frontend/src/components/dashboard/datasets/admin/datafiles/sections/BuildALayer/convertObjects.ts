@@ -223,7 +223,7 @@ export function convertLayerObjToForm(layerObj: APILayerSpec): LayerFormType {
                 tiles:
                     'tiles' in layerObj.layerConfig.source &&
                     layerObj.layerConfig.source?.tiles?.[0]
-                        ? (layerObj.layerConfig.source.tiles[0])
+                        ? layerObj.layerConfig.source.tiles[0]
                         : undefined,
                 provider: {
                     ...layerObj.layerConfig.source.provider,

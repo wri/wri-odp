@@ -15,7 +15,10 @@ import {
     useLayerStates,
     useLayerAsLayerObj,
 } from './storeHooks'
-import { type ActiveLayerGroup, type LayerState } from '@/interfaces/state.interface'
+import {
+    type ActiveLayerGroup,
+    type LayerState,
+} from '@/interfaces/state.interface'
 import { env } from '@/env.mjs'
 import { useSession } from 'next-auth/react'
 import { type Session } from 'next-auth'
@@ -121,7 +124,8 @@ async function getLayersFromRW(
                             )
                             const responseData = await fieldsRes.json()
 
-                            const resourcePackage = responseData.result.package_data.resources as Resource[]
+                            const resourcePackage = responseData.result
+                                .package_data.resources as Resource[]
                             const layerdata = resourcePackage.filter(
                                 (l) => l.id === layer
                             )

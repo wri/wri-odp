@@ -17,7 +17,10 @@ import { Legends } from './preview/Legends'
 import { Steps } from './Steps'
 import { getInteractiveLayers } from '@/utils/queryHooks'
 import Tooltip from './preview/Tooltip'
-import { type LngLat, type MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
+import {
+    type LngLat,
+    type MapGeoJSONFeature,
+} from 'react-map-gl/dist/esm/types'
 import { type APILayerSpec } from '@/interfaces/layer.interface'
 import LayerManagerPreview from './preview/LayerManagerPreview'
 import { slugify } from '@/utils/slugify'

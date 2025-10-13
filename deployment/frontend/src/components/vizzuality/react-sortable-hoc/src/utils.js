@@ -49,9 +49,9 @@ const vendorPrefix = (function () {
     const styles = window.getComputedStyle(document.documentElement, '') || [
         '-moz-hidden-iframe',
     ]
-    const pre = ((/-(moz|webkit|ms)-/.exec(Array.prototype.slice
-        .call(styles)
-        .join(''))) ||
+    const pre = (/-(moz|webkit|ms)-/.exec(
+        Array.prototype.slice.call(styles).join('')
+    ) ||
         (styles.OLink === '' && ['', 'o']))[1]
 
     switch (pre) {
@@ -150,10 +150,7 @@ export function getPosition(event) {
 }
 
 export function isTouchEvent(event) {
-    return (
-        (event.touches?.length) ||
-        (event.changedTouches?.length)
-    )
+    return event.touches?.length || event.changedTouches?.length
 }
 
 export function getEdgeOffset(node, parent, offset = { left: 0, top: 0 }) {

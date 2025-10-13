@@ -7,7 +7,10 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import DatasetApplication from '@/components/applications/DatasetApplication'
 import { getServerAuthSession } from '@/server/auth'
-import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next'
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next'
 import { appRouter } from '@/server/api/root'
 import { createServerSideHelpers } from '@trpc/react-query/server'
 import superjson from 'superjson'

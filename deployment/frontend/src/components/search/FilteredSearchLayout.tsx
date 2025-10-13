@@ -8,7 +8,10 @@ import {
 import Facet from './Facet'
 import LocationSearch from './LocationSearch'
 import classNames from '@/utils/classnames'
-import { type Filter, Facets as SearchFacet } from '@/interfaces/search.interface'
+import {
+    type Filter,
+    Facets as SearchFacet,
+} from '@/interfaces/search.interface'
 import { type SearchInput } from '@/schema/search.schema'
 import { api } from '@/utils/api'
 import { useSession } from 'next-auth/react'
@@ -266,8 +269,10 @@ export default function FilteredSearchLayout({
                                                                                 setFacetSelectedCount
                                                                             }
                                                                             options={
-                                                                                searchFacets?.[ff
-                                                                                        .key]
+                                                                                searchFacets?.[
+                                                                                    ff
+                                                                                        .key
+                                                                                ]
                                                                                     ? searchFacets[
                                                                                           ff
                                                                                               .key
@@ -327,8 +332,10 @@ export default function FilteredSearchLayout({
                                                                                     setFacetSelectedCount
                                                                                 }
                                                                                 options={
-                                                                                    searchFacets?.[ff
-                                                                                            .key]
+                                                                                    searchFacets?.[
+                                                                                        ff
+                                                                                            .key
+                                                                                    ]
                                                                                         ? searchFacets[
                                                                                               ff
                                                                                                   .key
@@ -385,8 +392,10 @@ export default function FilteredSearchLayout({
                                                                                         .length,
                                                                                 }}
                                                                                 options={
-                                                                                    searchFacets?.[ff
-                                                                                            .key]
+                                                                                    searchFacets?.[
+                                                                                        ff
+                                                                                            .key
+                                                                                    ]
                                                                                         ? searchFacets[
                                                                                               ff
                                                                                                   .key
@@ -443,8 +452,10 @@ export default function FilteredSearchLayout({
                                                                                 setFacetSelectedCount
                                                                             }
                                                                             options={
-                                                                                searchFacets?.[ff
-                                                                                        .key]
+                                                                                searchFacets?.[
+                                                                                    ff
+                                                                                        .key
+                                                                                ]
                                                                                     ? searchFacets[
                                                                                           ff
                                                                                               .key
@@ -576,8 +587,10 @@ export default function FilteredSearchLayout({
                                                                         setFacetSelectedCount
                                                                     }
                                                                     options={
-                                                                        searchFacets?.[ff
-                                                                                .key]
+                                                                        searchFacets?.[
+                                                                            ff
+                                                                                .key
+                                                                        ]
                                                                             ? searchFacets[
                                                                                   ff
                                                                                       .key
@@ -633,8 +646,10 @@ export default function FilteredSearchLayout({
                                                                             setFacetSelectedCount
                                                                         }
                                                                         options={
-                                                                            searchFacets?.[ff
-                                                                                    .key]
+                                                                            searchFacets?.[
+                                                                                ff
+                                                                                    .key
+                                                                            ]
                                                                                 ? searchFacets[
                                                                                       ff
                                                                                           .key
@@ -691,8 +706,10 @@ export default function FilteredSearchLayout({
                                                                                 .length,
                                                                         }}
                                                                         options={
-                                                                            searchFacets?.[ff
-                                                                                    .key]
+                                                                            searchFacets?.[
+                                                                                ff
+                                                                                    .key
+                                                                            ]
                                                                                 ? searchFacets[
                                                                                       ff
                                                                                           .key
@@ -746,8 +763,10 @@ export default function FilteredSearchLayout({
                                                                         setFacetSelectedCount
                                                                     }
                                                                     options={
-                                                                        searchFacets?.[ff
-                                                                                .key]
+                                                                        searchFacets?.[
+                                                                            ff
+                                                                                .key
+                                                                        ]
                                                                             ? searchFacets[
                                                                                   ff
                                                                                       .key

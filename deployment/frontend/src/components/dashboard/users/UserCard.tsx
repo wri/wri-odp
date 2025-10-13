@@ -37,7 +37,7 @@ type IUser = {
 
 function TeamProfile({ user }: { user: IRowProfile | IUser }) {
     const UserProfile = user as IUser
-    user.image_display_url = (user?.image_display_url!)
+    user.image_display_url = user?.image_display_url!
         ? user?.image_display_url
         : `https://gravatar.com/avatar/${(user as IUser)?.email_hash}?s=270&d=identicon`
     return (

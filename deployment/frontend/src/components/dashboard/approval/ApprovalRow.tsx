@@ -82,7 +82,7 @@ function filteredDataset(dataset: WriDataset) {
 }
 
 function Card({ approvalInfo }: { approvalInfo: WriDataset }) {
-    const user = (approvalInfo.user!) ?? { email: '', name: '' }
+    const user = approvalInfo.user! ?? { email: '', name: '' }
     user.name = user?.email ?? user?.name ?? 'Unknown'
     user.image_display_url = user?.image_display_url
         ? user?.image_display_url

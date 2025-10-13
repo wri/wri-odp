@@ -24,7 +24,7 @@ import type {
 import { searchArrayForKeyword } from '@/utils/general'
 import type { CkanResponse, User } from '@/schema/ckan.schema'
 import type { Group } from '@portaljs/ckan'
-import {type TopicHierarchy} from '@/interfaces/topic.interface';
+import { type TopicHierarchy } from '@/interfaces/topic.interface'
 import type Topic from '@/interfaces/topic.interface'
 
 import { TopicSchema } from '@/schema/topic.schema'

@@ -1,7 +1,7 @@
 import { type Labels } from '@/interfaces/state.interface'
 import { type MutableRefObject, useCallback, useEffect } from 'react'
 import { type MapRef } from 'react-map-gl'
-import {type Map as MapType} from 'mapbox-gl';
+import { type Map as MapType } from 'mapbox-gl'
 import type mapboxgl from 'mapbox-gl'
 import { useLabels } from '@/utils/storeHooks'
 
@@ -16,7 +16,7 @@ export default function Labels({
         (labels: Labels) => {
             const map = mapRef.current as unknown as MapType
             const LABELS_GROUP = ['labels']
-            const { layers, metadata } = (map).getStyle()
+            const { layers, metadata } = map.getStyle()
 
             const labelGroups = Object.keys(metadata['mapbox:groups']).filter(
                 (k) => {
@@ -50,7 +50,7 @@ export default function Labels({
             labelLayers.forEach((_layer: mapboxgl.Layer) => {
                 const match =
                     _layer.metadata['mapbox:group'] === labelsToDisplay.id
-                ;(map).setLayoutProperty(
+                map.setLayoutProperty(
                     _layer.id,
                     'visibility',
                     match ? 'visible' : 'none'

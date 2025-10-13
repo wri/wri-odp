@@ -628,9 +628,7 @@ export function DatasetHeader({
                                     variant="light"
                                     className="bg-wri-gold "
                                     onClick={() => {
-                                        addToFavorites.mutate(
-                                            dataset?.id!
-                                        )
+                                        addToFavorites.mutate(dataset?.id!)
                                     }}
                                     loading={addToFavorites.isLoading}
                                 >
@@ -680,9 +678,7 @@ export function DatasetHeader({
                                 <LoaderButton
                                     variant="destructive"
                                     onClick={() => {
-                                        removeFromFavorites.mutate(
-                                            dataset?.id!
-                                        )
+                                        removeFromFavorites.mutate(dataset?.id!)
                                     }}
                                     loading={removeFromFavorites.isLoading}
                                 >

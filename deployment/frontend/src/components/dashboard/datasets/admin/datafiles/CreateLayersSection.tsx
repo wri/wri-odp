@@ -11,7 +11,10 @@ import { PlusCircleIcon } from '@heroicons/react/20/solid'
 import { DataFileAccordion } from './DatafileAccordion'
 import { P, match } from 'ts-pattern'
 import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
-import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema'
+import {
+    type DatasetFormType,
+    type ResourceFormType,
+} from '@/schema/dataset.schema'
 import { v4 as uuidv4 } from 'uuid'
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
 import { RWDatasetForm } from '../metadata/RWDataset'

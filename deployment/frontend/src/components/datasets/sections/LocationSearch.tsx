@@ -169,8 +169,8 @@ export default function LocationSearch({
                 }}
             />
             {markers?.map((m, index) => (
-                    <Marker key={index} longitude={m[0]} latitude={m[1]} />
-                ))}
+                <Marker key={index} longitude={m[0]} latitude={m[1]} />
+            ))}
             {geojsons
                 .filter((g) => !g.address)
                 .map((geojson, index) => (
