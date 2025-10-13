@@ -7,6 +7,7 @@ export default interface Topic {
     num_datasets: number;
     num_subtopics: number;
     users?: Array<any>;
+    // eslint-disable-next-line semi
 }
 
 export interface TopicHierarchy {

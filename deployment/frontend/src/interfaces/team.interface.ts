@@ -6,4 +6,5 @@ export default interface Team {
     description: string;
     num_datasets: number;
     users?: Array<any>;
+    // eslint-disable-next-line semi
 }
