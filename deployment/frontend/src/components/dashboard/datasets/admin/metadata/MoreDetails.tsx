@@ -2,26 +2,26 @@ import {
     ExclamationCircleIcon,
     InformationCircleIcon,
     SquaresPlusIcon,
-} from '@heroicons/react/24/outline'
-import { Disclosure } from '@headlessui/react'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { MetadataAccordion } from './MetadataAccordion'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { UseFormReturn } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { Input } from '@/components/_shared/SimpleInput'
-import { SimpleEditor } from './RTE/SimpleEditor'
+} from '@heroicons/react/24/outline';
+import { Disclosure } from '@headlessui/react';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { MetadataAccordion } from './MetadataAccordion';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { type UseFormReturn } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { Input } from '@/components/_shared/SimpleInput';
+import { SimpleEditor } from './RTE/SimpleEditor';
 
 export function MoreDetailsForm({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
     const {
         register,
         formState: { errors },
-    } = formObj
+    } = formObj;
     return (
         <MetadataAccordion
             label={
@@ -130,5 +130,5 @@ export function MoreDetailsForm({
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>
-    )
+    );
 }

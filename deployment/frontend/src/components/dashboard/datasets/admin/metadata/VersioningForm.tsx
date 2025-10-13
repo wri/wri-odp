@@ -2,25 +2,25 @@ import {
     ClockIcon,
     FolderPlusIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import { Disclosure } from '@headlessui/react'
-import { MetadataAccordion } from './MetadataAccordion'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { UseFormReturn } from 'react-hook-form'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { SimpleEditor } from './RTE/SimpleEditor'
+} from '@heroicons/react/24/outline';
+import { Disclosure } from '@headlessui/react';
+import { MetadataAccordion } from './MetadataAccordion';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { type UseFormReturn } from 'react-hook-form';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { SimpleEditor } from './RTE/SimpleEditor';
 
 export function VersioningForm({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
     const {
         register,
         formState: { errors },
-    } = formObj
+    } = formObj;
     return (
         <MetadataAccordion
             defaultOpen
@@ -35,9 +35,7 @@ export function VersioningForm({
                 <InputGroup
                     label={
                         <div className="flex items-center gap-x-1">
-                            <span>
-                                Release Notes{' '}
-                            </span>
+                            <span>Release Notes </span>
                             <DefaultTooltip content="Release notes describe to users what has changed since the last version">
                                 <InformationCircleIcon
                                     className="h-5 w-5 text-neutral-500"
@@ -58,5 +56,5 @@ export function VersioningForm({
                 </InputGroup>
             </Disclosure.Panel>
         </MetadataAccordion>
-    )
+    );
 }

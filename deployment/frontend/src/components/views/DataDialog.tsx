@@ -2,17 +2,17 @@ import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import { Dialog } from '@headlessui/react'
-import { Dispatch, SetStateAction } from 'react'
+import { Dialog } from '@headlessui/react';
+import { type Dispatch, type SetStateAction } from 'react';
 
 export default function DataDialog({
     isOpen,
     setIsOpen,
     sql,
 }: {
-    isOpen: boolean
-    setIsOpen: Dispatch<SetStateAction<boolean>>
-    sql: string
+    isOpen: boolean;
+    setIsOpen: Dispatch<SetStateAction<boolean>>;
+    sql: string;
 }) {
     return (
         <Modal
@@ -34,5 +34,5 @@ export default function DataDialog({
                 </div>
             </div>
         </Modal>
-    )
+    );
 }

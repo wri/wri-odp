@@ -1,65 +1,65 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react';
 // => Tiptap packages
-import Placeholder from '@tiptap/extension-placeholder'
+import Placeholder from '@tiptap/extension-placeholder';
 import {
     useEditor,
     EditorContent,
-    Editor,
+    type Editor,
     BubbleMenu,
     ReactNodeViewRenderer,
-} from '@tiptap/react'
-import Document from '@tiptap/extension-document'
-import Paragraph from '@tiptap/extension-paragraph'
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import Text from '@tiptap/extension-text'
-import Link from '@tiptap/extension-link'
-import Bold from '@tiptap/extension-bold'
-import Underline from '@tiptap/extension-underline'
-import Italic from '@tiptap/extension-italic'
-import Strike from '@tiptap/extension-strike'
-import Code from '@tiptap/extension-code'
-import BulletList from '@tiptap/extension-bullet-list'
-import ListItem from '@tiptap/extension-list-item'
-import History from '@tiptap/extension-history'
+} from '@tiptap/react';
+import Document from '@tiptap/extension-document';
+import Paragraph from '@tiptap/extension-paragraph';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import Text from '@tiptap/extension-text';
+import Link from '@tiptap/extension-link';
+import Bold from '@tiptap/extension-bold';
+import Underline from '@tiptap/extension-underline';
+import Italic from '@tiptap/extension-italic';
+import Strike from '@tiptap/extension-strike';
+import Code from '@tiptap/extension-code';
+import BulletList from '@tiptap/extension-bullet-list';
+import ListItem from '@tiptap/extension-list-item';
+import History from '@tiptap/extension-history';
 // Custom
-import * as Icons from './Icons'
-import { LinkModal } from './LinkModal'
-import classNames from '@/utils/classnames'
+import * as Icons from './Icons';
+import { LinkModal } from './LinkModal';
+import classNames from '@/utils/classnames';
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
-    UseFormReturn,
-} from 'react-hook-form'
-import { Button } from '@/components/_shared/Button'
-import { NodeViewContent, NodeViewWrapper } from '@tiptap/react'
-import { createLowlight } from 'lowlight'
+    type FieldValues,
+    type Path,
+    type PathValue,
+    type UseFormReturn,
+} from 'react-hook-form';
+import { Button } from '@/components/_shared/Button';
+import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
+import { createLowlight } from 'lowlight';
 
-import python from 'highlight.js/lib/languages/python'
-import js from 'highlight.js/lib/languages/javascript'
-import r from 'highlight.js/lib/languages/r'
+import python from 'highlight.js/lib/languages/python';
+import js from 'highlight.js/lib/languages/javascript';
+import r from 'highlight.js/lib/languages/r';
 
-const lowlight = createLowlight()
+const lowlight = createLowlight();
 
-lowlight.register('python', python)
-lowlight.register('r', r)
-lowlight.register('js', js)
+lowlight.register('python', python);
+lowlight.register('r', r);
+lowlight.register('js', js);
 
 interface TEditorProps {
-    value: string
-    onChange(body: string): void
-    initialContent?: string | null
-    className: string
-    placeholder?: string
+    value: string;
+    onChange(body: string): void;
+    initialContent?: string | null;
+    className: string;
+    placeholder?: string;
 }
 
 interface ControlleRTEEditorProps<T extends FieldValues> {
-    formObj: UseFormReturn<T>
-    name: Path<T>
-    defaultValue?: PathValue<T, Path<T>>
-    className?: string
-    placeholder?: string
+    formObj: UseFormReturn<T>;
+    name: Path<T>;
+    defaultValue?: PathValue<T, Path<T>>;
+    className?: string;
+    placeholder?: string;
 }
 
 export function SimpleEditor<T extends FieldValues>({
@@ -69,7 +69,7 @@ export function SimpleEditor<T extends FieldValues>({
     placeholder,
     className,
 }: ControlleRTEEditorProps<T>) {
-    const { control, watch } = formObj
+    const { control, watch } = formObj;
     return (
         <Controller
             control={control}
@@ -81,12 +81,12 @@ export function SimpleEditor<T extends FieldValues>({
                     value={value}
                     initialContent={watch(name) ?? ''}
                     onChange={(value) => {
-                        onChange(value)
+                        onChange(value);
                     }}
                 />
             )}
         />
-    )
+    );
 }
 
 function TipTapEditor({
@@ -98,8 +98,8 @@ function TipTapEditor({
 }: TEditorProps) {
     const editor = useEditor({
         onUpdate({ editor }) {
-            const value = editor.getHTML()
-            onChange(value)
+            const value = editor.getHTML();
+            onChange(value);
         },
         content: initialContent ?? '',
         extensions: [
@@ -117,7 +117,7 @@ function TipTapEditor({
             Code,
             CodeBlockLowlight.extend({
                 addNodeView() {
-                    return ReactNodeViewRenderer(CodeBlockComponent)
+                    return ReactNodeViewRenderer(CodeBlockComponent);
                 },
             }).configure({
                 lowlight,
@@ -133,70 +133,80 @@ function TipTapEditor({
                 },
             }),
         ],
-    }) as Editor
+    });
 
-    const [modalIsOpen, setIsOpen] = useState(false)
-    const [url, setUrl] = useState<string>('')
+    const [modalIsOpen, setIsOpen] = useState(false);
+    const [url, setUrl] = useState<string>('');
 
     const openModal = useCallback(() => {
-        setUrl(editor.getAttributes('link').href)
-        setIsOpen(true)
-    }, [editor])
+        if (!editor) return;
+        setUrl(editor.getAttributes('link').href);
+        setIsOpen(true);
+    }, [editor]);
 
     const closeModal = useCallback(() => {
-        setIsOpen(false)
-        setUrl('')
-    }, [])
+        setIsOpen(false);
+        setUrl('');
+    }, []);
 
     const saveLink = useCallback(() => {
+        if (!editor) return;
         if (url) {
             editor
                 .chain()
                 .focus()
                 .extendMarkRange('link')
                 .setLink({ href: url, target: '_blank' })
-                .run()
+                .run();
         } else {
-            editor.chain().focus().extendMarkRange('link').unsetLink().run()
+            editor.chain().focus().extendMarkRange('link').unsetLink().run();
         }
-        closeModal()
-    }, [editor, url, closeModal])
+        closeModal();
+    }, [editor, url, closeModal]);
 
     const removeLink = useCallback(() => {
-        editor.chain().focus().extendMarkRange('link').unsetLink().run()
-        closeModal()
-    }, [editor, closeModal])
+        if (!editor) return;
+        editor.chain().focus().extendMarkRange('link').unsetLink().run();
+        closeModal();
+    }, [editor, closeModal]);
 
     const toggleBold = useCallback(() => {
-        editor.chain().focus().toggleBold().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleBold().run();
+    }, [editor]);
 
     const toggleUnderline = useCallback(() => {
-        editor.chain().focus().toggleUnderline().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleUnderline().run();
+    }, [editor]);
 
     const toggleItalic = useCallback(() => {
-        editor.chain().focus().toggleItalic().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleItalic().run();
+    }, [editor]);
 
     const toggleStrike = useCallback(() => {
-        editor.chain().focus().toggleStrike().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleStrike().run();
+    }, [editor]);
 
     const toggleCode = useCallback(() => {
-        editor.chain().focus().toggleCode().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleCode().run();
+    }, [editor]);
 
     const toggleList = useCallback(() => {
-        editor.chain().focus().toggleBulletList().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleBulletList().run();
+    }, [editor]);
 
     const toggleCodeBlock = useCallback(() => {
-        editor.chain().focus().toggleCodeBlock().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleCodeBlock().run();
+    }, [editor]);
 
     if (!editor) {
-        return null
+        return null;
     }
 
     return (
@@ -313,7 +323,7 @@ function TipTapEditor({
                 editor={editor}
                 shouldShow={({ editor, view, state, oldState, from, to }) => {
                     // only show the bubble menu for links.
-                    return from === to && editor.isActive('link')
+                    return from === to && editor.isActive('link');
                 }}
             >
                 <Button
@@ -353,7 +363,7 @@ function TipTapEditor({
                 onRemoveLink={removeLink}
             />
         </div>
-    )
+    );
 }
 
 function CodeBlockComponent({ updateAttributes, extension }: any) {
@@ -380,5 +390,5 @@ function CodeBlockComponent({ updateAttributes, extension }: any) {
                 <NodeViewContent as="code" />
             </pre>
         </NodeViewWrapper>
-    )
+    );
 }

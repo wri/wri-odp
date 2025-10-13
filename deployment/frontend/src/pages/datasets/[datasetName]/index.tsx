@@ -1,47 +1,50 @@
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import Header from '@/components/_shared/Header'
-import Spinner from '@/components/_shared/Spinner'
-import ApprovalRequestCard from '@/components/datasets/ApprovalRequestCard'
-import { DatasetHeader } from '@/components/datasets/DatasetHeader'
-import DatasetPageLayout from '@/components/datasets/DatasetPageLayout'
-import { DatasetTabs } from '@/components/datasets/DatasetTabs'
-import AddLayers from '@/components/datasets/add-layers/AddLayers'
-import { About } from '@/components/datasets/sections/About'
-import { Contact } from '@/components/datasets/sections/Contact'
-import { DataFiles } from '@/components/datasets/sections/DataFiles'
-import Issues from '@/components/datasets/sections/Issues'
-import { Members } from '@/components/datasets/sections/Members'
-import { Methodology } from '@/components/datasets/sections/Methodology'
-import { RelatedDatasets } from '@/components/datasets/sections/RelatedDatasets'
-import { getServerAuthSession } from '@/server/auth'
-import { api } from '@/utils/api'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import Header from '@/components/_shared/Header';
+import Spinner from '@/components/_shared/Spinner';
+import ApprovalRequestCard from '@/components/datasets/ApprovalRequestCard';
+import { DatasetHeader } from '@/components/datasets/DatasetHeader';
+import DatasetPageLayout from '@/components/datasets/DatasetPageLayout';
+import { DatasetTabs } from '@/components/datasets/DatasetTabs';
+import AddLayers from '@/components/datasets/add-layers/AddLayers';
+import { About } from '@/components/datasets/sections/About';
+import { Contact } from '@/components/datasets/sections/Contact';
+import { DataFiles } from '@/components/datasets/sections/DataFiles';
+import Issues from '@/components/datasets/sections/Issues';
+import { Members } from '@/components/datasets/sections/Members';
+import { Methodology } from '@/components/datasets/sections/Methodology';
+import { RelatedDatasets } from '@/components/datasets/sections/RelatedDatasets';
+import { getServerAuthSession } from '@/server/auth';
+import { api } from '@/utils/api';
 import {
     getAllDatasetFq,
     getOneDataset,
     getOnePendingDataset,
     getRecipient,
-} from '@/utils/apiUtils'
-import { Tab } from '@headlessui/react'
-import { Index } from 'flexsearch'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { useSession } from 'next-auth/react'
-import { NextSeo, DatasetJsonLd } from 'next-seo'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import { useState, useEffect } from 'react'
-import { env } from '@/env.mjs'
-import SyncUrl from '@/components/_shared/map/SyncUrl'
-import { TabularResource } from '@/components/datasets/visualizations/Visualizations'
-import { useIsAddingLayers } from '@/utils/storeHooks'
-import { decodeMapParam } from '@/utils/urlEncoding'
-import { WriDataset } from '@/schema/ckan.schema'
+} from '@/utils/apiUtils';
+import { Tab } from '@headlessui/react';
+import { Index } from 'flexsearch';
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next';
+import { useSession } from 'next-auth/react';
+import { NextSeo, DatasetJsonLd } from 'next-seo';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import { env } from '@/env.mjs';
+import SyncUrl from '@/components/_shared/map/SyncUrl';
+import { type TabularResource } from '@/components/datasets/visualizations/Visualizations';
+import { useIsAddingLayers } from '@/utils/storeHooks';
+import { decodeMapParam } from '@/utils/urlEncoding';
+import { type WriDataset } from '@/schema/ckan.schema';
 
-import { matchesAnyPattern } from '@/utils/general'
+import { matchesAnyPattern } from '@/utils/general';
 
-import { Versioning } from '@/components/datasets/sections/Versioning'
+import { Versioning } from '@/components/datasets/sections/Versioning';
 
-import { useActiveLayerGroups } from '@/utils/storeHooks'
-import Footer from '@/components/_shared/Footer'
+import { useActiveLayerGroups } from '@/utils/storeHooks';
+import Footer from '@/components/_shared/Footer';
 
 function customDataLayer(data: { event: string; resource_name: string }) {
     if (env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
@@ -49,7 +52,7 @@ function customDataLayer(data: { event: string; resource_name: string }) {
         dataLayer.push({
             event: data.event,
             resource_name: data.resource_name,
-        })
+        });
     }
 }
 
@@ -65,7 +68,7 @@ const LazyViz = dynamic(
             </div>
         ),
     }
-)
+);
 
 const API = dynamic(
     () => import('@/components/datasets/sections/API').then((mod) => mod.API),
@@ -79,21 +82,21 @@ const API = dynamic(
             </div>
         ),
     }
-)
+);
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ datasetName: string }>
 ) {
-    const { query } = context
-    const { map } = query
-    const mapState = decodeMapParam(map as string)
+    const { query } = context;
+    const { map } = query;
+    const mapState = decodeMapParam(map as string);
 
-    const datasetName = context.params?.datasetName as string
-    const session = await getServerAuthSession(context)
+    const datasetName = context.params?.datasetName!;
+    const session = await getServerAuthSession(context);
     if (!session) {
         try {
-            const dataset = await getOneDataset(datasetName, session, true)
-            const NEXTURL = env.NEXTAUTH_URL
+            const dataset = await getOneDataset(datasetName, session, true);
+            const NEXTURL = env.NEXTAUTH_URL;
             return {
                 props: {
                     NEXTURL,
@@ -116,7 +119,7 @@ export async function getServerSideProps(
                         mapView: mapState,
                     },
                 },
-            }
+            };
         } catch (e) {
             return {
                 props: {
@@ -124,50 +127,51 @@ export async function getServerSideProps(
                         destination: '/datasets/404',
                     },
                 },
-            }
+            };
         }
     }
     try {
-        let [prevdataset, pendingDataset] = await Promise.all([
+        const [prevdataset, pendingDataset] = await Promise.all([
             getOneDataset(datasetName, session, true),
             getOnePendingDataset(datasetName, session, true),
-        ])
+        ]);
 
-        let dataset = prevdataset
+        let dataset = prevdataset;
 
-        const isSysAdmin = session?.user.sysadmin
-        let userAuthorize = false
-        let approvalAuth = false
+        const isSysAdmin = session?.user.sysadmin;
+        let userAuthorize = false;
+        let approvalAuth = false;
         if (prevdataset.owner_org) {
             const orgdetails = await getRecipient({
                 owner_org: prevdataset.owner_org,
-                session: session!,
-            })
-            userAuthorize = !!orgdetails?.find((x) => x.id === session?.user.id)
+            });
+            userAuthorize = !!orgdetails?.find(
+                (x) => x.id === session?.user.id
+            );
             approvalAuth = !!orgdetails
                 .filter((x) => x.capacity === 'admin')
-                .find((x) => x.id === session?.user.id)
+                .find((x) => x.id === session?.user.id);
         } else if (prevdataset.creator_user_id === session?.user.id) {
-            userAuthorize = true
+            userAuthorize = true;
         }
 
-        approvalAuth = isSysAdmin || approvalAuth ? true : false
-        const generalAuthorized = isSysAdmin ? isSysAdmin : userAuthorize
+        approvalAuth = isSysAdmin || approvalAuth ? true : false;
+        const generalAuthorized = isSysAdmin ? isSysAdmin : userAuthorize;
 
         const pendingExist =
             pendingDataset &&
             generalAuthorized &&
             Object.keys(pendingDataset).length > 0
                 ? true
-                : false
+                : false;
 
         if (pendingExist && pendingDataset && generalAuthorized) {
-            dataset = pendingDataset
+            dataset = pendingDataset;
         }
 
-        let relatedDatasets: WriDataset[] = []
+        let relatedDatasets: WriDataset[] = [];
         if (dataset.groups?.length) {
-            let groupDatasets = await getAllDatasetFq({
+            const groupDatasets = await getAllDatasetFq({
                 apiKey: session?.user.apikey ?? '',
                 query: { search: '', page: { start: 0, rows: 50 } },
                 fq:
@@ -180,17 +184,17 @@ export async function getServerSideProps(
                           }+is_approved:true
                   `
                         : '',
-            })
+            });
 
             relatedDatasets = groupDatasets.datasets.filter(
                 (d) => d.id != dataset.id
-            )
+            );
         }
 
-        let prevRelatedDatasets: WriDataset[] = []
+        let prevRelatedDatasets: WriDataset[] = [];
         if (pendingExist) {
             if (prevdataset.groups?.length) {
-                let groupDatasets = await getAllDatasetFq({
+                const groupDatasets = await getAllDatasetFq({
                     apiKey: session?.user.apikey ?? '',
                     query: { search: '', page: { start: 0, rows: 50 } },
                     fq:
@@ -203,18 +207,18 @@ export async function getServerSideProps(
                               }+is_approved:true
                       `
                             : '',
-                })
+                });
 
                 prevRelatedDatasets = groupDatasets.datasets.filter(
                     (d) => d.id != prevdataset.id
-                )
+                );
             }
         }
 
         if (!dataset?.resources) {
-            dataset.resources = []
+            dataset.resources = [];
         }
-        const NEXTURL = env.NEXTAUTH_URL
+        const NEXTURL = env.NEXTAUTH_URL;
         return {
             props: {
                 NEXTURL,
@@ -247,46 +251,46 @@ export async function getServerSideProps(
                     mapView: mapState,
                 },
             },
-        }
+        };
     } catch (e) {
-        console.log('E', e)
+        console.log('E', e);
         return {
             props: {
                 redirect: {
                     destination: '/datasets/404',
                 },
             },
-        }
+        };
     }
 }
 
 export default function DatasetPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    let { dataset, prevdataset } = props
-    if (typeof dataset == 'string') dataset = JSON.parse(dataset)
-    if (typeof prevdataset == 'string') prevdataset = JSON.parse(prevdataset)
+    let { dataset, prevdataset } = props;
+    if (typeof dataset == 'string') dataset = JSON.parse(dataset);
+    if (typeof prevdataset == 'string') prevdataset = JSON.parse(prevdataset);
 
-    const [isCurrentVersion, setIsCurrentVersion] = useState<boolean>(false)
-    const [selectedIndex, setSelectedIndex] = useState(0)
+    const [isCurrentVersion, setIsCurrentVersion] = useState<boolean>(false);
+    const [selectedIndex, setSelectedIndex] = useState(0);
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
-        useActiveLayerGroups()
-    const datasetName = props.datasetName as string
-    const datasetId = props.datasetId!
-    const pendingExist = props.pendingExist!
-    const datasetAuth = props.generalAuthorized!
-    const isPendingState = props.isPendingState!
-    const is_approved = props.is_approved!
-    const approvalAuth = props.approvalAuth!
-    const NEXTURL = props.NEXTURL!
-    const apikey = props.apiKey!
-    const router = useRouter()
-    const { query } = router
+        useActiveLayerGroups();
+    const datasetName = props.datasetName!;
+    const datasetId = props.datasetId!;
+    const pendingExist = props.pendingExist!;
+    const datasetAuth = props.generalAuthorized!;
+    const isPendingState = props.isPendingState!;
+    const is_approved = props.is_approved!;
+    const approvalAuth = props.approvalAuth!;
+    const NEXTURL = props.NEXTURL!;
+    const apikey = props.apiKey!;
+    const router = useRouter();
+    const { query } = router;
     const isApprovalRequest =
         query?.approval === 'true' ||
-        (approvalAuth && pendingExist && isPendingState)
-    const { isAddingLayers } = useIsAddingLayers()
-    const session = useSession()
+        (approvalAuth && pendingExist && isPendingState);
+    const { isAddingLayers } = useIsAddingLayers();
+    const session = useSession();
 
     const {
         data: datasetData,
@@ -296,7 +300,7 @@ export default function DatasetPage(
         { id: datasetId, isPending: pendingExist, noLayer: true },
         // @ts-ignore
         { retry: 0, initialData: dataset }
-    )
+    );
 
     const {
         data: prevDatasetData,
@@ -306,7 +310,7 @@ export default function DatasetPage(
         { id: datasetName, noLayer: true },
         // @ts-ignore
         { retry: 0, initialData: prevdataset, enabled: !!pendingExist }
-    )
+    );
 
     const {
         data: diffData,
@@ -320,43 +324,43 @@ export default function DatasetPage(
             enabled: !!pendingExist,
             retry: 0,
         }
-    )
+    );
     if (!datasetData && datasetError) {
-        router.replace('/datasets/404')
+        router.replace('/datasets/404');
     }
 
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
         { id: datasetName },
         { enabled: !!session.data?.user.apikey, retry: false }
-    )
+    );
 
     const issues = api.dataset.getDatasetIssues.useQuery(
         { id: datasetName },
         { enabled: !!session.data?.user.apikey && pendingExist, retry: false }
-    )
+    );
 
     const teamsDetails = api.teams.getTeam.useQuery(
         { id: datasetData?.owner_org! },
         { enabled: !!datasetData, retry: false }
-    )
+    );
 
     const [tabularResource, setTabularResource] =
-        useState<TabularResource | null>(null)
+        useState<TabularResource | null>(null);
 
-    const [displayNoPreview, setDisplayNoPreview] = useState(false)
-    const [mapDisplayPreview, setMapDisplayPreview] = useState(false)
+    const [displayNoPreview, setDisplayNoPreview] = useState(false);
+    const [mapDisplayPreview, setMapDisplayPreview] = useState(false);
     const index = new Index({
         tokenize: 'full',
-    })
+    });
     datasetData?.resources?.forEach((resource) => {
         index.add(
             resource.id,
             `${resource.description} ${resource.format} ${resource.url} ${resource.title}`
-        )
-    })
+        );
+    });
     const indexIssues = new Index({
         tokenize: 'full',
-    })
+    });
     if (issues.data) {
         issues.data.forEach((issue) => {
             indexIssues.add(
@@ -364,41 +368,38 @@ export default function DatasetPage(
                 `${issue.description} ${issue.title} ${issue.comments
                     .map((comment) => comment.comment)
                     .join(' ')}`
-            )
-        })
+            );
+        });
     }
 
-    const openIssueLength =
-        issues.data &&
-        issues.data.filter((issue) => issue.status === 'open').length
-            ? issues.data.filter((issue) => issue.status === 'open').length
-            : undefined
+    const openIssueLength = issues.data?.filter(
+        (issue) => issue.status === 'open'
+    ).length
+        ? issues.data.filter((issue) => issue.status === 'open').length
+        : undefined;
 
-    let teamAuthorized: boolean | undefined = undefined
-    let generalAuthorized = false
+    let teamAuthorized: boolean | undefined = undefined;
+    let generalAuthorized = false;
 
     if (
         datasetData &&
         session.data?.user.id !== datasetData.creator_user_id &&
         session.data?.user.sysadmin === false
     ) {
-        teamAuthorized = !!(
-            teamsDetails.data &&
-            teamsDetails.data?.users?.find(
-                (user) =>
-                    user.id === session.data?.user.id &&
-                    (user.capacity === 'admin' || user.capacity === 'editor')
-            )
-        )
+        teamAuthorized = !!teamsDetails.data?.users?.find(
+            (user) =>
+                user.id === session.data?.user.id &&
+                (user.capacity === 'admin' || user.capacity === 'editor')
+        );
     } else {
-        generalAuthorized = true
+        generalAuthorized = true;
     }
 
     useEffect(() => {
         if (query.tab === 'issues' && issues.data) {
-            setSelectedIndex(6)
+            setSelectedIndex(6);
         }
-    }, [issues.data, query.tab])
+    }, [issues.data, query.tab]);
 
     const links = [
         { label: 'Datasets', url: '/search', current: false },
@@ -407,40 +408,40 @@ export default function DatasetPage(
             url: `/datasets/${datasetData?.name ?? '404'}`,
             current: true,
         },
-    ]
+    ];
 
-    let diffFields: string[] = []
+    let diffFields: string[] = [];
 
     if (pendingExist && diffData) {
         diffFields = Object.keys(diffData.diff).filter((item) => {
             if (item.includes('resources') && item.includes('title')) {
-                const rtitle = diffData.diff[item]?.old_value
+                const rtitle = diffData.diff[item]?.old_value;
                 if (rtitle === 'null' || rtitle === null) {
-                    return false
+                    return false;
                 }
             } else {
-                return matchesAnyPattern(item)
+                return matchesAnyPattern(item);
             }
-        })
+        });
     }
 
     let resourceDiffValues: Array<
         Record<string, { old_value: string; new_value: string }>
-    > = []
+    > = [];
     if (pendingExist && diffData) {
         let resourceDiff: Record<
             string,
             Record<string, { old_value: string; new_value: string }>
-        > = {}
+        > = {};
 
         for (const current in diffData.diff) {
-            if( !diffFields.includes(current) ) continue; 
+            if (!diffFields.includes(current)) continue;
             if (current.includes('resource')) {
-                const resource = current.split('.')[0]!
-                const field = current.split('.')[1]!
+                const resource = current.split('.')[0]!;
+                const field = current.split('.')[1]!;
 
                 if (!resourceDiff[resource]) {
-                    resourceDiff[resource] = {}
+                    resourceDiff[resource] = {};
                 }
 
                 resourceDiff = {
@@ -449,11 +450,11 @@ export default function DatasetPage(
                         ...resourceDiff[resource],
                         [field]: diffData.diff[current]!,
                     },
-                }
+                };
             }
         }
 
-        resourceDiffValues = Object.values(resourceDiff)
+        resourceDiffValues = Object.values(resourceDiff);
     }
 
     const tabs = [
@@ -542,68 +543,67 @@ export default function DatasetPage(
                     ['release_notes'].some((x) => f.includes(x))
                 ),
         },
-    ]
+    ];
 
     useEffect(() => {
-        const dataset = isCurrentVersion ? prevDatasetData : datasetData
+        const dataset = isCurrentVersion ? prevDatasetData : datasetData;
         if (dataset?.resources) {
             const LayerResource = dataset?.resources.find(
                 (d) => d.format === 'Layer' || d.rw_id
-            )
+            );
             if (LayerResource) {
-                removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id!)
-                setMapDisplayPreview(true)
+                removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id);
+                setMapDisplayPreview(true);
                 addLayerToLayerGroup(
                     LayerResource.rw_id!,
                     dataset.id,
                     undefined,
                     true
-                )
+                );
 
                 customDataLayer({
                     event: 'layer_view_event',
                     resource_name: LayerResource.title ?? LayerResource.name!,
-                })
+                });
             } else if (dataset?.provider && dataset?.rw_id) {
-                setDisplayNoPreview(false)
+                setDisplayNoPreview(false);
                 setTabularResource({
-                    provider: dataset.provider as string,
+                    provider: dataset.provider,
                     datasetName: dataset.title ?? dataset.name,
-                    id: dataset.rw_id as string,
-                    name: dataset.name as string,
-                })
+                    id: dataset.rw_id,
+                    name: dataset.name,
+                });
                 customDataLayer({
                     event: 'table_view_event',
                     resource_name: dataset.provider,
-                })
+                });
             } else if (dataset?.resources.find((d) => d.datastore_active)) {
                 const resource = dataset?.resources.find(
                     (d) => d.datastore_active
-                )
-                setDisplayNoPreview(false)
+                );
+                setDisplayNoPreview(false);
                 setTabularResource({
                     provider: 'datastore',
-                    id: resource?.id as string,
+                    id: resource?.id!,
                     apiKey: apikey,
                     datasetName: dataset.title ?? dataset.name,
-                    name: resource?.title ?? (resource?.name as string),
-                })
+                    name: resource?.title ?? resource?.name!,
+                });
                 customDataLayer({
                     event: 'table_view_event',
-                    resource_name:
-                        resource?.title ?? (resource?.name as string),
-                })
+                    resource_name: resource?.title ?? resource?.name!,
+                });
             } else {
-                setTabularResource(null)
-                setMapDisplayPreview(false)
-                setDisplayNoPreview(true)
+                setTabularResource(null);
+                setMapDisplayPreview(false);
+                setDisplayNoPreview(true);
             }
         } else {
-            setDisplayNoPreview(true)
+            setDisplayNoPreview(true);
         }
-    }, [isCurrentVersion])
+    }, [isCurrentVersion]);
 
-    const shouldLoad = pendingExist ? isLoadingDiff : false
+    const shouldLoad = pendingExist ? isLoadingDiff : false;
 
     if (isLoading || !datasetData || isLoadingPrev || shouldLoad) {
         return (
@@ -614,7 +614,7 @@ export default function DatasetPage(
                     <Spinner /> Loading
                 </div>
             </>
-        )
+        );
     }
 
     return (
@@ -864,36 +864,36 @@ export default function DatasetPage(
                 }}
             />
         </>
-    )
+    );
 }
 
 function canVisualizeDataset(dataset: WriDataset) {
     // If dataset or its resources are not available, it cannot be visualized
-    if (!dataset || !dataset.resources) {
-        return false
+    if (!dataset?.resources) {
+        return false;
     }
 
     // Check for a map layer resource (based on format 'Layer' or presence of rw_id)
     const hasLayerResource = dataset.resources.some(
         (resource) => resource.format === 'Layer' || resource.rw_id
-    )
+    );
     if (hasLayerResource) {
-        return true
+        return true;
     }
 
     // Check for a table preview based on dataset-level provider and rw_id
     if (dataset.provider && dataset.rw_id) {
-        return true
+        return true;
     }
 
     // Check for a table preview based on a resource with datastore_active
     const hasDatastoreResource = dataset.resources.some(
         (resource) => resource.datastore_active
-    )
+    );
     if (hasDatastoreResource) {
-        return true
+        return true;
     }
 
     // If none of the above conditions are met, it cannot be visualized
-    return false
+    return false;
 }

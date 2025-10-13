@@ -1,4 +1,4 @@
-import { GroupTree } from "@/schema/ckan.schema";
+import { type GroupTree } from '@/schema/ckan.schema';
 
 export function flattenTree(tree: GroupTree[]): Record<string, number> {
     const counts: Record<string, number> = {};

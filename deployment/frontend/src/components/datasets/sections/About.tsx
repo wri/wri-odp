@@ -1,45 +1,47 @@
-import { Button } from '@/components/_shared/Button'
-import { TextWithReadMore } from '@/components/_shared/TextWithReadMore'
-import { WriDataset } from '@/schema/ckan.schema'
-import classNames from '@/utils/classnames'
-import { LinkIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link'
+import { Button } from '@/components/_shared/Button';
+import { TextWithReadMore } from '@/components/_shared/TextWithReadMore';
+import { type WriDataset } from '@/schema/ckan.schema';
+import classNames from '@/utils/classnames';
+import { LinkIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 export function About({
     dataset,
     isCurrentVersion,
     diffFields,
 }: {
-    dataset: WriDataset
-    isCurrentVersion?: boolean
-    diffFields: string[]
+    dataset: WriDataset;
+    isCurrentVersion?: boolean;
+    diffFields: string[];
 }) {
     const highlighted = (field: string) => {
         if (diffFields && !isCurrentVersion) {
             if (diffFields.find((f) => f.includes(field))) {
-                return 'bg-yellow-200'
+                return 'bg-yellow-200';
             }
         }
-        return ''
-    }
+        return '';
+    };
 
     const highlightExtras = (index: number) => {
         return highlighted(`extras[${index}].key`) !== ''
             ? highlighted(`extras[${index}].key`)
             : highlighted(`extras[${index}].value`) !== ''
-            ? highlighted(`extras[${index}].value`)
-            : highlighted(`extras[${index}]`)
-    }
+              ? highlighted(`extras[${index}].value`)
+              : highlighted(`extras[${index}]`);
+    };
     const highlightTags = (index: number) => {
         return highlighted(`tags[${index}].display_name`) !== ''
             ? highlighted(`tags[${index}].display_name`)
             : highlighted(`tags[${index}].name`) !== ''
-            ? highlighted(`tags[${index}].name`)
-            : highlighted(`tags[${index}]`)
-    }
-    const topics = dataset.groups?.filter((group) => group.type === 'group') ?? []
+              ? highlighted(`tags[${index}].name`)
+              : highlighted(`tags[${index}]`);
+    };
+    const topics =
+        dataset.groups?.filter((group) => group.type === 'group') ?? [];
     //@ts-ignore
-    const applications = dataset.groups?.filter((group) => group.type === 'application') ?? []
+    const applications =
+        dataset.groups?.filter((group) => group.type === 'application') ?? [];
     return (
         <div className="flex flex-col gap-y-4 py-2">
             <div className="font-acumin text-base font-normal text-black">
@@ -176,15 +178,19 @@ export function About({
                                 Applications:{' '}
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">
-                                {applications.map((application, applicationIdx) => (
-                                    <span>
-                                        {application.display_name ?? application.name}
-                                        {applications &&
-                                        applicationIdx !== applications.length - 1
-                                            ? ', '
-                                            : ''}
-                                    </span>
-                                ))}
+                                {applications.map(
+                                    (application, applicationIdx) => (
+                                        <span>
+                                            {application.display_name ??
+                                                application.name}
+                                            {applications &&
+                                            applicationIdx !==
+                                                applications.length - 1
+                                                ? ', '
+                                                : ''}
+                                        </span>
+                                    )
+                                )}
                             </dd>
                         </>
                     </div>
@@ -315,7 +321,7 @@ export function About({
                 ))}
             </div>
         </div>
-    )
+    );
 }
 
 function Pill({ text, className }: { text: string; className?: string }) {
@@ -325,5 +331,5 @@ function Pill({ text, className }: { text: string; className?: string }) {
         >
             {text}
         </div>
-    )
+    );
 }

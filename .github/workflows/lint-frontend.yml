@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: deployment/frontend
-        run: npm ci
+        run: npm ci -f
 
       - name: Check lint
         working-directory: deployment/frontend

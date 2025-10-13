@@ -1,14 +1,14 @@
-import * as React from 'react'
-import * as TooltipPrimitive from '@radix-ui/react-tooltip'
-import classNames from '@/utils/classnames'
+import * as React from 'react';
+import * as TooltipPrimitive from '@radix-ui/react-tooltip';
+import classNames from '@/utils/classnames';
 
-const TooltipProvider = TooltipPrimitive.Provider
+const TooltipProvider = TooltipPrimitive.Provider;
 
-const Tooltip = TooltipPrimitive.Root
+const Tooltip = TooltipPrimitive.Root;
 
-const TooltipPortal = TooltipPrimitive.Portal
+const TooltipPortal = TooltipPrimitive.Portal;
 
-const TooltipTrigger = TooltipPrimitive.Trigger
+const TooltipTrigger = TooltipPrimitive.Trigger;
 
 const TooltipContent = React.forwardRef<
     React.ElementRef<typeof TooltipPrimitive.Content>,
@@ -23,8 +23,8 @@ const TooltipContent = React.forwardRef<
         )}
         {...props}
     />
-))
-TooltipContent.displayName = TooltipPrimitive.Content.displayName
+));
+TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
 const DefaultTooltip = ({
     children,
@@ -36,16 +36,16 @@ const DefaultTooltip = ({
     onOpenChange,
     delayDuration = 100,
 }: {
-    children: React.ReactNode
-    content: React.ReactNode | string
-    disabled?: boolean
-    side?: 'top' | 'bottom' | 'left' | 'right'
-    contentClassName?: string
-    open?: boolean
-    onOpenChange?: (open: boolean) => void
-    delayDuration?: number
+    children: React.ReactNode;
+    content: React.ReactNode | string;
+    disabled?: boolean;
+    side?: 'top' | 'bottom' | 'left' | 'right';
+    contentClassName?: string;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    delayDuration?: number;
 }) => {
-    if (disabled) return <>{children}</>
+    if (disabled) return <>{children}</>;
     return (
         <TooltipProvider delayDuration={delayDuration}>
             <Tooltip open={open} onOpenChange={onOpenChange}>
@@ -60,8 +60,8 @@ const DefaultTooltip = ({
                 </TooltipPrimitive.Portal>
             </Tooltip>
         </TooltipProvider>
-    )
-}
+    );
+};
 export {
     DefaultTooltip,
     Tooltip,
@@ -69,5 +69,5 @@ export {
     TooltipContent,
     TooltipProvider,
     TooltipPortal,
-}
-export default DefaultTooltip
+};
+export default DefaultTooltip;

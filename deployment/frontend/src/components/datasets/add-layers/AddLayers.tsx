@@ -1,18 +1,18 @@
-import classNames from '@/utils/classnames'
-import { Tab } from '@headlessui/react'
-import { Fragment, useEffect, useState } from 'react'
-import SearchPanel from './SearchPanel'
-import FiltersPanel from './FiltersPanel'
-import { SearchInput } from '@/schema/search.schema'
-import { Filter } from '@/interfaces/search.interface'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import Pagination from '../Pagination'
-import { useDataset } from '@/utils/storeHooks'
+import classNames from '@/utils/classnames';
+import { Tab } from '@headlessui/react';
+import { Fragment, useEffect, useState } from 'react';
+import SearchPanel from './SearchPanel';
+import FiltersPanel from './FiltersPanel';
+import { type SearchInput } from '@/schema/search.schema';
+import { type Filter } from '@/interfaces/search.interface';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import Pagination from '../Pagination';
+import { useDataset } from '@/utils/storeHooks';
 
 export default function AddLayers() {
-    const addLayerTabs = [{ name: 'Search' }, { name: 'Filters' }]
-    const { dataset } = useDataset()
+    const addLayerTabs = [{ name: 'Search' }, { name: 'Filters' }];
+    const { dataset } = useDataset();
 
     /**
      * Query used to show results
@@ -23,12 +23,12 @@ export default function AddLayers() {
         page: { start: 0, rows: 10 },
         sortBy: 'score desc',
         fq: { res_format: 'Layer' },
-        appendRawFq: ` -id:(${dataset.id})`
-    })
+        appendRawFq: ` -id:(${dataset.id})`,
+    });
 
-    const [filters, setFilters] = useState<Filter[]>([])
+    const [filters, setFilters] = useState<Filter[]>([]);
 
-    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query);
 
     /*
      * Whenever filters is updated, update the query's fq
@@ -37,40 +37,40 @@ export default function AddLayers() {
     useEffect(() => {
         const keys = [...new Set(filters.map((f) => f.key))].filter(
             (key) => key != 'search'
-        )
+        );
 
-        const fq: any = {}
-        let extLocationQ = ''
-        let extAddressQ = ''
+        const fq: any = {};
+        let extLocationQ = '';
+        let extAddressQ = '';
 
         keys.forEach((key) => {
-            let keyFq
+            let keyFq;
 
-            const keyFilters = filters.filter((f) => f.key == key)
-            if ((key as string) == 'temporal_coverage_start') {
+            const keyFilters = filters.filter((f) => f.key == key);
+            if (key == 'temporal_coverage_start') {
                 if (keyFilters.length > 0) {
-                    const temporalCoverageStart = keyFilters[0]
+                    const temporalCoverageStart = keyFilters[0];
                     const temporalCoverageEnd = filters.find(
                         (f) => f.key == 'temporal_coverage_end'
-                    )?.value
+                    )?.value;
 
-                    keyFq = `[${temporalCoverageStart?.value} TO *]`
+                    keyFq = `[${temporalCoverageStart?.value} TO *]`;
 
                     if (temporalCoverageEnd) {
-                        keyFq = `[* TO ${temporalCoverageEnd}]`
+                        keyFq = `[* TO ${temporalCoverageEnd}]`;
                     }
                 }
-            } else if ((key as string) == 'temporal_coverage_end') {
+            } else if (key == 'temporal_coverage_end') {
                 if (keyFilters.length > 0) {
-                    const temporalCoverageEnd = keyFilters[0]
+                    const temporalCoverageEnd = keyFilters[0];
                     const temporalCoverageStart = filters.find(
                         (f) => f.key == 'temporal_coverage_start'
-                    )?.value
+                    )?.value;
 
-                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`
+                    keyFq = `[* TO ${temporalCoverageEnd?.value}]`;
 
                     if (temporalCoverageStart) {
-                        keyFq = `[${temporalCoverageStart} TO *]`
+                        keyFq = `[${temporalCoverageStart} TO *]`;
                     }
                 }
             } else if (
@@ -79,38 +79,36 @@ export default function AddLayers() {
             ) {
                 const metadataModifiedSinceFilter = filters.find(
                     (f) => f.key === 'metadata_modified_since'
-                )
+                );
                 const metadataModifiedSince = metadataModifiedSinceFilter
                     ? metadataModifiedSinceFilter.value + 'T00:00:00Z'
-                    : '*'
+                    : '*';
 
                 const metadataModifiedBeforeFilter = filters.find(
                     (f) => f.key === 'metadata_modified_before'
-                )
+                );
                 const metadataModifiedBefore = metadataModifiedBeforeFilter
                     ? metadataModifiedBeforeFilter.value + 'T23:59:59Z'
-                    : '*'
+                    : '*';
 
-                fq[
-                    'metadata_modified'
-                ] = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`
+                fq.metadata_modified = `[${metadataModifiedSince} TO ${metadataModifiedBefore}]`;
             } else if (key == 'spatial') {
-                const coordinates = keyFilters[0]?.value
-                const address = keyFilters[0]?.label
+                const coordinates = keyFilters[0]?.value;
+                const address = keyFilters[0]?.label;
 
                 // @ts-ignore
-                if (coordinates) extLocationQ = coordinates.reverse().join(',')
-                if (address) extAddressQ = address
+                if (coordinates) extLocationQ = coordinates.reverse().join(',');
+                if (address) extAddressQ = address;
             } else {
-                keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ')
+                keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ');
             }
 
-            if (keyFq) fq[key as string] = keyFq
-        })
+            if (keyFq) fq[key] = keyFq;
+        });
 
-        delete fq.metadata_modified_since
-        delete fq.metadata_modified_before
-        delete fq.spatial
+        delete fq.metadata_modified_since;
+        delete fq.metadata_modified_before;
+        delete fq.spatial;
 
         setQuery((prev) => {
             return {
@@ -119,9 +117,9 @@ export default function AddLayers() {
                 search: filters.find((e) => e?.key == 'search')?.value ?? '',
                 extLocationQ,
                 extAddressQ,
-            }
-        })
-    }, [filters])
+            };
+        });
+    }, [filters]);
 
     return (
         <Tab.Group>
@@ -180,5 +178,5 @@ export default function AddLayers() {
                 </Tab.Panel>
             </Tab.Panels>
         </Tab.Group>
-    )
+    );
 }

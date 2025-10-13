@@ -1,13 +1,13 @@
-import classNames from '@/utils/classnames'
-import { Disclosure, Transition } from '@headlessui/react'
-import { PaperClipIcon } from '@heroicons/react/20/solid'
+import classNames from '@/utils/classnames';
+import { Disclosure, Transition } from '@headlessui/react';
+import { PaperClipIcon } from '@heroicons/react/20/solid';
 import {
     ChevronDownIcon,
     GlobeAsiaAustraliaIcon,
     LinkIcon,
     Squares2X2Icon,
     XMarkIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 import {
     Table,
     TableBody,
@@ -15,33 +15,33 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/_shared/Table'
-import { useLayoutEffect, useRef, useState } from 'react'
-import { match } from 'ts-pattern'
-import { UseFormReturn } from 'react-hook-form'
+} from '@/components/_shared/Table';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { match } from 'ts-pattern';
+import { type UseFormReturn } from 'react-hook-form';
 import {
-    DataDictionaryFormType,
-    DatasetFormType,
-} from '@/schema/dataset.schema'
-import { formatDate } from '@/utils/formatDate'
-import { convertBytes } from '@/utils/convertBytes'
-import { PreviewMap } from '../datafiles/sections/BuildALayer/BuildALayerSection'
+    type DataDictionaryFormType,
+    type DatasetFormType,
+} from '@/schema/dataset.schema';
+import { formatDate } from '@/utils/formatDate';
+import { convertBytes } from '@/utils/convertBytes';
+import { PreviewMap } from '../datafiles/sections/BuildALayer/BuildALayerSection';
 import {
     convertFormToLayerObj,
     getApiSpecFromRawObj,
-} from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects'
+} from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects';
 import {
-    LayerFormType,
-    RawLayerFormType,
-} from '../datafiles/sections/BuildALayer/layer.schema'
-import { InfoAlert } from '@/components/_shared/Alerts'
+    type LayerFormType,
+    type RawLayerFormType,
+} from '../datafiles/sections/BuildALayer/layer.schema';
+import { InfoAlert } from '@/components/_shared/Alerts';
 
 export function Preview({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { watch } = formObj
+    const { watch } = formObj;
     return (
         <div className="mx-auto w-full max-w-[71rem] bg-white px-4 font-acumin shadow sm:px-6 xxl:px-0">
             <div className="p-4 sm:p-8 xxl:p-24">
@@ -364,29 +364,29 @@ export function Preview({
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 function FullDescription({
     label,
     children,
 }: {
-    label: string
-    children: React.ReactNode
+    label: string;
+    children: React.ReactNode;
 }) {
-    const [showReadMore, setShowReadMore] = useState(false)
-    const [readMore, setReadMore] = useState(false)
-    const ref = useRef<HTMLDivElement | null>(null)
+    const [showReadMore, setShowReadMore] = useState(false);
+    const [readMore, setReadMore] = useState(false);
+    const ref = useRef<HTMLDivElement | null>(null);
     useLayoutEffect(() => {
         if (
             ref.current &&
             ref.current.clientHeight < ref.current.scrollHeight
         ) {
-            setShowReadMore(true)
-            return
+            setShowReadMore(true);
+            return;
         }
-        setShowReadMore(false)
-    }, [])
+        setShowReadMore(false);
+    }, []);
 
     return (
         <div>
@@ -416,15 +416,15 @@ function FullDescription({
                 </button>
             )}
         </div>
-    )
+    );
 }
 
 function SimpleDescription({
     label,
     text,
 }: {
-    label: string
-    text: string | React.ReactNode
+    label: string;
+    text: string | React.ReactNode;
 }) {
     return (
         <div>
@@ -435,7 +435,7 @@ function SimpleDescription({
                 {text !== '' ? text : '_'}
             </dd>
         </div>
-    )
+    );
 }
 
 function ListOfItems({ label, items }: { label: string; items: string[] }) {
@@ -457,7 +457,7 @@ function ListOfItems({ label, items }: { label: string; items: string[] }) {
                 ))}
             </dd>
         </div>
-    )
+    );
 }
 
 interface DatafilePreviewProps {
@@ -470,15 +470,15 @@ interface DatafilePreviewProps {
         | 'layer-raw'
         | 'reference-layer'
         | 'tile-cache'
-        | 'gee-asset'
-    name: string
-    title: string
-    format: string
-    description: string
-    size: number | null
-    dataDictionary: DataDictionaryFormType
-    layerObj: LayerFormType | null
-    layerObjRaw: RawLayerFormType | null
+        | 'gee-asset';
+    name: string;
+    title: string;
+    format: string;
+    description: string;
+    size: number | null;
+    dataDictionary: DataDictionaryFormType;
+    layerObj: LayerFormType | null;
+    layerObjRaw: RawLayerFormType | null;
 }
 
 function Datafile({
@@ -626,13 +626,13 @@ function Datafile({
                 </>
             )}
         </Disclosure>
-    )
+    );
 }
 
 function PreviewTable({
     dataDictionary,
 }: {
-    dataDictionary: DataDictionaryFormType
+    dataDictionary: DataDictionaryFormType;
 }) {
     return (
         <Table>
@@ -670,5 +670,5 @@ function PreviewTable({
                 ))}
             </TableBody>
         </Table>
-    )
+    );
 }

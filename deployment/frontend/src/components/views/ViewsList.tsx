@@ -1,60 +1,64 @@
-import { Button } from '@/components/_shared/Button'
+import { Button } from '@/components/_shared/Button';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import { Resource, View, ViewState } from '@/interfaces/dataset.interface'
-import { PopoverClose } from '@radix-ui/react-popover'
-import { useState } from 'react'
-import { DatastoreViewCard } from './DatastoreViewCard'
-import { RwViewCard } from './RwViewCard'
-import { WriDataset } from '@/schema/ckan.schema'
-import { DefaultTooltip } from '../_shared/Tooltip'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
+} from '@/components/_shared/Popover';
+import {
+    type Resource,
+    type View,
+    type ViewState,
+} from '@/interfaces/dataset.interface';
+import { PopoverClose } from '@radix-ui/react-popover';
+import { useState } from 'react';
+import { DatastoreViewCard } from './DatastoreViewCard';
+import { RwViewCard } from './RwViewCard';
+import { type WriDataset } from '@/schema/ckan.schema';
+import { DefaultTooltip } from '../_shared/Tooltip';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
-let uniqueId = 0
+let uniqueId = 0;
 const getUniqueInternalId = () => {
-    return uniqueId++
-}
+    return uniqueId++;
+};
 
 type DatastoreViewsListProps = {
-    provider: 'datastore'
-    datafile: Resource
-    dataset: WriDataset
-}
+    provider: 'datastore';
+    datafile: Resource;
+    dataset: WriDataset;
+};
 
 type RwViewsListProps = {
-    provider: 'rw'
-    rwDatasetId: string
-    views: View[]
-    dataset: WriDataset
-}
+    provider: 'rw';
+    rwDatasetId: string;
+    views: View[];
+    dataset: WriDataset;
+};
 
-type ViewsListProps = DatastoreViewsListProps | RwViewsListProps
+type ViewsListProps = DatastoreViewsListProps | RwViewsListProps;
 
 export default function ViewsList(props: ViewsListProps) {
-    let ogViews: View[]
-    let datafile: Resource | null = null
-    let rwDatasetId: string | null = null
+    let ogViews: View[];
+    let datafile: Resource | null = null;
+    let rwDatasetId: string | null = null;
 
     if (props?.provider == 'datastore') {
-        datafile = props?.datafile
-        ogViews = datafile._views ?? []
+        datafile = props?.datafile;
+        ogViews = datafile._views ?? [];
     } else {
-        ogViews = props?.views ?? []
-        rwDatasetId = props?.rwDatasetId
+        ogViews = props?.views ?? [];
+        rwDatasetId = props?.rwDatasetId;
     }
 
     const [views, setViews] = useState<ViewState[]>(
         ogViews
             ? ogViews.map((view) => ({
-                ...view,
-                _state: 'saved',
-                _id: getUniqueInternalId(),
-            }))
+                  ...view,
+                  _state: 'saved',
+                  _id: getUniqueInternalId(),
+              }))
             : []
-    )
+    );
 
     const addNewChartView = () => {
         setViews((prev) => [
@@ -66,7 +70,7 @@ export default function ViewsList(props: ViewsListProps) {
                         provider: props.provider,
                         id:
                             props.provider == 'datastore'
-                                ? datafile?.id ?? ''
+                                ? (datafile?.id ?? '')
                                 : props.rwDatasetId,
                         props: {
                             data: [],
@@ -81,13 +85,10 @@ export default function ViewsList(props: ViewsListProps) {
                 _state: 'new',
                 _id: getUniqueInternalId(),
             },
-        ])
-    }
+        ]);
+    };
 
-    const isCanCreateChartview = !!(
-        (datafile && datafile.datastore_active) ||
-        rwDatasetId
-    )
+    const isCanCreateChartview = !!(datafile?.datastore_active || rwDatasetId);
 
     return (
         <div>
@@ -108,7 +109,7 @@ export default function ViewsList(props: ViewsListProps) {
                                 content={'Data File must be in DataStore '}
                                 disabled={isCanCreateChartview}
                             >
-                                <div className='flex items-center'>
+                                <div className="flex items-center">
                                     <Button
                                         variant="ghost"
                                         className="w-full"
@@ -146,24 +147,24 @@ export default function ViewsList(props: ViewsListProps) {
                             onCancelOrDelete={(mode) => {
                                 if (mode == 'new') {
                                     setViews((prev) => {
-                                        let newViews = [...prev]
+                                        let newViews = [...prev];
 
                                         newViews = newViews.filter(
                                             (v) => v._id != view._id
-                                        )
+                                        );
 
-                                        return newViews
-                                    })
+                                        return newViews;
+                                    });
                                 } else if (mode == 'edit') {
                                     setViews((prev) => {
-                                        let newViews = [...prev]
+                                        let newViews = [...prev];
 
                                         newViews = newViews.filter(
                                             (v) => v._id != view._id
-                                        )
+                                        );
 
-                                        return newViews
-                                    })
+                                        return newViews;
+                                    });
                                 }
                             }}
                         />
@@ -175,30 +176,30 @@ export default function ViewsList(props: ViewsListProps) {
                             onCancelOrDelete={(mode) => {
                                 if (mode == 'new') {
                                     setViews((prev) => {
-                                        let newViews = [...prev]
+                                        let newViews = [...prev];
 
                                         newViews = newViews.filter(
                                             (v) => v._id != view._id
-                                        )
+                                        );
 
-                                        return newViews
-                                    })
+                                        return newViews;
+                                    });
                                 } else if (mode == 'edit') {
                                     setViews((prev) => {
-                                        let newViews = [...prev]
+                                        let newViews = [...prev];
 
                                         newViews = newViews.filter(
                                             (v) => v._id != view._id
-                                        )
+                                        );
 
-                                        return newViews
-                                    })
+                                        return newViews;
+                                    });
                                 }
                             }}
                         />
-                    )
+                    );
                 })}
             </div>
         </div>
-    )
+    );
 }

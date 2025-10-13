@@ -1,22 +1,22 @@
-import React from 'react'
-import { EnvelopeIcon } from '@heroicons/react/20/solid'
-import Image from 'next/image'
-import { Button } from './Button'
-import Link from 'next/link'
-import { SubscribeForm } from './SubscribeForm'
-import { env } from '@/env.mjs'
-import osanoListeners from './OsanoListeners'
+import React from 'react';
+import { EnvelopeIcon } from '@heroicons/react/20/solid';
+import Image from 'next/image';
+import { Button } from './Button';
+import Link from 'next/link';
+import { SubscribeForm } from './SubscribeForm';
+import { env } from '@/env.mjs';
+import osanoListeners from './OsanoListeners';
 
-type ctalink = { title: string; href: string }
+type ctalink = { title: string; href: string };
 type ctaLinks = {
-    primary: ctalink | ctalink[]
-    secondary?: ctalink
-}
+    primary: ctalink | ctalink[];
+    secondary?: ctalink;
+};
 
 interface FooterProps {
-    links?: ctaLinks
-    style?: string
-    isHome?: boolean
+    links?: ctaLinks;
+    style?: string;
+    isHome?: boolean;
 }
 
 export default function Footer({
@@ -34,7 +34,7 @@ export default function Footer({
     style = 'mt-16',
     isHome = false,
 }: FooterProps) {
-    osanoListeners()
+    osanoListeners();
 
     return (
         <section
@@ -222,5 +222,5 @@ export default function Footer({
                 </div>
             </div>
         </section>
-    )
+    );
 }

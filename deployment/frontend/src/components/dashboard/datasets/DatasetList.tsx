@@ -1,14 +1,14 @@
-import React from 'react'
-import { Tab } from '@headlessui/react'
-import DatasetLCardList from './DatasetLCardList'
-import Favourite from './Favourites'
-import Drafts from './Drafts'
-import ApprovalDataset from './ApprovalDataset'
-import Mydataset from './Mydataset'
-import DashboardDatasetTabs from './DashboardDatasetTabs'
-import { useRouter } from 'next/router'
-import type { SearchInput } from '@/schema/search.schema'
-import { useState, useEffect } from 'react'
+import React from 'react';
+import { Tab } from '@headlessui/react';
+import DatasetLCardList from './DatasetLCardList';
+import Favourite from './Favourites';
+import Drafts from './Drafts';
+import ApprovalDataset from './ApprovalDataset';
+import Mydataset from './Mydataset';
+import DashboardDatasetTabs from './DashboardDatasetTabs';
+import { useRouter } from 'next/router';
+import type { SearchInput } from '@/schema/search.schema';
+import { useState, useEffect } from 'react';
 
 const tabs = [
     {
@@ -41,20 +41,20 @@ const tabs = [
         name: 'Awaiting Approval',
         title: 'Awaiting Approval',
     },
-]
+];
 
 export default function DatasetList() {
-    const router = useRouter()
-    const { tab } = router.query
-    const tabIndex = tab ? tabs.findIndex((i) => i.id === tab) : 0
-    const q = router.query
+    const router = useRouter();
+    const { tab } = router.query;
+    const tabIndex = tab ? tabs.findIndex((i) => i.id === tab) : 0;
+    const q = router.query;
     const [query, setQuery] = useState<SearchInput>({
         search: q.search ? JSON.parse(q.search as string) : '',
         page: q.page ? JSON.parse(q.page as string) : { start: 0, rows: 10 },
         fq: q.fq ? JSON.parse(q.fq as string) : {},
         _isUserSearch: true,
         tab: tab ? (tab as string) : 'datasets',
-    })
+    });
 
     useEffect(() => {
         router.push(
@@ -71,8 +71,8 @@ export default function DatasetList() {
             {
                 shallow: true,
             }
-        )
-    }, [query.search, query.page, query.fq, query.tab])
+        );
+    }, [query.search, query.page, query.fq, query.tab]);
 
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
@@ -85,7 +85,7 @@ export default function DatasetList() {
                         page: { start: 0, rows: 10 },
                         fq: {},
                         tab: (tabs[index] as { id: string }).id,
-                    })
+                    });
                 }}
             >
                 <Tab.List className="flex max-w-8xl  ">
@@ -104,5 +104,5 @@ export default function DatasetList() {
                 </Tab.Panels>
             </Tab.Group>
         </section>
-    )
+    );
 }

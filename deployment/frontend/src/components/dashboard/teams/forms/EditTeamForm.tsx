@@ -1,39 +1,39 @@
-import { useForm } from 'react-hook-form'
-import { use, useState } from 'react'
-import TeamForm from './TeamForm'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import Container from '@/components/_shared/Container'
-import { TeamFormType, TeamSchema } from '@/schema/team.schema'
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { zodResolver } from '@hookform/resolvers/zod'
-import notify from '@/utils/notify'
-import { api } from '@/utils/api'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { useRouter } from 'next/router'
-import dynamic from 'next/dynamic'
+import { useForm } from 'react-hook-form';
+import { use, useState } from 'react';
+import TeamForm from './TeamForm';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import Container from '@/components/_shared/Container';
+import { type TeamFormType, TeamSchema } from '@/schema/team.schema';
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import notify from '@/utils/notify';
+import { api } from '@/utils/api';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import Link from 'next/link'
-import { RouterOutput } from '@/server/api/root'
-import { Tab } from '@headlessui/react'
-import { Fragment } from 'react'
-import classNames from '@/utils/classnames'
-import { Members } from '../metadata/Members'
-import { z } from 'zod'
-import { useSession } from 'next-auth/react'
+});
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import Link from 'next/link';
+import { type RouterOutput } from '@/server/api/root';
+import { Tab } from '@headlessui/react';
+import { Fragment } from 'react';
+import classNames from '@/utils/classnames';
+import { Members } from '../metadata/Members';
+import { z } from 'zod';
+import { useSession } from 'next-auth/react';
 
-type TeamOutput = RouterOutput['teams']['getTeam']
+type TeamOutput = RouterOutput['teams']['getTeam'];
 
 export default function EditTeamForm({ team }: { team: TeamOutput }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [deleteOpen, setDeleteOpen] = useState(false)
-    const router = useRouter()
-    const possibleParents = api.teams.getAllTeams.useQuery()
-    const { data: session } = useSession()
-    const sysadmin = session?.user?.sysadmin ?? false
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const router = useRouter();
+    const possibleParents = api.teams.getAllTeams.useQuery();
+    const { data: session } = useSession();
+    const sysadmin = session?.user?.sysadmin ?? false;
     const links = [
         { label: 'Teams', url: '/dashboard/teams', current: false },
         {
@@ -41,34 +41,36 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             url: `/dashboard/teams/${team.name}/edit`,
             current: true,
         },
-    ]
-    const userCapacity = api.user.getUserCapacity.useQuery()
-    const isAdminCurrentTeam = userCapacity.data?.adminOrg.some(
-        (org) => org.name === team.name
-    ) ?? false
+    ];
+    const userCapacity = api.user.getUserCapacity.useQuery();
+    const isAdminCurrentTeam =
+        userCapacity.data?.adminOrg.some((org) => org.name === team.name) ??
+        false;
 
     const TeamSchemaRefine = TeamSchema.superRefine((val, ctx) => {
         if (val.visibility.value === 'public' && val.parent) {
             const parent = possibleParents.data?.find(
                 (team) => team.name === val.parent?.value
-            )
-            const visibility = parent?.visibility
-            const isPrivate = parent && visibility === 'private'
+            );
+            const visibility = parent?.visibility;
+            const isPrivate = parent && visibility === 'private';
             if (isPrivate) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ['visibility'],
                     message:
                         'Team visibility cannot be set to public if selected parent Team is private.',
-                })
+                });
             }
         }
 
         if (!sysadmin && val.parent) {
-            const org = possibleParents.data?.find((team) => team.id === val.id)
+            const org = possibleParents.data?.find(
+                (team) => team.id === val.id
+            );
 
-            const capacity = org?.capacity
-            const isAdmin = org && capacity !== 'admin'
+            const capacity = org?.capacity;
+            const isAdmin = org && capacity !== 'admin';
 
             if (isAdmin) {
                 ctx.addIssue({
@@ -76,16 +78,16 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                     path: ['parent'],
                     message:
                         'User does not have admin access to edit a SubTeam',
-                })
+                });
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ['visibility'],
                     message:
                         'User does not have admin access to edit this Team',
-                })
+                });
             }
         }
-    })
+    });
 
     const formObj = useForm<TeamFormType>({
         defaultValues: {
@@ -111,38 +113,38 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
             })),
         },
         resolver: zodResolver(TeamSchemaRefine),
-    })
+    });
 
-    const utils = api.useContext()
+    const utils = api.useContext();
     const editTeam = api.teams.editTeam.useMutation({
         onSuccess: async ({ name, title }) => {
-            await utils.teams.getTeam.invalidate({ id: name })
-            notify(`Successfully edited the ${title ?? name} Team`, 'success')
-            router.push('/dashboard/teams')
+            await utils.teams.getTeam.invalidate({ id: name });
+            notify(`Successfully edited the ${title ?? name} Team`, 'success');
+            router.push('/dashboard/teams');
         },
         onError: (error) => setErrorMessage(error.message),
-    })
+    });
 
     const deleteTeam = api.teams.deleteTeam.useMutation({
         onSuccess: async () => {
-            await utils.teams.getTeam.invalidate({ id: team.name })
-            setDeleteOpen(false)
+            await utils.teams.getTeam.invalidate({ id: team.name });
+            setDeleteOpen(false);
             notify(
                 `Successfully deleted the ${team.title ?? team.name} Team`,
                 'error'
-            )
-            router.push('/dashboard/teams')
+            );
+            router.push('/dashboard/teams');
         },
         onError: (error) => {
-            setDeleteOpen(false)
-            setErrorMessage(error.message)
+            setDeleteOpen(false);
+            setErrorMessage(error.message);
         },
-    })
+    });
 
     const tabs = [
         { name: 'Metadata', enabled: true },
         { name: 'Members', enabled: true },
-    ]
+    ];
 
     return (
         <>
@@ -239,7 +241,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                             <Tab.Panel>
                                 <form
                                     onSubmit={formObj.handleSubmit((data) => {
-                                        editTeam.mutate(data)
+                                        editTeam.mutate(data);
                                     })}
                                 >
                                     <div className="w-full py-8 border-b border-blue-800 shadow">
@@ -278,7 +280,7 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                         loading={editTeam.isLoading}
                         type="submit"
                         onClick={formObj.handleSubmit((data) => {
-                            editTeam.mutate(data)
+                            editTeam.mutate(data);
                         })}
                     >
                         Save
@@ -286,5 +288,5 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                 </div>
             </Container>
         </>
-    )
+    );
 }

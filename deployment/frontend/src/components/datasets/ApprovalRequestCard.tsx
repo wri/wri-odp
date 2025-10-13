@@ -1,27 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
     CheckIcon,
     XMarkIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import { useRouter } from 'next/router'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import type { IssueSchemaType } from '@/schema/issue.schema'
-import { IssueSchema } from '@/schema/issue.schema'
-import { api } from '@/utils/api'
-import notify from '@/utils/notify'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { SimpleEditor } from '../dashboard/datasets/admin/metadata/RTE/SimpleEditor'
-import { Dialog } from '@headlessui/react'
-import { useSession } from 'next-auth/react'
-import Spinner from '../_shared/Spinner'
+import { useRouter } from 'next/router';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import type { IssueSchemaType } from '@/schema/issue.schema';
+import { IssueSchema } from '@/schema/issue.schema';
+import { api } from '@/utils/api';
+import notify from '@/utils/notify';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { SimpleEditor } from '../dashboard/datasets/admin/metadata/RTE/SimpleEditor';
+import { Dialog } from '@headlessui/react';
+import { useSession } from 'next-auth/react';
+import Spinner from '../_shared/Spinner';
 
 export default function ApprovalRequestCard({
     datasetName,
@@ -31,20 +31,20 @@ export default function ApprovalRequestCard({
     diffField,
     datasetTitle,
 }: {
-    datasetName: string
-    owner_org: string | null
-    creator_id: string | null
-    datasetId: string
-    diffField: string[] | never[]
-    datasetTitle?: string
+    datasetName: string;
+    owner_org: string | null;
+    creator_id: string | null;
+    datasetId: string;
+    diffField: string[] | never[];
+    datasetTitle?: string;
 }) {
-    const [open, setOpen] = useState(false)
-    const [approveOpen, setApproveOpen] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const router = useRouter()
-    const { data: session } = useSession()
-    const { query } = router
-    const utils = api.useUtils()
+    const [open, setOpen] = useState(false);
+    const [approveOpen, setApproveOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const router = useRouter();
+    const { data: session } = useSession();
+    const { query } = router;
+    const utils = api.useUtils();
     const formObj = useForm<IssueSchemaType>({
         resolver: zodResolver(IssueSchema),
         mode: 'onBlur',
@@ -55,54 +55,57 @@ export default function ApprovalRequestCard({
             owner_org: owner_org,
             creator_id: creator_id,
         },
-    })
+    });
 
-    const { errors } = formObj.formState
+    const { errors } = formObj.formState;
 
     const { data: userIdentity, isLoading: isLoadingIUser } =
-        api.user.getUserCapacity.useQuery()
+        api.user.getUserCapacity.useQuery();
     const approveDataset = api.dataset.approvePendingDataset.useMutation({
         onSuccess: async (data) => {
             await utils.dataset.getPendingDatasets.invalidate({
                 search: '',
                 page: { start: 0, rows: 10 },
                 sortBy: 'metadata_modified desc',
-            })
+            });
             await utils.dataset.showPendingDiff.invalidate({
                 id: datasetId,
-            })
-            setApproveOpen(false)
+            });
+            setApproveOpen(false);
             notify(
                 `Successfully approved the Dataset ${datasetTitle ?? datasetName}`,
                 'success'
-            )
-            router.push(`/dashboard/datasets`)
+            );
+            router.push(`/dashboard/datasets`);
         },
         onError: (error) => {
-            setErrorMessage(error.message)
+            setErrorMessage(error.message);
         },
-    })
+    });
     const createIssueApi = api.dataset.createIssue.useMutation({
         onSuccess: async (data) => {
             await utils.dataset.getDatasetIssues.invalidate({
                 id: datasetName,
-            })
+            });
             await utils.dataset.getPendingDatasets.invalidate({
                 search: '',
                 page: { start: 0, rows: 10 },
                 sortBy: 'metadata_modified desc',
-            })
-            formObj.reset()
-            setOpen(false)
-            notify('Issue successfully created', 'success')
-            notify(`Dataset ${datasetTitle ?? datasetName} successfully rejected`, 'error')
-            router.push('/dashboard/datasets')
+            });
+            formObj.reset();
+            setOpen(false);
+            notify('Issue successfully created', 'success');
+            notify(
+                `Dataset ${datasetTitle ?? datasetName} successfully rejected`,
+                'error'
+            );
+            router.push('/dashboard/datasets');
         },
         onError: (error) => setErrorMessage(error.message),
-    })
+    });
 
     if (!session?.user.sysadmin && isLoadingIUser) {
-        return <Spinner className="mx-auto my-2" />
+        return <Spinner className="mx-auto my-2" />;
     }
 
     if (
@@ -111,7 +114,7 @@ export default function ApprovalRequestCard({
         !userIdentity.isOrgAdmin &&
         diffField.length === 0
     ) {
-        return ''
+        return '';
     }
 
     return (
@@ -144,7 +147,7 @@ export default function ApprovalRequestCard({
                     {/* <p className='font-normal text-base text-[#666666]'>Lorem ipsum mipsum hipsum dolor....</p> */}
                     <form
                         onSubmit={formObj.handleSubmit((data) => {
-                            createIssueApi.mutate(data)
+                            createIssueApi.mutate(data);
                         })}
                     >
                         <ErrorDisplay name="title" errors={errors} />
@@ -236,5 +239,5 @@ export default function ApprovalRequestCard({
                 )}
             </Modal>
         </>
-    )
+    );
 }

@@ -1,49 +1,52 @@
-import Header from '@/components/_shared/Header'
-import Footer from '@/components/_shared/Footer'
-import { NextSeo } from 'next-seo'
-import { api } from '@/utils/api'
-import { useState, useEffect } from 'react'
-import Spinner from '@/components/_shared/Spinner'
-import type { SearchInput } from '@/schema/search.schema'
-import Pagination from '@/components/datasets/Pagination'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
-import { getServerAuthSession } from '@/server/auth'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import { appRouter } from '@/server/api/root'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import superjson from 'superjson'
-import { env } from '@/env.mjs'
-import dynamic from 'next/dynamic'
-import { Index } from 'flexsearch'
-import { Organization as CkanOrg } from '@portaljs/ckan'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2'
-import TopicsSearch from '@/components/topics/TopicsSearch'
-import TeamsSearch from '@/components/team/TeamsSearch'
+import Header from '@/components/_shared/Header';
+import Footer from '@/components/_shared/Footer';
+import { NextSeo } from 'next-seo';
+import { api } from '@/utils/api';
+import { useState, useEffect } from 'react';
+import Spinner from '@/components/_shared/Spinner';
+import type { SearchInput } from '@/schema/search.schema';
+import Pagination from '@/components/datasets/Pagination';
+import { type GroupTree, GroupsmDetails } from '@/schema/ckan.schema';
+import { getServerAuthSession } from '@/server/auth';
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next';
+import { appRouter } from '@/server/api/root';
+import { createServerSideHelpers } from '@trpc/react-query/server';
+import superjson from 'superjson';
+import { env } from '@/env.mjs';
+import dynamic from 'next/dynamic';
+import { Index } from 'flexsearch';
+import { type Organization as CkanOrg } from '@portaljs/ckan';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2';
+import TopicsSearch from '@/components/topics/TopicsSearch';
+import TeamsSearch from '@/components/team/TeamsSearch';
 
 const TeamsSearchResults = dynamic(
     () => import('@/components/team/TeamsSearchResults')
-)
+);
 
-type Organization = CkanOrg & { numSubTeams: number }
+type Organization = CkanOrg & { numSubTeams: number };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
     const helpers = createServerSideHelpers({
         router: appRouter,
         ctx: { session, ip: undefined },
         transformer: superjson,
-    })
+    });
     await helpers.teams.getGeneralTeam.prefetch({
         search: '',
         page: { start: 0, rows: 10000 },
         allTree: true,
-    })
+    });
 
     return {
         props: {
             trpcState: helpers.dehydrate(),
         },
-    }
+    };
 }
 
 export default function TeamsPage(
@@ -52,18 +55,18 @@ export default function TeamsPage(
     const [pagination, setPagination] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
-    })
+    });
 
-    const [query, setQuery] = useState<string>('')
+    const [query, setQuery] = useState<string>('');
 
     const { data, isLoading } = api.teams.getGeneralTeam.useQuery({
         search: '',
         page: { start: 0, rows: 10000 },
         allTree: true,
-    })
+    });
     const indexTeams = new Index({
         tokenize: 'full',
-    })
+    });
     if (data?.allTeams) {
         data?.allTeams.forEach((team) => {
             indexTeams.add(
@@ -72,12 +75,12 @@ export default function TeamsPage(
                     title: team.title,
                     description: team.description || team.notes,
                 })
-            )
-        })
+            );
+        });
     }
 
     function ProcessTeams() {
-        if (!data) return { teams: [], teamsDetails: {}, count: 0 }
+        if (!data) return { teams: [], teamsDetails: {}, count: 0 };
         const filteredTeams =
             query !== ''
                 ? (data?.allTeams
@@ -89,17 +92,17 @@ export default function TeamsPage(
                 : data.teams.filter(
                       (obj, index, self) =>
                           index === self.findIndex((t) => t.id === obj.id)
-                  ) // Compare based on 'id' property
+                  ); // Compare based on 'id' property
         const teams = filteredTeams.slice(
             pagination.page.start,
             pagination.page.start + pagination.page.rows
-        ) as GroupTree[] | Organization[]
-        const teamsDetails = data?.teamsDetails
-        return { teams, teamsDetails, count: filteredTeams.length }
+        ) as GroupTree[] | Organization[];
+        const teamsDetails = data?.teamsDetails;
+        return { teams, teamsDetails, count: filteredTeams.length };
     }
 
-    const filteredTeams = ProcessTeams()
-    const links = [{ label: 'Teams', url: '/teams', current: true }]
+    const filteredTeams = ProcessTeams();
+    const links = [{ label: 'Teams', url: '/teams', current: true }];
 
     return (
         <>
@@ -178,5 +181,5 @@ export default function TeamsPage(
                 }}
             />
         </>
-    )
+    );
 }

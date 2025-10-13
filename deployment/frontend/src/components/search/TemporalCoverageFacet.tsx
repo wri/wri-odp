@@ -1,42 +1,42 @@
-import { Filter } from '@/interfaces/search.interface'
-import { SearchInput } from '@/schema/search.schema'
-import { Disclosure, Transition } from '@headlessui/react'
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { Input } from '../_shared/SimpleInput'
+import { type Filter } from '@/interfaces/search.interface';
+import { SearchInput } from '@/schema/search.schema';
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Input } from '../_shared/SimpleInput';
 
 export default function TemporalCoverageFacet({
     setFilters,
     filters,
 }: {
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    filters: Filter[]
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    filters: Filter[];
 }) {
     const getUpdatedState = () => {
         return ['temporal_coverage_start', 'temporal_coverage_end'].reduce(
             (a, v) => {
-                const value = filters.find((f) => f?.key == v)?.value ?? ''
+                const value = filters.find((f) => f?.key == v)?.value ?? '';
 
                 return {
                     ...a,
                     [v]: value,
-                }
+                };
             },
             {}
-        )
-    }
+        );
+    };
 
     const [optionsState, setOptionsState] = useState<{
-        temporal_coverage_start?: string
-        temporal_coverage_end?: string
-    }>(getUpdatedState())
+        temporal_coverage_start?: string;
+        temporal_coverage_end?: string;
+    }>(getUpdatedState());
 
     useEffect(() => {
-        setOptionsState(getUpdatedState())
-    }, [filters])
+        setOptionsState(getUpdatedState());
+    }, [filters]);
 
     return (
         <Disclosure
@@ -103,18 +103,19 @@ export default function TemporalCoverageFacet({
                                                     if (e.key == 'Enter') {
                                                         setFilters((prev) => {
                                                             const value =
-                                                                e?.target?.value
+                                                                e?.target
+                                                                    ?.value;
 
                                                             const newFilters = [
                                                                 ...prev,
-                                                            ]
+                                                            ];
 
                                                             const filter =
                                                                 newFilters.find(
                                                                     (f) =>
                                                                         f.key ==
                                                                         'temporal_coverage_start'
-                                                                )
+                                                                );
 
                                                             if (
                                                                 value &&
@@ -127,7 +128,7 @@ export default function TemporalCoverageFacet({
                                                                         value: value,
                                                                         label: value,
                                                                     }
-                                                                )
+                                                                );
                                                             }
                                                             if (
                                                                 value &&
@@ -140,7 +141,7 @@ export default function TemporalCoverageFacet({
                                                                             'temporal_coverage_start'
                                                                     ),
                                                                     1
-                                                                )
+                                                                );
                                                                 newFilters.push(
                                                                     {
                                                                         key: 'temporal_coverage_start',
@@ -148,7 +149,7 @@ export default function TemporalCoverageFacet({
                                                                         value: value,
                                                                         label: value,
                                                                     }
-                                                                )
+                                                                );
                                                             } else if (!value) {
                                                                 newFilters.splice(
                                                                     newFilters.findIndex(
@@ -157,11 +158,11 @@ export default function TemporalCoverageFacet({
                                                                             'temporal_coverage_start'
                                                                     ),
                                                                     1
-                                                                )
+                                                                );
                                                             }
 
-                                                            return newFilters
-                                                        })
+                                                            return newFilters;
+                                                        });
                                                     }
                                                 }}
                                             />
@@ -205,18 +206,19 @@ export default function TemporalCoverageFacet({
                                                     if (e.key == 'Enter') {
                                                         setFilters((prev) => {
                                                             const value =
-                                                                e?.target?.value
+                                                                e?.target
+                                                                    ?.value;
 
                                                             const newFilters = [
                                                                 ...prev,
-                                                            ]
+                                                            ];
 
                                                             const filter =
                                                                 newFilters.find(
                                                                     (f) =>
                                                                         f.key ==
                                                                         'temporal_coverage_end'
-                                                                )
+                                                                );
 
                                                             if (
                                                                 value &&
@@ -229,7 +231,7 @@ export default function TemporalCoverageFacet({
                                                                         value: value,
                                                                         label: value,
                                                                     }
-                                                                )
+                                                                );
                                                             }
                                                             if (
                                                                 value &&
@@ -242,7 +244,7 @@ export default function TemporalCoverageFacet({
                                                                             'temporal_coverage_end'
                                                                     ),
                                                                     1
-                                                                )
+                                                                );
                                                                 newFilters.push(
                                                                     {
                                                                         key: 'temporal_coverage_end',
@@ -250,7 +252,7 @@ export default function TemporalCoverageFacet({
                                                                         value: value,
                                                                         label: value,
                                                                     }
-                                                                )
+                                                                );
                                                             } else if (!value) {
                                                                 newFilters.splice(
                                                                     newFilters.findIndex(
@@ -259,11 +261,11 @@ export default function TemporalCoverageFacet({
                                                                             'temporal_coverage_end'
                                                                     ),
                                                                     1
-                                                                )
+                                                                );
                                                             }
 
-                                                            return newFilters
-                                                        })
+                                                            return newFilters;
+                                                        });
                                                     }
                                                 }}
                                             />
@@ -276,5 +278,5 @@ export default function TemporalCoverageFacet({
                 </>
             )}
         </Disclosure>
-    )
+    );
 }
