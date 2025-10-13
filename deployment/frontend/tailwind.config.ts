@@ -1,5 +1,10 @@
 import { type Config } from 'tailwindcss'
 import defaultTheme from 'tailwindcss/defaultTheme'
+import containerQueries from '@tailwindcss/container-queries'
+import plugin from 'tailwindcss/plugin'
+import tailwindcssAnimate from 'tailwindcss-animate'
+import forms from '@tailwindcss/forms'
+import typography from '@tailwindcss/typography'
 
 export default {
     content: ['./src/**/*.{js,ts,jsx,tsx}'],
@@ -99,16 +104,12 @@ export default {
         },
     },
     plugins: [
-        require('@tailwindcss/container-queries'),
-        require('tailwindcss/plugin')(function ({
-            addVariant,
-        }: {
-            addVariant: any
-        }) {
-            addVariant('not-last', '&:not(:last-child)')
+        containerQueries,
+        plugin((api) => {
+            api.addVariant('not-last', '&:not(:last-child)')
         }),
-        require('tailwindcss-animate'),
-        require('@tailwindcss/forms'),
-        require('@tailwindcss/typography'),
+        tailwindcssAnimate,
+        forms,
+        typography,
     ],
 } satisfies Config
