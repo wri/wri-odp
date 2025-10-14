@@ -442,7 +442,7 @@ jobs:
       - name: Set up Docker Containers
         run: |
           # Start all containers except frontend (it will be started after API token is created)
-          docker compose -f docker-compose.test.yml --env-file .env.example up -d ckan-dev db solr redis datapusher minio prefect
+          docker compose -f docker-compose.test.yml --env-file .env.example up -d ckan-dev db solr redis my-datapusher minio prefect
         working-directory: ./ckan-backend-dev
       - name: Wait for CKAN to be ready
         run: |
