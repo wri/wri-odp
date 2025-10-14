@@ -254,6 +254,10 @@ jobs:
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "OSANO_URL=${{ secrets.DEV_OSANO_URL }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
       - name: Add url(s) to hosts
         run: |
           sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
