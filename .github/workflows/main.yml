@@ -424,10 +424,11 @@ jobs:
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
+          echo "OSANO_URL=${{ secrets.DEV_OSANO_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_DISABLE_HOTJAR=enabled" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
       - name: Add url(s) to hosts
         run: |
@@ -467,19 +468,33 @@ jobs:
       - name: Cypress Install and Frontend setup
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
+        env:
+          CI: 1
+          CYPRESS_CACHE_FOLDER: /home/runner/.cache/Cypress
+          npm_config_cache: /home/runner/.npm
+          TERM: xterm
         with:
           wait-on: 'http://localhost:3000'
           wait-on-timeout: 120
           runTests: false
           working-directory: ./e2e-tests
+          publish-summary: true
       - name: Initialize the Extensions
         run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Run frontend tests group ${{ matrix.group }} 🧪
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
+        env:
+          CI: 1
+          CYPRESS_CACHE_FOLDER: /home/runner/.cache/Cypress
+          npm_config_cache: /home/runner/.npm
+          TERM: xterm
         with:
           command: npm run test:group${{ matrix.group }}
           working-directory: ./e2e-tests
+          publish-summary: true
+          component: false
+          record: false
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
