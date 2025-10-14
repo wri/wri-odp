@@ -59,6 +59,7 @@ services:
       - NEXT_PUBLIC_NEXTAUTH_URL=${NEXT_PUBLIC_NEXTAUTH_URL}
       - NEXT_PUBLIC_GTM_ID=${NEXT_PUBLIC_GTM_ID}
       - NEXT_PUBLIC_HOTJAR_ID=${NEXT_PUBLIC_HOTJAR_ID}
+      - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
       - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
       - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default
       - OKTA_CLIENT_SECRET=ffffffffffffffffffffffffffffffff
