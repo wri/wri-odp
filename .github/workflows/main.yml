@@ -376,12 +376,14 @@ jobs:
       - name: Fix s3filestore test.ini for minio
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/fix_s3filestore_test_ini.sh"
         working-directory: ./ckan-backend-dev
-      - name: Initialize the pending datasets table
-        run: docker exec ckan-wri sh -c "ckan -c production.ini pendingdatasetsdb"
-      - name: Initialize the issues table
-        run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
-      - name: Initialize the notification table
-        run: docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
+      - name: Initialize extension tables
+        run: |
+          docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
+          docker exec ckan-wri sh -c "ckan -c production.ini downloadeventdb"
+          docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
+          docker exec ckan-wri sh -c "ckan -c production.ini pendingdatasetsdb"
+          docker exec ckan-wri sh -c "ckan -c production.ini resourcelocationdb"
+          docker exec ckan-wri sh -c "ckan -c production.ini db upgrade -p harvest"
       - name: Run Unit Tests 🧪
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
@@ -441,14 +443,9 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
-      - name: Cypress Install and CKAN setup
-        if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
-        uses: cypress-io/github-action@v6
-        with:
-          wait-on: 'http://localhost:5000/private-admin/en'
-          wait-on-timeout: 120
-          runTests: false
-          working-directory: ./integration-tests
+      - name: Wait for CKAN to be ready
+        run: |
+          timeout 120 bash -c 'until curl -f http://localhost:5000/private-admin/en > /dev/null 2>&1; do sleep 2; done'
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Set up Frontend Docker Container
