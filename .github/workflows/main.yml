@@ -426,6 +426,11 @@ jobs:
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
+          echo "OSANO_URL=${{ secrets.DEV_OSANO_URL }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
       - name: Add url(s) to hosts
         run: |
           sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
@@ -436,6 +441,20 @@ jobs:
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
+      - name: Cypress Install and CKAN setup
+        if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:5000/private-admin/en'
+          wait-on-timeout: 120
+          runTests: false
+          working-directory: ./integration-tests
+      - name: Create sysadmin API for Authorization
+        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
+      - name: Set up Frontend Docker Container
+        if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
+        working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
@@ -444,6 +463,8 @@ jobs:
           wait-on-timeout: 120
           runTests: false
           working-directory: ./e2e-tests
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
       - name: Run frontend tests group ${{ matrix.group }} 🧪
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
