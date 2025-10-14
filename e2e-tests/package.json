@@ -7,13 +7,12 @@
   "scripts": {
     "open": "cypress open",
     "test": "cypress run --browser electron",
-    "test:group": "cypress run --browser electron --spec \"$(node split-tests.js \"$GROUP\" \"$TOTAL_GROUPS\")\"",
-    "test:group1": "GROUP=1 TOTAL_GROUPS=6 npm run test:group",
-    "test:group2": "GROUP=2 TOTAL_GROUPS=6 npm run test:group",
-    "test:group3": "GROUP=3 TOTAL_GROUPS=6 npm run test:group",
-    "test:group4": "GROUP=4 TOTAL_GROUPS=6 npm run test:group",
-    "test:group5": "GROUP=5 TOTAL_GROUPS=6 npm run test:group",
-    "test:group6": "GROUP=6 TOTAL_GROUPS=6 npm run test:group"
+    "test:group1": "cypress run --browser electron --spec \"$(node split-tests.js 1 6)\"",
+    "test:group2": "cypress run --browser electron --spec \"$(node split-tests.js 2 6)\"",
+    "test:group3": "cypress run --browser electron --spec \"$(node split-tests.js 3 6)\"",
+    "test:group4": "cypress run --browser electron --spec \"$(node split-tests.js 4 6)\"",
+    "test:group5": "cypress run --browser electron --spec \"$(node split-tests.js 5 6)\"",
+    "test:group6": "cypress run --browser electron --spec \"$(node split-tests.js 6 6)\""
   },
   "author": "",
   "license": "ISC",
