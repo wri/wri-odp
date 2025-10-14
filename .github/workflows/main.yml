@@ -24,9 +24,132 @@ permissions:
   contents: read
   security-events: write
 jobs:
-  buildandtest:
-    name: Build and Scan Image with Integration Tests
+  build-ckan:
+    name: Build CKAN Image
     runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Prepare CKAN build context
+        run: mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
+      - name: Build and push CKAN image to ECR
+        uses: docker/build-push-action@v5
+        with:
+          context: deployment/ckan
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}
+          cache-from: type=gha,scope=ckan
+          cache-to: type=gha,mode=max,scope=ckan
+
+  build-frontend:
+    name: Build Frontend Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push Frontend image to ECR
+        uses: docker/build-push-action@v5
+        with:
+          context: deployment/frontend
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:dev-${{ github.sha }}
+          build-args: |
+            NEXTAUTH_SECRET=${{ secrets.DEV_FRONTEND_NEXTAUTH_SECRET }}
+            NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}
+            CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}
+            NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}
+            NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}
+            NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}
+            NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}
+            NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }}
+            OSANO_URL=${{ secrets.DEV_OSANO_URL }}
+            NEXT_PUBLIC_DEPLOYMENT_TYPE=dev
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+  build-datapusher:
+    name: Build Datapusher Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push Datapusher image to ECR
+        uses: docker/build-push-action@v5
+        with:
+          context: datapusher
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}
+          cache-from: type=gha,scope=datapusher
+          cache-to: type=gha,mode=max,scope=datapusher
+
+  build-migration:
+    name: Build Migration Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push Migration image to ECR
+        uses: docker/build-push-action@v5
+        with:
+          context: migration
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-migration
+          cache-from: type=gha,scope=migration
+          cache-to: type=gha,mode=max,scope=migration
+
+  test:
+    name: Run Integration and Unit Tests
+    runs-on: ubuntu-latest
+    needs: [build-ckan, build-frontend, build-datapusher, build-migration]
+    if: always() && (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped')
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -46,56 +169,6 @@ jobs:
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
-      - name: Build and push CKAN image to ECR
-        if: ${{ env.ENABLE_BUILD_CKAN == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
-          IMAGE_TAG: dev-${{ github.sha }}
-        run: |
-          mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
-          docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
-          docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
-      - name: Build and push Frontend image to ECR
-        if: ${{ env.ENABLE_BUILD_FRONTEND == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
-          IMAGE_TAG: dev-${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-          --build-arg NEXTAUTH_SECRET=${{ secrets.DEV_FRONTEND_NEXTAUTH_SECRET }} \
-          --build-arg NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
-          --build-arg CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
-          --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
-          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
-          --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }} \
-          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }} \
-          --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
-          --build-arg OSANO_URL=${{ secrets.DEV_OSANO_URL }} \
-          --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="dev" \
-          deployment/frontend
-          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
-      - name: Build and push Datapusher image to ECR
-        if: ${{ env.ENABLE_BUILD_DATAPUSHER == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: dev-${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
-          datapusher
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
-      - name: Build and push Migration image to ECR
-        if: ${{ env.ENABLE_BUILD_MIGRATION == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: dev-${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration \
-          migration
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
@@ -109,7 +182,6 @@ jobs:
         with:
           wait-on: 'http://localhost:5000/private-admin/en'
           wait-on-timeout: 120
-          node-version: 18
           runTests: false
           working-directory: ./integration-tests
       - name: Create sysadmin API for Authorization
@@ -132,7 +204,6 @@ jobs:
         with:
           wait-on: 'http://localhost:3000'
           wait-on-timeout: 60
-          node-version: 18
           runTests: false
           working-directory: ./e2e-tests
       - name: Initialize the Extensions
@@ -198,8 +269,32 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
+      - name: Tear down containers
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+        if: failure() || success()
+        run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
+        working-directory: ./ckan-backend-dev
+
+  trivy-ckan:
+    name: Trivy Security Scan - CKAN
+    runs-on: ubuntu-latest
+    needs: [build-ckan]
+    if: always() && needs.build-ckan.result == 'success'
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
       - name: Run Trivy Vulnerability Scanner for CKAN Container 🧪
-        if: ${{ env.ENABLE_TRIVY_SCANNING == 'true' }}
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -213,8 +308,30 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+      - name: Upload CKAN container Trivy scan results to GitHub Code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ckan-trivy-results.sarif
+
+  trivy-frontend:
+    name: Trivy Security Scan - Frontend
+    runs-on: ubuntu-latest
+    needs: [build-frontend]
+    if: always() && needs.build-frontend.result == 'success'
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
       - name: Run Trivy Vulnerability Scanner for Frontend Container 🧪
-        if: ${{ env.ENABLE_TRIVY_SCANNING == 'true' }}
         uses: aquasecurity/trivy-action@master
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -228,30 +345,17 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-      - name: Upload CKAN container Trivy scan results to GitHub Code scanning
-        if: ${{ env.ENABLE_TRIVY_SCANNING == 'true' }}
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ckan-trivy-results.sarif
       - name: Upload Frontend container Trivy scan results to GitHub Code scanning
-        if: ${{ env.ENABLE_TRIVY_SCANNING == 'true' }}
         uses: github/codeql-action/upload-sarif@v3
         with:
           category: frontend_container_trivy_results
           sarif_file: frontend-trivy-results.sarif
-      - name: Tear down containers
-        env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
-        if: failure() || success()
-        run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
-        working-directory: ./ckan-backend-dev
 
   deploy:
     name: Deploy To AWS
     runs-on: ubuntu-latest
-    needs:
-      - buildandtest
-    if: github.event_name != 'pull_request'
+    needs: [build-ckan, build-frontend, build-datapusher, build-migration, test, trivy-ckan, trivy-frontend]
+    if: github.event_name != 'pull_request' && always() && (needs.test.result == 'success' || needs.test.result == 'skipped')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -288,7 +392,6 @@ jobs:
         uses: azure/setup-helm@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          id: install
       - name: 'Deploy using Helm Upgrade'
         run: |
           set -e
