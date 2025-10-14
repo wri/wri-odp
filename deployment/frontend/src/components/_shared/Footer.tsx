@@ -138,7 +138,7 @@ export default function Footer({
                         <Link href="/user-guide" className=" font-normal">
                             User Guide
                         </Link>
-                        <a 
+                        <a
                             href="https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b"
                             target="_blank"
                             className=" font-normal"
