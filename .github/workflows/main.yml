@@ -405,7 +405,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [1, 2, 3]
+        group: [1, 2, 3, 4, 5, 6]
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
