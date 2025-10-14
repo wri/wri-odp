@@ -39,53 +39,8 @@ const apiUrl = (path) => {
   return `${Cypress.config().apiUrl}/api/3/action/${path}`;
 };
 
-// Debug helper to log current auth/session state to the terminal
-Cypress.Commands.add("logAuthState", (label = "") => {
-  cy.headlessLog("[AUTH] label:", label);
-  cy.url({ log: false }).then((u) => cy.headlessLog("[AUTH] url:", u));
-  cy.location("pathname", { log: false }).then((p) =>
-    cy.headlessLog("[AUTH] pathname:", p)
-  );
-
-  cy.getCookies({ log: false }).then((cookies) => {
-    const brief = cookies.map(({ name, domain, httpOnly, secure }) => ({
-      name,
-      domain,
-      httpOnly,
-      secure,
-    }));
-    cy.headlessLog("[AUTH] cookies:", brief);
-  });
-
-  cy.window({ log: false }).then((win) => {
-    try {
-      const lsKeys = Object.keys(win.localStorage || {});
-      const ssKeys = Object.keys(win.sessionStorage || {});
-      cy.headlessLog("[AUTH] localStorage keys:", lsKeys);
-      cy.headlessLog("[AUTH] sessionStorage keys:", ssKeys);
-    } catch (e) {
-      cy.headlessLog("[AUTH] storage inspect error:", String(e));
-    }
-  });
-
-  // NextAuth session endpoint (frontend)
-  cy.request({
-    url: "/api/auth/session",
-    failOnStatusCode: false,
-    log: false,
-  }).then((res) => {
-    cy.headlessLog("[AUTH] /api/auth/session status:", res.status);
-    try {
-      cy.headlessLog("[AUTH] /api/auth/session body:", res.body);
-    } catch (_) {
-      // ignore serialization issues
-    }
-  });
-});
-
 Cypress.Commands.add("login", (username, password) => {
   cy.session([username, password], () => {
-    cy.headlessLog("[LOGIN] starting session for:", username);
     cy.on('window:before:load', (win) => {
       const origAppendChild = win.document.head.appendChild;
       win.document.head.appendChild = function(el) {
@@ -96,7 +51,6 @@ Cypress.Commands.add("login", (username, password) => {
       };
     });
     cy.visit("/");
-    cy.logAuthState("after visit /");
     cy.get('body').then(($body) => {
       if ($body.find('.osano-cm-manage').length) {
         cy.get('.osano-cm-manage').click({ force: true });
@@ -104,18 +58,14 @@ Cypress.Commands.add("login", (username, password) => {
       }
     });
     cy.get("#nav-login-button").click();
-    cy.logAuthState("after clicking nav-login-button");
     cy.get("#login-modal").as("login-modal");
 
     cy.get("@login-modal").get('input[name="username"]').type(username);
     cy.get("@login-modal").get('input[name="password"]').type(password);
 
     cy.get("button#login-button").click({ force: true });
-    cy.logAuthState("after clicking login-button");
     cy.wait(9000);
-    cy.logAuthState("before asserting nav-user-menu");
     cy.get("#nav-user-menu").should("be.visible");
-    cy.headlessLog("[LOGIN] nav-user-menu is visible for:", username);
   });
 });
 
