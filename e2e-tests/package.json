@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "open": "cypress open",
-    "test": "cypress run --browser electron"
+    "test": "cypress run --browser electron",
+    "test:group1": "cypress run --browser electron --spec 'cypress/e2e/{dataset_permissions,datafile_location_index,datafile_not_downloadable,dashboard,datapusher,dataset_create_and_read,file-conversion,group_org_patch,api_tokens}.cy.js'",
+    "test:group2": "cypress run --browser electron --spec 'cypress/e2e/{accesibility_test,applicatoin_crud,auth,chart_view,map_view,private_teams,team_crud,teams_public_private_permissions,topic_crud}.cy.js'",
+    "test:group3": "cypress run --browser electron --spec 'cypress/e2e/{external_sources,home,release_notes,robots_txt,search,tabbing_accessibility_forms,topics,user_management,user_management_cascading_roles,web_search_indexing}.cy.js'"
   },
   "author": "",
   "license": "ISC",
