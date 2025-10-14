@@ -15,7 +15,7 @@ export default defineConfig({
     USER_NAME_SUFFIX: "-user-test",
   },
   e2e: {
-    baseUrl: "http://127.0.0.1:3000",
+    baseUrl: "http://localhost:3000",
     apiUrl: "http://ckan-dev:5000/private-admin/en",
     setupNodeEvents(on, config) {
       on("task", {
