@@ -324,8 +324,8 @@ jobs:
   test-unit:
     name: Run Unit Tests
     runs-on: ubuntu-latest
-    needs: [build-ckan, build-frontend, build-datapusher, build-migration, build-prefect, build-postgresql, build-solr]
-    if: always() && (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped')
+    needs: [test-integration]
+    if: always() && (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped')
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -380,6 +380,8 @@ jobs:
         run: docker exec ckan-wri sh -c "ckan -c production.ini pendingdatasetsdb"
       - name: Initialize the issues table
         run: docker exec ckan-wri sh -c "ckan -c production.ini issuesdb"
+      - name: Initialize the notification table
+        run: docker exec ckan-wri sh -c "ckan -c production.ini notificationdb"
       - name: Run Unit Tests 🧪
         run: docker compose -f docker-compose.test.yml --env-file .env.example exec -T ckan-dev /bin/bash -c "/srv/app/run_unit_tests.sh"
         working-directory: ./ckan-backend-dev
@@ -396,8 +398,8 @@ jobs:
   test-frontend:
     name: Run Frontend E2E Tests (Group ${{ matrix.group }})
     runs-on: ubuntu-latest
-    if: always() && (needs.test-integration.result == 'success' && needs.test-unit.result == 'success')
-    needs: [test-integration, test-unit]
+    if: always() && (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped')
+    needs: [test-integration]
     strategy:
       fail-fast: false
       matrix:
