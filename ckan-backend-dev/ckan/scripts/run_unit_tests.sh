@@ -13,20 +13,6 @@ echo "Test Summary" > "$ROOT_DIR/test_summary.txt"
 #     echo "CKAN Core: Failed" >> test_summary.txt
 # fi
 
-if [ -d "src_extensions/ckanext-wri" ]; then
-  cd src_extensions/ckanext-wri
-
-  pytest --ckan-ini=test.ini -v --tb=long ckanext/wri/tests 2>&1 | tee -a "$ROOT_DIR/test_results.txt"
-  PYTEST_EXIT_CODE=${PIPESTATUS[0]}
-
-  if [ $PYTEST_EXIT_CODE -eq 0 ]; then
-    echo "ckanext-wri: Passed" >> "$ROOT_DIR/test_summary.txt"
-  else
-    echo "ckanext-wri: Failed" >> "$ROOT_DIR/test_summary.txt"
-  fi
-
-fi
-
 if [ -d "$ROOT_DIR/src/ckanext-wri" ]; then
   cd $ROOT_DIR/src/ckanext-wri
 
