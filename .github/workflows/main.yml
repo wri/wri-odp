@@ -279,9 +279,9 @@ jobs:
           working-directory: ./integration-tests
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
-      - name: Set up Frontend Docker Container
+      - name: Restart Frontend with updated API token
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
+        run: docker compose -f docker-compose.test.yml --env-file .env.example restart frontend
         working-directory: ./ckan-backend-dev
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
@@ -324,8 +324,8 @@ jobs:
   test-unit:
     name: Run Unit Tests
     runs-on: ubuntu-latest
-    needs: [test-integration]
-    if: always() && (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped')
+    needs: [build-ckan, build-frontend, build-datapusher, build-migration, build-prefect, build-postgresql, build-solr]
+    if: always() && (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped')
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -400,8 +400,8 @@ jobs:
   test-frontend:
     name: Run Frontend E2E Tests (Group ${{ matrix.group }})
     runs-on: ubuntu-latest
-    if: always() && (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped')
-    needs: [test-integration]
+    if: always() && (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped')
+    needs: [build-ckan, build-frontend, build-datapusher, build-migration, build-prefect, build-postgresql, build-solr]
     strategy:
       fail-fast: false
       matrix:
@@ -448,9 +448,9 @@ jobs:
           timeout 120 bash -c 'until curl -f http://localhost:5000/private-admin/en > /dev/null 2>&1; do sleep 2; done'
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
-      - name: Set up Frontend Docker Container
+      - name: Restart Frontend with updated API token
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
+        run: docker compose -f docker-compose.test.yml --env-file .env.example restart frontend
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
