@@ -441,18 +441,22 @@ jobs:
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          SCRIPT_NAME: '/private-admin'
         run: |
-          # Start all containers except frontend (it will be started after API token is created)
-          docker compose -f docker-compose.test.yml --env-file .env.example up -d ckan-dev db solr redis my-datapusher minio prefect
+          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
       - name: Wait for CKAN to be ready
         run: |
           timeout 120 bash -c 'until curl -f http://localhost:5000/private-admin/en > /dev/null 2>&1; do sleep 2; done'
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
-      - name: Start Frontend with API token
+      - name: Set up Frontend Docker Container
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and Frontend setup
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
@@ -478,10 +482,14 @@ jobs:
           if-no-files-found: ignore
       - name: Print Error Logs
         if: failure()
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Tear down containers
         if: failure() || success()
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
         working-directory: ./ckan-backend-dev
 
