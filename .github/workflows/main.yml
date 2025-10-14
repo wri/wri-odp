@@ -451,13 +451,9 @@ jobs:
           timeout 120 bash -c 'until curl -f http://localhost:5000/private-admin/en > /dev/null 2>&1; do sleep 2; done'
       - name: Create sysadmin API for Authorization
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
-      - name: Stop Frontend container to reload environment
+      - name: Recreate Frontend container with updated API token
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
-        run: docker compose -f docker-compose.test.yml --env-file .env.example stop frontend
-        working-directory: ./ckan-backend-dev
-      - name: Start Frontend with updated API token
-        if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d --force-recreate --no-deps frontend
         working-directory: ./ckan-backend-dev
       - name: Wait for Frontend to be ready after restart
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
