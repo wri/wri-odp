@@ -54,6 +54,12 @@ services:
       - SMTP_FROM=${SMTP_FROM}
       - PREFECT_INTERNAL_URL=http://prefect:4200
       - NEXT_PUBLIC_GFW_API_KEY="1111"
+      - NEXT_PUBLIC_CKAN_URL=${NEXT_PUBLIC_CKAN_URL}
+      - NEXT_PUBLIC_NEXTAUTH_URL=${NEXT_PUBLIC_NEXTAUTH_URL}
+      - NEXT_PUBLIC_GTM_ID=${NEXT_PUBLIC_GTM_ID}
+      - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
+      - NEXT_PUBLIC_HOTJAR_ID=${NEXT_PUBLIC_HOTJAR_ID}
+      - NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL=https://www.wri.org/about/privacy-policy?sitename=WRI%20Data%20Explorer&osanoid=c2a89d08-4931-4ad0-99cb-8d3aa022aaec
       - OSANO_URL="YOUR_OSANO_URL/osano.js"
       - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
       - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default
