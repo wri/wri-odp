@@ -87,6 +87,7 @@ jobs:
             NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}
             NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }}
             OSANO_URL=${{ secrets.DEV_OSANO_URL }}
+            NEXT_PUBLIC_DISABLE_HOTJAR="disabled"
             NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
   build-datapusher:
     name: Build Datapusher Image
