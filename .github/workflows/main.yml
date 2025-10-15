@@ -25,7 +25,7 @@ permissions:
   security-events: write
 jobs:
   build-ckan:
-    name: Build and Scan Image with Integration Tests
+    name: Build CKAN Image
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -52,7 +52,7 @@ jobs:
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
 
   build-datapusher:
-    name: Build and Scan Image with Integration Tests
+    name: Build Datapusher Image
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -79,7 +79,7 @@ jobs:
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
 
   build-migration:
-    name: Build and Scan Image with Integration Tests
+    name: Build Migration Image
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -104,16 +104,10 @@ jobs:
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration \
           migration
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
-      
-  buildandtest:
-    name: Build and Scan Image with Integration Tests
+
+  build-frontend:
+    name: Build Frontend Image
     runs-on: ubuntu-latest
-    needs: [build-ckan, build-datapusher, build-migration]
-    if: |
-      always() &&
-      (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
-      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
-      (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped')
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -127,12 +121,6 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-      - name: Add url(s) to hosts
-        run: |
-          sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
-          sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
-          sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
-          sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Build and push Frontend image to ECR
         if: ${{ env.ENABLE_BUILD_FRONTEND == 'true' }}
         env:
@@ -153,6 +141,36 @@ jobs:
           --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="dev" \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
+      
+  buildandtest:
+    name: Build and Scan Image with Integration Tests
+    runs-on: ubuntu-latest
+    needs: [build-ckan, build-datapusher, build-migration, build-frontend]
+    if: |
+      always() &&
+      (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
+      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
+      (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
+      (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped')
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+      - name: Add url(s) to hosts
+        run: |
+          sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
