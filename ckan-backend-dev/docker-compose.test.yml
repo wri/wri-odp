@@ -54,7 +54,8 @@ services:
       - SMTP_FROM=${SMTP_FROM}
       - PREFECT_INTERNAL_URL=http://prefect:4200
       - NEXT_PUBLIC_GFW_API_KEY="1111"
-      - NEXT_PUBLIC_DISABLE_HOTJAR="disabled"
+      - OSANO_URL=${OSANO_URL}
+      - NEXT_PUBLIC_DISABLE_HOTJAR=${NEXT_PUBLIC_DISABLE_HOTJAR}
       - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
       - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default
       - OKTA_CLIENT_SECRET=ffffffffffffffffffffffffffffffff
