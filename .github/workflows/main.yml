@@ -448,15 +448,19 @@ jobs:
         working-directory: ./ckan-backend-dev
       
   build-and-test:
-    name: Build and Scan Image with Integration Tests
+    name: Build and E2E Tests (Group ${{ matrix.group }})
     runs-on: ubuntu-latest
-    needs: [build-ckan, build-datapusher, build-migration, build-frontend]
+    needs:
+      - build-ckan
+      - build-frontend
+      - build-datapusher
+      - build-migration
     if: |
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
+      (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
       (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
-      (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
-      (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped')
+      (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped')
     strategy:
       fail-fast: false
       matrix:
