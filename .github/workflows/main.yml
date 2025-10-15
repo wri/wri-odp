@@ -429,7 +429,6 @@ jobs:
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
-          echo "OSANO_URL=${{ secrets.DEV_OSANO_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
       - name: Add url(s) to hosts
         run: |
@@ -442,7 +441,7 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
           SCRIPT_NAME: '/private-admin'
         run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
+          docker compose -f docker-compose.test.yml --env-file .env.example up -d ckan-dev db solr redis minio prefect my-datapusher
         working-directory: ./ckan-backend-dev
       - name: Wait for CKAN to be ready
         run: |
@@ -454,9 +453,9 @@ jobs:
       - name: Start Frontend with updated API token
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
         env:
+          OSANO_URL: YOUR_OSANO_URL/osano.js
           NEXT_PUBLIC_DISABLE_HOTJAR: disabled
         run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example down frontend
           docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
         working-directory: ./ckan-backend-dev
       - name: Wait for Frontend to be ready after restart
