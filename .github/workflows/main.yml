@@ -328,8 +328,126 @@ jobs:
         if: failure() || success()
         run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
         working-directory: ./ckan-backend-dev
-      
+
   test-frontend:
+    name: Run Frontend E2E Tests (Group ${{ matrix.group }})
+    runs-on: ubuntu-latest
+    needs: [
+      build-ckan,
+      build-frontend,
+      build-datapusher,
+      build-migration,
+    ]
+    if: |
+      always() && 
+      (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
+      (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
+      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
+      (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped')
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [1]
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+      - name: Set image environment variables
+        run: |
+          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-prefect" >> $GITHUB_ENV
+          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-postgresql" >> $GITHUB_ENV
+          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-solr" >> $GITHUB_ENV
+          echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
+          echo "OSANO_URL=http://localhost:3000/osano-stub.js" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
+      - name: Add url(s) to hosts
+        run: |
+          sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Set up Docker Containers (without frontend)
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          SCRIPT_NAME: '/private-admin'
+        run: |
+          docker compose -f docker-compose.test.yml --env-file .env.example up -d
+        working-directory: ./ckan-backend-dev
+      - name: Cypress Install and CKAN setup
+        if: ${{ env.ENABLE_INT_TESTS == 'true' }}
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:5000/private-admin/en'
+          wait-on-timeout: 120
+          runTests: false
+          working-directory: ./integration-tests
+      - name: Create sysadmin API for Authorization
+        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
+      - name: Cypress setup print
+        run: cat integration-tests/cypress.json
+      - name: Set up Frontend Docker Container
+        if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
+        working-directory: ./ckan-backend-dev
+      - name: Print Logs
+        if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
+      - name: Cypress Install and Frontend setup
+        if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 60
+          runTests: false
+          working-directory: ./e2e-tests
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
+      - name: Run frontend tests group ${{ matrix.group }} 🧪
+        if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm run test:group${{ matrix.group }}
+          working-directory: ./e2e-tests
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots-group-${{ matrix.group }}
+          path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
+          if-no-files-found: ignore
+      - name: Print Error Logs
+        if: failure()
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
+        working-directory: ./ckan-backend-dev
+      - name: Tear down containers
+        if: failure() || success()
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
+        working-directory: ./ckan-backend-dev
+      
+  build-and-test:
     name: Build and E2E Tests (Group ${{ matrix.group }})
     runs-on: ubuntu-latest
     needs:
@@ -346,7 +464,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [1, 2, 3, 4, 5, 6]
+        group: [1]
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
