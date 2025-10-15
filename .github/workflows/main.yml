@@ -86,7 +86,7 @@ jobs:
             NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}
             NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}
             NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }}
-            OSANO_URL="YOUR_OSANO_URL/osano.js"
+            OSANO_URL=${{ secrets.DEV_OSANO_URL }}
             NEXT_PUBLIC_DISABLE_HOTJAR="disabled"
             NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
   build-datapusher:
@@ -428,7 +428,6 @@ jobs:
           echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
-          echo "OSANO_URL=${{ secrets.DEV_OSANO_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
       - name: Add url(s) to hosts
