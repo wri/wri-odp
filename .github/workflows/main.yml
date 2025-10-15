@@ -441,7 +441,7 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
           SCRIPT_NAME: '/private-admin'
         run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d ckan-dev db solr redis minio prefect my-datapusher
+          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
         working-directory: ./ckan-backend-dev
       - name: Wait for CKAN to be ready
         run: |
@@ -453,9 +453,11 @@ jobs:
       - name: Start Frontend with updated API token
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
         env:
-          # OSANO_URL: YOUR_OSANO_URL/osano.js
+          OSANO_URL: YOUR_OSANO_URL/osano.js
           NEXT_PUBLIC_DISABLE_HOTJAR: disabled
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d --build frontend
+        run: |
+          docker compose -f docker-compose.test.yml --env-file .env.example down frontend
+          docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
         working-directory: ./ckan-backend-dev
       - name: Wait for Frontend to be ready after restart
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
