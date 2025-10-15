@@ -263,7 +263,7 @@ jobs:
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers (without frontend)
         run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example up -d ckan-dev db solr redis minio prefect my-datapusher
+          docker compose -f docker-compose.test.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and CKAN setup
         if: ${{ env.ENABLE_INT_TESTS == 'true' }}
@@ -277,7 +277,7 @@ jobs:
         run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Recreate Frontend container with updated API token
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d --force-recreate --no-deps frontend
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
         working-directory: ./ckan-backend-dev
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
@@ -441,7 +441,7 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
           SCRIPT_NAME: '/private-admin'
         run: |
-          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
+          docker compose -f docker-compose.test.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
       - name: Cypress Install and CKAN setup
         if: ${{ env.ENABLE_INT_TESTS == 'true' }}
