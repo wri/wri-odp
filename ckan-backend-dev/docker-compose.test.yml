@@ -33,7 +33,7 @@ services:
 
   frontend:
     container_name: wri-frontend
-    image: ${FRONTEND_IMAGE}
+
     build:
       context: ../deployment/frontend/
       args:
