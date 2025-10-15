@@ -86,9 +86,8 @@ jobs:
             NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}
             NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}
             NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }}
-            NEXT_PUBLIC_DISABLE_HOTJAR="disabled"
-            OSANO_URL="YOUR_OSANO_URL/osano.js"
-            NEXT_PUBLIC_DEPLOYMENT_TYPE=dev
+            OSANO_URL=${{ secrets.DEV_OSANO_URL }}
+            NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
   build-datapusher:
     name: Build Datapusher Image
     runs-on: ubuntu-latest
