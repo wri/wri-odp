@@ -33,7 +33,20 @@ services:
 
   frontend:
     container_name: wri-frontend
-    image: ${FRONTEND_IMAGE}
+    build:
+      context: ../deployment/frontend/
+      args:
+        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000/private-admin/en
+        - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
+        - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
+        - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
+        - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
+        - NEXT_PUBLIC_GFW_API_KEY="1111"
+        - OSANO_URL="YOUR_OSANO_URL/osano.js"
+        - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
+        - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default
+        - OKTA_CLIENT_SECRET=ffffffffffffffffffffffffffffffff
+        - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://localhost:3000
@@ -54,8 +67,7 @@ services:
       - SMTP_FROM=${SMTP_FROM}
       - PREFECT_INTERNAL_URL=http://prefect:4200
       - NEXT_PUBLIC_GFW_API_KEY="1111"
-      - OSANO_URL=${OSANO_URL}
-      - NEXT_PUBLIC_DISABLE_HOTJAR=${NEXT_PUBLIC_DISABLE_HOTJAR}
+      - OSANO_URL="YOUR_OSANO_URL/osano.js"
       - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
       - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default
       - OKTA_CLIENT_SECRET=ffffffffffffffffffffffffffffffff
@@ -74,7 +86,8 @@ services:
 
   prefect:
     container_name: prefect-server
-    image: ${PREFECT_IMAGE}
+    build:
+      context: ./prefect-server
     restart: always
     environment:
       - PREFECT_UI_URL=http://prefect:4200/api
@@ -96,7 +109,8 @@ services:
 
   my-datapusher:
     container_name: my-datapusher
-    image: ${DATAPUSHER_IMAGE}
+    build:
+      context: ../datapusher
     restart: always
     environment:
       - PREFECT_API_URL=http://prefect:4200/api
@@ -114,7 +128,8 @@ services:
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
-    image: ${POSTGRESQL_IMAGE}
+    build:
+      context: postgresql/
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -133,7 +148,9 @@ services:
 
   solr:
     container_name: ${SOLR_CONTAINER_NAME}
-    image: ${SOLR_IMAGE}
+      #image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
+    build:
+      context: solr/
     volumes:
       - solr_data:/var/solr
       - ./ckan/setup/schema.xml:/opt/solr/server/solr/configsets/ckan/conf/managed-schema
