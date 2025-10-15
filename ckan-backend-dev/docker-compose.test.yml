@@ -33,6 +33,7 @@ services:
 
   frontend:
     container_name: wri-frontend
+    image: ${FRONTEND_IMAGE}
     build:
       context: ../deployment/frontend/
       args:
@@ -86,6 +87,7 @@ services:
 
   prefect:
     container_name: prefect-server
+    image: ${PREFECT_IMAGE:-prefect-server}
     build:
       context: ./prefect-server
     restart: always
@@ -109,6 +111,7 @@ services:
 
   my-datapusher:
     container_name: my-datapusher
+    image: ${DATAPUSHER_IMAGE:-my-datapusher}
     build:
       context: ../datapusher
     restart: always
@@ -128,6 +131,7 @@ services:
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
+    image: ${POSTGRESQL_IMAGE:-wri-postgresql}
     build:
       context: postgresql/
     environment:
@@ -148,6 +152,7 @@ services:
 
   solr:
     container_name: ${SOLR_CONTAINER_NAME}
+    image: ${SOLR_IMAGE:-wri-solr}
       #image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
     build:
       context: solr/
