@@ -109,7 +109,6 @@ jobs:
         with:
           wait-on: 'http://localhost:5000/private-admin/en'
           wait-on-timeout: 120
-          node-version: 18
           runTests: false
           working-directory: ./integration-tests
       - name: Create sysadmin API for Authorization
@@ -118,7 +117,7 @@ jobs:
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
-        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
         working-directory: ./ckan-backend-dev
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
@@ -132,7 +131,6 @@ jobs:
         with:
           wait-on: 'http://localhost:3000'
           wait-on-timeout: 60
-          node-version: 18
           runTests: false
           working-directory: ./e2e-tests
       - name: Initialize the Extensions
