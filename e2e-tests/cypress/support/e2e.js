@@ -42,15 +42,6 @@ const apiUrl = (path) => {
 Cypress.Commands.add("login", (username, password) => {
   cy.session([username, password], () => {
     cy.on('window:before:load', (win) => {
-      // Provide a minimal Osano stub for tests so Hotjar/consent checks don't fail
-      if (!win.Osano) {
-        win.Osano = {
-          cm: {
-            getConsent: () => ({ ANALYTICS: 'GRANT' }),
-            showDrawer: () => {},
-          },
-        };
-      }
       const origAppendChild = win.document.head.appendChild;
       win.document.head.appendChild = function(el) {
         if (el.tagName === 'SCRIPT' && el.src && el.src.includes('osano')) {
