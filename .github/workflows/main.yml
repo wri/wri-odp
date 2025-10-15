@@ -40,54 +40,17 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Prepare CKAN build context
-        run: mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
       - name: Build and push CKAN image to ECR
-        uses: docker/build-push-action@v5
-        with:
-          context: deployment/ckan
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}
-          cache-from: type=gha,scope=ckan
-          cache-to: type=gha,mode=max,scope=ckan
+        if: ${{ env.ENABLE_BUILD_CKAN == 'true' }}
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
+          IMAGE_TAG: dev-${{ github.sha }}
+        run: |
+          mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
+          docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
+          docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
 
-  build-frontend:
-    name: Build Frontend Image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push Frontend image to ECR
-        uses: docker/build-push-action@v5
-        with:
-          context: deployment/frontend
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:dev-${{ github.sha }}
-          build-args: |
-            NEXTAUTH_SECRET=${{ secrets.DEV_FRONTEND_NEXTAUTH_SECRET }}
-            NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}
-            CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}
-            NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}
-            NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}
-            NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}
-            NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}
-            NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }}
-            OSANO_URL=${{ secrets.DEV_OSANO_URL }}
-            NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
   build-datapusher:
     name: Build Datapusher Image
     runs-on: ubuntu-latest
@@ -104,16 +67,16 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
       - name: Build and push Datapusher image to ECR
-        uses: docker/build-push-action@v5
-        with:
-          context: datapusher
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}
-          cache-from: type=gha,scope=datapusher
-          cache-to: type=gha,mode=max,scope=datapusher
+        if: ${{ env.ENABLE_BUILD_DATAPUSHER == 'true' }}
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
+          IMAGE_TAG: dev-${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
+          datapusher
+          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
 
   build-migration:
     name: Build Migration Image
@@ -131,19 +94,19 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
       - name: Build and push Migration image to ECR
-        uses: docker/build-push-action@v5
-        with:
-          context: migration
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-migration
-          cache-from: type=gha,scope=migration
-          cache-to: type=gha,mode=max,scope=migration
+        if: ${{ env.ENABLE_BUILD_MIGRATION == 'true' }}
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
+          IMAGE_TAG: dev-${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration \
+          migration
+          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
 
-  build-prefect:
-    name: Build Prefect Server Image
+  build-frontend:
+    name: Build Frontend Image
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
@@ -158,71 +121,26 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: 'true'
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push Prefect image to ECR
-        uses: docker/build-push-action@v5
-        with:
-          context: ckan-backend-dev/prefect-server
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-prefect
-          cache-from: type=gha,scope=prefect-server
-          cache-to: type=gha,mode=max,scope=prefect-server
-
-  build-postgresql:
-    name: Build PostgreSQL Image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push PostgreSQL image to ECR
-        uses: docker/build-push-action@v5
-        with:
-          context: ckan-backend-dev/postgresql
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-postgresql
-          cache-from: type=gha,scope=postgresql
-          cache-to: type=gha,mode=max,scope=postgresql
-
-  build-solr:
-    name: Build Solr Image
-    runs-on: ubuntu-latest
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and push Solr image to ECR
-        uses: docker/build-push-action@v5
-        with:
-          context: ckan-backend-dev/solr
-          push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-solr
-          cache-from: type=gha,scope=solr
-          cache-to: type=gha,mode=max,scope=solr
-
+      - name: Build and push Frontend image to ECR
+        if: ${{ env.ENABLE_BUILD_FRONTEND == 'true' }}
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
+          IMAGE_TAG: dev-${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
+          --build-arg NEXTAUTH_SECRET=${{ secrets.DEV_FRONTEND_NEXTAUTH_SECRET }} \
+          --build-arg NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
+          --build-arg CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
+          --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }} \
+          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }} \
+          --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
+          --build-arg OSANO_URL=${{ secrets.DEV_OSANO_URL }} \
+          --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="dev" \
+          deployment/frontend
+          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
   test-integration:
     name: Run Integration Tests
     runs-on: ubuntu-latest
@@ -396,8 +314,18 @@ jobs:
   test-frontend:
     name: Run Frontend E2E Tests (Group ${{ matrix.group }})
     runs-on: ubuntu-latest
-    if: always() && (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped')
-    needs: [build-ckan, build-frontend, build-datapusher, build-migration, build-prefect, build-postgresql, build-solr]
+    needs: [
+      build-ckan,
+      build-frontend,
+      build-datapusher,
+      build-migration,
+    ]
+    if: |
+      always() && 
+      (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
+      (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
+      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
+      (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped')
     strategy:
       fail-fast: false
       matrix:
@@ -500,6 +428,108 @@ jobs:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
         working-directory: ./ckan-backend-dev
+      
+  build-and-test:
+    name: Build and Scan Image with Integration Tests
+    runs-on: ubuntu-latest
+    needs: [build-ckan, build-datapusher, build-migration, build-frontend]
+    if: |
+      always() &&
+      (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
+      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
+      (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
+      (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped')
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+      - name: Add url(s) to hosts
+        run: |
+          sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Set up Docker Containers
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+          SCRIPT_NAME: '/private-admin'
+        run: |
+          docker compose -f docker-compose.test.yml --env-file .env.example up --build -d
+        working-directory: ./ckan-backend-dev
+      - name: Cypress Install and CKAN setup
+        if: ${{ env.ENABLE_INT_TESTS == 'true' }}
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:5000/private-admin/en'
+          wait-on-timeout: 120
+          runTests: false
+          working-directory: ./integration-tests
+      - name: Create sysadmin API for Authorization
+        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
+      - name: Set up Frontend Docker Container
+        if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example up --build -d frontend
+        working-directory: ./ckan-backend-dev
+      - name: Print Logs
+        if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
+        working-directory: ./ckan-backend-dev
+      - name: Cypress Install and Frontend setup
+        if: ${{ env.ENABLE_INT_TESTS == 'true' }}
+        uses: cypress-io/github-action@v6
+        with:
+          wait-on: 'http://localhost:3000'
+          wait-on-timeout: 60
+          runTests: false
+          working-directory: ./e2e-tests
+      - name: Initialize the Extensions
+        run: bash ./ckan-backend-dev/ckan/scripts/init-extensions.sh
+      - name: Check prefect url
+        uses: jtalk/url-health-check-action@v4
+        with:
+          # Check the following URLs one by one sequentially
+          url: http://prefect:4200
+          # Follow redirects, or just report success on 3xx status codes
+          follow-redirect: false # Optional, defaults to "false"
+          # Fail this action after this many failed attempts
+          max-attempts: 3 # Optional, defaults to 1
+      - name: Run frontend tests 🧪
+        if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
+        uses: cypress-io/github-action@v6
+        with:
+          command: npm run test:group1
+          working-directory: ./e2e-tests
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
+          if-no-files-found: ignore
+      - name: Print Error Logs
+        if: failure()
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}'
+        run: docker compose -f docker-compose.test.yml --env-file .env.example logs
+        working-directory: ./ckan-backend-dev
+      - name: Tear down containers
+        env:
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ github.sha }}'
+        if: failure() || success()
+        run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
+        working-directory: ./ckan-backend-dev
 
   trivy-ckan:
     name: Trivy Security Scan - CKAN
@@ -579,8 +609,19 @@ jobs:
   deploy:
     name: Deploy To AWS
     runs-on: ubuntu-latest
-    needs: [build-ckan, build-frontend, build-datapusher, build-migration, build-prefect, build-postgresql, build-solr, test-integration, test-unit, test-frontend, trivy-ckan, trivy-frontend]
-    if: github.event_name != 'pull_request' && always() && (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped') && (needs.test-unit.result == 'success' || needs.test-unit.result == 'skipped') && (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
+    needs:
+      - test-integration
+      - test-unit
+      - test-frontend
+      - build-and-test
+
+    if: |
+      github.event_name != 'pull_request' && 
+      always() && 
+      (needs.build-and-test.result == 'success' || needs.build-and-test.result == 'skipped') &&
+      (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped') && 
+      (needs.test-unit.result == 'success' || needs.test-unit.result == 'skipped') && 
+      (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
