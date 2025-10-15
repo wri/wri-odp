@@ -457,6 +457,10 @@ jobs:
       (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
       (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped')
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [1, 2, 3, 4, 5, 6]
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -524,16 +528,16 @@ jobs:
           follow-redirect: false # Optional, defaults to "false"
           # Fail this action after this many failed attempts
           max-attempts: 3 # Optional, defaults to 1
-      - name: Run frontend tests 🧪
+      - name: Run frontend tests ${{ matrix.group }} 🧪
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
         with:
-          command: npm run test:group1
+          command: npm run test:group${{ matrix.group }}
           working-directory: ./e2e-tests
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: cypress-screenshots
+          name: cypress-screenshots-group-${{ matrix.group }}
           path: /home/runner/work/wri-odp/wri-odp/e2e-tests/cypress/screenshots
           if-no-files-found: ignore
       - name: Print Error Logs
