@@ -451,8 +451,8 @@ jobs:
       - name: Start Frontend with updated API token
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
         env:
-          OSANO_URL: 'YOUR_OSANO_URL/osano.js'
-          NEXT_PUBLIC_DISABLE_HOTJAR: 'disabled'
+          OSANO_URL: YOUR_OSANO_URL/osano.js
+          NEXT_PUBLIC_DISABLE_HOTJAR: disabled
         run: docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
         working-directory: ./ckan-backend-dev
       - name: Wait for Frontend to be ready after restart
