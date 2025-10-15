@@ -190,3 +190,42 @@ def package_collaborator_list(context: Context, data_dict: DataDict) -> AuthResu
 def download_event_create(context: Context, data_dict: DataDict):
     """ Only sysadmins can create download events """
     return tk.check_access("vocabulary_create", context, data_dict)
+
+
+@tk.chained_auth_function
+def package_collaborator_list_for_user(up_func, context, data_dict):
+    """
+    Wrapper around CKAN core auth for package_collaborator_list_for_user with extra logging.
+
+    Logs details about the current user and the requested id to diagnose
+    AnonymousUser attribute errors without changing authorization behavior.
+    """
+    try:
+        model = context.get("model")
+        current_user_name = context.get("user")
+        requested_id = data_dict.get("id") if isinstance(data_dict, dict) else None
+        user_obj = None
+        if model and current_user_name:
+            try:
+                user_obj = model.User.get(current_user_name)
+            except Exception:
+                user_obj = None
+
+        log.warning(
+            "Auth package_collaborator_list_for_user: context.user=%r, requested.id=%r, user_obj_type=%s, has_id=%s, is_anonymous=%s",
+            current_user_name,
+            requested_id,
+            type(user_obj).__name__ if user_obj is not None else None,
+            hasattr(user_obj, "id") if user_obj is not None else None,
+            getattr(user_obj, "is_anonymous", None) if user_obj is not None else None,
+        )
+    except Exception as e:
+        # Never let logging itself break auth
+        log.error("Logging error in package_collaborator_list_for_user auth: %s", e)
+
+    try:
+        return up_func(context, data_dict)
+    except Exception as e:
+        # Log full details and re-raise to keep behavior unchanged
+        log.exception("Core auth error in package_collaborator_list_for_user: %s", e)
+        raise
