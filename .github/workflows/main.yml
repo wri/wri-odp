@@ -470,6 +470,7 @@ jobs:
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
+          echo "OSANO_URL='YOUR_OSANO_URL/osano.js'" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
