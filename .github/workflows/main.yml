@@ -477,6 +477,8 @@ jobs:
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_GFW_API_KEY=1111" >> $GITHUB_ENV
+          echo "NEXTAUTH_SECRET=${{ secrets.DEV_FRONTEND_NEXTAUTH_SECRET }}" >> $GITHUB_ENV
+          echo "NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
           echo "OSANO_URL=YOUR_OSANO_URL/osano.js" >> $GITHUB_ENV
       - name: Add url(s) to hosts
         run: |
