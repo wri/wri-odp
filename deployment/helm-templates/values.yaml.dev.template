@@ -267,3 +267,12 @@ solr:
     requests:
       memory: 3G
       cpu: 0.6
+redis:
+  architecture: standalone
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/redis
+    tag: "7.0.12-debian-11-r0"
+  master:
+    persistence:
+      size: 1G
