@@ -209,7 +209,6 @@ class WriPlugin(plugins.SingletonPlugin):
         facets_dict["visibility_type"] = toolkit._("Visibility")
         facets_dict["featured_dataset"] = toolkit._("Featured Dataset")
         facets_dict["wri_data"] = toolkit._("WRI Data")
-        facets_dict["metadata_modified"] = toolkit._("Last Updated")
         return facets_dict
 
     def group_facets(self, facets_dict, group_type, package_type):
