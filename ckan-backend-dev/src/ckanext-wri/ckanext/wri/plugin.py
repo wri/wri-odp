@@ -185,7 +185,6 @@ class WriPlugin(plugins.SingletonPlugin):
             "package_collaborator_list": auth.package_collaborator_list,
             "package_create": auth.package_create,
             "download_event_create": auth.download_event_create,
-            "package_collaborator_list_for_user": auth.package_collaborator_list_for_user,
         }
 
     # IValidators
@@ -210,6 +209,7 @@ class WriPlugin(plugins.SingletonPlugin):
         facets_dict["visibility_type"] = toolkit._("Visibility")
         facets_dict["featured_dataset"] = toolkit._("Featured Dataset")
         facets_dict["wri_data"] = toolkit._("WRI Data")
+        facets_dict["metadata_modified"] = toolkit._("Last Updated")
         return facets_dict
 
     def group_facets(self, facets_dict, group_type, package_type):
