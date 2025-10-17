@@ -742,15 +742,15 @@ jobs:
     needs:
       - test-integration
       - test-unit
-      - test-frontend
-#    - build-and-test
+      - build-and-test
+#      - test-frontend
     if: |
       github.event_name != 'pull_request' && 
       always() && 
       (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped') && 
       (needs.test-unit.result == 'success' || needs.test-unit.result == 'skipped') && 
-      (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
-#      (needs.build-and-test.result == 'success' || needs.build-and-test.result == 'skipped') &&
+      (needs.build-and-test.result == 'success' || needs.build-and-test.result == 'skipped')
+#      (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped') &&
     steps:
       - name: Checkout
         uses: actions/checkout@v4
