@@ -139,6 +139,13 @@ export default function Footer({
                             User Guide
                         </Link>
                         <a
+                            href="https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b"
+                            target="_blank"
+                            className=" font-normal"
+                        >
+                            Contact Us
+                        </a>
+                        <a
                             className="osano-cookie-preference-link font-normal cursor-pointer"
                             title="Manage privacy and cookie preferences"
                         >

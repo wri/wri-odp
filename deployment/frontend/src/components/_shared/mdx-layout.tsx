@@ -1,4 +1,3 @@
-import { Hero } from '../home/Hero';
 import { HomeFooter } from '../home/HomeFooter';
 import Header from './Header';
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
