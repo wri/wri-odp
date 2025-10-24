@@ -1,30 +1,30 @@
-import React, { useState } from 'react'
-import SearchHeader from '../_shared/SearchHeader'
-import SelectFilter from '../_shared/SelectFilter'
-import { api } from '@/utils/api'
-import type { SearchInput } from '@/schema/search.schema'
-import { getKeyValues } from '@/utils/general'
-import type { Group } from '@portaljs/ckan'
-import type { WriOrganization } from '@/schema/ckan.schema'
+import React, { useState } from 'react';
+import SearchHeader from '../_shared/SearchHeader';
+import SelectFilter from '../_shared/SelectFilter';
+import { api } from '@/utils/api';
+import type { SearchInput } from '@/schema/search.schema';
+import { getKeyValues } from '@/utils/general';
+import type { Group } from '@portaljs/ckan';
+import type { WriOrganization } from '@/schema/ckan.schema';
 
 type IOrg = {
-    title: string | undefined
-    name: string | undefined
-    image_display_url: string | undefined
-    description: string
-}
+    title: string | undefined;
+    name: string | undefined;
+    image_display_url: string | undefined;
+    description: string;
+};
 
 function LeftNode({
     setQuery,
     query,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
 }) {
     const { data: team, isLoading: isLoadingTeam } =
-        api.organization.getAllOrganizations.useQuery()
+        api.organization.getAllOrganizations.useQuery();
     const { data: topics, isLoading: isLoadingTopics } =
-        api.topics.getAllTopics.useQuery()
+        api.topics.getAllTopics.useQuery();
 
     if (isLoadingTeam || isLoadingTopics)
         return (
@@ -50,14 +50,14 @@ function LeftNode({
                     query={{} as SearchInput}
                 />
             </div>
-        )
+        );
 
     return (
         <div className="flex  gap-x-3" key="selectrender">
             <SelectFilter
                 key="teamselect"
                 options={[{ id: 'None', label: 'All Teams' }].concat(
-                    getKeyValues(team as WriOrganization[], 'title', 'name')
+                    getKeyValues(team!, 'title', 'name')
                 )}
                 filtername="organization"
                 setQuery={setQuery}
@@ -66,14 +66,14 @@ function LeftNode({
             <SelectFilter
                 key="topicselect"
                 options={[{ id: 'None', label: 'All Topics' }].concat(
-                    getKeyValues(topics as Group[], 'name', 'name')
+                    getKeyValues(topics!, 'name', 'name')
                 )}
                 setQuery={setQuery}
                 query={query}
                 filtername="groups"
             />
         </div>
-    )
+    );
 }
 
 export default function DatasetHeader({
@@ -81,9 +81,9 @@ export default function DatasetHeader({
     query,
     Pagination,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
-    Pagination?: React.ReactNode
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
+    Pagination?: React.ReactNode;
 }) {
     return (
         <SearchHeader
@@ -94,5 +94,5 @@ export default function DatasetHeader({
             rightStyle="px-2 sm:pr-4"
             Pagination={Pagination}
         />
-    )
+    );
 }

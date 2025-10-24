@@ -1,71 +1,70 @@
-import React, { useEffect, useState } from 'react'
-import SearchHeader from '../_shared/SearchHeader'
-import RowProfile from '../_shared/RowProfile'
-import Row from '../_shared/Row'
-import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline'
-import type { IRowProfile } from '../_shared/RowProfile'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import type { SearchInput } from '@/schema/search.schema'
-import Pagination from '../_shared/Pagination'
-import notify from '@/utils/notify'
-import dynamic from 'next/dynamic'
+import React, { useEffect, useState } from 'react';
+import SearchHeader from '../_shared/SearchHeader';
+import RowProfile from '../_shared/RowProfile';
+import Row from '../_shared/Row';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import type { IRowProfile } from '../_shared/RowProfile';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import type { SearchInput } from '@/schema/search.schema';
+import Pagination from '../_shared/Pagination';
+import notify from '@/utils/notify';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { useRouter } from 'next/router'
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import type { GroupTree } from '@/schema/ckan.schema'
-import { useQuery } from 'react-query'
-import { DownloadIcon } from '@/components/_shared/icons/DownloadIcon'
-import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/solid'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { visibilityTypeLabels } from '@/utils/constants'
-import Chip from '../../_shared/Chip'
-
+});
+import { useRouter } from 'next/router';
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import type { GroupTree } from '@/schema/ckan.schema';
+import { useQuery } from 'react-query';
+import { DownloadIcon } from '@/components/_shared/icons/DownloadIcon';
+import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/solid';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { visibilityTypeLabels } from '@/utils/constants';
+import Chip from '../../_shared/Chip';
 
 function downloadCsv(data: string, filename: string) {
-    const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
 
     // Create a temporary URL for the Blob
-    const url = window.URL.createObjectURL(blob)
+    const url = window.URL.createObjectURL(blob);
 
     // Create a temporary link element
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', filename)
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename);
 
     // Append link to body, click it, and remove it
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
     // Clean up the URL
-    window.URL.revokeObjectURL(url)
+    window.URL.revokeObjectURL(url);
 }
 
 type IOrg = {
-    title: string | undefined
-    name: string | undefined
-    image_display_url: string | undefined
-    description: string
-}
+    title: string | undefined;
+    name: string | undefined;
+    image_display_url: string | undefined;
+    description: string;
+};
 
 function TeamProfile({
     team,
     org2img,
 }: {
-    team: GroupTree
-    org2img: Record<string, string>
+    team: GroupTree;
+    org2img: Record<string, string>;
 }) {
     const description = team?.children?.length
         ? `${team?.children?.length} SubTeams`
-        : 'No SubTeams'
-    const TopicProfile = team as IRowProfile
-    TopicProfile.description = description
-    TopicProfile.image_display_url = org2img[team.id]
+        : 'No SubTeams';
+    const TopicProfile = team as IRowProfile;
+    TopicProfile.description = description;
+    TopicProfile.image_display_url = org2img[team.id];
     return (
         <div className="flex py-5 pl-2">
             <RowProfile
@@ -75,33 +74,27 @@ function TeamProfile({
                 defaultImg="/images/placeholders/teams/teamdefault.png"
             />
             {team.visibility === 'private' && (
-              <div className='ml-2 py-3'>
-                <Chip
-                    text={
-                        visibilityTypeLabels[
-                            team.visibility
-                        ] ?? ''
-                    }
-                />
-              </div>
+                <div className="ml-2 py-3">
+                    <Chip text={visibilityTypeLabels[team.visibility] ?? ''} />
+                </div>
             )}
         </div>
-    )
+    );
 }
 
 function SubTeamProfile({
     team,
     org2img,
 }: {
-    team: GroupTree
-    org2img: Record<string, string>
+    team: GroupTree;
+    org2img: Record<string, string>;
 }) {
     const description = team?.children?.length
         ? `${team?.children?.length} SubTeams`
-        : 'No SubTeams'
-    const TopicProfile = team as IRowProfile
-    TopicProfile.description = description
-    TopicProfile.image_display_url = org2img[team.id]
+        : 'No SubTeams';
+    const TopicProfile = team as IRowProfile;
+    TopicProfile.description = description;
+    TopicProfile.image_display_url = org2img[team.id];
     return (
         <div className="flex py-5 pl-3 sm:pl-5">
             <RowProfile
@@ -111,18 +104,12 @@ function SubTeamProfile({
                 defaultImg="/images/placeholders/teams/teamdefault.png"
             />
             {team.visibility === 'private' && (
-                <div className='ml-2 py-3'>
-                    <Chip
-                        text={
-                            visibilityTypeLabels[
-                            team.visibility
-                            ] ?? ''
-                        }
-                    />
+                <div className="ml-2 py-3">
+                    <Chip text={visibilityTypeLabels[team.visibility] ?? ''} />
                 </div>
             )}
         </div>
-    )
+    );
 }
 
 function SubCardProfile({
@@ -130,50 +117,50 @@ function SubCardProfile({
     highlighted,
     org2img,
 }: {
-    teams: IRowProfile[] | GroupTree[] | undefined
-    highlighted?: boolean
-    org2img: Record<string, string>
+    teams: IRowProfile[] | GroupTree[] | undefined;
+    highlighted?: boolean;
+    org2img: Record<string, string>;
 }) {
-    const utils = api.useUtils()
-    const [open, setOpen] = useState(false)
-    const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null)
-    const router = useRouter()
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const utils = api.useUtils();
+    const [open, setOpen] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null);
+    const router = useRouter();
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const deleteTeam = api.teams.deleteDashboardTeam.useMutation({
         onSuccess: async (data) => {
             await utils.organization.getUsersOrganizations.invalidate({
                 search: '',
                 page: { start: 0, rows: 10 },
-            })
-            setOpen(false)
+            });
+            setOpen(false);
             notify(
                 `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} Team`,
                 'error'
-            )
+            );
         },
         onError: (error) => {
-          console.log('DELETION ERROR', error)
-          setErrorMessage(error.message)
+            console.log('DELETION ERROR', error);
+            setErrorMessage(error.message);
         },
-    })
+    });
     const getDownloadEvents = api.downloadEvents.getAllEvents.useMutation({
         onSuccess: async (data: string, variables) => {
-            downloadCsv(data, `signups-${variables?.ownerOrg}.csv`)
+            downloadCsv(data, `signups-${variables?.ownerOrg}.csv`);
         },
-    })
+    });
 
     const handleOpenModal = (topic: GroupTree) => {
-        setSelectedTeam(topic)
-        setOpen(true)
-    }
+        setSelectedTeam(topic);
+        setOpen(true);
+    };
 
     const Team = (team: GroupTree) => {
-        const TeamProfile = team as IRowProfile
-        TeamProfile.image_display_url = org2img[team.id]
-        return TeamProfile
-    }
+        const TeamProfile = team as IRowProfile;
+        TeamProfile.image_display_url = org2img[team.id];
+        return TeamProfile;
+    };
 
-    if (!teams || teams.length === 0) return <></>
+    if (!teams || teams.length === 0) return <></>;
     return (
         <div className="flex flex-col pt-2 pl-4">
             {teams.map((team, index) => {
@@ -188,23 +175,23 @@ function SubCardProfile({
                                     groupStyle="group/item group-hover/item:visible "
                                     className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF] `}
                                     rowMain={
-                                    <>
-                                        <SubTeamProfile
-                                            team={team as GroupTree}
-                                            org2img={org2img}
-                                        />
-                                       {team.visibility === 'private' && (
-                                        <div className='ml-2 py-3'>
-                                            <Chip
-                                                text={
-                                                    visibilityTypeLabels[
-                                                    team.visibility
-                                                    ] ?? ''
-                                                }
+                                        <>
+                                            <SubTeamProfile
+                                                team={team as GroupTree}
+                                                org2img={org2img}
                                             />
-                                        </div>
-                                    )}
-                                    </>
+                                            {team.visibility === 'private' && (
+                                                <div className="ml-2 py-3">
+                                                    <Chip
+                                                        text={
+                                                            visibilityTypeLabels[
+                                                                team.visibility
+                                                            ] ?? ''
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+                                        </>
                                     }
                                     linkButton={{
                                         label: 'View Team',
@@ -224,7 +211,7 @@ function SubCardProfile({
                                             onClick: () => {
                                                 router.push(
                                                     `/dashboard/teams/${team.name}/edit`
-                                                )
+                                                );
                                             },
                                         },
                                         {
@@ -276,27 +263,29 @@ function SubCardProfile({
                                     className={`pr-6 border-b-[1px] border-wri-gray hover:bg-[#DDEAEF]`}
                                     rowMain={
                                         <>
-                                        <div className="flex pl-4 sm:pl-6  ">
-                                            <RowProfile
-                                                imgStyle="w-8 h-8 mt-2"
-                                                isPad
-                                                profile={Team(
-                                                    team as GroupTree
-                                                )}
-                                                defaultImg="/images/placeholders/teams/teamdefault.png"
-                                            />
-                                                {team.visibility === 'private' && (
-                                                    <div className='ml-2 py-3'>
+                                            <div className="flex pl-4 sm:pl-6  ">
+                                                <RowProfile
+                                                    imgStyle="w-8 h-8 mt-2"
+                                                    isPad
+                                                    profile={Team(
+                                                        team as GroupTree
+                                                    )}
+                                                    defaultImg="/images/placeholders/teams/teamdefault.png"
+                                                />
+                                                {team.visibility ===
+                                                    'private' && (
+                                                    <div className="ml-2 py-3">
                                                         <Chip
                                                             text={
                                                                 visibilityTypeLabels[
-                                                                team.visibility
+                                                                    team
+                                                                        .visibility
                                                                 ] ?? ''
                                                             }
                                                         />
                                                     </div>
                                                 )}
-                                        </div>
+                                            </div>
                                         </>
                                     }
                                     linkButton={{
@@ -317,7 +306,7 @@ function SubCardProfile({
                                             onClick: () => {
                                                 router.push(
                                                     `/dashboard/teams/${team.name}/edit`
-                                                )
+                                                );
                                             },
                                         },
                                         {
@@ -355,7 +344,7 @@ function SubCardProfile({
                             </>
                         )}
                     </div>
-                )
+                );
             })}
             {selectedTeam && (
                 <Modal
@@ -399,79 +388,79 @@ function SubCardProfile({
                         >
                             Cancel
                         </Button>
-                    {errorMessage ? (
-                        <ErrorAlert
-                            text={errorMessage}
-                            title="Delete Team failed"
-                        />
-                    ) : null}
+                        {errorMessage ? (
+                            <ErrorAlert
+                                text={errorMessage}
+                                title="Delete Team failed"
+                            />
+                        ) : null}
                     </div>
                 </Modal>
             )}
         </div>
-    )
+    );
 }
 
 export default function TeamCard() {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
-    })
+    });
     const [pagination, setPagination] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
-    })
+    });
     const { data, isLoading, refetch } =
-        api.organization.getUsersOrganizations.useQuery(query)
-    const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null)
-    const [open, setOpen] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const router = useRouter()
+        api.organization.getUsersOrganizations.useQuery(query);
+    const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null);
+    const [open, setOpen] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const router = useRouter();
     const deleteTeam = api.teams.deleteDashboardTeam.useMutation({
         onSuccess: async (data) => {
-            await refetch()
-            setOpen(false)
+            await refetch();
+            setOpen(false);
             notify(
                 `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} Team`,
                 'error'
-            )
+            );
         },
         onError: (error) => {
-          console.log('DELETION ERROR', error)
-          setErrorMessage(error.message)
+            console.log('DELETION ERROR', error);
+            setErrorMessage(error.message);
         },
-    })
+    });
     const getDownloadEvents = api.downloadEvents.getAllEvents.useMutation({
         onSuccess: async (data, variables) => {
-            downloadCsv(data, `signups-${variables?.ownerOrg}.csv`)
+            downloadCsv(data, `signups-${variables?.ownerOrg}.csv`);
         },
-    })
+    });
 
     const handleOpenModal = (team: GroupTree) => {
-        setSelectedTeam(team)
-        setOpen(true)
-    }
+        setSelectedTeam(team);
+        setOpen(true);
+    };
 
     const ProcessedTeam = useQuery(
         ['paginatedTeams', data, pagination],
         () => {
-            if (!data) return { organizations: [], org2Image: {}, count: 0 }
+            if (!data) return { organizations: [], org2Image: {}, count: 0 };
 
             const organizations = data?.organizations.slice(
                 pagination.page.start,
                 pagination.page.start + pagination.page.rows
-            )
-            const org2Image = data?.org2Image
-            return { organizations, org2Image, count: data?.count }
+            );
+            const org2Image = data?.org2Image;
+            return { organizations, org2Image, count: data?.count };
         },
         {
             enabled: !!data,
         }
-    )
+    );
 
     useEffect(() => {
-        setPagination({ search: '', page: { start: 0, rows: 10 } })
-    }, [query.search])
+        setPagination({ search: '', page: { start: 0, rows: 10 } });
+    }, [query.search]);
 
     return (
         <section className="w-full max-w-8xl flex flex-col gap-y-4 sm:gap-y-0">
@@ -499,7 +488,7 @@ export default function TeamCard() {
                 </div>
             ) : (
                 ProcessedTeam.data?.organizations.map((team, index) => {
-                    const isPrivate = team?.visibility === 'private'
+                    const isPrivate = team?.visibility === 'private';
                     //console.log('IS PRIVATE', isPrivate)
                     return (
                         <div key={team.name}>
@@ -511,12 +500,7 @@ export default function TeamCard() {
                                 rowMain={
                                     <TeamProfile
                                         team={team}
-                                        org2img={
-                                            data?.org2Image as Record<
-                                                string,
-                                                string
-                                            >
-                                        }
+                                        org2img={data?.org2Image!}
                                     />
                                 }
                                 linkButton={{
@@ -538,7 +522,7 @@ export default function TeamCard() {
                                             // on click go to /teams/:teamName
                                             router.push(
                                                 `/dashboard/teams/${team.name}/edit`
-                                            )
+                                            );
                                         },
                                     },
                                     {
@@ -574,19 +558,14 @@ export default function TeamCard() {
                                     <SubCardProfile
                                         teams={team.children}
                                         highlighted={team?.highlighted}
-                                        org2img={
-                                            data?.org2Image as Record<
-                                                string,
-                                                string
-                                            >
-                                        }
+                                        org2img={data?.org2Image!}
                                     />
                                 }
                                 isDropDown
                                 isPrivate={isPrivate}
                             />
                         </div>
-                    )
+                    );
                 })
             )}
 
@@ -621,9 +600,7 @@ export default function TeamCard() {
                         <LoaderButton
                             variant="destructive"
                             loading={deleteTeam.isLoading}
-                            onClick={() =>
-                                deleteTeam.mutate(selectedTeam.name!)
-                            }
+                            onClick={() => deleteTeam.mutate(selectedTeam.name)}
                             id={selectedTeam.name}
                         >
                             Delete Team
@@ -643,9 +620,9 @@ export default function TeamCard() {
                                 title="Delete Team failed"
                             />
                         ) : null}
-                        </div>
+                    </div>
                 </Modal>
             )}
         </section>
-    )
+    );
 }

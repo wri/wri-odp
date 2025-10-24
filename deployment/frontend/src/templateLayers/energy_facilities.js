@@ -10,7 +10,7 @@ export const energy_facilities = {
     thumbnailUrl:
         'https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/2d3986c5-5483-4f65-98e0-b74b326dcd99-1644511745613.png',
     layerConfig: {
-        type: "vector",
+        type: 'vector',
         account: 'wri-rw',
         source: {
             type: 'vector',
@@ -193,4 +193,4 @@ export const energy_facilities = {
     staticImageConfig: {},
     createdAt: '2021-03-04T21:37:28.562Z',
     updatedAt: '2021-12-22T17:08:12.956Z',
-}
+};

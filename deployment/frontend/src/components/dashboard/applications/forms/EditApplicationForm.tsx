@@ -1,80 +1,94 @@
-import { useForm } from 'react-hook-form'
-import { useState } from 'react'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import Container from '@/components/_shared/Container'
-import { ApplicationFormType, ApplicationSchema } from '@/schema/application.schema'
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { zodResolver } from '@hookform/resolvers/zod'
-import notify from '@/utils/notify'
-import { api } from '@/utils/api'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import ApplicationForm from './ApplicationForm'
-import { useRouter } from 'next/router'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog, Tab } from '@headlessui/react'
+import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import Container from '@/components/_shared/Container';
+import {
+    type ApplicationFormType,
+    ApplicationSchema,
+} from '@/schema/application.schema';
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import notify from '@/utils/notify';
+import { api } from '@/utils/api';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import ApplicationForm from './ApplicationForm';
+import { useRouter } from 'next/router';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog, Tab } from '@headlessui/react';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import Link from 'next/link'
-import { RouterOutput } from '@/server/api/root'
-import { Fragment } from 'react'
-import classNames from '@/utils/classnames'
+import Link from 'next/link';
+import { type RouterOutput } from '@/server/api/root';
+import { Fragment } from 'react';
+import classNames from '@/utils/classnames';
 
-type ApplicationOutput = RouterOutput["applications"]["getApplication"];
+type ApplicationOutput = RouterOutput['applications']['getApplication'];
 
-export default function EditApplicationForm({ application }: { application: ApplicationOutput }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [deleteOpen, setDeleteOpen] = useState(false)
-    const router = useRouter()
+export default function EditApplicationForm({
+    application,
+}: {
+    application: ApplicationOutput;
+}) {
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const router = useRouter();
     const links = [
-        { label: 'Applications', url: '/dashboard/applications', current: false },
+        {
+            label: 'Applications',
+            url: '/dashboard/applications',
+            current: false,
+        },
         {
             label: 'Edit Application',
             url: `/dashboard/applications/${application.name}/edit`,
             current: true,
         },
-    ]
+    ];
 
     const formObj = useForm<ApplicationFormType>({
         defaultValues: {
             ...application,
         },
         resolver: zodResolver(ApplicationSchema),
-    })
+    });
 
-    const utils = api.useContext()
+    const utils = api.useContext();
     const editApplication = api.applications.editApplication.useMutation({
         onSuccess: async ({ title, name }) => {
-            await utils.applications.getApplication.invalidate({ id: name })
-            notify(`Successfully edited the ${title ?? name} Application`, 'success')
-            router.push('/dashboard/applications')
-            formObj.reset()
+            await utils.applications.getApplication.invalidate({ id: name });
+            notify(
+                `Successfully edited the ${title ?? name} Application`,
+                'success'
+            );
+            router.push('/dashboard/applications');
+            formObj.reset();
         },
         onError: (error) => {
-            setErrorMessage(error.message)
+            setErrorMessage(error.message);
         },
-    })
+    });
 
     const deleteApplication = api.applications.deleteApplication.useMutation({
         onSuccess: async () => {
-            await utils.applications.getApplication.invalidate({ id: application.name })
+            await utils.applications.getApplication.invalidate({
+                id: application.name,
+            });
             notify(
                 `Successfully deleted the ${application.title ?? application.name} Team`,
                 'error'
-            )
-            setDeleteOpen(false)
-            router.push('/dashboard/applications')
+            );
+            setDeleteOpen(false);
+            router.push('/dashboard/applications');
         },
         onError: (error) => {
-            setDeleteOpen(false)
-            setErrorMessage(error.message)
+            setDeleteOpen(false);
+            setErrorMessage(error.message);
         },
-    })
+    });
 
-    const tabs = [
-        { name: 'Metadata', enabled: true },
-    ]
+    const tabs = [{ name: 'Metadata', enabled: true }];
 
     return (
         <>
@@ -99,7 +113,8 @@ export default function EditApplicationForm({ application }: { application: Appl
                         </Dialog.Title>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500">
-                                Are you sure you want to delete this Application?
+                                Are you sure you want to delete this
+                                Application?
                             </p>
                         </div>
                     </div>
@@ -108,7 +123,9 @@ export default function EditApplicationForm({ application }: { application: Appl
                     <LoaderButton
                         variant="destructive"
                         loading={deleteApplication.isLoading}
-                        onClick={() => deleteApplication.mutate({ id: application.name })}
+                        onClick={() =>
+                            deleteApplication.mutate({ id: application.name })
+                        }
                     >
                         Delete Application
                     </LoaderButton>
@@ -171,12 +188,15 @@ export default function EditApplicationForm({ application }: { application: Appl
                             <Tab.Panel>
                                 <form
                                     onSubmit={formObj.handleSubmit((data) => {
-                                        editApplication.mutate(data)
+                                        editApplication.mutate(data);
                                     })}
                                 >
                                     <div className="w-full py-8 border-b border-blue-800 shadow">
                                         <div className="px-2 sm:px-8">
-                                            <ApplicationForm formObj={formObj} editing={true} />
+                                            <ApplicationForm
+                                                formObj={formObj}
+                                                editing={true}
+                                            />
                                         </div>
                                     </div>
                                     {errorMessage && (
@@ -197,7 +217,7 @@ export default function EditApplicationForm({ application }: { application: Appl
                         loading={editApplication.isLoading}
                         type="submit"
                         onClick={formObj.handleSubmit((data) => {
-                            editApplication.mutate(data)
+                            editApplication.mutate(data);
                         })}
                     >
                         Save
@@ -205,5 +225,5 @@ export default function EditApplicationForm({ application }: { application: Appl
                 </div>
             </Container>
         </>
-    )
+    );
 }

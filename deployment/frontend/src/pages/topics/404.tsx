@@ -1,9 +1,9 @@
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import Header from '@/components/_shared/Header'
-import { NextSeo } from 'next-seo'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import Header from '@/components/_shared/Header';
+import { NextSeo } from 'next-seo';
 
 export default function TopicsNotFound() {
-    const links = [{ label: 'Topics', url: '/topics', current: false }]
+    const links = [{ label: 'Topics', url: '/topics', current: false }];
     return (
         <>
             <NextSeo title={`Not Found - Topics`} />
@@ -37,5 +37,5 @@ export default function TopicsNotFound() {
                 </div>
             </main>
         </>
-    )
+    );
 }

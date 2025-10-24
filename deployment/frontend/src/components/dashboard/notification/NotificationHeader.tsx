@@ -1,29 +1,29 @@
-import React, { Fragment, useState } from 'react'
-import TableHeader from '../_shared/TableHeader'
+import React, { Fragment, useState } from 'react';
+import TableHeader from '../_shared/TableHeader';
 import {
     TrashIcon,
     EllipsisVerticalIcon,
     EnvelopeOpenIcon,
     EnvelopeIcon,
-} from '@heroicons/react/24/outline'
-import { Menu, Transition } from '@headlessui/react'
-import { NotificationType } from '@/schema/notification.schema'
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import notify from '@/utils/notify'
-import Spinner from '@/components/_shared/Spinner'
-import { api } from '@/utils/api'
+} from '@heroicons/react/24/outline';
+import { Menu, Transition } from '@headlessui/react';
+import { type NotificationType } from '@/schema/notification.schema';
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import notify from '@/utils/notify';
+import Spinner from '@/components/_shared/Spinner';
+import { api } from '@/utils/api';
 
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 
 const DefaultTooltip = dynamic(() => import('@/components/_shared/Tooltip'), {
     ssr: false,
-})
+});
 
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
+});
 
 const ErrorAlert = dynamic<{ text: string; title?: string }>(
     () =>
@@ -33,45 +33,45 @@ const ErrorAlert = dynamic<{ text: string; title?: string }>(
     {
         ssr: false,
     }
-)
+);
 
 function LeftNode({
     selected,
     setSelected,
     data,
 }: {
-    selected: string[]
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>
-    data: NotificationType[]
+    selected: string[];
+    setSelected: React.Dispatch<React.SetStateAction<string[]>>;
+    data: NotificationType[];
 }) {
-    const [openDelete, setOpenDelete] = useState(false)
-    const [openMarkAsRead, setOpenMarkAsRead] = useState(false)
-    const [openMarkAsUnread, setOpenMarkAsUnread] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const utils = api.useUtils()
+    const [openDelete, setOpenDelete] = useState(false);
+    const [openMarkAsRead, setOpenMarkAsRead] = useState(false);
+    const [openMarkAsUnread, setOpenMarkAsUnread] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const utils = api.useUtils();
     const UpdateNotfication = api.notification.updateNotification.useMutation({
         onSuccess: async (data) => {
-            await utils.notification.getAllNotifications.invalidate()
-            setSelected([])
+            await utils.notification.getAllNotifications.invalidate();
+            setSelected([]);
 
             if (openDelete) {
-                setOpenDelete(false)
-                notify(`Successfully deleted the notification`, 'error')
+                setOpenDelete(false);
+                notify(`Successfully deleted the notification`, 'error');
             }
             if (openMarkAsRead) {
-                setOpenMarkAsRead(false)
-                notify(`Successfully marked notification as read`, 'success')
+                setOpenMarkAsRead(false);
+                notify(`Successfully marked notification as read`, 'success');
             }
 
             if (openMarkAsUnread) {
-                setOpenMarkAsUnread(false)
-                notify(`Successfully marked notification as unread`, 'success')
+                setOpenMarkAsUnread(false);
+                notify(`Successfully marked notification as unread`, 'success');
             }
         },
         onError: (error) => {
-            setErrorMessage(error.message)
+            setErrorMessage(error.message);
         },
-    })
+    });
     return (
         <div className="relative flex flex-row items-center gap-x-3 w-full pl-10 sm:pl-12">
             <div className="flex h-6 items-center">
@@ -85,9 +85,9 @@ function LeftNode({
                         className="h-4 w-4 rounded bg-white"
                         onChange={(e) => {
                             if (e.target.checked) {
-                                setSelected(data.map((item) => item.id))
+                                setSelected(data.map((item) => item.id));
                             } else {
-                                setSelected([])
+                                setSelected([]);
                             }
                         }}
                     />
@@ -177,17 +177,17 @@ function LeftNode({
                             onClick={() => {
                                 let filteredData = data.filter((item) =>
                                     selected.includes(item.id)
-                                )
+                                );
 
                                 filteredData = filteredData.map((n) => {
-                                    delete n.object_data
-                                    return n
-                                })
+                                    delete n.object_data;
+                                    return n;
+                                });
 
                                 UpdateNotfication.mutate({
                                     notifications: filteredData,
                                     state: 'deleted',
-                                })
+                                });
                             }}
                             id="deletemodalnotification"
                         >
@@ -314,7 +314,7 @@ function LeftNode({
                 </Modal>
             )}
         </div>
-    )
+    );
 }
 
 export default function NotificationHeader({
@@ -323,10 +323,10 @@ export default function NotificationHeader({
     data,
     Pagination,
 }: {
-    selected: string[]
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>
-    data: NotificationType[]
-    Pagination: React.ReactNode
+    selected: string[];
+    setSelected: React.Dispatch<React.SetStateAction<string[]>>;
+    data: NotificationType[];
+    Pagination: React.ReactNode;
 }) {
     return (
         <TableHeader
@@ -340,5 +340,5 @@ export default function NotificationHeader({
             leftstyle="order-last sm:order-first"
             Pagination={Pagination}
         />
-    )
+    );
 }

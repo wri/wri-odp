@@ -1,23 +1,26 @@
-import { Dispatch, Fragment, SetStateAction, useState } from 'react'
-import { Dialog, Disclosure, Transition } from '@headlessui/react'
+import { type Dispatch, Fragment, type SetStateAction, useState } from 'react';
+import { Dialog, Disclosure, Transition } from '@headlessui/react';
 import {
     Bars3Icon,
     ChevronRightIcon,
     XMarkIcon,
-} from '@heroicons/react/24/outline'
-import Facet from './Facet'
-import LocationSearch from './LocationSearch'
-import classNames from '@/utils/classnames'
-import { Filter, Facets as SearchFacet } from '@/interfaces/search.interface'
-import { SearchInput } from '@/schema/search.schema'
-import { api } from '@/utils/api'
-import { useSession } from 'next-auth/react'
-import TemporalCoverageFacet from './TemporalCoverageFacet'
-import MetadataModifiedFacet from './MetadataModifiedFacet'
-import Spinner from '../_shared/Spinner'
-import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants'
-import Tags from './Tag'
-import React from 'react'
+} from '@heroicons/react/24/outline';
+import Facet from './Facet';
+import LocationSearch from './LocationSearch';
+import classNames from '@/utils/classnames';
+import {
+    type Filter,
+    Facets as SearchFacet,
+} from '@/interfaces/search.interface';
+import { type SearchInput } from '@/schema/search.schema';
+import { api } from '@/utils/api';
+import { useSession } from 'next-auth/react';
+import TemporalCoverageFacet from './TemporalCoverageFacet';
+import MetadataModifiedFacet from './MetadataModifiedFacet';
+import Spinner from '../_shared/Spinner';
+import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants';
+import Tags from './Tag';
+import React from 'react';
 
 export default function FilteredSearchLayout({
     children,
@@ -28,17 +31,17 @@ export default function FilteredSearchLayout({
     value,
     setValue,
 }: {
-    children: React.ReactNode
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    filters: Filter[]
-    facetSelectedCount: Record<string, number>
-    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>
-    value: string[]
-    setValue: Dispatch<SetStateAction<string[]>>
+    children: React.ReactNode;
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    filters: Filter[];
+    facetSelectedCount: Record<string, number>;
+    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>;
+    value: string[];
+    setValue: Dispatch<SetStateAction<string[]>>;
 }) {
-    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const session = useSession()
+    const session = useSession();
 
     /*
      * Query used to fetch all possible facet options
@@ -59,27 +62,33 @@ export default function FilteredSearchLayout({
         { key: 'language', title: 'Language' },
         { key: 'wri_data', title: 'WRI Data' },
         { key: 'metadata_modified', title: 'Last Updated' },
-    ]
+    ];
 
     if (session.status == 'authenticated') {
-        facetFields.push({ key: 'visibility_type', title: 'Visibility' })
+        facetFields.push({ key: 'visibility_type', title: 'Visibility' });
     }
 
     const [facetsQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 5 },
         facetFields: facetFields.map((ff) => ff.key),
-    })
+    });
 
     const { data: facetsData, isLoading: isLoadingFacets } =
-        api.dataset.getAllDataset.useQuery(facetsQuery)
-    console.log('facetsData in FilteredSearchLayout', JSON.stringify(facetsData, null, 2))
+        api.dataset.getAllDataset.useQuery(facetsQuery);
+    console.log(
+        'facetsData in FilteredSearchLayout',
+        JSON.stringify(facetsData, null, 2)
+    );
 
-    const searchFacets = facetsData?.searchFacets
+    const searchFacets = facetsData?.searchFacets;
 
     if (searchFacets) {
-        console.log('searchFacets in FilteredSearchLayout', JSON.stringify(searchFacets, null, 2))
-        for (let key in searchFacets) {
+        console.log(
+            'searchFacets in FilteredSearchLayout',
+            JSON.stringify(searchFacets, null, 2)
+        );
+        for (const key in searchFacets) {
             /*
              * Boolean fields look better with Yes and No options
              *
@@ -89,41 +98,45 @@ export default function FilteredSearchLayout({
                     searchFacets[key]?.items.map((i) => ({
                         ...i,
                         display_name: i.name == 'true' ? 'Yes' : 'No',
-                    })) || []
+                    })) || [];
 
                 // @ts-ignore
-                searchFacets[key].items = items
+                searchFacets[key].items = items;
             } else if (key == 'visibility_type') {
                 // @ts-ignore
                 searchFacets[key].items = searchFacets[key].items.map((i) => ({
                     ...i,
                     // @ts-ignore
                     display_name: visibilityTypeLabels[i.name],
-                }))
+                }));
             } else if (key == 'update_frequency') {
                 // @ts-ignore
                 searchFacets[key].items = searchFacets[key].items.map((i) => ({
                     ...i,
                     // @ts-ignore
                     display_name: updateFrequencyLabels[i.name],
-                }))
-            } else if (key === 'organization') { // && facetsData?.teamVisibility) {
-                const visibilityMap = facetsData.teamVisibility
+                }));
+            } else if (key === 'organization') {
+                // && facetsData?.teamVisibility) {
+                const visibilityMap = facetsData.teamVisibility;
                 // @ts-ignore
-                searchFacets[key].items = searchFacets[key].items.map((item) => {
-                    const baseName = item.display_name ?? item.name
-                    const isPrivate = visibilityMap[item.name] === 'private'
-                    const lockEmoji = '🔒'
-                    const displayName = isPrivate && !baseName.includes(lockEmoji)
-                        ? `${baseName} ${lockEmoji}`
-                        : baseName
-                    return {
-                        ...item,
-                        display_name: displayName,
+                searchFacets[key].items = searchFacets[key].items.map(
+                    (item) => {
+                        const baseName = item.display_name ?? item.name;
+                        const isPrivate =
+                            visibilityMap[item.name] === 'private';
+                        const lockEmoji = '🔒';
+                        const displayName =
+                            isPrivate && !baseName.includes(lockEmoji)
+                                ? `${baseName} ${lockEmoji}`
+                                : baseName;
+                        return {
+                            ...item,
+                            display_name: displayName,
+                        };
                     }
-                })
+                );
             }
-
         }
     }
 
@@ -257,8 +270,7 @@ export default function FilteredSearchLayout({
                                                                                 setFacetSelectedCount
                                                                             }
                                                                             options={
-                                                                                searchFacets &&
-                                                                                searchFacets[
+                                                                                searchFacets?.[
                                                                                     ff
                                                                                         .key
                                                                                 ]
@@ -297,7 +309,11 @@ export default function FilteredSearchLayout({
                                                                         />
                                                                     ) : ff.key ===
                                                                       'groups' ? (
-                                                                        <React.Fragment key={ff.key}>
+                                                                        <React.Fragment
+                                                                            key={
+                                                                                ff.key
+                                                                            }
+                                                                        >
                                                                             <Facet
                                                                                 text={
                                                                                     'Topics'
@@ -317,8 +333,7 @@ export default function FilteredSearchLayout({
                                                                                     setFacetSelectedCount
                                                                                 }
                                                                                 options={
-                                                                                    searchFacets &&
-                                                                                    searchFacets[
+                                                                                    searchFacets?.[
                                                                                         ff
                                                                                             .key
                                                                                     ]
@@ -378,8 +393,7 @@ export default function FilteredSearchLayout({
                                                                                         .length,
                                                                                 }}
                                                                                 options={
-                                                                                    searchFacets &&
-                                                                                    searchFacets[
+                                                                                    searchFacets?.[
                                                                                         ff
                                                                                             .key
                                                                                     ]
@@ -439,8 +453,7 @@ export default function FilteredSearchLayout({
                                                                                 setFacetSelectedCount
                                                                             }
                                                                             options={
-                                                                                searchFacets &&
-                                                                                searchFacets[
+                                                                                searchFacets?.[
                                                                                     ff
                                                                                         .key
                                                                                 ]
@@ -575,8 +588,7 @@ export default function FilteredSearchLayout({
                                                                         setFacetSelectedCount
                                                                     }
                                                                     options={
-                                                                        searchFacets &&
-                                                                        searchFacets[
+                                                                        searchFacets?.[
                                                                             ff
                                                                                 .key
                                                                         ]
@@ -635,8 +647,7 @@ export default function FilteredSearchLayout({
                                                                             setFacetSelectedCount
                                                                         }
                                                                         options={
-                                                                            searchFacets &&
-                                                                            searchFacets[
+                                                                            searchFacets?.[
                                                                                 ff
                                                                                     .key
                                                                             ]
@@ -696,8 +707,7 @@ export default function FilteredSearchLayout({
                                                                                 .length,
                                                                         }}
                                                                         options={
-                                                                            searchFacets &&
-                                                                            searchFacets[
+                                                                            searchFacets?.[
                                                                                 ff
                                                                                     .key
                                                                             ]
@@ -754,8 +764,7 @@ export default function FilteredSearchLayout({
                                                                         setFacetSelectedCount
                                                                     }
                                                                     options={
-                                                                        searchFacets &&
-                                                                        searchFacets[
+                                                                        searchFacets?.[
                                                                             ff
                                                                                 .key
                                                                         ]
@@ -824,5 +833,5 @@ export default function FilteredSearchLayout({
                 </div>
             </div>
         </>
-    )
+    );
 }

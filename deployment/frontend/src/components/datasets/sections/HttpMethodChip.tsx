@@ -2,8 +2,8 @@ export const HttpMethodChip = ({
     children,
     className,
 }: {
-    children: React.ReactNode
-    className: string
+    children: React.ReactNode;
+    className: string;
 }) => {
     return (
         <div className="w-16">
@@ -13,5 +13,5 @@ export const HttpMethodChip = ({
                 {children}
             </span>
         </div>
-    )
-}
+    );
+};

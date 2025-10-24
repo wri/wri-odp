@@ -1,27 +1,27 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Fragment } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { Input } from '@/components/_shared/SimpleInput'
-import { useForm } from 'react-hook-form'
-import { ErrorDisplay } from '@/components/_shared/InputGroup'
-import MulText from '@/components/dashboard/datasets/admin/MulText'
-import { WriDataset } from '@/schema/ckan.schema'
-import { countries } from '@/utils/listOfCountries'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { Input } from '@/components/_shared/SimpleInput';
+import { useForm } from 'react-hook-form';
+import { ErrorDisplay } from '@/components/_shared/InputGroup';
+import MulText from '@/components/dashboard/datasets/admin/MulText';
+import { type WriDataset } from '@/schema/ckan.schema';
+import { countries } from '@/utils/listOfCountries';
 
 type DownloadFormData = {
-    email: string
-    firstName: string
-    lastName: string
-    country: { label: string; value: string }
-    affiliation: { label: string; value: string }
-    otherAffiliation?: string
-    organization?: string
-    jobTitle?: string
-    interests?: { label: string; value: string }[]
-    acceptTerms: boolean
-}
+    email: string;
+    firstName: string;
+    lastName: string;
+    country: { label: string; value: string };
+    affiliation: { label: string; value: string };
+    otherAffiliation?: string;
+    organization?: string;
+    jobTitle?: string;
+    interests?: { label: string; value: string }[];
+    acceptTerms: boolean;
+};
 
 export const downloadEventSchema = z.object({
     email: z.string().email(),
@@ -43,9 +43,9 @@ export const downloadEventSchema = z.object({
         })
         .optional(),
     interests: z.array(z.string()).optional(),
-})
+});
 
-export type DownloadEventForm = z.infer<typeof downloadEventSchema>
+export type DownloadEventForm = z.infer<typeof downloadEventSchema>;
 
 const affiliationOptions = [
     'Government',
@@ -59,7 +59,7 @@ const affiliationOptions = [
     'Private Sector',
     'No Affiliation',
     'Other',
-]
+];
 
 const interestOptions = [
     'Restoring Degraded Landscapes',
@@ -68,7 +68,7 @@ const interestOptions = [
     'Strengthening Indigenous Peoples & Local Communities Land Rights',
     'Improving Agricultural Land Use & Food Systems',
     'Protecting Natural Ecosystems',
-]
+];
 
 export function DownloadPopup({
     isOpen,
@@ -80,14 +80,14 @@ export function DownloadPopup({
     skipButton,
     subtitle,
 }: {
-    isOpen: boolean
-    onClose: () => void
-    onSubmit: (data: any) => void
-    title: string
-    downloadButton: React.ReactNode
-    dataset: WriDataset
-    skipButton?: React.ReactNode
-    subtitle?: string
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (data: any) => void;
+    title: string;
+    downloadButton: React.ReactNode;
+    dataset: WriDataset;
+    skipButton?: React.ReactNode;
+    subtitle?: string;
 }) {
     const formObj = useForm({
         resolver: zodResolver(
@@ -101,7 +101,7 @@ export function DownloadPopup({
                             path: ['affiliation'],
                             code: z.ZodIssueCode.custom,
                             message: 'Required',
-                        })
+                        });
                     }
                     if (data.affiliation.value === 'Other') {
                         if (
@@ -112,7 +112,7 @@ export function DownloadPopup({
                                 code: z.ZodIssueCode.custom,
                                 message: 'Required',
                                 path: ['affiliation'],
-                            })
+                            });
                         }
                     }
                     if (data.acceptTerms) {
@@ -121,36 +121,36 @@ export function DownloadPopup({
                                 code: z.ZodIssueCode.custom,
                                 message: 'Required',
                                 path: ['firstName'],
-                            })
+                            });
                         }
                         if (!data.country || data.country.value == '') {
                             ctx.addIssue({
                                 code: z.ZodIssueCode.custom,
                                 message: 'Required',
                                 path: ['country'],
-                            })
+                            });
                         }
                         if (!data.lastName) {
                             ctx.addIssue({
                                 code: z.ZodIssueCode.custom,
                                 message: 'Required',
                                 path: ['lastName'],
-                            })
+                            });
                         }
                     }
                 })
         ),
-    })
+    });
     const {
         register,
         handleSubmit,
         watch,
         formState: { errors },
-    } = formObj
+    } = formObj;
 
-    const affiliation = watch('affiliation')
+    const affiliation = watch('affiliation');
 
-    const required = <span className="text-red-500">*</span>
+    const required = <span className="text-red-500">*</span>;
     return (
         <Transition.Root show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-40" onClose={onClose}>
@@ -464,7 +464,7 @@ export function DownloadPopup({
                 </div>
             </Dialog>
         </Transition.Root>
-    )
+    );
 }
 
 export function DirectDownloadPopup({
@@ -477,14 +477,14 @@ export function DirectDownloadPopup({
     subtitle,
     dataset,
 }: {
-    isOpen: boolean
-    onClose: () => void
-    onSubmit: (data: any) => void
-    title: string
-    downloadButton: React.ReactNode
-    skipButton: React.ReactNode
-    dataset: WriDataset
-    subtitle?: string
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (data: any) => void;
+    title: string;
+    downloadButton: React.ReactNode;
+    skipButton: React.ReactNode;
+    dataset: WriDataset;
+    subtitle?: string;
 }) {
     const formObj = useForm<DownloadFormData>({
         resolver: zodResolver(
@@ -503,7 +503,7 @@ export function DirectDownloadPopup({
                             path: ['affiliation'],
                             code: z.ZodIssueCode.custom,
                             message: 'Required',
-                        })
+                        });
                     }
                     if (
                         ['global-forest-watch', 'land-carbon-lab'].includes(
@@ -515,10 +515,10 @@ export function DirectDownloadPopup({
                                 code: z.ZodIssueCode.custom,
                                 message: 'Required',
                                 path: ['interests'],
-                            })
+                            });
                         }
                     }
-                    console.log('AFFILIATION', data.affiliation.value)
+                    console.log('AFFILIATION', data.affiliation.value);
                     if (data.affiliation.value === 'Other') {
                         if (
                             !data.otherAffiliation ||
@@ -528,22 +528,22 @@ export function DirectDownloadPopup({
                                 code: z.ZodIssueCode.custom,
                                 message: 'Required',
                                 path: ['affiliation'],
-                            })
+                            });
                         }
                     }
                 })
         ),
-    })
+    });
     const {
         register,
         handleSubmit,
         watch,
         formState: { errors },
-    } = formObj
+    } = formObj;
 
-    const affiliation = watch('affiliation')
-    const required = <span className="text-red-500">*</span>
-    console.log('ERRORS', errors)
+    const affiliation = watch('affiliation');
+    const required = <span className="text-red-500">*</span>;
+    console.log('ERRORS', errors);
     return (
         <Transition.Root show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -778,5 +778,5 @@ export function DirectDownloadPopup({
                 </div>
             </Dialog>
         </Transition.Root>
-    )
+    );
 }

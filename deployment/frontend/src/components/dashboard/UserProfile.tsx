@@ -1,16 +1,16 @@
-import React from 'react'
-import Image from 'next/image'
-import { api } from '@/utils/api'
-import Spinner from '../_shared/Spinner'
+import React from 'react';
+import Image from 'next/image';
+import { api } from '@/utils/api';
+import Spinner from '../_shared/Spinner';
 
 export default function UserProfile() {
-    const { data, isLoading } = api.user.getDashboardUser.useQuery()
+    const { data, isLoading } = api.user.getDashboardUser.useQuery();
     if (isLoading)
         return (
             <div className="w-full flex flex-col justify-center items-center font-acumin gap-y-2 text-white pb-6 pt-10">
                 <Spinner />
             </div>
-        )
+        );
 
     return (
         <div className="w-full flex flex-col justify-center items-center font-acumin gap-y-2 text-white pb-6 pt-10">
@@ -51,5 +51,5 @@ export default function UserProfile() {
                 </span>
             </div>
         </div>
-    )
+    );
 }

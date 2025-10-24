@@ -1,26 +1,26 @@
-import { useState } from 'react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import { Combobox } from '@headlessui/react'
-import { api } from '@/utils/api'
-import classNames from '@/utils/classnames'
-import { Controller, Path, UseFormReturn } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import Spinner from '@/components/_shared/Spinner'
-import { match, P } from 'ts-pattern'
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
+import { useState } from 'react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid';
+import { Combobox } from '@headlessui/react';
+import { api } from '@/utils/api';
+import classNames from '@/utils/classnames';
+import { Controller, type Path, type UseFormReturn } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import Spinner from '@/components/_shared/Spinner';
+import { match, P } from 'ts-pattern';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 export default function FormatInput({
     formObj,
     name,
     className = '',
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    name: Path<DatasetFormType>
-    className?: string
+    formObj: UseFormReturn<DatasetFormType>;
+    name: Path<DatasetFormType>;
+    className?: string;
 }) {
-    const { control } = formObj
-    const [query, setQuery] = useState('')
-    const possibleFormats = api.dataset.getFormats.useQuery({ q: query })
+    const { control } = formObj;
+    const [query, setQuery] = useState('');
+    const possibleFormats = api.dataset.getFormats.useQuery({ q: query });
 
     return (
         <Controller
@@ -42,7 +42,10 @@ export default function FormatInput({
                             )}
                             onChange={(event) => setQuery(event.target.value)}
                         />
-                        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none" aria-label='dropdown'>
+                        <Combobox.Button
+                            className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+                            aria-label="dropdown"
+                        >
                             <ChevronDownIcon
                                 className="h-5 w-5 text-gray-400"
                                 aria-hidden="true"
@@ -133,5 +136,5 @@ export default function FormatInput({
                 </Combobox>
             )}
         />
-    )
+    );
 }

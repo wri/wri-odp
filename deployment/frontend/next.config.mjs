@@ -3,22 +3,22 @@
  * for Docker builds.
  */
 
-import withBundleAnalyzer from '@next/bundle-analyzer'
-import createMDX from '@next/mdx'
+import withBundleAnalyzer from '@next/bundle-analyzer';
+import createMDX from '@next/mdx';
 
-await import('./src/env.mjs')
+await import('./src/env.mjs');
 
 const bundleAnalyzer = withBundleAnalyzer({
     enabled: process.env.ANALYZE === 'true',
-})
+});
 
 const withMDX = createMDX({
     // Add markdown plugins if needed
-})
+});
 
 const cspHeader = `
     frame-ancestors '*';
-`
+`;
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -58,6 +58,6 @@ const config = {
         ],
     },
     pageExtensions: ['tsx', 'mdx', 'ts', 'md'],
-}
+};
 
-export default bundleAnalyzer(withMDX(config))
+export default bundleAnalyzer(withMDX(config));

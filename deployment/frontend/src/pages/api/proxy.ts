@@ -1,14 +1,14 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { type NextApiRequest, type NextApiResponse } from 'next';
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    const body = JSON.parse(req.body)
+    const body = JSON.parse(req.body);
 
-    const { url, headers } = body
+    const { url, headers } = body;
 
-    const response = await fetch(url, { headers })
+    const response = await fetch(url, { headers });
 
-    return res.json(await response.json())
+    return res.json(await response.json());
 }

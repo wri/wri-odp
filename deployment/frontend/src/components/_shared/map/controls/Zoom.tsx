@@ -1,11 +1,11 @@
-import { MutableRefObject } from 'react'
-import IconButton from './IconButton'
-import { MapRef } from 'react-map-gl'
+import { type MutableRefObject } from 'react';
+import IconButton from './IconButton';
+import { type MapRef } from 'react-map-gl';
 
 export default function Zoom({
     mapRef,
 }: {
-    mapRef: MutableRefObject<MapRef | null>
+    mapRef: MutableRefObject<MapRef | null>;
 }) {
     return (
         <>
@@ -22,7 +22,7 @@ export default function Zoom({
                 <MinusIcon />
             </IconButton>
         </>
-    )
+    );
 }
 
 function PlusIcon() {
@@ -42,7 +42,7 @@ function PlusIcon() {
                 strokeLinejoin="round"
             />
         </svg>
-    )
+    );
 }
 
 function MinusIcon() {
@@ -62,5 +62,5 @@ function MinusIcon() {
                 strokeLinejoin="round"
             />
         </svg>
-    )
+    );
 }

@@ -1,34 +1,34 @@
-import { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Fragment, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 import {
     Bars3Icon,
     MagnifyingGlassIcon,
     XMarkIcon,
-} from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import Login from '../_shared/Login'
-import { useSession } from 'next-auth/react'
-import UserMenu from '../_shared/UserMenu'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import Login from '../_shared/Login';
+import { useSession } from 'next-auth/react';
+import UserMenu from '../_shared/UserMenu';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
 export function Hero() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
-    const session = useSession()
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const session = useSession();
 
-    const { asPath } = useRouter()
-    const searchSchema = z.object({ search: z.string() })
-    type searchFormType = z.infer<typeof searchSchema>
+    const { asPath } = useRouter();
+    const searchSchema = z.object({ search: z.string() });
+    type searchFormType = z.infer<typeof searchSchema>;
 
     const { handleSubmit, register, reset } = useForm<searchFormType>({
         resolver: zodResolver(searchSchema),
         defaultValues: { search: '' },
-    })
-    const router = useRouter()
+    });
+    const router = useRouter();
     const navigation = [
         {
             title: 'Search',
@@ -50,10 +50,10 @@ export function Hero() {
             href: '/applications',
             active: false,
         },
-    ]
+    ];
     navigation.forEach((item) => {
-        item.active = asPath.startsWith(item.href)
-    })
+        item.active = asPath.startsWith(item.href);
+    });
 
     return (
         <div className="bg-gray-900">
@@ -244,7 +244,7 @@ export function Hero() {
                         <form
                             onSubmit={handleSubmit((data) => {
                                 if (data.search === '') {
-                                    return router.push('/search')
+                                    return router.push('/search');
                                 }
                                 router.push({
                                     pathname: '/search',
@@ -253,7 +253,7 @@ export function Hero() {
                                     )}%22%2C%22value%22%3A%22${encodeURIComponent(
                                         data.search
                                     )}%22%7D%5D`,
-                                })
+                                });
                             })}
                         >
                             <div className="mt-10 flex relative items-start justify-start  w-full max-w-[876px]">
@@ -314,5 +314,5 @@ export function Hero() {
                 </Dialog>
             </Transition>
         </div>
-    )
+    );
 }

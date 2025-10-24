@@ -1,15 +1,15 @@
-import { match, P } from 'ts-pattern'
+import { match, P } from 'ts-pattern';
 import {
-    ColorPatternType,
+    type ColorPatternType,
     InteractionFormType,
-    LayerFormType,
+    type LayerFormType,
     layerSchema,
-    LegendsFormType,
-    RawLayerFormType,
-} from './layer.schema'
-import { v4 as uuidv4 } from 'uuid'
-import { APILayerSpec } from '@/interfaces/layer.interface'
-import { rampTypes } from '../../../formOptions'
+    type LegendsFormType,
+    type RawLayerFormType,
+} from './layer.schema';
+import { v4 as uuidv4 } from 'uuid';
+import { type APILayerSpec } from '@/interfaces/layer.interface';
+import { rampTypes } from '../../../formOptions';
 
 export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
     return {
@@ -30,14 +30,13 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
         interactionConfig: formData.interactionConfig
             ? {
                   output: formData.interactionConfig.output.filter((item) => {
-                      if (typeof item.enabled === 'undefined') return true
-                      return !!item.enabled
+                      if (typeof item.enabled === 'undefined') return true;
+                      return !!item.enabled;
                   }),
               }
             : undefined,
         legendConfig:
-            formData.legendConfig &&
-            formData.legendConfig.items &&
+            formData.legendConfig?.items &&
             formData.legendConfig.items.length > 0
                 ? formData.legendConfig
                 : {},
@@ -134,13 +133,13 @@ export function convertFormToLayerObj(formData: LayerFormType): APILayerSpec {
                       }
                     : {},
         },
-    }
+    };
 }
 
 function removeKeysWithUndefined(obj: any) {
     return Object.fromEntries(
         Object.entries(obj).filter(([_, v]) => v !== undefined && v !== null)
-    )
+    );
 }
 
 function matchColorPattern(colorPattern: ColorPatternType) {
@@ -191,7 +190,7 @@ function matchColorPattern(colorPattern: ColorPatternType) {
                     .filter((item) => !(!item && item !== 0)),
             ]
         )
-        .otherwise(() => '#000000')
+        .otherwise(() => '#000000');
 }
 
 export function convertLayerObjToForm(layerObj: APILayerSpec): LayerFormType {
@@ -223,9 +222,8 @@ export function convertLayerObjToForm(layerObj: APILayerSpec): LayerFormType {
                 ...layerObj.layerConfig.source,
                 tiles:
                     'tiles' in layerObj.layerConfig.source &&
-                    layerObj.layerConfig.source?.tiles &&
-                    layerObj.layerConfig.source?.tiles[0]
-                        ? (layerObj.layerConfig.source.tiles[0] as string)
+                    layerObj.layerConfig.source?.tiles?.[0]
+                        ? layerObj.layerConfig.source.tiles[0]
                         : undefined,
                 provider: {
                     ...layerObj.layerConfig.source.provider,
@@ -241,16 +239,16 @@ export function convertLayerObjToForm(layerObj: APILayerSpec): LayerFormType {
                 },
             },
         },
-    }
+    };
 }
 
 function mapByTwo(list: Array<any>) {
     return list.reduce((accumulator, currentValue, currentIndex, array) => {
         if (currentIndex % 2 === 0) {
-            accumulator.push(array.slice(currentIndex, currentIndex + 2))
+            accumulator.push(array.slice(currentIndex, currentIndex + 2));
         }
-        return accumulator
-    }, [])
+        return accumulator;
+    }, []);
 }
 
 function parseInputExpr(input: any) {
@@ -261,7 +259,7 @@ function parseInputExpr(input: any) {
             operation: 'get',
             column: { value, label: value },
         }))
-        .otherwise(() => undefined)
+        .otherwise(() => undefined);
 }
 
 function parsePaintColor(color: any) {
@@ -304,8 +302,8 @@ function parsePaintColor(color: any) {
                 })),
             })
         )
-        .otherwise(() => undefined)
-    return colorObj
+        .otherwise(() => undefined);
+    return colorObj;
 }
 
 function parseRender(render: any) {
@@ -342,7 +340,7 @@ function parseRender(render: any) {
                         return [
                             'all',
                             ...filter.map((_filter) => {
-                                if (typeof _filter === 'string') return _filter
+                                if (typeof _filter === 'string') return _filter;
                                 return {
                                     operation: {
                                         value: _filter[0],
@@ -353,22 +351,22 @@ function parseRender(render: any) {
                                         label: _filter[1],
                                     },
                                     value: _filter[2],
-                                }
+                                };
                             }),
-                        ]
+                        ];
                     }
                 )
                 .otherwise(() => {
-                    return []
+                    return [];
                 }),
         })),
-    }
-    return _render
+    };
+    return _render;
 }
 
 export const getApiSpecFromRawObj = (rawLayerFormObj: RawLayerFormType) => {
     const { generalConfig, layerConfig, interactionConfig, legendConfig } =
-        rawLayerFormObj
+        rawLayerFormObj;
     try {
         const apiSpec = {
             id: uuidv4(),
@@ -376,17 +374,17 @@ export const getApiSpecFromRawObj = (rawLayerFormObj: RawLayerFormType) => {
             layerConfig: JSON.parse(layerConfig ?? '{}'),
             interactionConfig: JSON.parse(interactionConfig ?? '{}'),
             legendConfig: JSON.parse(legendConfig ?? '{}'),
-        }
-        return apiSpec
+        };
+        return apiSpec;
     } catch (e) {
-        console.error(e)
-        throw new Error('Could not convert to layer object')
+        console.error(e);
+        throw new Error('Could not convert to layer object');
     }
-}
+};
 
 export const getRawObjFromApiSpec = (apiSpec: APILayerSpec) => {
     const { layerConfig, interactionConfig, legendConfig, id, ...attributes } =
-        apiSpec
+        apiSpec;
     return {
         id,
         rw_id: id,
@@ -394,5 +392,5 @@ export const getRawObjFromApiSpec = (apiSpec: APILayerSpec) => {
         layerConfig: JSON.stringify(layerConfig, null, 2),
         interactionConfig: JSON.stringify(interactionConfig, null, 2),
         legendConfig: JSON.stringify(legendConfig, null, 2),
-    }
-}
+    };
+};

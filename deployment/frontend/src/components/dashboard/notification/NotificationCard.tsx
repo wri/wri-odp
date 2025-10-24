@@ -1,31 +1,31 @@
-import React from 'react'
-import Row from '../_shared/Row'
-import { NotificationType } from '@/schema/notification.schema'
-import Image from 'next/image'
-import Link from 'next/link'
-import dynamic from 'next/dynamic'
+import React from 'react';
+import Row from '../_shared/Row';
+import { type NotificationType } from '@/schema/notification.schema';
+import Image from 'next/image';
+import Link from 'next/link';
+import dynamic from 'next/dynamic';
 
 const DefaultTooltip = dynamic(() => import('@/components/_shared/Tooltip'), {
     ssr: false,
-})
+});
 function Card({
     rowProfile,
     selected,
     setSelected,
 }: {
-    rowProfile: NotificationType
-    selected: string[]
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>
+    rowProfile: NotificationType;
+    selected: string[];
+    setSelected: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
     const handleCheckboxChange = (item: string) => {
         if (selected.includes(item)) {
             setSelected(
                 selected.filter((selectedItem) => selectedItem !== item)
-            )
+            );
         } else {
-            setSelected([...selected, item])
+            setSelected([...selected, item]);
         }
-    }
+    };
     return (
         <div className="flex gap-x-4 items-center pl-4 sm:pl-6 py-4">
             {rowProfile?.is_unread ? (
@@ -102,7 +102,7 @@ function Card({
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default function NotificationCard({
@@ -110,9 +110,9 @@ export default function NotificationCard({
     selected,
     setSelected,
 }: {
-    rowProfile: NotificationType
-    selected: string[]
-    setSelected: React.Dispatch<React.SetStateAction<string[]>>
+    rowProfile: NotificationType;
+    selected: string[];
+    setSelected: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
     return (
         <Row
@@ -127,5 +127,5 @@ export default function NotificationCard({
                 selected.includes(rowProfile.id) ? 'bg-slate-100' : ''
             }`}
         />
-    )
+    );
 }

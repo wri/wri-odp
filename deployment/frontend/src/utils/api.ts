@@ -4,21 +4,21 @@
  *
  * We also create a few inference helpers for input and output types.
  */
-import { httpBatchLink, loggerLink } from '@trpc/client'
-import { createTRPCNext } from '@trpc/next'
-import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server'
-import superjson from 'superjson'
+import { httpBatchLink, loggerLink } from '@trpc/client';
+import { createTRPCNext } from '@trpc/next';
+import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
+import superjson from 'superjson';
 
-import { type AppRouter } from '@/server/api/root'
-import { MutationCache, QueryCache } from '@tanstack/react-query'
-import { signOut } from 'next-auth/react'
-import { toast } from 'react-toastify'
+import { type AppRouter } from '@/server/api/root';
+import { MutationCache, QueryCache } from '@tanstack/react-query';
+import { signOut } from 'next-auth/react';
+import { toast } from 'react-toastify';
 
 const getBaseUrl = () => {
-    if (typeof window !== 'undefined') return '' // browser should use relative url
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // SSR should use vercel url
-    return `http://localhost:${process.env.PORT ?? 3000}` // dev SSR should use localhost
-}
+    if (typeof window !== 'undefined') return ''; // browser should use relative url
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
+    return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+};
 
 /** A set of type-safe react-query hooks for your tRPC API. */
 export const api = createTRPCNext<AppRouter>({
@@ -35,18 +35,18 @@ export const api = createTRPCNext<AppRouter>({
             queryClientConfig: {
                 queryCache: new QueryCache({
                     onError: (error) => {
-                        verifyAuthorizationError(error)
+                        verifyAuthorizationError(error);
                     },
                     onSuccess: (r) => {
-                        verifyAuthorizationError(r)
+                        verifyAuthorizationError(r);
                     },
                 }),
                 mutationCache: new MutationCache({
                     onError: (error) => {
-                        verifyAuthorizationError(error)
+                        verifyAuthorizationError(error);
                     },
                     onSuccess: (r) => {
-                        verifyAuthorizationError(r)
+                        verifyAuthorizationError(r);
                     },
                 }),
             },
@@ -65,19 +65,19 @@ export const api = createTRPCNext<AppRouter>({
                             opts.result instanceof Error &&
                             opts.result.data?.code === 'FORBIDDEN'
                         )
-                            return false
+                            return false;
                         return (
                             process.env.NODE_ENV === 'development' ||
                             (opts.direction === 'down' &&
                                 opts.result instanceof Error)
-                        )
+                        );
                     },
                 }),
                 httpBatchLink({
                     url: `${getBaseUrl()}/api/trpc`,
                 }),
             ],
-        }
+        };
     },
     /**
      * Whether tRPC should await queries when server rendering pages.
@@ -85,7 +85,7 @@ export const api = createTRPCNext<AppRouter>({
      * @see https://trpc.io/docs/nextjs#ssr-boolean-default-false
      */
     ssr: false,
-})
+});
 
 function verifyAuthorizationError(response: any) {
     if (
@@ -94,10 +94,10 @@ function verifyAuthorizationError(response: any) {
     ) {
         toast('Your session is no longer valid, please sign in again.', {
             type: 'warning',
-        })
+        });
         setTimeout(() => {
-            signOut()
-        }, 3000)
+            signOut();
+        }, 3000);
     }
 }
 
@@ -106,11 +106,11 @@ function verifyAuthorizationError(response: any) {
  *
  * @example type HelloInput = RouterInputs['example']['hello']
  */
-type RouterInputs = inferRouterInputs<AppRouter>
+type RouterInputs = inferRouterInputs<AppRouter>;
 
 /**
  * Inference helper for outputs.
  *
  * @example type HelloOutput = RouterOutputs['example']['hello']
  */
-type RouterOutputs = inferRouterOutputs<AppRouter>
+type RouterOutputs = inferRouterOutputs<AppRouter>;

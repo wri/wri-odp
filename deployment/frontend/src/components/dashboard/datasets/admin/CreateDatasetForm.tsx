@@ -1,43 +1,43 @@
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import { CreateDatasetTabs } from '@/components/dashboard/datasets/admin/CreateDatasetTabs'
-import { CreateDataFilesSection } from '@/components/dashboard/datasets/admin/datafiles/CreateDatafilesSection'
-import { CreateLayersSection } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection'
-import { CustomFieldsForm } from '@/components/dashboard/datasets/admin/metadata/CustomFields'
-import { DescriptionForm } from '@/components/dashboard/datasets/admin/metadata/DescriptionForm'
-import { MoreDetailsForm } from '@/components/dashboard/datasets/admin/metadata/MoreDetails'
-import { OverviewForm } from '@/components/dashboard/datasets/admin/metadata/Overview'
-import { PointOfContactForm } from '@/components/dashboard/datasets/admin/metadata/PointOfContact'
-import { Preview } from '@/components/dashboard/datasets/admin/preview/Preview'
-import { DatasetFormType, DatasetSchema } from '@/schema/dataset.schema'
-import { api } from '@/utils/api'
-import classNames from '@/utils/classnames'
-import notify from '@/utils/notify'
-import { slugify } from '@/utils/slugify'
-import { Tab } from '@headlessui/react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { match } from 'ts-pattern'
-import { v4 as uuidv4 } from 'uuid'
-import { OpenInForm } from './metadata/OpenIn'
-import Link from 'next/link'
-import { LocationForm } from './metadata/LocationForm'
-import dynamic from 'next/dynamic'
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import { CreateDatasetTabs } from '@/components/dashboard/datasets/admin/CreateDatasetTabs';
+import { CreateDataFilesSection } from '@/components/dashboard/datasets/admin/datafiles/CreateDatafilesSection';
+import { CreateLayersSection } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection';
+import { CustomFieldsForm } from '@/components/dashboard/datasets/admin/metadata/CustomFields';
+import { DescriptionForm } from '@/components/dashboard/datasets/admin/metadata/DescriptionForm';
+import { MoreDetailsForm } from '@/components/dashboard/datasets/admin/metadata/MoreDetails';
+import { OverviewForm } from '@/components/dashboard/datasets/admin/metadata/Overview';
+import { PointOfContactForm } from '@/components/dashboard/datasets/admin/metadata/PointOfContact';
+import { Preview } from '@/components/dashboard/datasets/admin/preview/Preview';
+import { type DatasetFormType, DatasetSchema } from '@/schema/dataset.schema';
+import { api } from '@/utils/api';
+import classNames from '@/utils/classnames';
+import notify from '@/utils/notify';
+import { slugify } from '@/utils/slugify';
+import { Tab } from '@headlessui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
+import { v4 as uuidv4 } from 'uuid';
+import { OpenInForm } from './metadata/OpenIn';
+import Link from 'next/link';
+import { LocationForm } from './metadata/LocationForm';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import { VersioningForm } from './metadata/VersioningForm'
-import { ErrorMessage } from '@hookform/error-message'
+});
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import { VersioningForm } from './metadata/VersioningForm';
+import { ErrorMessage } from '@hookform/error-message';
 
 export default function CreateDatasetForm() {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [selectedIndex, setSelectedIndex] = useState(0)
-    const [isOpen, setIsOpen] = useState(false)
-    const router = useRouter()
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [isOpen, setIsOpen] = useState(false);
+    const router = useRouter();
 
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
@@ -87,34 +87,34 @@ export default function CreateDatasetForm() {
                 },
             ],
         },
-    })
+    });
 
     const createDataset = api.dataset.createDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
             notify(
                 `Successfully created the "${title ?? name}" Dataset`,
                 'success'
-            )
-            setIsOpen(false)
-            router.push('/dashboard/datasets')
-            formObj.reset()
+            );
+            setIsOpen(false);
+            router.push('/dashboard/datasets');
+            formObj.reset();
         },
         onError: (error) => {
-            setErrorMessage(error.message)
+            setErrorMessage(error.message);
         },
-    })
+    });
 
     const {
         setValue,
         watch,
         trigger,
         formState: { dirtyFields, errors },
-    } = formObj
+    } = formObj;
 
-    console.log('ERRORS', errors)
+    console.log('ERRORS', errors);
     useEffect(() => {
-        if (!dirtyFields['name']) setValue('name', slugify(watch('title')))
-    }, [watch('title')])
+        if (!dirtyFields.name) setValue('name', slugify(watch('title')));
+    }, [watch('title')]);
 
     return (
         <>
@@ -131,7 +131,7 @@ export default function CreateDatasetForm() {
                             className="flex flex-col gap-y-12"
                             id="create_dataset_form"
                             onSubmit={formObj.handleSubmit((data) => {
-                                createDataset.mutate(data)
+                                createDataset.mutate(data);
                             })}
                         >
                             <OverviewForm formObj={formObj} />
@@ -155,7 +155,7 @@ export default function CreateDatasetForm() {
                             className="flex flex-col gap-y-12"
                             id="create_dataset_form"
                             onSubmit={formObj.handleSubmit((data) => {
-                                createDataset.mutate(data)
+                                createDataset.mutate(data);
                             })}
                         >
                             <Preview formObj={formObj} />
@@ -208,7 +208,7 @@ export default function CreateDatasetForm() {
                                                         name={key}
                                                     />
                                                 </li>
-                                            )
+                                            );
                                         })}
                                     </ul>
                                 </div>
@@ -251,9 +251,9 @@ export default function CreateDatasetForm() {
                         <Button
                             type="button"
                             onClick={async () => {
-                                const ok = await trigger()
-                                if (!ok) return
-                                setSelectedIndex(selectedIndex + 1)
+                                const ok = await trigger();
+                                if (!ok) return;
+                                setSelectedIndex(selectedIndex + 1);
                             }}
                         >
                             Next:{' '}
@@ -311,7 +311,7 @@ export default function CreateDatasetForm() {
                                         value: 'draft',
                                         label: 'Draft',
                                     },
-                                })
+                                });
                             })}
                         >
                             Save as Draft
@@ -327,5 +327,5 @@ export default function CreateDatasetForm() {
                 </Modal>
             </div>
         </>
-    )
+    );
 }

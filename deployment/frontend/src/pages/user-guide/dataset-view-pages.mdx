@@ -1,4 +1,4 @@
-import MdxLayout from '@/components/_shared/mdx-layout'
+import MdxLayout from '@/components/_shared/mdx-layout';
 
 1.  [Dataset Metadata](#Dataset-Metadata)
 
@@ -89,15 +89,15 @@ In that map, you can search using a bbox by clicking on the square at the top le
 
 <img src="/images/user-guide/dataset7.webp" />
 
--   If that rectangle intersects or covers a geojson shape that is attached to a Data Files, that Data Files will then appear
+- If that rectangle intersects or covers a geojson shape that is attached to a Data Files, that Data Files will then appear
 
--   If that rectangle covers the center coordinate of an address that is attached to a Data Files, that Data Files will also appear
+- If that rectangle covers the center coordinate of an address that is attached to a Data Files, that Data Files will also appear
 
 Besides that, we also have an autocomplete field for addresses, which will match in the following way
 
--   If the center of that address is inside the geojson attached to a Data Files, then that Data Files will appear
+- If the center of that address is inside the geojson attached to a Data Files, then that Data Files will appear
 
--   If the address typed matches or is contained by the address in a specific Data Files, then that Data Files will appear, for example, in the image below, we have a Data Files that is attached to the state of Lagos in Nigeria, if we type Ikeja, Lagos, Nigeria, which is a city inside that particular state, the result will match, given that possibly data about the state of Lagos will also contain data about that particular city
+- If the address typed matches or is contained by the address in a specific Data Files, then that Data Files will appear, for example, in the image below, we have a Data Files that is attached to the state of Lagos in Nigeria, if we type Ikeja, Lagos, Nigeria, which is a city inside that particular state, the result will match, given that possibly data about the state of Lagos will also contain data about that particular city
 
 <img src="/images/user-guide/dataset8.webp" />
 
@@ -217,15 +217,15 @@ The export as control allows users to export the map as an embedding.
 
 It provides some extra functionality to the maps. Some of the features are:
 
--   Display layer metadata such as the title
+- Display layer metadata such as the title
 
--   Render legends, that could be "choropleth", "gradient", "basic", "proportional" or "multiple" (for multiple legends)
+- Render legends, that could be "choropleth", "gradient", "basic", "proportional" or "multiple" (for multiple legends)
 
--   Reorder layers
+- Reorder layers
 
--   Hide layers
+- Hide layers
 
--   Change layer opacity
+- Change layer opacity
 
 <img src="/images/user-guide/dataset31.webp" />
 
@@ -302,5 +302,5 @@ export default function MDXPage({ children }) {
         >
             {children}
         </MdxLayout>
-    )
+    );
 }

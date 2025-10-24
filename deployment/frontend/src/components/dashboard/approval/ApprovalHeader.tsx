@@ -1,5 +1,5 @@
-import React from 'react'
-import TableHeader from '../_shared/TableHeader'
+import React from 'react';
+import TableHeader from '../_shared/TableHeader';
 
 function LeftNode() {
     return (
@@ -14,13 +14,13 @@ function LeftNode() {
             </div>
             <div className=" lg:w-[55%] xl:w-[42%] xxl:w-[38%] 2xl:w-[34%]"></div>
         </div>
-    )
+    );
 }
 
 export default function ApprovalHeader({
     Pagination,
 }: {
-    Pagination: React.ReactNode
+    Pagination: React.ReactNode;
 }) {
     return (
         <TableHeader
@@ -29,5 +29,5 @@ export default function ApprovalHeader({
             rightStyle="py-2"
             Pagination={Pagination}
         />
-    )
+    );
 }

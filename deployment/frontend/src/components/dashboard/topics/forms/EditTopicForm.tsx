@@ -1,33 +1,33 @@
-import { useForm } from 'react-hook-form'
-import { useState } from 'react'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import Container from '@/components/_shared/Container'
-import { TopicFormType, TopicSchema } from '@/schema/topic.schema'
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { zodResolver } from '@hookform/resolvers/zod'
-import notify from '@/utils/notify'
-import { api } from '@/utils/api'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import TopicForm from './TopicForm'
-import { useRouter } from 'next/router'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog, Tab } from '@headlessui/react'
+import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import Container from '@/components/_shared/Container';
+import { type TopicFormType, TopicSchema } from '@/schema/topic.schema';
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { zodResolver } from '@hookform/resolvers/zod';
+import notify from '@/utils/notify';
+import { api } from '@/utils/api';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import TopicForm from './TopicForm';
+import { useRouter } from 'next/router';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog, Tab } from '@headlessui/react';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import Link from 'next/link'
-import { RouterOutput } from '@/server/api/root'
-import { Fragment } from 'react'
-import { Members } from '../metadata/Members'
-import classNames from '@/utils/classnames'
+import Link from 'next/link';
+import { type RouterOutput } from '@/server/api/root';
+import { Fragment } from 'react';
+import { Members } from '../metadata/Members';
+import classNames from '@/utils/classnames';
 
-type TopicOutput = RouterOutput["topics"]["getTopic"];
+type TopicOutput = RouterOutput['topics']['getTopic'];
 
 export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [deleteOpen, setDeleteOpen] = useState(false)
-    const router = useRouter()
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const router = useRouter();
     const links = [
         { label: 'Topics', url: '/dashboard/topics', current: false },
         {
@@ -35,7 +35,7 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
             url: `/dashboard/topics/${topic.name}/edit`,
             current: true,
         },
-    ]
+    ];
 
     const formObj = useForm<TopicFormType>({
         defaultValues: {
@@ -51,47 +51,47 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                 },
                 topic_id: topic.id,
                 capacity: {
-                    value: (member as any).capacity,
-                    label: (member as any).capacity,
+                    value: member.capacity,
+                    label: member.capacity,
                 },
             })),
         },
         resolver: zodResolver(TopicSchema),
-    })
+    });
 
-    const utils = api.useContext()
+    const utils = api.useContext();
     const editTopic = api.topics.editTopic.useMutation({
         onSuccess: async ({ title, name }) => {
-            await utils.topics.getTopic.invalidate({ id: name })
-            notify(`Successfully edited the ${title ?? name} Topic`, 'success')
-            router.push('/dashboard/topics')
-            formObj.reset()
+            await utils.topics.getTopic.invalidate({ id: name });
+            notify(`Successfully edited the ${title ?? name} Topic`, 'success');
+            router.push('/dashboard/topics');
+            formObj.reset();
         },
         onError: (error) => {
-            setErrorMessage(error.message)
+            setErrorMessage(error.message);
         },
-    })
+    });
 
     const deleteTopic = api.topics.deleteTopic.useMutation({
         onSuccess: async () => {
-            await utils.topics.getTopic.invalidate({ id: topic.name })
+            await utils.topics.getTopic.invalidate({ id: topic.name });
             notify(
                 `Successfully deleted the ${topic.title ?? topic.name} Team`,
                 'error'
-            )
-            setDeleteOpen(false)
-            router.push('/dashboard/topics')
+            );
+            setDeleteOpen(false);
+            router.push('/dashboard/topics');
         },
         onError: (error) => {
-            setDeleteOpen(false)
-            setErrorMessage(error.message)
+            setDeleteOpen(false);
+            setErrorMessage(error.message);
         },
-    })
+    });
 
     const tabs = [
         { name: 'Metadata', enabled: true },
         { name: 'Members', enabled: true },
-    ]
+    ];
 
     return (
         <>
@@ -188,12 +188,15 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                             <Tab.Panel>
                                 <form
                                     onSubmit={formObj.handleSubmit((data) => {
-                                        editTopic.mutate(data)
+                                        editTopic.mutate(data);
                                     })}
                                 >
                                     <div className="w-full py-8 border-b border-blue-800 shadow">
                                         <div className="px-2 sm:px-8">
-                                            <TopicForm formObj={formObj} editing={true} />
+                                            <TopicForm
+                                                formObj={formObj}
+                                                editing={true}
+                                            />
                                         </div>
                                     </div>
                                     {errorMessage && (
@@ -207,10 +210,7 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                                 as="div"
                                 className="flex flex-col gap-y-12 mt-8"
                             >
-                                <Members
-                                    topic={topic}
-                                    formObj={formObj}
-                                />
+                                <Members topic={topic} formObj={formObj} />
                             </Tab.Panel>
                         </Tab.Panels>
                     </div>
@@ -223,7 +223,7 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                         loading={editTopic.isLoading}
                         type="submit"
                         onClick={formObj.handleSubmit((data) => {
-                            editTopic.mutate(data)
+                            editTopic.mutate(data);
                         })}
                     >
                         Save
@@ -231,5 +231,5 @@ export default function EditTopicForm({ topic }: { topic: TopicOutput }) {
                 </div>
             </Container>
         </>
-    )
+    );
 }

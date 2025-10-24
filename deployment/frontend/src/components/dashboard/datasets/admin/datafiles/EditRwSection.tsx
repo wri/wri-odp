@@ -1,32 +1,35 @@
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
-import { v4 as uuidv4 } from 'uuid'
-import { EditDataFile } from './EditDataFile'
-import { MetadataAccordion } from '../metadata/MetadataAccordion'
-import { RWDatasetForm } from '../metadata/RWDataset'
-import { api } from '@/utils/api'
-import ViewsList from '@/components/views/ViewsList'
-import { AddLayer } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection'
-import { WriDataset } from '@/schema/ckan.schema'
-import SortableList, { SortableItem } from 'react-easy-sort'
+import { type UseFormReturn, useFieldArray } from 'react-hook-form';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import {
+    type DatasetFormType,
+    ResourceFormType,
+} from '@/schema/dataset.schema';
+import { v4 as uuidv4 } from 'uuid';
+import { EditDataFile } from './EditDataFile';
+import { MetadataAccordion } from '../metadata/MetadataAccordion';
+import { RWDatasetForm } from '../metadata/RWDataset';
+import { api } from '@/utils/api';
+import ViewsList from '@/components/views/ViewsList';
+import { AddLayer } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection';
+import { type WriDataset } from '@/schema/ckan.schema';
+import SortableList, { SortableItem } from 'react-easy-sort';
 
 export function EditRwSection({
     formObj,
     dataset,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    dataset: WriDataset
+    formObj: UseFormReturn<DatasetFormType>;
+    dataset: WriDataset;
 }) {
-    const { control, watch } = formObj
+    const { control, watch } = formObj;
     const { fields, append, prepend, remove, swap, move, insert } =
         useFieldArray({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
-        })
+        });
 
-    const rwId = watch('rw_id')
-    const provider = watch('provider')
+    const rwId = watch('rw_id');
+    const provider = watch('provider');
     const {
         data: datasetViews,
         isLoading: isDatasetViewsLoading,
@@ -34,7 +37,7 @@ export function EditRwSection({
     } = api.rw.getDatasetViews.useQuery(
         { rwDatasetId: rwId ?? '' },
         { enabled: !!rwId }
-    )
+    );
 
     const layers = fields.filter(
         (r) =>
@@ -43,7 +46,7 @@ export function EditRwSection({
             r.type !== 'empty-file' &&
             r.type !== 'tile-cache' &&
             r.type !== 'gee-asset'
-    )
+    );
 
     const notLayers = fields.filter(
         (r) =>
@@ -52,7 +55,7 @@ export function EditRwSection({
             r.type === 'empty-file' ||
             r.type === 'tile-cache' ||
             r.type === 'gee-asset'
-    )
+    );
 
     return (
         <>
@@ -69,14 +72,14 @@ export function EditRwSection({
             )}
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
-                    swap(oldIdx, newIdx)
+                    swap(oldIdx, newIdx);
                 }}
                 className="list"
                 lockAxis="y"
                 draggedItemClassName="dragged"
             >
                 {layers.map((field, index) => {
-                    index += notLayers.length
+                    index += notLayers.length;
                     return (
                         <SortableItem key={field.id}>
                             <div>
@@ -98,7 +101,7 @@ export function EditRwSection({
                                 )}
                             </div>
                         </SortableItem>
-                    )
+                    );
                 })}
             </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
@@ -124,5 +127,5 @@ export function EditRwSection({
                 </button>
             </div>
         </>
-    )
+    );
 }
