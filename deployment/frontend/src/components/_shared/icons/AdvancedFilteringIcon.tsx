@@ -15,5 +15,5 @@ export function AdvancedFilteringIcon() {
                 strokeLinejoin="round"
             />
         </svg>
-    )
+    );
 }

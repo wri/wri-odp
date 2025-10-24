@@ -1,5 +1,7 @@
 import logging
 import random
+import os
+from dotenv import load_dotenv
 
 from locust import HttpUser, between
 import locust.stats as stats
@@ -13,6 +15,24 @@ from journeys.apis import ApiAutomationTasks, ApiManualTasks
 
 
 log = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s,%(msecs)03d] [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
+
+load_dotenv()
+
+
+def _env_int(var, default):
+    val = os.getenv(var, None)
+
+    try:
+        return int(val) if val is not None else default
+    except (ValueError, TypeError):
+        log.error(f"Invalid value for {var!r}: {val!r} — using default {default}")
+        return default
 
 
 # Overrides the default Locust stats output.
@@ -63,13 +83,20 @@ class WebsiteUser(HttpUser):
     # Defines the distribution of different user journeys.
     # TODO: Adjust these once we have better real-world data.
     tasks = {
-        HomeTasks: 700,          # ~53.8%
-        DatasetsTasks: 200,      # ~15.4%
-        TopicsSearchTasks: 120,  # ~9.2%
-        TopicsPageTasks: 110,    # ~8.5%
-        SearchTasks: 40,         # ~3.1%
-        TeamsSearchTasks: 30,    # ~2.3%
-        TeamsPageTasks: 30,      # ~2.3%
-        ApiAutomationTasks: 50,  # ~3.8%
-        ApiManualTasks: 20,      # ~1.5%
+        HomeTasks: _env_int("HOME_TASKS_WEIGHT", 700),                   # ~70%
+        DatasetsTasks: _env_int("DATASETS_TASKS_WEIGHT", 210),           # ~21%
+        TopicsSearchTasks: _env_int("TOPICS_SEARCH_TASKS_WEIGHT", 120),  # ~12%
+        TopicsPageTasks: _env_int("TOPICS_PAGE_TASKS_WEIGHT", 110),      # ~11%
+        SearchTasks: _env_int("SEARCH_TASKS_WEIGHT", 20),                # ~2%
+        TeamsSearchTasks: _env_int("TEAMS_SEARCH_TASKS_WEIGHT", 10),     # ~1%
+        TeamsPageTasks: _env_int("TEAMS_PAGE_TASKS_WEIGHT", 10),         # ~1%
+        ApiAutomationTasks: _env_int("API_AUTOMATION_TASKS_WEIGHT", 20), # ~2%
+        ApiManualTasks: _env_int("API_MANUAL_TASKS_WEIGHT", 10),         # ~1%
     }
+
+    task_distribution_message = "Running with task distribution weights:\n\n"
+
+    for task_class, weight in tasks.items():
+        task_distribution_message += f"{task_class.__name__}: {weight}\n"
+
+    log.info(task_distribution_message)

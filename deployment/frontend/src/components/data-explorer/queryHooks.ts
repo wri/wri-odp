@@ -1,34 +1,34 @@
-import { api } from '@/utils/api'
+import { api } from '@/utils/api';
 import {
-    ColumnSort,
-    PaginationState,
-    ColumnFilter,
-    Updater,
-} from '@tanstack/react-table'
-import { useQuery } from 'react-query'
-import { TabularResource } from '../datasets/visualizations/Visualizations'
-import { env } from '@/env.mjs'
-import { CkanResponse } from '@/schema/ckan.schema'
-import { FilterObjType } from './search.schema'
-import { DataExplorerColumnFilter } from './DataExplorer'
-import { useSession } from 'next-auth/react'
+    type ColumnSort,
+    type PaginationState,
+    type ColumnFilter,
+    type Updater,
+} from '@tanstack/react-table';
+import { useQuery } from 'react-query';
+import { type TabularResource } from '../datasets/visualizations/Visualizations';
+import { env } from '@/env.mjs';
+import { type CkanResponse } from '@/schema/ckan.schema';
+import { type FilterObjType } from './search.schema';
+import { type DataExplorerColumnFilter } from './DataExplorer';
+import { useSession } from 'next-auth/react';
 
 export interface FieldsResponse {
-    tableName: string
-    fields: Record<string, any> | Array<{ name: string; alias: string }>
+    tableName: string;
+    fields: Record<string, any> | Array<{ name: string; alias: string }>;
 }
 
 export function useFields({ id, provider, apiKey }: TabularResource) {
-    const session = useSession()
+    const session = useSession();
 
     const headers = {
         'Content-Type': 'application/json',
-    } as any
+    } as any;
 
     if (apiKey) {
-        headers['Authorization'] = apiKey
+        headers.Authorization = apiKey;
     } else if (session.data?.user.apikey) {
-        headers['Authorization'] = session.data?.user.apikey
+        headers.Authorization = session.data?.user.apikey;
     }
 
     const datastoreHook = useQuery(['fields', id], async () => {
@@ -41,15 +41,15 @@ export function useFields({ id, provider, apiKey }: TabularResource) {
                     id,
                 }),
             }
-        )
+        );
         const fields: CkanResponse<{
             fields: Array<{
-                id: string
-                name: string
-                info: { label: string | null; default: string | null }
-                type: string
-            }>
-        }> = await fieldsRes.json()
+                id: string;
+                name: string;
+                info: { label: string | null; default: string | null };
+                type: string;
+            }>;
+        }> = await fieldsRes.json();
 
         return {
             tableName: id,
@@ -59,16 +59,16 @@ export function useFields({ id, provider, apiKey }: TabularResource) {
                 type: field.type,
                 default: field.info.default ?? '',
             })),
-        }
-    })
+        };
+    });
     const rwHook = api.rw.getFields.useQuery({
         id,
         provider,
-    })
+    });
     if (provider === 'datastore') {
-        return datastoreHook
+        return datastoreHook;
     }
-    return rwHook
+    return rwHook;
 }
 
 export function useNumberOfRows({
@@ -78,11 +78,11 @@ export function useNumberOfRows({
     provider,
     setPageCount,
 }: {
-    tableName: string
-    datasetId: string
-    filters: DataExplorerColumnFilter[]
-    provider: string
-    setPageCount: (updater: Updater<number>) => void
+    tableName: string;
+    datasetId: string;
+    filters: DataExplorerColumnFilter[];
+    provider: string;
+    setPageCount: (updater: Updater<number>) => void;
 }) {
     if (provider === 'datastore') {
         return api.datastore.getNumberOfRows.useQuery(
@@ -93,10 +93,10 @@ export function useNumberOfRows({
             {
                 keepPreviousData: true,
                 onSuccess: (data) => {
-                    setPageCount(data ? Math.ceil(data / 10) : 0)
+                    setPageCount(data ? Math.ceil(data / 10) : 0);
                 },
             }
-        )
+        );
     }
     return api.rw.getNumberOfRows.useQuery(
         {
@@ -104,17 +104,17 @@ export function useNumberOfRows({
             provider,
             tableName: tableName ?? '',
             filters: filters as {
-                id: string
-                value: FilterObjType[]
+                id: string;
+                value: FilterObjType[];
             }[],
         },
         {
             keepPreviousData: true,
             onSuccess: (data) => {
-                setPageCount(data ? Math.ceil(data / 10) : 0)
+                setPageCount(data ? Math.ceil(data / 10) : 0);
             },
         }
-    )
+    );
 }
 
 export function useTableData({
@@ -128,15 +128,15 @@ export function useTableData({
     provider,
     groupBy,
 }: {
-    pagination: PaginationState
-    sorting: ColumnSort[]
-    tableName: string
-    datasetId: string
-    columns: string[]
-    enabled?: boolean
-    filters: ColumnFilter[]
-    provider: string
-    groupBy?: string[]
+    pagination: PaginationState;
+    sorting: ColumnSort[];
+    tableName: string;
+    datasetId: string;
+    columns: string[];
+    enabled?: boolean;
+    filters: ColumnFilter[];
+    provider: string;
+    groupBy?: string[];
 }) {
     if (provider === 'datastore') {
         return api.datastore.getData.useQuery(
@@ -146,8 +146,8 @@ export function useTableData({
                 columns,
                 sorting,
                 filters: filters as {
-                    id: string
-                    value: FilterObjType[]
+                    id: string;
+                    value: FilterObjType[];
                 }[],
                 groupBy,
             },
@@ -155,7 +155,7 @@ export function useTableData({
                 enabled: !!tableName && enabled,
                 keepPreviousData: true,
             }
-        )
+        );
     }
     return api.rw.getData.useQuery(
         {
@@ -166,13 +166,13 @@ export function useTableData({
             provider,
             sorting,
             filters: filters as {
-                id: string
-                value: FilterObjType[]
+                id: string;
+                value: FilterObjType[];
             }[],
         },
         {
             enabled: !!datasetId && !!tableName && enabled,
             keepPreviousData: true,
         }
-    )
+    );
 }

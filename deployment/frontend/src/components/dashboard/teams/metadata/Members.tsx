@@ -1,24 +1,24 @@
 import {
-    UseFieldArrayRemove,
-    UseFormReturn,
+    type UseFieldArrayRemove,
+    type UseFormReturn,
     useFieldArray,
-} from 'react-hook-form'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { api } from '@/utils/api'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { MinusCircleIcon } from '@heroicons/react/24/outline'
-import { InputGroup } from '../../datasets/admin/metadata/InputGroup'
-import { match, P } from 'ts-pattern'
-import Spinner from '@/components/_shared/Spinner'
-import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { capacityOptions } from '../../datasets/admin/formOptions'
-import notify from '@/utils/notify'
-import { TeamFormType } from '@/schema/team.schema'
-import { RouterOutput } from '@/server/api/root'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
+} from 'react-hook-form';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { api } from '@/utils/api';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { MinusCircleIcon } from '@heroicons/react/24/outline';
+import { InputGroup } from '../../datasets/admin/metadata/InputGroup';
+import { match, P } from 'ts-pattern';
+import Spinner from '@/components/_shared/Spinner';
+import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { capacityOptions } from '../../datasets/admin/formOptions';
+import notify from '@/utils/notify';
+import { type TeamFormType } from '@/schema/team.schema';
+import { type RouterOutput } from '@/server/api/root';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
-type TeamOutput = RouterOutput['teams']['getTeam']
+type TeamOutput = RouterOutput['teams']['getTeam'];
 
 function Membertooltip() {
     return (
@@ -34,20 +34,20 @@ function Membertooltip() {
                 <b>Members</b> can view Datasets.
             </p>
         </>
-    )
+    );
 }
 export function Members({
     team,
     formObj,
 }: {
-    team: TeamOutput
-    formObj: UseFormReturn<TeamFormType>
+    team: TeamOutput;
+    formObj: UseFormReturn<TeamFormType>;
 }) {
-    const { control } = formObj
+    const { control } = formObj;
     const { fields, append, remove } = useFieldArray({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: 'members',
-    })
+    });
 
     return (
         <div className="mx-auto w-full max-w-[1380px] sm:px-6 xxl:px-0">
@@ -102,7 +102,7 @@ export function Members({
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 function MemberForm({
@@ -111,12 +111,12 @@ function MemberForm({
     remove,
     team,
 }: {
-    formObj: UseFormReturn<TeamFormType>
-    index: number
-    remove: UseFieldArrayRemove
-    team: any
+    formObj: UseFormReturn<TeamFormType>;
+    index: number;
+    remove: UseFieldArrayRemove;
+    team: any;
 }) {
-    const allUsers = api.teams.getPossibleMembers.useQuery(team)
+    const allUsers = api.teams.getPossibleMembers.useQuery(team);
 
     return (
         <div className="flex items-center gap-x-2">
@@ -179,5 +179,5 @@ function MemberForm({
                 />
             </DefaultTooltip>
         </div>
-    )
+    );
 }

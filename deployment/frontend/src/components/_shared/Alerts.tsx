@@ -1,19 +1,19 @@
-import { XCircleIcon } from '@heroicons/react/20/solid'
+import { XCircleIcon } from '@heroicons/react/20/solid';
 import {
     ClipboardIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import DefaultTooltip from './Tooltip'
-import classNames from '@/utils/classnames'
-import notify from '@/utils/notify'
-import { useState } from 'react'
+} from '@heroicons/react/24/outline';
+import DefaultTooltip from './Tooltip';
+import classNames from '@/utils/classnames';
+import notify from '@/utils/notify';
+import { useState } from 'react';
 
 export function ErrorAlert({
     text,
     title = 'There was an error',
 }: {
-    text: string | React.ReactNode
-    title?: string
+    text: string | React.ReactNode;
+    title?: string;
 }) {
     return (
         <div className="rounded-md bg-red-50 p-4">
@@ -34,7 +34,7 @@ export function ErrorAlert({
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export function InfoAlert({
@@ -43,23 +43,23 @@ export function InfoAlert({
     copy = false,
     close = false,
 }: {
-    text: string | React.ReactNode
-    title?: string
-    copy?: boolean
-    close?: boolean
+    text: string | React.ReactNode;
+    title?: string;
+    copy?: boolean;
+    close?: boolean;
 }) {
-    const [closed, setClosed] = useState(false)
+    const [closed, setClosed] = useState(false);
     const copyTextToClipboard = async (text: string) => {
         if (document !== undefined) {
             if ('clipboard' in navigator) {
-                await navigator.clipboard.writeText(text)
-                notify(`Copied text to clipboard`, 'success')
+                await navigator.clipboard.writeText(text);
+                notify(`Copied text to clipboard`, 'success');
             } else {
-                return document.execCommand('copy', true, text)
+                return document.execCommand('copy', true, text);
             }
         }
-    }
-    if (closed) return <></>
+    };
+    if (closed) return <></>;
     return (
         <div className="rounded-md bg-green-50 p-4">
             <div className="flex">
@@ -107,5 +107,5 @@ export function InfoAlert({
                 )}
             </div>
         </div>
-    )
+    );
 }

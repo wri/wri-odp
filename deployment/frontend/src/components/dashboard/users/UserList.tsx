@@ -1,14 +1,14 @@
-import React from 'react'
-import { Tab } from '@headlessui/react'
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
-import UserCard from './UserCard'
-import { useRouter } from 'next/router'
-import AddUserForm from './AddUserForm'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
+import React from 'react';
+import { Tab } from '@headlessui/react';
+import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import UserCard from './UserCard';
+import { useRouter } from 'next/router';
+import AddUserForm from './AddUserForm';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
 
 function empty({ username }: { username: string }) {
-    return <div></div>
+    return <div></div>;
 }
 const tabs = [
     {
@@ -21,12 +21,12 @@ const tabs = [
         content: AddUserForm,
         title: 'Add user',
     },
-]
+];
 
 export default function UserList() {
-    const { q } = useRouter().query
-    const username = (q as string) ?? ''
-    const { data, isLoading } = api.user.getUserCapacity.useQuery()
+    const { q } = useRouter().query;
+    const username = (q as string) ?? '';
+    const { data, isLoading } = api.user.getUserCapacity.useQuery();
 
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
@@ -79,5 +79,5 @@ export default function UserList() {
                 </Tab.Panels>
             </Tab.Group>
         </section>
-    )
+    );
 }

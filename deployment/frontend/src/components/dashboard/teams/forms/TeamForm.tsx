@@ -1,22 +1,22 @@
-import { UseFormReturn } from 'react-hook-form'
-import { TeamFormType } from '@/schema/team.schema'
+import { type UseFormReturn } from 'react-hook-form';
+import { type TeamFormType } from '@/schema/team.schema';
 import {
     ErrorDisplay,
     InputGroup,
     InputGroupCustom,
-} from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { ImageUploader } from '../../_shared/ImageUploader'
-import { UploadResult } from '@uppy/core'
-import { api } from '@/utils/api'
-import { P, match } from 'ts-pattern'
-import Spinner from '@/components/_shared/Spinner'
-import { useSession } from 'next-auth/react'
-import { useEffect } from 'react'
-import DefaultTooltip from '@/components/_shared/Tooltip'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
+} from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { ImageUploader } from '../../_shared/ImageUploader';
+import { type UploadResult } from '@uppy/core';
+import { api } from '@/utils/api';
+import { P, match } from 'ts-pattern';
+import Spinner from '@/components/_shared/Spinner';
+import { useSession } from 'next-auth/react';
+import { useEffect } from 'react';
+import DefaultTooltip from '@/components/_shared/Tooltip';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 function ToolTipVisibility() {
     return (
@@ -32,7 +32,7 @@ function ToolTipVisibility() {
                 updated independently.
             </p>
         </>
-    )
+    );
 }
 
 export default function TeamForm({
@@ -41,21 +41,21 @@ export default function TeamForm({
     sysadmin = false,
     isAdminCurrentTeam = false,
 }: {
-    formObj: UseFormReturn<TeamFormType>
-    editing?: boolean
-    sysadmin?: boolean
-    isAdminCurrentTeam?: boolean
+    formObj: UseFormReturn<TeamFormType>;
+    editing?: boolean;
+    sysadmin?: boolean;
+    isAdminCurrentTeam?: boolean;
 }) {
     const {
         register,
         setValue,
         watch,
         formState: { errors, isSubmitting },
-    } = formObj
+    } = formObj;
 
     const possibleParents = api.teams.getAllTeams.useQuery(undefined, {
         refetchOnMount: false,
-    })
+    });
 
     return (
         <div className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
@@ -108,9 +108,11 @@ export default function TeamForm({
                                 onUploadSuccess={(response: UploadResult) => {
                                     const url =
                                         response.successful[0]?.uploadURL ??
-                                        null
-                                    const name = url ? url.split('/').pop() : ''
-                                    setValue('image_url', name)
+                                        null;
+                                    const name = url
+                                        ? url.split('/').pop()
+                                        : '';
+                                    setValue('image_url', name);
                                 }}
                             />
                         </div>
@@ -209,16 +211,23 @@ export default function TeamForm({
                                       },
                                   ]
                                 : [
-                                      { label: 'Public', value: 'public', visibility: 'public' },
-                                      { label: 'Private', value: 'private', visibility: 'private' },
+                                      {
+                                          label: 'Public',
+                                          value: 'public',
+                                          visibility: 'public',
+                                      },
+                                      {
+                                          label: 'Private',
+                                          value: 'private',
+                                          visibility: 'private',
+                                      },
                                   ]
                         }
                         placeholder="Select visibility"
-                        
                     />
                     <ErrorDisplay name="visibility" errors={errors} />
                 </InputGroupCustom>
             </div>
         </div>
-    )
+    );
 }

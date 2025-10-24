@@ -1,70 +1,70 @@
-import { Collaborator, WriDataset } from '@/schema/ckan.schema'
+import { Collaborator, type WriDataset } from '@/schema/ckan.schema';
 import {
     CapacityUnion,
-    DataDictionaryFormType,
-    DatasetFormType,
+    type DataDictionaryFormType,
+    type DatasetFormType,
     DatasetSchema,
-    ResourceFormType,
-} from '@/schema/dataset.schema'
-import classNames from '@/utils/classnames'
-import { Tab } from '@headlessui/react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/router'
-import { Fragment, useState, useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { OverviewForm } from './metadata/Overview'
-import { DescriptionForm } from './metadata/DescriptionForm'
-import { PointOfContactForm } from './metadata/PointOfContact'
-import { MoreDetailsForm } from './metadata/MoreDetails'
-import { OpenInForm } from './metadata/OpenIn'
-import { CustomFieldsForm } from './metadata/CustomFields'
+    type ResourceFormType,
+} from '@/schema/dataset.schema';
+import classNames from '@/utils/classnames';
+import { Tab } from '@headlessui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/router';
+import { Fragment, useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { OverviewForm } from './metadata/Overview';
+import { DescriptionForm } from './metadata/DescriptionForm';
+import { PointOfContactForm } from './metadata/PointOfContact';
+import { MoreDetailsForm } from './metadata/MoreDetails';
+import { OpenInForm } from './metadata/OpenIn';
+import { CustomFieldsForm } from './metadata/CustomFields';
 import {
     capacityOptions,
     languageOptions,
     updateFrequencyOptions,
     visibilityOptions,
-} from './formOptions'
-import { api } from '@/utils/api'
-import notify from '@/utils/notify'
-import { LoaderButton } from '@/components/_shared/Button'
-import Link from 'next/link'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { EditDataFilesSection } from './datafiles/EditDataFilesSection'
-import { useSession } from 'next-auth/react'
-import { match } from 'ts-pattern'
-import { Collaborators } from './metadata/Collaborators'
-import { LocationForm } from './metadata/LocationForm'
-import { EditRwSection } from './datafiles/EditRwSection'
-import { VersioningForm } from './metadata/VersioningForm'
-import { ErrorMessage } from '@hookform/error-message'
+} from './formOptions';
+import { api } from '@/utils/api';
+import notify from '@/utils/notify';
+import { LoaderButton } from '@/components/_shared/Button';
+import Link from 'next/link';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { EditDataFilesSection } from './datafiles/EditDataFilesSection';
+import { useSession } from 'next-auth/react';
+import { match } from 'ts-pattern';
+import { Collaborators } from './metadata/Collaborators';
+import { LocationForm } from './metadata/LocationForm';
+import { EditRwSection } from './datafiles/EditRwSection';
+import { VersioningForm } from './metadata/VersioningForm';
+import { ErrorMessage } from '@hookform/error-message';
 
 function getDiff<T>(dirtyObject: T, changedFields: string[]) {
     for (const key in dirtyObject) {
-        const value = dirtyObject[key]
+        const value = dirtyObject[key];
         if (typeof value !== 'boolean') {
             if (Array.isArray(value) && value.length > 0) {
-                const arrayChanged: string[] = []
-                const changed = getDiff(value, arrayChanged)
+                const arrayChanged: string[] = [];
+                const changed = getDiff(value, arrayChanged);
                 if (changed.length > 0) {
-                    changedFields.push(key)
+                    changedFields.push(key);
                 }
             } else if (typeof value === 'object') {
                 //@ts-ignore
                 if (Object.keys(value).length > 0) {
-                    const objChange: string[] = []
-                    const changed = getDiff(value, objChange)
+                    const objChange: string[] = [];
+                    const changed = getDiff(value, objChange);
                     if (changed.length > 0) {
-                        changedFields.push(key)
+                        changedFields.push(key);
                     }
                 }
             }
         } else {
             if (value) {
-                changedFields.push(key)
+                changedFields.push(key);
             }
         }
     }
-    return changedFields
+    return changedFields;
 }
 
 //change image
@@ -78,33 +78,33 @@ function getDiff<T>(dirtyObject: T, changedFields: string[]) {
 // change temporal coverage
 
 export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const router = useRouter()
-    const possibleLicenses = api.dataset.getLicenses.useQuery()
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const router = useRouter();
+    const possibleLicenses = api.dataset.getLicenses.useQuery();
     const { data: teamUsers } = api.teams.getTeamUsers.useQuery(
         {
             id: dataset.organization?.id ?? dataset.owner_org ?? '',
             capacity: 'admin',
         },
         { enabled: !!dataset.organization?.id }
-    )
+    );
     const license = possibleLicenses.data?.find(
         (license) => license.id === dataset.license_id
-    )
-    const session = useSession()
+    );
+    const session = useSession();
     const { data: collaborators } =
         api.dataset.getDatasetCollaborators.useQuery({
             id: dataset.name,
-        })
+        });
 
     const canEditCollaborators = match(session.data?.user.sysadmin ?? false)
         .with(true, () => true)
         .with(false, () => {
-            if (dataset.creator_user_id === session.data?.user.id) return true
+            if (dataset.creator_user_id === session.data?.user.id) return true;
             if (teamUsers && teamUsers.length > 0) {
                 return teamUsers.some(
                     (user: string[]) => user[0] === session.data?.user.id
-                )
+                );
             }
             return collaborators
                 ? collaborators.some(
@@ -112,33 +112,33 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                           collaborator.id === session.data?.user.id &&
                           collaborator.capacity === 'admin'
                   )
-                : false
+                : false;
         })
-        .otherwise(() => false)
+        .otherwise(() => false);
 
     const resourceForm = dataset.resources.sort((a, b) => {
         const isLayer = (r: any) =>
             r.type === 'layer' ||
             r.type === 'layer-raw' ||
-            r.type === 'empty-layer'
+            r.type === 'empty-layer';
 
-        const isALayer = isLayer(a)
-        const isBLayer = isLayer(b)
+        const isALayer = isLayer(a);
+        const isBLayer = isLayer(b);
 
         if (isALayer && isBLayer) {
-            return 0
+            return 0;
         }
 
         if (!isALayer && isBLayer) {
-            return -1
+            return -1;
         }
 
         if (isALayer && !isBLayer) {
-            return 1
+            return 1;
         }
 
-        return 0
-    }) as unknown as ResourceFormType[]
+        return 0;
+    }) as unknown as ResourceFormType[];
 
     const formObj = useForm<DatasetFormType>({
         resolver: zodResolver(DatasetSchema),
@@ -203,15 +203,15 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 : [],
             resources: resourceForm.map((resource) => {
                 const schema = resource.schema as unknown as {
-                    value: DataDictionaryFormType
-                }
+                    value: DataDictionaryFormType;
+                };
                 return {
                     ...resource,
                     title: resource.title ?? resource.name,
                     type: resource.url_type as any,
-                    resourceId: resource.id as string,
+                    resourceId: resource.id!,
                     schema: resource.schema ? schema.value : undefined,
-                }
+                };
             }),
             spatial_type: dataset.spatial_type
                 ? (dataset.spatial_type as
@@ -228,32 +228,32 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       : undefined,
             extras: dataset?.extras ? dataset.extras : [],
         },
-    })
+    });
 
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
             notify(
                 `Successfully edited the "${title ?? name}" Dataset`,
                 'success'
-            )
+            );
 
-            router.push(`/datasets/${name}`)
+            router.push(`/datasets/${name}`);
         },
         onError: (error) => {
-            setErrorMessage(error.message)
+            setErrorMessage(error.message);
         },
-    })
+    });
 
     const {
         formState: { dirtyFields, touchedFields, errors },
-    } = formObj
+    } = formObj;
 
     const tabs = [
         { name: 'Metadata', enabled: true },
         { name: 'Data Files', enabled: true },
         { name: 'Layers / Dataset Views', enabled: true },
         { name: 'Collaborators', enabled: canEditCollaborators },
-    ]
+    ];
 
     return (
         <>
@@ -297,7 +297,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         >
                             <form
                                 onSubmit={formObj.handleSubmit((data) => {
-                                    editDataset.mutate(data)
+                                    editDataset.mutate(data);
                                 })}
                             >
                                 <OverviewForm
@@ -389,7 +389,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                                         name={key}
                                                     />
                                                 </li>
-                                            )
+                                            );
                                         })}
                                     </ul>
                                 </div>
@@ -415,42 +415,43 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             const diffLayerResources =
                                 dirtyFields?.resources?.filter(
                                     (r) => !r?.layerObj
-                                )
+                                );
 
                             const newDirtyFields = {
                                 ...dirtyFields,
                                 resources: diffLayerResources
                                     ? diffLayerResources
                                     : false,
-                            }
+                            };
 
-                            const changedFields: string[] = []
+                            const changedFields: string[] = [];
 
-                            getDiff(newDirtyFields, changedFields)
+                            getDiff(newDirtyFields, changedFields);
                             if (data.featured_image !== dataset.featured_image)
-                                changedFields.push('featured_dataset')
+                                changedFields.push('featured_dataset');
 
-                            const toBeSavedData: Partial<DatasetFormType> = data
+                            const toBeSavedData: Partial<DatasetFormType> =
+                                data;
 
                             const storedDirty =
-                                sessionStorage.getItem('dirtyFields')
+                                sessionStorage.getItem('dirtyFields');
 
                             // check if layerobj was updated
                             if (storedDirty) {
-                                sessionStorage.removeItem('dirtyFields')
-                                return editDataset.mutate(toBeSavedData)
+                                sessionStorage.removeItem('dirtyFields');
+                                return editDataset.mutate(toBeSavedData);
                             } else {
                                 const defaultvalues = structuredClone(
                                     formObj.formState.defaultValues
-                                )
-                                const newData = structuredClone(data)
+                                );
+                                const newData = structuredClone(data);
 
                                 // check if new resource was added
                                 if (
                                     newData.resources?.length !==
                                     defaultvalues?.resources?.length
                                 ) {
-                                    return editDataset.mutate(toBeSavedData)
+                                    return editDataset.mutate(toBeSavedData);
                                 }
 
                                 // check if changefield is just collaborators
@@ -467,9 +468,9 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                                     'id',
                                                 ].includes(key)
                                         )
-                                    )
+                                    );
 
-                                    return editDataset.mutate(newData)
+                                    return editDataset.mutate(newData);
                                 } else if (
                                     changedFields.length === 2 &&
                                     changedFields.includes('language')
@@ -479,12 +480,14 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                     // so we need to check if the language is different from the default
                                     const defaultLang = defaultvalues?.language
                                         ? defaultvalues?.language
-                                        : { value: '', label: '' }
+                                        : { value: '', label: '' };
                                     if (
                                         newData.language?.value !==
                                         defaultLang?.value
                                     ) {
-                                        return editDataset.mutate(toBeSavedData)
+                                        return editDataset.mutate(
+                                            toBeSavedData
+                                        );
                                     } else {
                                         if (
                                             changedFields.includes(
@@ -500,29 +503,29 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                                         'id',
                                                     ].includes(key)
                                                 )
-                                            )
+                                            );
 
-                                            return editDataset.mutate(newData)
+                                            return editDataset.mutate(newData);
                                         } else {
                                             return editDataset.mutate(
                                                 toBeSavedData
-                                            )
+                                            );
                                         }
                                     }
                                 } else if (changedFields.length > 0) {
                                     // if by anymeans the changed fields get here and is not empty
-                                    return editDataset.mutate(toBeSavedData)
+                                    return editDataset.mutate(toBeSavedData);
                                 } else {
                                     notify(
                                         'No changes to the Dataset',
                                         'success'
-                                    )
-                                    router.push(`/datasets/${dataset.name}`)
+                                    );
+                                    router.push(`/datasets/${dataset.name}`);
                                 }
                             }
                         },
                         (err) => {
-                            console.error(err)
+                            console.error(err);
                         }
                     )}
                 >
@@ -530,5 +533,5 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 </LoaderButton>
             </div>
         </>
-    )
+    );
 }

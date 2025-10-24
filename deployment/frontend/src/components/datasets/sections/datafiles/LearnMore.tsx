@@ -1,9 +1,9 @@
-import { Button } from '@/components/_shared/Button'
+import { Button } from '@/components/_shared/Button';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import { Tab } from '@headlessui/react'
+import { Tab } from '@headlessui/react';
 import {
     ArrowPathIcon,
     ArrowTopRightOnSquareIcon,
@@ -11,22 +11,22 @@ import {
     FingerPrintIcon,
     LightBulbIcon,
     MapPinIcon,
-} from '@heroicons/react/24/outline'
-import { useState } from 'react'
-import { DatasetTabs } from '../../DatasetTabs'
-import { WriDataset } from '@/schema/ckan.schema'
-import { Resource } from '@/interfaces/dataset.interface'
-import classNames from '@/utils/classnames'
-import { getFormatColor } from '@/utils/formatColors'
+} from '@heroicons/react/24/outline';
+import { useState } from 'react';
+import { DatasetTabs } from '../../DatasetTabs';
+import { type WriDataset } from '@/schema/ckan.schema';
+import { type Resource } from '@/interfaces/dataset.interface';
+import classNames from '@/utils/classnames';
+import { getFormatColor } from '@/utils/formatColors';
 
 export function LearnMoreButton({
     dataset,
     datafile,
 }: {
-    dataset: WriDataset
-    datafile: Resource
+    dataset: WriDataset;
+    datafile: Resource;
 }) {
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false);
     return (
         <>
             <button
@@ -46,7 +46,7 @@ export function LearnMoreButton({
                 datafile={datafile}
             />
         </>
-    )
+    );
 }
 
 function LearnMoreModal({
@@ -55,19 +55,19 @@ function LearnMoreModal({
     dataset,
     datafile,
 }: {
-    open: boolean
-    setOpen: (open: boolean) => void
-    dataset: WriDataset
-    datafile: Resource
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    dataset: WriDataset;
+    datafile: Resource;
 }) {
-    const tabs = [{ name: 'About' }, { name: 'Methodology' }]
-    const created_at = new Date(datafile?.created ?? '')
-    const last_updated = new Date(datafile?.metadata_modified ?? '')
+    const tabs = [{ name: 'About' }, { name: 'Methodology' }];
+    const created_at = new Date(datafile?.created ?? '');
+    const last_updated = new Date(datafile?.metadata_modified ?? '');
     const options = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-    } as const
+    } as const;
     return (
         <Modal open={open} setOpen={setOpen} className="max-w-[64rem]">
             <div className="flex flex-col gap-y-4 p-5 font-acumin">
@@ -192,5 +192,5 @@ function LearnMoreModal({
                 </Tab.Group>
             </div>
         </Modal>
-    )
+    );
 }

@@ -1,18 +1,18 @@
-import React, { Fragment, useEffect, useState } from 'react'
-import Image from 'next/image'
-import { Menu, Transition, Dialog } from '@headlessui/react'
-import { Bars3Icon } from '@heroicons/react/20/solid'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import Login from './Login'
-import UserMenu from './UserMenu'
-import { useSession } from 'next-auth/react'
-import { api } from '@/utils/api'
+import React, { Fragment, useEffect, useState } from 'react';
+import Image from 'next/image';
+import { Menu, Transition, Dialog } from '@headlessui/react';
+import { Bars3Icon } from '@heroicons/react/20/solid';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import Login from './Login';
+import UserMenu from './UserMenu';
+import { useSession } from 'next-auth/react';
+import { api } from '@/utils/api';
 
 export default function Header() {
-    const { asPath } = useRouter()
-    const [isOpen, setIsOpen] = useState(false)
-    const session = useSession()
+    const { asPath } = useRouter();
+    const [isOpen, setIsOpen] = useState(false);
+    const session = useSession();
 
     const apiTokenQuery = api.auth.getApiTokensList.useQuery(
         {},
@@ -20,20 +20,20 @@ export default function Header() {
             enabled: false,
             cacheTime: 1,
         }
-    )
+    );
 
     useEffect(() => {
         if (session.status == 'authenticated') {
-            apiTokenQuery.refetch()
+            apiTokenQuery.refetch();
         }
-    }, [session?.status])
+    }, [session?.status]);
 
     function closeModal() {
-        setIsOpen(false)
+        setIsOpen(false);
     }
 
     function openModal() {
-        setIsOpen(true)
+        setIsOpen(true);
     }
 
     const navigation = [
@@ -57,15 +57,15 @@ export default function Header() {
             href: '/applications',
             active: false,
         },
-    ]
+    ];
 
     navigation.forEach((item) => {
         if (asPath.includes('?')) {
-            item.active = asPath.split('?')[0] === item.href
+            item.active = asPath.split('?')[0] === item.href;
         } else {
-            item.active = asPath === item.href
+            item.active = asPath === item.href;
         }
-    })
+    });
 
     return (
         <section className="w-full shadow">
@@ -104,7 +104,7 @@ export default function Header() {
                                 >
                                     {item.title}
                                 </Link>
-                            )
+                            );
                         })}
                     </div>
 
@@ -199,7 +199,7 @@ export default function Header() {
                                                     )}
                                                 </Menu.Item>
                                             </div>
-                                        )
+                                        );
                                     })}
                                 </Menu.Items>
                             </Transition>
@@ -208,5 +208,5 @@ export default function Header() {
                 </div>
             </section>
         </section>
-    )
+    );
 }
