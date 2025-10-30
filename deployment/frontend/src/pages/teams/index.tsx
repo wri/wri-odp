@@ -108,10 +108,10 @@ export default function TeamsPage(
         <>
             <NextSeo
                 title="Teams"
-                description="WRI Open Data Catalog Teams"
+                description="WRI Open Data Catalog, WRI Data Explorer Teams"
                 openGraph={{
                     title: 'Teams',
-                    description: 'WRI Open Data Catalog Teams',
+                    description: 'WRI Open Data Catalog, WRI Data Explorer Teams',
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/teams`,
                     type: 'website',
                 }}
