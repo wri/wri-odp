@@ -187,7 +187,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     return (
         <QueryClientProvider client={queryClient}>
             <DefaultSeo
-                titleTemplate="%s - WRI ODP"
+                titleTemplate="%s - WRI Data Explorer"
                 openGraph={{
                     images: [
                         {
