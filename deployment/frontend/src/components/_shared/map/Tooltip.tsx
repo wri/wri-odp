@@ -5,49 +5,52 @@ import {
     useImperativeHandle,
     useMemo,
     useState,
-} from 'react'
-import { Map, MapLayerMouseEvent } from 'mapbox-gl'
-import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
-import { Popup } from 'react-map-gl'
-import { useLayersFromRW } from '@/utils/queryHooks'
+} from 'react';
+import { Map, type MapLayerMouseEvent } from 'mapbox-gl';
+import {
+    type LngLat,
+    type MapGeoJSONFeature,
+} from 'react-map-gl/dist/esm/types';
+import { Popup } from 'react-map-gl';
+import { useLayersFromRW } from '@/utils/queryHooks';
 import numeral from 'numeral';
 
 export interface TooltipRef {
-    onClickLayer: (e: MapLayerMouseEvent) => void | undefined
-    close: () => void
+    onClickLayer: (e: MapLayerMouseEvent) => void | undefined;
+    close: () => void;
 }
 
 export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
-    const { data: layers } = useLayersFromRW()
+    const { data: layers } = useLayersFromRW();
     const [coordinates, setCoordinates] = useState<
         { longitude: number; latitude: number } | undefined
-    >()
-    const [layersInfo, setLayersInfo] = useState<any>()
+    >();
+    const [layersInfo, setLayersInfo] = useState<any>();
     useEffect(() => {
-        close()
-    }, [layers?.length])
+        close();
+    }, [layers?.length]);
 
     const onClickLayer = useCallback(
         ({
             features,
             lngLat,
         }: {
-            features?: MapGeoJSONFeature[]
-            lngLat: LngLat
+            features?: MapGeoJSONFeature[];
+            lngLat: LngLat;
         }) => {
-            setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
-            const layersInfo = []
-            for (let layer of layers) {
+            setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat });
+            const layersInfo = [];
+            for (const layer of layers) {
                 const feature = features?.find(
                     //  @ts-ignore
                     (f) => (f?.source || f.layer?.source) === layer.id
-                )
-                const { interactionConfig } = layer
+                );
+                const { interactionConfig } = layer;
 
                 const layerInfo = {
                     id: layer.id,
                     name: layer.name,
-                }
+                };
 
                 if (feature && interactionConfig?.output) {
                     //  TODO: output is supposed to be an array
@@ -59,33 +62,29 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
                                 //  TODO: c.column is supposed to be a string
                                 //  @ts-ignore
                                 value: feature.properties[c.column],
-                            }
+                            };
                         }
-                    )
+                    );
                 }
 
-                layersInfo.push(layerInfo)
+                layersInfo.push(layerInfo);
             }
-            setLayersInfo(layersInfo)
+            setLayersInfo(layersInfo);
         },
         [layers]
-    )
+    );
 
     const close = () => {
-        setCoordinates(undefined)
-        setLayersInfo(undefined)
-    }
+        setCoordinates(undefined);
+        setLayersInfo(undefined);
+    };
 
-    useImperativeHandle(
-        ref,
-        () => {
-            return {
-                onClickLayer,
-                close,
-            }
-        },
-        [layers]
-    )
+    useImperativeHandle(ref, () => {
+        return {
+            onClickLayer,
+            close,
+        };
+    }, [layers]);
 
     return !!coordinates ? (
         <Popup
@@ -103,7 +102,13 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
                         </h1>
                         <div>
                             {info.properties?.map((prop: any, j: number) => {
-                                const value = prop.config.format && prop.config.type === 'number' ? numeral(prop.value).format(prop.config.format) : prop.value 
+                                const value =
+                                    prop.config.format &&
+                                    prop.config.type === 'number'
+                                        ? numeral(prop.value).format(
+                                              prop.config.format
+                                          )
+                                        : prop.value;
                                 return (
                                     <p
                                         key={`tooltip-layer-${i}-prop-${j}`}
@@ -119,7 +124,7 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
                                         {value}
                                         {prop.config.suffix}
                                     </p>
-                                )
+                                );
                             }) || (
                                 <p className="text-sm">
                                     No info found for this coordinate
@@ -127,10 +132,10 @@ export default forwardRef<TooltipRef>(function Tooltip({}, ref) {
                             )}
                         </div>
                     </div>
-                )
+                );
             })}
         </Popup>
     ) : (
         <></>
-    )
-})
+    );
+});

@@ -1,34 +1,34 @@
-import React, { useRef } from 'react'
-import TableHeader from './TableHeader'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import type { SearchInput } from '@/schema/search.schema'
+import React, { useRef } from 'react';
+import TableHeader from './TableHeader';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import type { SearchInput } from '@/schema/search.schema';
 
 function LeftNode({
     placeholder,
     setQuery,
     query,
 }: {
-    placeholder?: string
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
+    placeholder?: string;
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
 }) {
-    const inputRef = useRef<HTMLInputElement>(null)
+    const inputRef = useRef<HTMLInputElement>(null);
 
     if (query.search && inputRef.current) {
-        inputRef.current.value = query.search
+        inputRef.current.value = query.search;
     }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
+        e.preventDefault();
         if (inputRef.current) {
             const updateQuery: SearchInput = {
                 ...query,
                 page: { ...query.page, start: 0 },
                 search: inputRef.current.value,
-            }
-            setQuery && setQuery(updateQuery)
+            };
+            setQuery && setQuery(updateQuery);
         }
-    }
+    };
 
     return (
         <form onSubmit={(e) => handleSubmit(e)} className="w-full">
@@ -48,7 +48,7 @@ function LeftNode({
                 </button>
             </div>
         </form>
-    )
+    );
 }
 
 export default function SearchHeader({
@@ -60,13 +60,13 @@ export default function SearchHeader({
     placeholder,
     Pagination,
 }: {
-    RightNode?: React.ReactNode
-    rightStyle?: string
-    leftStyle?: string
-    placeholder?: string
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
-    Pagination: React.ReactNode
+    RightNode?: React.ReactNode;
+    rightStyle?: string;
+    leftStyle?: string;
+    placeholder?: string;
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
+    Pagination: React.ReactNode;
 }) {
     return (
         <TableHeader
@@ -82,5 +82,5 @@ export default function SearchHeader({
             leftstyle={leftStyle}
             Pagination={Pagination}
         />
-    )
+    );
 }

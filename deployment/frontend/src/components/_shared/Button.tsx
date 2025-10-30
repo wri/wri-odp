@@ -1,6 +1,6 @@
-import * as React from 'react'
-import { cva, type VariantProps } from 'class-variance-authority'
-import classNames from '@/utils/classnames'
+import * as React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import classNames from '@/utils/classnames';
 
 const buttonVariants = cva(
     'inline-flex items-center justify-center ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 max-w-[800px]',
@@ -34,12 +34,12 @@ const buttonVariants = cva(
             size: 'default',
         },
     }
-)
+);
 
 interface ButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement>,
         VariantProps<typeof buttonVariants> {
-    asChild?: boolean
+    asChild?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -47,14 +47,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         return (
             <button
                 className={classNames(
-                    buttonVariants({ variant, size, className }),
+                    buttonVariants({ variant, size, className })
                 )}
                 ref={ref}
                 {...props}
             />
-        )
+        );
     }
-)
+);
 
 const LoaderButton = React.forwardRef<
     HTMLButtonElement,
@@ -107,7 +107,7 @@ const LoaderButton = React.forwardRef<
                     </svg>
                     Loading
                 </button>
-            )
+            );
         }
         return (
             <button
@@ -117,10 +117,10 @@ const LoaderButton = React.forwardRef<
                 ref={ref}
                 {...props}
             />
-        )
+        );
     }
-)
+);
 
-Button.displayName = 'Button'
+Button.displayName = 'Button';
 
-export { Button, LoaderButton, buttonVariants }
+export { Button, LoaderButton, buttonVariants };

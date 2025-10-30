@@ -1,42 +1,38 @@
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { MinusCircleIcon } from '@heroicons/react/24/outline';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    PlusCircleIcon,
-} from '@heroicons/react/20/solid'
-import {
-    InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import { MinusCircleIcon } from '@heroicons/react/24/outline'
-import { zodResolver } from '@hookform/resolvers/zod'
-import {
-    Control,
-    UseFormRegister,
+    type Control,
+    type UseFormRegister,
     useFieldArray,
     useForm,
     useFormContext,
-} from 'react-hook-form'
-import { LayerFormType } from '../layer.schema'
-import { InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import { Button } from '@/components/_shared/Button'
-import { useState } from 'react'
-import { Accordion } from '../Accordion'
-import { ScrollArea } from '@/components/_shared/ScrollArea'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
+} from 'react-hook-form';
+import { type LayerFormType } from '../layer.schema';
+import { InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import { Button } from '@/components/_shared/Button';
+import { useState } from 'react';
+import { Accordion } from '../Accordion';
+import { ScrollArea } from '@/components/_shared/ScrollArea';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 interface InteractionFormProps {
-    onNext: () => void
-    onPrev: () => void
+    onNext: () => void;
+    onPrev: () => void;
 }
 
 export default function InteractionForm({
     onPrev,
     onNext,
 }: InteractionFormProps) {
-    const formObj = useFormContext<LayerFormType>()
-    const [q, setQ] = useState('')
-    const { handleSubmit, register, control } = formObj
+    const formObj = useFormContext<LayerFormType>();
+    const [q, setQ] = useState('');
+    const { handleSubmit, register, control } = formObj;
     const onSubmit = () => {
-        onNext()
-    }
+        onNext();
+    };
     return (
         <>
             <div className="mt-10 px-4 mb-4">
@@ -64,7 +60,7 @@ export default function InteractionForm({
                 </div>
             </form>
         </>
-    )
+    );
 }
 
 function ItemsArray({
@@ -72,15 +68,15 @@ function ItemsArray({
     register,
     q = '',
 }: {
-    register: UseFormRegister<LayerFormType>
-    control: Control<LayerFormType>
-    q?: string
+    register: UseFormRegister<LayerFormType>;
+    control: Control<LayerFormType>;
+    q?: string;
 }) {
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'interactionConfig.output',
-    })
-    const { watch } = useFormContext<LayerFormType>()
+    });
+    const { watch } = useFormContext<LayerFormType>();
     const filteredOutputs =
         q !== ''
             ? watch(`interactionConfig.output`)
@@ -88,7 +84,7 @@ function ItemsArray({
                       item.column ? item.column.includes(q) : false
                   )
                   .map((item) => item.column)
-            : watch(`interactionConfig.output`).map((item) => item.column)
+            : watch(`interactionConfig.output`).map((item) => item.column);
     return (
         <>
             <ScrollArea className="h-[375px]">
@@ -122,7 +118,10 @@ function ItemsArray({
                                         )}
                                         type="text"
                                         icon={
-                                            <DefaultTooltip contentClassName='max-w-[20rem]' content="The column that you want to show the data, needs to be spelled exactly like in the database">
+                                            <DefaultTooltip
+                                                contentClassName="max-w-[20rem]"
+                                                content="The column that you want to show the data, needs to be spelled exactly like in the database"
+                                            >
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         }
@@ -152,7 +151,11 @@ function ItemsArray({
                                         )}
                                         type="text"
                                         icon={
-                                            <DefaultTooltip  side="left" contentClassName="max-w-[20rem]" content="Allows you to add a prefix to tooltip displaying this item">
+                                            <DefaultTooltip
+                                                side="left"
+                                                contentClassName="max-w-[20rem]"
+                                                content="Allows you to add a prefix to tooltip displaying this item"
+                                            >
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         }
@@ -169,7 +172,10 @@ function ItemsArray({
                                         )}
                                         type="text"
                                         icon={
-                                            <DefaultTooltip contentClassName="max-w-[30rem]" content="Allows you to give a title to this item, for example instead of showing the column name country_index you could show 'Country Index'">
+                                            <DefaultTooltip
+                                                contentClassName="max-w-[30rem]"
+                                                content="Allows you to give a title to this item, for example instead of showing the column name country_index you could show 'Country Index'"
+                                            >
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         }
@@ -186,7 +192,11 @@ function ItemsArray({
                                         )}
                                         type="text"
                                         icon={
-                                            <DefaultTooltip  side="left" contentClassName="max-w-[20rem]" content="Allows you to add a suffix to the tooltip displaying this item e.g: tonnes, degrees etc">
+                                            <DefaultTooltip
+                                                side="left"
+                                                contentClassName="max-w-[20rem]"
+                                                content="Allows you to add a suffix to the tooltip displaying this item e.g: tonnes, degrees etc"
+                                            >
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         }
@@ -203,7 +213,10 @@ function ItemsArray({
                                         )}
                                         type="text"
                                         icon={
-                                            <DefaultTooltip  contentClassName="max-w-[20rem]" content="Allows you to define the type for this column, e.g: datetime/number/year etc">
+                                            <DefaultTooltip
+                                                contentClassName="max-w-[20rem]"
+                                                content="Allows you to define the type for this column, e.g: datetime/number/year etc"
+                                            >
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         }
@@ -224,7 +237,10 @@ function ItemsArray({
                                     <div className="ml-3 text-sm leading-6">
                                         <label className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800">
                                             Enable
-                                            <DefaultTooltip  contentClassName="max-w-[10rem]" content="Toggle this to enable the tooltip for this item">
+                                            <DefaultTooltip
+                                                contentClassName="max-w-[10rem]"
+                                                content="Toggle this to enable the tooltip for this item"
+                                            >
                                                 <InformationCircleIcon className="z-10 h-4 w-4 text-gray-300" />
                                             </DefaultTooltip>
                                         </label>
@@ -264,5 +280,5 @@ function ItemsArray({
                 </div>
             </ScrollArea>
         </>
-    )
+    );
 }

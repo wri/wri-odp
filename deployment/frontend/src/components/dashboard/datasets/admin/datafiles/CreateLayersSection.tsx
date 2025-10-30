@@ -1,35 +1,38 @@
-import { Tab } from '@headlessui/react'
+import { Tab } from '@headlessui/react';
 import {
     FolderPlusIcon,
     Square3Stack3DIcon,
     GlobeAsiaAustraliaIcon,
     MinusCircleIcon,
-} from '@heroicons/react/24/outline'
-import classNames from '@/utils/classnames'
-import { UseFormReturn, useFieldArray } from 'react-hook-form'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { DataFileAccordion } from './DatafileAccordion'
-import { P, match } from 'ts-pattern'
-import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
-import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
-import { v4 as uuidv4 } from 'uuid'
-import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
-import { RWDatasetForm } from '../metadata/RWDataset'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import SortableList, { SortableItem } from 'react-easy-sort'
-import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm'
+} from '@heroicons/react/24/outline';
+import classNames from '@/utils/classnames';
+import { type UseFormReturn, useFieldArray } from 'react-hook-form';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { DataFileAccordion } from './DatafileAccordion';
+import { P, match } from 'ts-pattern';
+import { BuildALayer } from './sections/BuildALayer/BuildALayerSection';
+import {
+    type DatasetFormType,
+    type ResourceFormType,
+} from '@/schema/dataset.schema';
+import { v4 as uuidv4 } from 'uuid';
+import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection';
+import { RWDatasetForm } from '../metadata/RWDataset';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import SortableList, { SortableItem } from 'react-easy-sort';
+import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm';
 
 export function CreateLayersSection({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { control, watch } = formObj
+    const { control, watch } = formObj;
     const { fields, append, prepend, remove, swap, move, insert } =
         useFieldArray({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
-        })
+        });
 
     const layers = fields.filter(
         (r) =>
@@ -38,7 +41,7 @@ export function CreateLayersSection({
             r.type !== 'empty-file' &&
             r.type !== 'tile-cache' &&
             r.type !== 'gee-asset'
-    )
+    );
 
     const notLayers = fields.filter(
         (r) =>
@@ -47,21 +50,21 @@ export function CreateLayersSection({
             r.type === 'empty-file' ||
             r.type === 'tile-cache' ||
             r.type === 'gee-asset'
-    )
+    );
 
     return (
         <>
             <RWDatasetForm formObj={formObj} />
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
-                    swap(oldIdx, newIdx)
+                    swap(oldIdx, newIdx);
                 }}
                 className="list"
                 lockAxis="y"
                 draggedItemClassName="dragged"
             >
                 {layers.map((field, index) => {
-                    index += notLayers.length
+                    index += notLayers.length;
                     return (
                         <SortableItem key={field.id}>
                             <div>
@@ -73,7 +76,7 @@ export function CreateLayersSection({
                                 />
                             </div>
                         </SortableItem>
-                    )
+                    );
                 })}
             </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
@@ -98,7 +101,7 @@ export function CreateLayersSection({
                 </button>
             </div>
         </>
-    )
+    );
 }
 
 export function AddLayer({
@@ -107,19 +110,19 @@ export function AddLayer({
     index,
     formObj,
 }: {
-    remove: () => void
-    index: number
-    field: ResourceFormType
-    formObj: UseFormReturn<DatasetFormType>
+    remove: () => void;
+    index: number;
+    field: ResourceFormType;
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { setValue, watch } = formObj
-    const datafile = watch(`resources.${index}`)
+    const { setValue, watch } = formObj;
+    const datafile = watch(`resources.${index}`);
     const notLayers = watch('resources')?.filter(
         (r) =>
             r.type === 'upload' || r.type === 'link' || r.type === 'empty-file'
-    )
+    );
 
-    const notLayersCount = notLayers?.length ?? 0
+    const notLayersCount = notLayers?.length ?? 0;
 
     return (
         <>
@@ -323,5 +326,5 @@ export function AddLayer({
                 </div>
             </DataFileAccordion>
         </>
-    )
+    );
 }

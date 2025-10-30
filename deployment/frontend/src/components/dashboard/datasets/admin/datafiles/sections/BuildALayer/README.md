@@ -1,7 +1,6 @@
 # Docs about layers
 
-We need to figure out how to represent an ramp/scale/curve as a zod object 
-
+We need to figure out how to represent an ramp/scale/curve as a zod object
 
 Definition ramp:
 

@@ -1,5 +1,5 @@
-import { createEnv } from '@t3-oss/env-nextjs'
-import { z } from 'zod'
+import { createEnv } from '@t3-oss/env-nextjs';
+import { z } from 'zod';
 
 export const env = createEnv({
     /**
@@ -91,13 +91,16 @@ export const env = createEnv({
         SMTP_PASSWORD: process.env.SMTP_PASSWORD,
         SMTP_FROM: process.env.SMTP_FROM,
         NEXT_PUBLIC_NEXTAUTH_URL: process.env.NEXT_PUBLIC_NEXTAUTH_URL,
-        NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID, 
-        NEXT_PUBLIC_DISABLE_HOTJAR: process.env.NEXT_PUBLIC_DISABLE_HOTJAR || "enabled",
+        NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID,
+        NEXT_PUBLIC_DISABLE_HOTJAR:
+            process.env.NEXT_PUBLIC_DISABLE_HOTJAR || 'enabled',
         NEXT_PUBLIC_HOTJAR_ID: process.env.NEXT_PUBLIC_HOTJAR_ID,
         NEXT_PUBLIC_GFW_API_KEY: process.env.NEXT_PUBLIC_GFW_API_KEY,
         OSANO_URL: process.env.OSANO_URL,
-        NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL: process.env.NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL || "https://www.wri.org/about/privacy-policy?sitename=WRI%20Data%20Explorer&osanoid=c2a89d08-4931-4ad0-99cb-8d3aa022aaec",
-        NEXT_PUBLIC_DEPLOYMENT_TYPE: process.env.NEXT_PUBLIC_DEPLOYMENT_TYPE
+        NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL:
+            process.env.NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL ||
+            'https://www.wri.org/about/privacy-policy?sitename=WRI%20Data%20Explorer&osanoid=c2a89d08-4931-4ad0-99cb-8d3aa022aaec',
+        NEXT_PUBLIC_DEPLOYMENT_TYPE: process.env.NEXT_PUBLIC_DEPLOYMENT_TYPE,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
@@ -109,4 +112,4 @@ export const env = createEnv({
      * `SOME_VAR: z.string()` and `SOME_VAR=''` will throw an error.
      */
     emptyStringAsUndefined: true,
-})
+});

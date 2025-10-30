@@ -2,13 +2,13 @@ import {
     createTRPCRouter,
     protectedProcedure,
     publicProcedure,
-} from '@/server/api/trpc'
-import { env } from '@/env.mjs'
-import { CkanResponse } from '@/schema/ckan.schema'
-import { z } from 'zod'
-import { DownloadEvent } from '@/interfaces/downloadEvent.interface'
-import { downloadEventSchema } from '@/components/_shared/DownloadPopup'
-import qs from 'query-string'
+} from '@/server/api/trpc';
+import { env } from '@/env.mjs';
+import { type CkanResponse } from '@/schema/ckan.schema';
+import { z } from 'zod';
+import { type DownloadEvent } from '@/interfaces/downloadEvent.interface';
+import { downloadEventSchema } from '@/components/_shared/DownloadPopup';
+import qs from 'query-string';
 
 export const downloadEventRouter = createTRPCRouter({
     getAllEvents: protectedProcedure
@@ -18,10 +18,10 @@ export const downloadEventRouter = createTRPCRouter({
             })
         )
         .mutation(async ({ input, ctx }) => {
-            const user = ctx.session.user
+            const user = ctx.session.user;
             const url = input.ownerOrg
                 ? `${env.CKAN_URL}/api/action/download_event_list?owner_org=${input.ownerOrg}&format=csv`
-                : `${env.CKAN_URL}/api/action/download_event_list?&format=csv`
+                : `${env.CKAN_URL}/api/action/download_event_list?&format=csv`;
             const downloadEventRes = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -32,10 +32,10 @@ export const downloadEventRouter = createTRPCRouter({
                     owner_org: input.ownerOrg,
                     format: 'csv',
                 }),
-            })
+            });
             const downloadEvents: CkanResponse<string> =
-                await downloadEventRes.json()
-            return downloadEvents.result
+                await downloadEventRes.json();
+            return downloadEvents.result;
         }),
     createEvents: publicProcedure
         .input(
@@ -59,7 +59,7 @@ export const downloadEventRouter = createTRPCRouter({
                 first_name: input.firstName,
                 last_name: input.lastName,
                 job_title: input.jobTitle,
-            }
+            };
             const body = {
                 website: 'https://datasets.wri.org/',
                 'form-name':
@@ -80,7 +80,7 @@ export const downloadEventRouter = createTRPCRouter({
                 first_name: input.firstName,
                 last_name: input.lastName,
                 interests: input.interests?.join(',') ?? '',
-            }
+            };
             if (input.acceptTerms) {
                 try {
                     const response = await fetch(
@@ -93,10 +93,10 @@ export const downloadEventRouter = createTRPCRouter({
                                     'application/x-www-form-urlencoded',
                             },
                         }
-                    )
-                    console.log('ORTTO RESPONSE', response)
+                    );
+                    console.log('ORTTO RESPONSE', response);
                 } catch (e) {
-                    console.log(e)
+                    console.log(e);
                 }
             }
 
@@ -110,10 +110,10 @@ export const downloadEventRouter = createTRPCRouter({
                     },
                     body: JSON.stringify(_input),
                 }
-            )
+            );
             const downloadEvent: CkanResponse<DownloadEvent[]> =
-                await downloadEventRes.json()
-            console.log('DOWNLOAD EVENT', downloadEvent)
-            return downloadEvent.result
+                await downloadEventRes.json();
+            console.log('DOWNLOAD EVENT', downloadEvent);
+            return downloadEvent.result;
         }),
-})
+});

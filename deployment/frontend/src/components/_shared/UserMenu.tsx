@@ -1,16 +1,15 @@
-import React, { Fragment } from 'react'
-import { Menu, Transition } from '@headlessui/react'
-import { UserCircleIcon } from '@heroicons/react/20/solid'
-import { signOut, useSession } from 'next-auth/react'
-import Link from 'next/link'
-
+import React, { Fragment } from 'react';
+import { Menu, Transition } from '@headlessui/react';
+import { UserCircleIcon } from '@heroicons/react/20/solid';
+import { signOut, useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 export default function UserMenu({
     colors = 'dark',
 }: {
-    colors?: 'dark' | 'light'
+    colors?: 'dark' | 'light';
 }) {
-    const session = useSession()
+    const session = useSession();
 
     const navigation = [
         {
@@ -27,30 +26,32 @@ export default function UserMenu({
             title: 'Log Out',
             onClick: async () => {
                 try {
-                    await fetch(`${process.env.NEXT_PUBLIC_CKAN_URL}/api/3/action/user_logout`, {
-                      method: 'POST',
-                      body: new URLSearchParams({
-                        id: session.data?.user.id as string,
-                      }),
-                    })
+                    await fetch(
+                        `${process.env.NEXT_PUBLIC_CKAN_URL}/api/3/action/user_logout`,
+                        {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                id: session.data?.user.id!,
+                            }),
+                        }
+                    );
                 } catch (error) {
-                    console.error('Failed to logout from CKAN backend. The current token will not be revoked until next login.')
-                    console.error(error)
+                    console.error(
+                        'Failed to logout from CKAN backend. The current token will not be revoked until next login.'
+                    );
+                    console.error(error);
                 }
                 signOut({ redirect: true, callbackUrl: window.location.href });
             },
         },
-    ]
+    ];
 
     return (
         <div
             className="text-right -ml-6 sm:ml-0 font-acumin"
             id="nav-user-menu"
         >
-            <Menu
-                as="div"
-                className="relative inline-block text-left  pr-1 "
-            >
+            <Menu as="div" className="relative inline-block text-left  pr-1 ">
                 <div>
                     <Menu.Button>
                         <div className="flex ">
@@ -99,11 +100,11 @@ export default function UserMenu({
                                         </Menu.Item>
                                     </div>
                                 </div>
-                            )
+                            );
                         })}
                     </Menu.Items>
                 </Transition>
             </Menu>
         </div>
-    )
+    );
 }

@@ -1,32 +1,32 @@
-import { Disclosure, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { Map } from 'react-map-gl'
-import GeocoderControl from './GeocoderControl'
-import { Dispatch, SetStateAction } from 'react'
-import { SearchInput } from '@/schema/search.schema'
-import { Filter } from '@/interfaces/search.interface'
-import classNames from '@/utils/classnames'
-import { HideBoundaries } from '../_shared/HideBoundaries'
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { Map } from 'react-map-gl';
+import GeocoderControl from './GeocoderControl';
+import { type Dispatch, type SetStateAction } from 'react';
+import { SearchInput } from '@/schema/search.schema';
+import { type Filter } from '@/interfaces/search.interface';
+import classNames from '@/utils/classnames';
+import { HideBoundaries } from '../_shared/HideBoundaries';
 
 export default function LocationSearch({
     setFilters,
     filters,
 }: {
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    filters: Filter[]
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    filters: Filter[];
 }) {
-    const initialValue = filters?.find((f) => f.key == 'spatial')?.label ?? ''
-    const locationFilterIndex = filters.findIndex((f) => f.key == 'spatial')
-    const globalQValue = filters.find((f) => f.key == 'extGlobalQ')?.value
+    const initialValue = filters?.find((f) => f.key == 'spatial')?.label ?? '';
+    const locationFilterIndex = filters.findIndex((f) => f.key == 'spatial');
+    const globalQValue = filters.find((f) => f.key == 'extGlobalQ')?.value;
     function updateGlobalQ(value: string) {
         setFilters((prev) => {
-            const newFilters = prev.length ? [...prev] : []
+            const newFilters = prev.length ? [...prev] : [];
 
             const filterIndex = newFilters.findIndex(
                 (f) => f.key == 'extGlobalQ'
-            )
+            );
             if (value === 'only' && locationFilterIndex >= 0) {
-                newFilters.splice(locationFilterIndex, 1)
+                newFilters.splice(locationFilterIndex, 1);
             }
 
             if (filterIndex >= 0) {
@@ -36,9 +36,9 @@ export default function LocationSearch({
                         key: 'extGlobalQ',
                         label: value === 'only' ? 'Only global' : 'Excluded',
                         value: value,
-                    }
+                    };
                 } else {
-                    newFilters.splice(filterIndex, 1)
+                    newFilters.splice(filterIndex, 1);
                 }
             } else {
                 if (value === 'only' || value === 'exclude') {
@@ -47,14 +47,14 @@ export default function LocationSearch({
                         title: 'Global',
                         label: value === 'only' ? 'Only global' : 'Excluded',
                         value: value,
-                    })
+                    });
                 } else {
-                    newFilters.splice(filterIndex, 1)
+                    newFilters.splice(filterIndex, 1);
                 }
             }
 
-            return newFilters
-        })
+            return newFilters;
+        });
     }
     return (
         <Disclosure
@@ -154,13 +154,13 @@ export default function LocationSearch({
                                             setFilters((prev) => {
                                                 const newFilters = prev.length
                                                     ? [...prev]
-                                                    : []
+                                                    : [];
 
                                                 const filterIndex =
                                                     newFilters.findIndex(
                                                         (f) =>
                                                             f.key == 'spatial'
-                                                    )
+                                                    );
 
                                                 if (filterIndex >= 0) {
                                                     // @ts-ignore
@@ -171,7 +171,7 @@ export default function LocationSearch({
                                                         label: e.result
                                                             .place_name,
                                                         value: e.result.geometry.coordinates.reverse(),
-                                                    }
+                                                    };
                                                 } else {
                                                     newFilters.push({
                                                         key: 'spatial',
@@ -179,33 +179,33 @@ export default function LocationSearch({
                                                         label: e.result
                                                             .place_name,
                                                         value: e.result.geometry.coordinates.reverse(),
-                                                    })
+                                                    });
                                                 }
 
-                                                return newFilters
-                                            })
+                                                return newFilters;
+                                            });
                                         }}
                                         onClear={() => {
                                             setFilters((prev) => {
                                                 const newFilters = prev.length
                                                     ? [...prev]
-                                                    : []
+                                                    : [];
 
                                                 const filterIndex =
                                                     newFilters.findIndex(
                                                         (f) =>
                                                             f.key == 'spatial'
-                                                    )
+                                                    );
 
                                                 if (filterIndex >= 0) {
                                                     newFilters.splice(
                                                         filterIndex,
                                                         1
-                                                    )
+                                                    );
                                                 }
 
-                                                return newFilters
-                                            })
+                                                return newFilters;
+                                            });
                                         }}
                                         initialValue={initialValue}
                                     />
@@ -216,5 +216,5 @@ export default function LocationSearch({
                 </>
             )}
         </Disclosure>
-    )
+    );
 }

@@ -11,11 +11,11 @@ export const formatColors = {
     api: 'wri-gray',
     zip: 'bg-wri-zip text-white',
     layer: 'bg-wri-green text-white',
-}
+};
 
 export function getFormatColor(format: string) {
     return (
         formatColors[format.toLowerCase() as keyof typeof formatColors] ||
         'bg-wri-light-green'
-    )
+    );
 }

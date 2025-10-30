@@ -25,6 +25,7 @@ metadata:
   name: wri-prod-ingress-fe-internal-admin
   namespace: wri-odp-prod
 spec:
+  ingressClassName: nginx
   rules:
   - host: datasets.wri.org
     http:

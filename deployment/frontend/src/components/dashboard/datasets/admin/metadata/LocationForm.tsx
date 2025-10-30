@@ -4,66 +4,66 @@ import {
     FolderArrowDownIcon,
     GlobeEuropeAfricaIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Disclosure, Tab } from '@headlessui/react'
-import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor'
-import { MetadataAccordion } from './MetadataAccordion'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { UseFormReturn } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { MapPinIcon } from '@heroicons/react/20/solid'
-import { useEffect, useRef, useState } from 'react'
-import classNames from '@/utils/classnames'
-import { match } from 'ts-pattern'
-import GeocoderControl from '@/components/search/GeocoderControl'
-import { Layer, Map, Source } from 'react-map-gl'
-import notify from '@/utils/notify'
-import Spinner from '@/components/_shared/Spinner'
-import { HideBoundaries } from '@/components/_shared/HideBoundaries'
+} from '@heroicons/react/24/outline';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Disclosure, Tab } from '@headlessui/react';
+import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor';
+import { MetadataAccordion } from './MetadataAccordion';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { type UseFormReturn } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { MapPinIcon } from '@heroicons/react/20/solid';
+import { useEffect, useRef, useState } from 'react';
+import classNames from '@/utils/classnames';
+import { match } from 'ts-pattern';
+import GeocoderControl from '@/components/search/GeocoderControl';
+import { Layer, Map, Source } from 'react-map-gl';
+import notify from '@/utils/notify';
+import Spinner from '@/components/_shared/Spinner';
+import { HideBoundaries } from '@/components/_shared/HideBoundaries';
 
 export function LocationForm({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const [isLoadingGeoJSON, setIsLoadingGeoJSON] = useState(false)
+    const [isLoadingGeoJSON, setIsLoadingGeoJSON] = useState(false);
 
     const {
         formState: { errors },
         setValue,
         watch,
-    } = formObj
+    } = formObj;
 
-    const uploadInputRef = useRef<HTMLInputElement>(null)
+    const uploadInputRef = useRef<HTMLInputElement>(null);
 
     /*
      * This useEffect prevents page from scrolling to the map
      *
      */
     useEffect(() => {
-        const chooseAddress = document.getElementById('choose-address')
+        const chooseAddress = document.getElementById('choose-address');
 
         if (chooseAddress) {
-            chooseAddress.style.visibility = 'hidden'
+            chooseAddress.style.visibility = 'hidden';
             setTimeout(() => {
-                chooseAddress.style.visibility = 'visible'
-            }, 2000)
+                chooseAddress.style.visibility = 'visible';
+            }, 2000);
         }
-    }, [])
+    }, []);
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         if (!e.target.files) {
-            return
+            return;
         }
 
-        setIsLoadingGeoJSON(true)
+        setIsLoadingGeoJSON(true);
 
-        const file = e?.target?.files[0]
+        const file = e?.target?.files[0];
 
         if (!file) {
-            return
+            return;
         }
 
         if (
@@ -71,23 +71,23 @@ export function LocationForm({
             !file.type.startsWith('application/geo') &&
             !file.type.startsWith('application/json')
         ) {
-            notify('File is not GeoJSON', 'error')
-            return
+            notify('File is not GeoJSON', 'error');
+            return;
         }
 
-        const reader = new FileReader()
+        const reader = new FileReader();
         reader.addEventListener('load', (event) => {
-            setIsLoadingGeoJSON(false)
+            setIsLoadingGeoJSON(false);
             try {
-                const json = JSON.parse(event?.target?.result as string)
-                setValue(`spatial`, json)
+                const json = JSON.parse(event?.target?.result as string);
+                setValue(`spatial`, json);
             } catch (e) {
-                console.error(e)
-                notify('Failed to parse GeoJSON file', 'error')
+                console.error(e);
+                notify('Failed to parse GeoJSON file', 'error');
             }
-        })
+        });
 
-        reader.readAsText(file)
+        reader.readAsText(file);
     }
 
     return (
@@ -132,10 +132,10 @@ export function LocationForm({
                             onClick={() => {
                                 !watch('spatial')
                                     ? uploadInputRef.current?.click()
-                                    : setValue('spatial', undefined)
+                                    : setValue('spatial', undefined);
 
-                                setValue('spatial_type', 'geom')
-                                setValue('spatial_address', null)
+                                setValue('spatial_type', 'geom');
+                                setValue('spatial_address', null);
                             }}
                             id="tabUpload"
                         >
@@ -159,8 +159,8 @@ export function LocationForm({
                         <Tab
                             id="tabLink"
                             onClick={() => {
-                                setValue(`spatial_type`, 'address')
-                                setValue(`spatial`, undefined)
+                                setValue(`spatial_type`, 'address');
+                                setValue(`spatial`, undefined);
                             }}
                         >
                             {({ selected }) => (
@@ -185,9 +185,9 @@ export function LocationForm({
                         <Tab
                             id="tabLink"
                             onClick={() => {
-                                setValue(`spatial_type`, 'global')
-                                setValue(`spatial`, undefined)
-                                setValue(`spatial_address`, 'Global')
+                                setValue(`spatial_type`, 'global');
+                                setValue(`spatial`, undefined);
+                                setValue(`spatial_address`, 'Global');
                             }}
                         >
                             {({ selected }) => (
@@ -217,9 +217,9 @@ export function LocationForm({
                                 setValue(
                                     `spatial_type`,
                                     'derived_from_resources'
-                                )
-                                setValue(`spatial`, undefined)
-                                setValue(`spatial_address`, null)
+                                );
+                                setValue(`spatial`, undefined);
+                                setValue(`spatial_address`, null);
                             }}
                         >
                             {({ selected }) => (
@@ -299,10 +299,10 @@ export function LocationForm({
                                         setValue(
                                             'spatial_address',
                                             e?.result?.place_name
-                                        )
+                                        );
                                     }}
                                     onClear={(e) => {
-                                        setValue('spatial_address', '')
+                                        setValue('spatial_address', '');
                                     }}
                                     initialValue={
                                         watch('spatial_address') ?? undefined
@@ -315,5 +315,5 @@ export function LocationForm({
                 </Tab.Group>
             </Disclosure.Panel>
         </MetadataAccordion>
-    )
+    );
 }

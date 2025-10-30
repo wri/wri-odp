@@ -1,9 +1,13 @@
-import { Resource, View, ViewState } from '@/interfaces/dataset.interface'
-import ViewCard from './ViewCard'
-import { useState } from 'react'
-import { api } from '@/utils/api'
-import { toast } from 'react-toastify'
-import { WriDataset } from '@/schema/ckan.schema'
+import {
+    type Resource,
+    type View,
+    type ViewState,
+} from '@/interfaces/dataset.interface';
+import ViewCard from './ViewCard';
+import { useState } from 'react';
+import { api } from '@/utils/api';
+import { toast } from 'react-toastify';
+import { type WriDataset } from '@/schema/ckan.schema';
 
 export function DatastoreViewCard({
     view: _ogView,
@@ -11,18 +15,23 @@ export function DatastoreViewCard({
     onCancelOrDelete,
     dataset,
 }: {
-    view: ViewState
-    datafile: Resource
-    onCancelOrDelete: (mode: string) => void
-    dataset: WriDataset
+    view: ViewState;
+    datafile: Resource;
+    onCancelOrDelete: (mode: string) => void;
+    dataset: WriDataset;
 }) {
-    const [mode, setMode] = useState(_ogView._state)
-    const [view, setView] = useState<View>(_ogView)
+    const [mode, setMode] = useState(_ogView._state);
+    const [view, setView] = useState<View>(_ogView);
 
-    const createMutation = api.dataset.createResourceView.useMutation()
-    const updateMutation = api.dataset.updateResourceView.useMutation()
+    const createMutation = api.dataset.createResourceView.useMutation();
+    const updateMutation = api.dataset.updateResourceView.useMutation();
 
-    const onSave = (mode: string, view: View, onError: () => void, onSuccess: () => void) => {
+    const onSave = (
+        mode: string,
+        view: View,
+        onError: () => void,
+        onSuccess: () => void
+    ) => {
         if (mode == 'new') {
             createMutation.mutate(
                 {
@@ -34,18 +43,18 @@ export function DatastoreViewCard({
                 },
                 {
                     onError: (e) => {
-                        toast(e.message, { type: 'error' })
-                        onError()
+                        toast(e.message, { type: 'error' });
+                        onError();
                     },
                     onSuccess: () => {
                         toast('The new view was successfully created', {
                             type: 'success',
-                        })
-                        setMode('saved')
-                        onSuccess()
+                        });
+                        setMode('saved');
+                        onSuccess();
                     },
                 }
-            )
+            );
         } else if (mode == 'edit' && view.id) {
             updateMutation.mutate(
                 {
@@ -58,20 +67,20 @@ export function DatastoreViewCard({
                 },
                 {
                     onError: (e) => {
-                        toast(e.message, { type: 'error' })
-                        onError()
+                        toast(e.message, { type: 'error' });
+                        onError();
                     },
                     onSuccess: () => {
                         toast('The view was successfully updated', {
                             type: 'success',
-                        })
-                        setMode('saved')
-                        onSuccess()
+                        });
+                        setMode('saved');
+                        onSuccess();
                     },
                 }
-            )
+            );
         }
-    }
+    };
 
     return (
         <ViewCard
@@ -83,5 +92,5 @@ export function DatastoreViewCard({
             onSave={onSave}
             dataset={dataset}
         />
-    )
+    );
 }

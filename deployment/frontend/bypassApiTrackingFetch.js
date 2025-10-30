@@ -1,4 +1,4 @@
-const originalFetch = global.fetch
+const originalFetch = global.fetch;
 
 /**
  * @param {string} url
@@ -6,7 +6,7 @@ const originalFetch = global.fetch
  * @returns {Promise<Response>}
  */
 function bypassApiTrackingFetch(url = '', options = {}) {
-    options.headers = options.headers || {}
+    options.headers = options.headers || {};
     //console.log(`Using bypassApiTrackingFetch: ${url}`)
 
     if (
@@ -19,7 +19,7 @@ function bypassApiTrackingFetch(url = '', options = {}) {
         options.headers = {
             ...options.headers,
             'X-From-Frontend-Portal': 'true',
-        }
+        };
         //console.log(
         //    `Header added successfully to CKAN request: ${
         //        options.headers['X-From-Frontend-Portal'] === 'true'
@@ -30,9 +30,9 @@ function bypassApiTrackingFetch(url = '', options = {}) {
     //}
 
     return originalFetch(url, options).catch((error) => {
-        console.error('Error occurred during fetch:', error)
-        throw error
-    })
+        console.error('Error occurred during fetch:', error);
+        throw error;
+    });
 }
 
-global.fetch = bypassApiTrackingFetch
+global.fetch = bypassApiTrackingFetch;

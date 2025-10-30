@@ -1,25 +1,25 @@
-import classNames from '@/utils/classnames'
-import { Disclosure } from '@headlessui/react'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/router'
+import classNames from '@/utils/classnames';
+import { Disclosure } from '@headlessui/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 
 export default function DatasetPageLayout({
     lhs,
     rhs,
     hasViz,
 }: {
-    lhs: React.ReactNode
-    rhs: React.ReactNode
-    hasViz: boolean
+    lhs: React.ReactNode;
+    rhs: React.ReactNode;
+    hasViz: boolean;
 }) {
-    const showLhsByDefault = hasViz
-    const { query } = useRouter()
-    const isApprovalRequest = query?.approval === 'true'
-    const [lhsOpen, setLhsOpen] = useState(true)
-    const [rhsOpen, setRhsOpen] = useState(showLhsByDefault)
-    const [lhsMaxHeight, setLhsMaxHeight] = useState('auto')
-    const ref = useRef<HTMLDivElement>(null)
+    const showLhsByDefault = hasViz;
+    const { query } = useRouter();
+    const isApprovalRequest = query?.approval === 'true';
+    const [lhsOpen, setLhsOpen] = useState(true);
+    const [rhsOpen, setRhsOpen] = useState(showLhsByDefault);
+    const [lhsMaxHeight, setLhsMaxHeight] = useState('auto');
+    const ref = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (
@@ -27,11 +27,11 @@ export default function DatasetPageLayout({
             ref.current.clientHeight &&
             typeof window !== undefined
         ) {
-            const _90vh = document.documentElement.clientHeight * 0.9
-            setLhsMaxHeight(`${Math.max(ref.current.clientHeight, _90vh)}px`)
-            return
+            const _90vh = document.documentElement.clientHeight * 0.9;
+            setLhsMaxHeight(`${Math.max(ref.current.clientHeight, _90vh)}px`);
+            return;
         }
-    }, [rhs])
+    }, [rhs]);
 
     return (
         <div className="flex min-h-screen h-full flex-wrap lg:flex-nowrap lg:max-w-screen">
@@ -41,7 +41,7 @@ export default function DatasetPageLayout({
                         <Disclosure.Button
                             aria-label="Toggle left hand side"
                             onClick={() => {
-                                setLhsOpen(!open)
+                                setLhsOpen(!open);
                             }}
                             className={classNames(
                                 'absolute left-[calc(100%-3rem)] lg:left-[calc(50%-3rem)] top-[23vh] sm:top-[26vh] lg:top-[40vh] z-20 hidden lg:block',
@@ -90,7 +90,7 @@ export default function DatasetPageLayout({
                         <Disclosure.Button
                             aria-label="Toggle right hand side"
                             onClick={() => {
-                                setRhsOpen(!open)
+                                setRhsOpen(!open);
                             }}
                             className={classNames(
                                 'absolute right-[calc(100%-3rem)] lg:right-[calc(50%-3rem)] top-[23vh] sm:top-[26vh] lg:top-[40vh] z-20 hidden lg:block',
@@ -138,5 +138,5 @@ export default function DatasetPageLayout({
                 )}
             </Disclosure>
         </div>
-    )
+    );
 }

@@ -1,14 +1,14 @@
-import Container from '@/components/_shared/Container'
-import Header from '@/components/_shared/Header'
-import Loading from '@/components/_shared/Loading'
-import EditTopicForm from '@/components/dashboard/topics/forms/EditTopicForm'
-import { getServerAuthSession } from '@/server/auth'
-import { api } from '@/utils/api'
-import { GetServerSideProps, NextPage } from 'next'
-import { NextSeo } from 'next-seo'
+import Container from '@/components/_shared/Container';
+import Header from '@/components/_shared/Header';
+import Loading from '@/components/_shared/Loading';
+import EditTopicForm from '@/components/dashboard/topics/forms/EditTopicForm';
+import { getServerAuthSession } from '@/server/auth';
+import { api } from '@/utils/api';
+import { type GetServerSideProps, type NextPage } from 'next';
+import { NextSeo } from 'next-seo';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
 
     if (!session) {
         return {
@@ -16,7 +16,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 destination: '/',
                 permanent: false,
             },
-        }
+        };
+    }
+
+    // Restrict edit page to sysadmin users only
+    if (!session.user.sysadmin) {
+        return {
+            redirect: {
+                destination: '/dashboard/topics',
+                permanent: false,
+            },
+        };
     }
 
     // Restrict edit page to sysadmin users only
@@ -37,21 +47,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                     ? context.params.topicName
                     : null,
         },
-    }
-}
+    };
+};
 
 const EditTopicPage: NextPage<{ topicName: string }> = ({ topicName }) => {
     const {
         data: topic,
         isLoading,
         isError,
-    } = api.topics.getTopic.useQuery({ id: topicName })
-    if (isLoading) return <Loading />
+    } = api.topics.getTopic.useQuery({ id: topicName });
+    if (isLoading) return <Loading />;
     return (
         <>
-            <NextSeo
-                title={`Edit ${topic?.title ?? topic?.name}`}
-            />
+            <NextSeo title={`Edit ${topic?.title ?? topic?.name}`} />
             <Header />
             {isError && (
                 <Container className="mb-20 font-acumin">
@@ -62,7 +70,7 @@ const EditTopicPage: NextPage<{ topicName: string }> = ({ topicName }) => {
             )}
             {!isError && topic && <EditTopicForm topic={topic} />}
         </>
-    )
-}
+    );
+};
 
-export default EditTopicPage
+export default EditTopicPage;

@@ -29,5 +29,5 @@ export function ColFilterIcon() {
                 />
             </defs>
         </svg>
-    )
+    );
 }

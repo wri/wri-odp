@@ -1,25 +1,25 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import classNames from '@/utils/classnames'
-import { SearchInput } from '@/schema/search.schema'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Filter } from '@/interfaces/search.interface'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import classNames from '@/utils/classnames';
+import { SearchInput } from '@/schema/search.schema';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Filter } from '@/interfaces/search.interface';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function RedirectedSearchInput() {
-    const router = useRouter()
-    const { pathname } = router
-    const searchSchema = z.object({ search: z.string() })
-    type searchFormType = z.infer<typeof searchSchema>
+    const router = useRouter();
+    const { pathname } = router;
+    const searchSchema = z.object({ search: z.string() });
+    type searchFormType = z.infer<typeof searchSchema>;
 
     const { handleSubmit, register, reset } = useForm<searchFormType>({
         resolver: zodResolver(searchSchema),
         defaultValues: { search: '' },
-    })
+    });
 
     return (
         <section
@@ -69,7 +69,7 @@ export default function RedirectedSearchInput() {
                             )}%22%2C%22value%22%3A%22${encodeURIComponent(
                                 data.search
                             )}%22%7D%5D`,
-                        })
+                        });
                     })}
                     className="relative flex w-full max-w-[819px] items-start justify-start gap-x-6 pl-8 px-4"
                 >
@@ -87,5 +87,5 @@ export default function RedirectedSearchInput() {
                 </form>
             </div>
         </section>
-    )
+    );
 }

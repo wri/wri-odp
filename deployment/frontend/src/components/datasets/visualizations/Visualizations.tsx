@@ -1,35 +1,35 @@
-import { Tab } from '@headlessui/react'
-import { VisualizationTabs } from './VisualizationTabs'
-import MapView from './MapView'
-import { useEffect, useState } from 'react'
-import { useActiveCharts, useVizIndex } from '@/utils/storeHooks'
-import { DataExplorer } from '@/components/data-explorer/DataExplorer'
-import ChartView from './ChartView'
+import { Tab } from '@headlessui/react';
+import { VisualizationTabs } from './VisualizationTabs';
+import MapView from './MapView';
+import { useEffect, useState } from 'react';
+import { useActiveCharts, useVizIndex } from '@/utils/storeHooks';
+import { DataExplorer } from '@/components/data-explorer/DataExplorer';
+import ChartView from './ChartView';
 
 export type TabularResource = {
-    provider: string
-    connectorUrl?: string
-    datasetId?: string
-    datasetName?: string
-    id: string
-    apiKey?: string
-    name?: string
-}
+    provider: string;
+    connectorUrl?: string;
+    datasetId?: string;
+    datasetName?: string;
+    id: string;
+    apiKey?: string;
+    name?: string;
+};
 
 export default function Visualizations({
     tabularResource,
     displayNoPreview,
     mapDisplayPreview,
 }: {
-    tabularResource: TabularResource | null
-    displayNoPreview: boolean
-    mapDisplayPreview: boolean
+    tabularResource: TabularResource | null;
+    displayNoPreview: boolean;
+    mapDisplayPreview: boolean;
 }) {
     const [prevTabularResource, setPrevTabularResource] =
-        useState(tabularResource)
-    const { vizIndex, setVizIndex } = useVizIndex()
-    const { activeCharts } = useActiveCharts()
-    const [prevActiveCharts, setPrevActiveCharts] = useState([])
+        useState(tabularResource);
+    const { vizIndex, setVizIndex } = useVizIndex();
+    const { activeCharts } = useActiveCharts();
+    const [prevActiveCharts, setPrevActiveCharts] = useState([]);
 
     const tabs = [
         { name: 'Map View', enabled: !!mapDisplayPreview },
@@ -39,55 +39,55 @@ export default function Visualizations({
             name: 'Preview',
             enabled: !!displayNoPreview,
         },
-    ]
+    ];
 
     useEffect(() => {
         if (activeCharts?.length && !prevActiveCharts.length) {
             // Charts view was enabled, focus it
-            const index = tabs.findIndex((t) => t.name == 'Chart View')
-            setVizIndex(index)
+            const index = tabs.findIndex((t) => t.name == 'Chart View');
+            setVizIndex(index);
         } else if (
             !activeCharts?.length &&
             prevActiveCharts.length &&
             vizIndex == 2
         ) {
-            const index = tabs.findIndex((t) => t.name == 'Preview')
-            setVizIndex(index)
+            const index = tabs.findIndex((t) => t.name == 'Preview');
+            setVizIndex(index);
         }
 
-        setPrevActiveCharts(activeCharts)
-    }, [activeCharts])
+        setPrevActiveCharts(activeCharts);
+    }, [activeCharts]);
 
     useEffect(() => {
         if (tabularResource) {
-            const index = tabs.findIndex((t) => t.name == 'Tabular View')
-            setVizIndex(index)
+            const index = tabs.findIndex((t) => t.name == 'Tabular View');
+            setVizIndex(index);
         } else if (!tabularResource && vizIndex == 1) {
-            const mapExist = tabs.find((t) => t.name == 'Map View')
+            const mapExist = tabs.find((t) => t.name == 'Map View');
             if (mapExist?.enabled) {
-                setVizIndex(0)
+                setVizIndex(0);
             } else {
-                const index = tabs.findIndex((t) => t.name == 'Preview')
-                setVizIndex(index)
+                const index = tabs.findIndex((t) => t.name == 'Preview');
+                setVizIndex(index);
             }
         }
 
-        setPrevActiveCharts(activeCharts)
-    }, [tabularResource])
+        setPrevActiveCharts(activeCharts);
+    }, [tabularResource]);
 
     useEffect(() => {
         if (displayNoPreview) {
-            const index = tabs.findIndex((t) => t.name == 'Preview')
-            setVizIndex(index)
+            const index = tabs.findIndex((t) => t.name == 'Preview');
+            setVizIndex(index);
         }
-    }, [displayNoPreview])
+    }, [displayNoPreview]);
 
     useEffect(() => {
         if (mapDisplayPreview) {
-            const index = tabs.findIndex((t) => t.name == 'Map View')
-            setVizIndex(index)
+            const index = tabs.findIndex((t) => t.name == 'Map View');
+            setVizIndex(index);
         }
-    }, [mapDisplayPreview])
+    }, [mapDisplayPreview]);
 
     return (
         <div className="h-full grow flex flex-col">
@@ -113,5 +113,5 @@ export default function Visualizations({
                 </Tab.Panels>
             </Tab.Group>
         </div>
-    )
+    );
 }

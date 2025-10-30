@@ -1,24 +1,24 @@
-import React from 'react'
-import Image from 'next/image'
-import Topic from '@/interfaces/topic.interface'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
-import { Group } from '@portaljs/ckan'
-import { api } from '@/utils/api'
-import Link from 'next/link'
+import React from 'react';
+import Image from 'next/image';
+import Topic from '@/interfaces/topic.interface';
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
+import { type Group } from '@portaljs/ckan';
+import { api } from '@/utils/api';
+import Link from 'next/link';
 
 //write a typeguard to check if the topic is a GroupTree
 function isGroupTree(topic: GroupTree | Group): topic is GroupTree {
-    return (topic as GroupTree).children !== undefined
+    return (topic as GroupTree).children !== undefined;
 }
 
 export default function TopicCard({
     topic,
     topicDetails,
 }: {
-    topic: GroupTree | (Group & { numSubtopics: number })
-    topicDetails: Record<string, GroupsmDetails>
+    topic: GroupTree | (Group & { numSubtopics: number });
+    topicDetails: Record<string, GroupsmDetails>;
 }) {
-    const { data: numOfSubtopics } = api.topics.getNumberOfSubtopics.useQuery()
+    const { data: numOfSubtopics } = api.topics.getNumberOfSubtopics.useQuery();
     return (
         <Link
             href={`/topics/${topic.name}`}
@@ -73,5 +73,5 @@ export default function TopicCard({
                 )}
             </div>
         </Link>
-    )
+    );
 }

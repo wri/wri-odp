@@ -1,9 +1,9 @@
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import Header from '@/components/_shared/Header'
-import { NextSeo } from 'next-seo'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import Header from '@/components/_shared/Header';
+import { NextSeo } from 'next-seo';
 
 export default function TeamsNotFound() {
-    const links = [{ label: 'Teams', url: '/teams', current: false }]
+    const links = [{ label: 'Teams', url: '/teams', current: false }];
     return (
         <>
             <NextSeo title={`Not Found - Teams`} />
@@ -37,5 +37,5 @@ export default function TeamsNotFound() {
                 </div>
             </main>
         </>
-    )
+    );
 }

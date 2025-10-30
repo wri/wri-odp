@@ -1,24 +1,26 @@
-import React from 'react'
-import Header from '@/components/_shared/Header'
-import Layout from '@/components/dashboard/Layout'
-import DatasetList from '@/components/dashboard/datasets/DatasetList'
-import Footer from '@/components/_shared/Footer'
-import { NextSeo } from 'next-seo'
-import { env } from '@/env.mjs'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import superjson from 'superjson'
-import { createServerSideHelpers } from '@trpc/react-query/server'
-import { appRouter } from '@/server/api/root'
-import { getServerAuthSession } from '../../../server/auth'
+import React from 'react';
+import Header from '@/components/_shared/Header';
+import Layout from '@/components/dashboard/Layout';
+import DatasetList from '@/components/dashboard/datasets/DatasetList';
+import Footer from '@/components/_shared/Footer';
+import { NextSeo } from 'next-seo';
+import { env } from '@/env.mjs';
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next';
+import superjson from 'superjson';
+import { createServerSideHelpers } from '@trpc/react-query/server';
+import { appRouter } from '@/server/api/root';
+import { getServerAuthSession } from '../../../server/auth';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const session = await getServerAuthSession(context)
-    console.log('SESISON', session)
+    const session = await getServerAuthSession(context);
     const helpers = createServerSideHelpers({
         router: appRouter,
         ctx: { session, ip: undefined },
         transformer: superjson,
-    })
+    });
 
     await helpers.dataset.getAllDataset.prefetch({
         search: '',
@@ -28,8 +30,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             is_approved: 'true',
             draft: 'false',
         },
-    })
-    console.log('got all datasets')
+    });
 
     if (!session) {
         return {
@@ -37,7 +38,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
                 destination: '/auth/signin',
                 permanent: false,
             },
-        }
+        };
     }
 
     return {
@@ -45,7 +46,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             trpcState: helpers.dehydrate(),
             session,
         },
-    }
+    };
 }
 
 export default function DatasetListPage(
@@ -68,5 +69,5 @@ export default function DatasetListPage(
             </Layout>
             <Footer style="mt-0" />
         </>
-    )
+    );
 }

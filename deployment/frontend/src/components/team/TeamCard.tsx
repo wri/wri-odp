@@ -1,26 +1,26 @@
-import React from 'react'
-import Image from 'next/image'
-import Team from '@/interfaces/team.interface'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
-import { api } from '@/utils/api'
-import { Organization } from '@portaljs/ckan'
-import Link from 'next/link'
-import { visibilityTypeLabels } from '@/utils/constants'
-import Chip from '@/components/_shared/Chip'
+import React from 'react';
+import Image from 'next/image';
+import Team from '@/interfaces/team.interface';
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
+import { api } from '@/utils/api';
+import { type Organization } from '@portaljs/ckan';
+import Link from 'next/link';
+import { visibilityTypeLabels } from '@/utils/constants';
+import Chip from '@/components/_shared/Chip';
 
 //write a typeguard to check if the topic is a GroupTree
 function isGroupTree(org: GroupTree | Organization): org is GroupTree {
-    return (org as GroupTree).children !== undefined
+    return (org as GroupTree).children !== undefined;
 }
 
 export default function TeamCard({
     team,
     teamsDetails,
 }: {
-    team: GroupTree | (Organization & { numSubTeams: number, notes?: string })
-    teamsDetails: Record<string, GroupsmDetails>
+    team: GroupTree | (Organization & { numSubTeams: number; notes?: string });
+    teamsDetails: Record<string, GroupsmDetails>;
 }) {
-    const { data: numOfSubTeams } = api.teams.getNumberOfSubTeams.useQuery()
+    const { data: numOfSubTeams } = api.teams.getNumberOfSubTeams.useQuery();
     return (
         <Link
             href={`/teams/${team.name}`}
@@ -44,34 +44,33 @@ export default function TeamCard({
             {'visibility' in team && team.visibility === 'private' && (
                 <div className="mt-2 mb-1">
                     <Chip
-                        text={
-                            visibilityTypeLabels[
-                            team.visibility
-                            ] ?? ''
-                        }
-                        className={""}
+                        text={visibilityTypeLabels[team.visibility] ?? ''}
+                        className={''}
                     />
                 </div>
             )}
             <article className=" line-clamp-3 w-[88%] font-light text-base mt-2 leading-[1.375rem] h-16">
                 {isGroupTree(team)
-                    ? teamsDetails[team.id]?.description || team.description || teamsDetails[team.id]?.notes || team.notes
+                    ? teamsDetails[team.id]?.description ||
+                      team.description ||
+                      teamsDetails[team.id]?.notes ||
+                      team.notes
                     : team.description || team.notes}
             </article>
             <div className="flex font-light text-sm text-wri-black mt-1 leading-[1.375rem] items-center">
                 {isGroupTree(team) && (
                     <span className="mr-2">
                         {teamsDetails[team.id]?.package_count &&
-                        (teamsDetails[team.id]?.package_count as number) <= 1
+                        teamsDetails[team.id]?.package_count! <= 1
                             ? `${teamsDetails[team.id]?.package_count || 0} Dataset`
-                            : `${teamsDetails[team.id]
-                                  ?.package_count || 0} Datasets`}
+                            : `${
+                                  teamsDetails[team.id]?.package_count || 0
+                              } Datasets`}
                     </span>
                 )}
                 {!isGroupTree(team) && (
                     <span className="mr-2">
-                        {team.package_count &&
-                        (team.package_count as number) <= 1
+                        {team.package_count && team.package_count <= 1
                             ? `${team.package_count} Dataset`
                             : `${team.package_count} Datasets`}
                     </span>
@@ -98,5 +97,5 @@ export default function TeamCard({
                 )}
             </div>
         </Link>
-    )
+    );
 }

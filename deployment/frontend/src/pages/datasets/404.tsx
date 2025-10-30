@@ -1,9 +1,9 @@
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import Header from '@/components/_shared/Header'
-import { NextSeo } from 'next-seo'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import Header from '@/components/_shared/Header';
+import { NextSeo } from 'next-seo';
 
 export default function DatasetNotFound() {
-    const links = [{ label: 'Explore Data', url: '/search', current: false }]
+    const links = [{ label: 'Explore Data', url: '/search', current: false }];
     return (
         <>
             <NextSeo title={`Not Found - Datasets`} />
@@ -37,5 +37,5 @@ export default function DatasetNotFound() {
                 </div>
             </main>
         </>
-    )
+    );
 }

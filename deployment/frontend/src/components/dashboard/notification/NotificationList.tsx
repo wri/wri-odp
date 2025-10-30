@@ -1,51 +1,54 @@
-import React, { useState } from 'react'
-import NotificationHeader from './NotificationHeader'
-import NotificationCard from './NotificationCard'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import { useQuery } from 'react-query'
-import Pagination from '../_shared/Pagination'
-import type { SearchInput } from '@/schema/search.schema'
-import { NotificationType } from '@/schema/notification.schema'
+import React, { useState } from 'react';
+import NotificationHeader from './NotificationHeader';
+import NotificationCard from './NotificationCard';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import { useQuery } from 'react-query';
+import Pagination from '../_shared/Pagination';
+import type { SearchInput } from '@/schema/search.schema';
+import { type NotificationType } from '@/schema/notification.schema';
 
 export default function NotificationList() {
     const { data, isLoading } = api.notification.getAllNotifications.useQuery({
         returnLength: true,
-    })
-    const [selected, setSelected] = useState<string[]>([])
+    });
+    const [selected, setSelected] = useState<string[]>([]);
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         fq: {},
         page: { start: 0, rows: 10 },
-    })
+    });
 
     const paginatedData = useQuery(
         ['paginatedNotifications', data, query],
         () => {
-            const notification: NotificationType[] = []
-            if (!data) return notification
+            const notification: NotificationType[] = [];
+            if (!data) return notification;
 
-            const start = query.page.start
-            const rows = query.page.rows
+            const start = query.page.start;
+            const rows = query.page.rows;
 
             let slicedData = (data as NotificationType[]).sort((a, b) => {
                 const dateA =
-                    Number(new Date()) - Number(new Date(a.time_sent!))
+                    Number(new Date()) - Number(new Date(a.time_sent!));
                 const dateB =
-                    Number(new Date()) - Number(new Date(b.time_sent!))
-                return dateA - dateB
-            })
+                    Number(new Date()) - Number(new Date(b.time_sent!));
+                return dateA - dateB;
+            });
 
-            slicedData = (data as NotificationType[]).slice(start, start + rows)
-            return slicedData
+            slicedData = (data as NotificationType[]).slice(
+                start,
+                start + rows
+            );
+            return slicedData;
         },
         {
             enabled: !!data,
         }
-    )
+    );
 
     if (isLoading || paginatedData.isLoading) {
-        return <Spinner className="mx-auto" />
+        return <Spinner className="mx-auto" />;
     }
 
     return (
@@ -75,10 +78,10 @@ export default function NotificationList() {
                                 selected={selected}
                                 setSelected={setSelected}
                             />
-                        )
+                        );
                     })
                 )}
             </div>
         </section>
-    )
+    );
 }

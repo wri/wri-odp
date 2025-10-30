@@ -1,12 +1,12 @@
-import { Filter } from '@/interfaces/search.interface'
-import { Disclosure, Transition } from '@headlessui/react'
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import TagMulText from './Tagmultext'
+import { type Filter } from '@/interfaces/search.interface';
+import { Disclosure, Transition } from '@headlessui/react';
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
+import TagMulText from './Tagmultext';
 
 interface Option {
-    value: string
-    label: string
+    value: string;
+    label: string;
 }
 
 export default function Tags({
@@ -19,36 +19,36 @@ export default function Tags({
     value,
     setValue,
 }: {
-    options: Option[]
-    fqKey: string
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    filters: Filter[]
-    facetSelectedCount: Record<string, number>
-    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>
-    value: string[]
-    setValue: Dispatch<SetStateAction<string[]>>
+    options: Option[];
+    fqKey: string;
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    filters: Filter[];
+    facetSelectedCount: Record<string, number>;
+    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>;
+    value: string[];
+    setValue: Dispatch<SetStateAction<string[]>>;
 }) {
     // console.log('Facetselect79000: ', facetSelectedCount)
     const getUpdatedOptionsState = () => {
         return options.reduce((a, v) => {
             const checked = filters.find(
                 (f) => f?.key == fqKey && f?.value == v.value
-            )
+            );
 
             return {
                 ...a,
                 [v.value]: checked,
-            }
-        }, {})
-    }
+            };
+        }, {});
+    };
 
-    const [optionsState, setOptionsState] = useState<{ [k: string]: boolean }>(
+    const [optionsState, setOptionsState] = useState<Record<string, boolean>>(
         getUpdatedOptionsState()
-    )
+    );
 
     useEffect(() => {
-        setOptionsState(getUpdatedOptionsState)
-    }, [filters])
+        setOptionsState(getUpdatedOptionsState);
+    }, [filters]);
 
     return (
         <Disclosure
@@ -102,5 +102,5 @@ export default function Tags({
                 </>
             )}
         </Disclosure>
-    )
+    );
 }

@@ -1,12 +1,12 @@
-import React from 'react'
-import { EnvelopeIcon } from '@heroicons/react/20/solid'
-import { Button, LoaderButton } from './Button'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { ErrorDisplay } from './InputGroup'
-import { useMutation } from 'react-query'
-import { toast } from 'react-toastify'
+import React from 'react';
+import { EnvelopeIcon } from '@heroicons/react/20/solid';
+import { Button, LoaderButton } from './Button';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { ErrorDisplay } from './InputGroup';
+import { useMutation } from 'react-query';
+import { toast } from 'react-toastify';
 export function SubscribeForm() {
     const {
         formState: { errors },
@@ -19,17 +19,17 @@ export function SubscribeForm() {
                 email: z.string().email(),
             })
         ),
-    })
+    });
     const submitNewsletter = useMutation({
         mutationFn: async (data: { email: string }) => {
             const res = await fetch('/api/proxy-ortto', {
                 method: 'POST',
                 body: JSON.stringify(data),
-            })
-            const subscribe = await res.json()
-            return subscribe
+            });
+            const subscribe = await res.json();
+            return subscribe;
         },
-    })
+    });
     return (
         <form
             onSubmit={handleSubmit(async (data) => {
@@ -38,15 +38,15 @@ export function SubscribeForm() {
                         toast(
                             "You'll receive an email confirming your subscription",
                             { type: 'success' }
-                        )
+                        );
                     },
                     onError: (err) => {
-                        console.error(err)
+                        console.error(err);
                         toast('Failed to subscribe to newsletter', {
                             type: 'error',
-                        })
+                        });
                     },
-                })
+                });
             })}
             className="flex w-full flex-col gap-x-2 gap-y-4 lg:flex-row justify-between"
         >
@@ -73,5 +73,5 @@ export function SubscribeForm() {
                 SUBSCRIBE
             </LoaderButton>
         </form>
-    )
+    );
 }

@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
-import { type GetServerSidePropsContext } from 'next'
+import { type GetServerSidePropsContext } from 'next';
 import {
     getServerSession,
     type NextAuthOptions,
     type DefaultSession,
-    User,
-} from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { env } from '@/env.mjs'
-import type { CkanResponse } from '@/schema/ckan.schema'
-import { Organization } from '@portaljs/ckan'
-import AzureAdProvider from 'next-auth/providers/azure-ad'
-import OktaProvider from 'next-auth/providers/okta'
+    type User,
+} from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { env } from '@/env.mjs';
+import type { CkanResponse } from '@/schema/ckan.schema';
+import { Organization } from '@portaljs/ckan';
+import AzureAdProvider from 'next-auth/providers/azure-ad';
+import OktaProvider from 'next-auth/providers/okta';
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -22,23 +22,23 @@ import OktaProvider from 'next-auth/providers/okta'
 declare module 'next-auth' {
     interface Session extends DefaultSession {
         user: DefaultSession['user'] & {
-            id: string
-            email: string
-            username: string
-            apikey: string
-            sysadmin: boolean
+            id: string;
+            email: string;
+            username: string;
+            apikey: string;
+            sysadmin: boolean;
             //teams: { name: string; id: string }[]
-            image: string
-        }
+            image: string;
+        };
     }
 
     interface User {
-        email: string
-        username: string
-        apikey: string
-        sysadmin: boolean
+        email: string;
+        username: string;
+        apikey: string;
+        sysadmin: boolean;
         //teams: { name: string; id: string }[]
-        image: string
+        image: string;
     }
 }
 
@@ -57,29 +57,29 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async redirect({ url, baseUrl }) {
-            return url.startsWith(baseUrl) ? url : baseUrl
+            return url.startsWith(baseUrl) ? url : baseUrl;
         },
         async jwt({ token, user, account }) {
             if (user) {
-                token.apikey = user.apikey
+                token.apikey = user.apikey;
                 // token.teams = user.teams
-                token.sysadmin = user.sysadmin
+                token.sysadmin = user.sysadmin;
             }
-            let isAzureAd = account?.provider === 'azure-ad'
-            let isOkta = account?.provider === 'okta'
+            const isAzureAd = account?.provider === 'azure-ad';
+            const isOkta = account?.provider === 'okta';
             if (isAzureAd || isOkta) {
                 const reqBody: any = {
                     email: user?.email,
                     name: user?.name,
                     id_token: account?.id_token,
-                }
+                };
                 if (isAzureAd) {
-                    reqBody.from_azure = true
+                    reqBody.from_azure = true;
                 }
                 if (isOkta) {
-                    reqBody.from_okta = true
+                    reqBody.from_okta = true;
                 }
-                if (account && account.access_token) {
+                if (account?.access_token) {
                     const userRes = await fetch(
                         `${process.env.CKAN_URL}/api/3/action/user_login`,
                         {
@@ -89,17 +89,17 @@ export const authOptions: NextAuthOptions = {
                             },
                             body: JSON.stringify(reqBody),
                         }
-                    )
+                    );
 
                     const validUser: CkanResponse<
                         User & { frontend_token: string }
-                    > = await userRes.json()
+                    > = await userRes.json();
 
                     if ((validUser.result as any).errors) {
                         // TODO: error from the response should be sent to the client, but it's not working
                         throw new Error(
                             (validUser.result as any).error_summary.auth
-                        )
+                        );
                     }
 
                     user = {
@@ -110,12 +110,12 @@ export const authOptions: NextAuthOptions = {
                             (validUser.result as any)?.image ??
                             '',
                         apikey: validUser.result.frontend_token,
-                    }
+                    };
 
-                    return { ...token, ...user, sub: validUser.result.id }
+                    return { ...token, ...user, sub: validUser.result.id };
                 }
             }
-            return token
+            return token;
         },
         session: ({ session, token }) => {
             return {
@@ -127,9 +127,12 @@ export const authOptions: NextAuthOptions = {
                     // teams: token.teams ? token.teams : { name: '', id: '' },
                     sysadmin: token?.sysadmin ? token.sysadmin : false,
                     id: token.sub,
-                    image: typeof token.image === 'string' ? token.image : JSON.stringify(token.image || {}),
+                    image:
+                        typeof token.image === 'string'
+                            ? token.image
+                            : JSON.stringify(token.image || {}),
                 },
-            }
+            };
         },
     },
     /*pages: {
@@ -153,7 +156,7 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials, _req) {
                 try {
-                    if (!credentials) return null
+                    if (!credentials) return null;
                     const userRes = await fetch(
                         `${env.CKAN_URL}/api/3/action/user_login`,
                         {
@@ -166,15 +169,17 @@ export const authOptions: NextAuthOptions = {
                                 password: credentials.password,
                             }),
                         }
-                    )
+                    );
                     const user: CkanResponse<
                         User & { frontend_token: string }
-                    > = await userRes.json()
-                    console.log('USER', user)
+                    > = await userRes.json();
+                    console.log('USER', user);
 
                     if ((user.result as any).errors) {
                         // TODO: error from the response should be sent to the client, but it's not working
-                        throw new Error((user.result as any).error_summary.auth)
+                        throw new Error(
+                            (user.result as any).error_summary.auth
+                        );
                     }
 
                     if (user.result.id) {
@@ -183,13 +188,13 @@ export const authOptions: NextAuthOptions = {
                             image: '',
                             apikey: user.result.frontend_token,
                             sysadmin: user.result?.sysadmin,
-                        }
+                        };
                     } else {
-                        throw 'An unexpected error occurred while signing in. Please, try again.'
+                        throw 'An unexpected error occurred while signing in. Please, try again.';
                     }
                 } catch (e) {
-                    console.error(e)
-                    throw e
+                    console.error(e);
+                    throw e;
                 }
             },
         }),
@@ -204,7 +209,7 @@ export const authOptions: NextAuthOptions = {
         //    issuer: env.OKTA_ISSUER ?? '',
         //}),
     ],
-}
+};
 
 /**
  * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
@@ -212,8 +217,8 @@ export const authOptions: NextAuthOptions = {
  * @see https://next-auth.js.org/configuration/nextjs
  */
 export const getServerAuthSession = (ctx: {
-    req: GetServerSidePropsContext['req']
-    res: GetServerSidePropsContext['res']
+    req: GetServerSidePropsContext['req'];
+    res: GetServerSidePropsContext['res'];
 }) => {
-    return getServerSession(ctx.req, ctx.res, authOptions)
-}
+    return getServerSession(ctx.req, ctx.res, authOptions);
+};

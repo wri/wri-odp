@@ -1,19 +1,19 @@
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import React from 'react'
-import Spinner from '../_shared/Spinner'
+import { type GroupTree, GroupsmDetails } from '@/schema/ckan.schema';
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import React from 'react';
+import Spinner from '../_shared/Spinner';
 
 export default function GroupBreadcrumb({
     groups,
     isLoading,
     groupType,
 }: {
-    isLoading: boolean
-    groups: GroupTree[]
-    groupType: 'teams' | 'topics'
+    isLoading: boolean;
+    groups: GroupTree[];
+    groupType: 'teams' | 'topics';
 }) {
-    if (isLoading) return <Spinner className="mx-auto" />
-    const group = groups[0] as GroupTree
+    if (isLoading) return <Spinner className="mx-auto" />;
+    const group = groups[0]!;
 
     const links = [
         {
@@ -26,7 +26,7 @@ export default function GroupBreadcrumb({
             url: `/${groupType}/${group.name}`,
             current: true,
         },
-    ]
+    ];
 
-    return <Breadcrumbs links={links} />
+    return <Breadcrumbs links={links} />;
 }
