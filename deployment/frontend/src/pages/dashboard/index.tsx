@@ -23,10 +23,10 @@ export default function index(
                 title={`Dashboard`}
                 noindex={true}
                 nofollow={true}
-                description={`Dashboard - WRI Open Data Catalog`}
+                description={`Dashboard - WRI Open Data Catalog, WRI Data Explorer`}
                 openGraph={{
                     title: `Dashboard`,
-                    description: `Dashboard - WRI Open Data Catalog`,
+                    description: `Dashboard - WRI Open Data Catalog, WRI Data Explorer`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard`,
                 }}
             />

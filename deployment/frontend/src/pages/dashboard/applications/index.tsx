@@ -45,10 +45,10 @@ export default function applications() {
         <>
             <NextSeo
                 title={`Applications - Dashboard`}
-                description={`Applications - Dashboard -- WRI Open Data Catalog`}
+                description={`Applications - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`}
                 openGraph={{
                     title: `Applications - Dashboard`,
-                    description: `Applications - Dashboard -- WRI Open Data Catalog`,
+                    description: `Applications - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/applications`,
                 }}
             />
