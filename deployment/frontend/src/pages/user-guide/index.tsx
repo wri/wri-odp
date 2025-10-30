@@ -1,5 +1,5 @@
-import TableContent from '@/contents/TableContent.mdx'
-import MdxLayout from '@/components/_shared/mdx-layout'
+import TableContent from '@/contents/TableContent.mdx';
+import MdxLayout from '@/components/_shared/mdx-layout';
 
 export default function Page() {
     return (
@@ -10,5 +10,5 @@ export default function Page() {
         >
             <TableContent />
         </MdxLayout>
-    )
+    );
 }

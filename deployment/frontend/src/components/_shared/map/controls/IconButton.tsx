@@ -1,9 +1,9 @@
-import { DefaultTooltip } from '../../Tooltip'
+import { DefaultTooltip } from '../../Tooltip';
 
 interface IconButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    children: React.ReactNode
-    tooltip: string
+    children: React.ReactNode;
+    tooltip: string;
 }
 
 export default function IconButton({
@@ -23,5 +23,5 @@ export default function IconButton({
                 {children}
             </button>
         </DefaultTooltip>
-    )
+    );
 }

@@ -296,6 +296,16 @@ describe("Dashboard Test", () => {
     cy.wait(20000);
   });
 
+  it("Should not have non-relevant values in the diff dropdown", () => {
+    cy.visit("/dashboard/approval-request");
+    cy.contains(datasetName, { timeout: 30000 });
+    cy.get("button#rowshow").first().click();
+    cy.contains("Title");
+    cy.contains("null").should("not.exist");
+    cy.contains("NULL").should("not.exist");
+    cy.contains("empty").should("not.exist");
+  });
+
   it("Should have approve dataset", () => {
     cy.visit("/dashboard/approval-request");
     cy.contains(datasetName, { timeout: 30000 });

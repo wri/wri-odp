@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React from 'react'
-import PropTypes from 'prop-types'
-import Image from 'next/image'
+import React from 'react';
+import PropTypes from 'prop-types';
+import Image from 'next/image';
 
 class LegendItem extends React.PureComponent {
     static propTypes = {
@@ -10,7 +10,7 @@ class LegendItem extends React.PureComponent {
         name: PropTypes.string,
         icon: PropTypes.string, // triangle, circle, square, line
         hideIcon: PropTypes.bool,
-    }
+    };
 
     static defaultProps = {
         size: 12,
@@ -18,13 +18,13 @@ class LegendItem extends React.PureComponent {
         name: '',
         icon: 'square',
         hideIcon: false,
-    }
+    };
 
     getIconHtml = (iconName) => {
-        const { name, hideIcon, color, size, icon } = this.props
+        const { name, hideIcon, color, size, icon } = this.props;
 
         if (hideIcon) {
-            return null
+            return null;
         }
 
         if (iconName === 'triangle') {
@@ -38,7 +38,7 @@ class LegendItem extends React.PureComponent {
                         borderBottomColor: color,
                     }}
                 />
-            )
+            );
         }
 
         if (iconName === 'line') {
@@ -47,7 +47,7 @@ class LegendItem extends React.PureComponent {
                     className={`block mr-[5px] mt-[2px] h-[2px]`}
                     style={{ width: size, backgroundColor: color }}
                 />
-            )
+            );
         }
 
         if (iconName === 'square' || iconName === 'circle') {
@@ -64,7 +64,7 @@ class LegendItem extends React.PureComponent {
                         backgroundColor: color,
                     }}
                 />
-            )
+            );
         }
 
         return (
@@ -76,11 +76,11 @@ class LegendItem extends React.PureComponent {
                     className="block w-[14px] h-[14px]"
                 />
             </div>
-        )
-    }
+        );
+    };
 
     render() {
-        const { name, icon } = this.props
+        const { name, icon } = this.props;
 
         return (
             <div className="flex items-start justify-start text-[12px]">
@@ -88,8 +88,8 @@ class LegendItem extends React.PureComponent {
 
                 <span className="block">{name}</span>
             </div>
-        )
+        );
     }
 }
 
-export default LegendItem
+export default LegendItem;

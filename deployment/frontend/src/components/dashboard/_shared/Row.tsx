@@ -1,43 +1,43 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
     EyeIcon,
     ChevronDownIcon,
     ChevronUpIcon,
-} from '@heroicons/react/24/outline'
-import { Transition } from '@headlessui/react'
-import classNames from '@/utils/classnames'
-import { useSession } from 'next-auth/react'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { useRouter } from 'next/router'
+} from '@heroicons/react/24/outline';
+import { Transition } from '@headlessui/react';
+import classNames from '@/utils/classnames';
+import { useSession } from 'next-auth/react';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { useRouter } from 'next/router';
 
 type RowButton = {
-    label?: string
-    icon?: React.ReactNode
-    color?: string
-    onClick: () => void
+    label?: string;
+    icon?: React.ReactNode;
+    color?: string;
+    onClick: () => void;
     tooltip?: {
-        id: string
-        content: string
-    }
-}
+        id: string;
+        content: string;
+    };
+};
 
 type RowLinkButton = {
-    label?: string
-    link?: string
-}
+    label?: string;
+    link?: string;
+};
 
 type RowProps = {
-    rowMain: React.ReactNode
-    rowSub?: React.ReactNode
-    isDropDown?: boolean
-    controlButtons?: RowButton[]
-    linkButton?: RowLinkButton
-    groupStyle?: string
-    className?: string
-    authorized?: boolean
-    highlighted?: boolean
-    isPrivate?: boolean
-}
+    rowMain: React.ReactNode;
+    rowSub?: React.ReactNode;
+    isDropDown?: boolean;
+    controlButtons?: RowButton[];
+    linkButton?: RowLinkButton;
+    groupStyle?: string;
+    className?: string;
+    authorized?: boolean;
+    highlighted?: boolean;
+    isPrivate?: boolean;
+};
 
 export default function Row({
     rowMain,
@@ -51,13 +51,13 @@ export default function Row({
     highlighted = false,
     isPrivate = false,
 }: RowProps) {
-    const [isShowSubRow, setIsShowSubRow] = useState(highlighted)
-    const { data: session } = useSession()
-    const router = useRouter()
+    const [isShowSubRow, setIsShowSubRow] = useState(highlighted);
+    const { data: session } = useSession();
+    const router = useRouter();
     // state event to change hover effect on desktop to click effect on mobile
     // const [isHover, setIsHover] = useState(false)
     const enableControlDiv =
-        isDropDown || controlButtons || linkButton ? true : false
+        isDropDown || controlButtons || linkButton ? true : false;
     return (
         <div
             className={`flex flex-col hover:bg-wri-slate ${isShowSubRow ? 'bg-wri-slate' : ' '}  `}
@@ -80,7 +80,9 @@ export default function Row({
                             ''
                         )}
                         {controlButtons &&
-                        (router.pathname.includes('/topics') ? session?.user.sysadmin : (session?.user.sysadmin || authorized))
+                        (router.pathname.includes('/topics')
+                            ? session?.user.sysadmin
+                            : session?.user.sysadmin || authorized)
                             ? controlButtons.map((button, index) => {
                                   return (
                                       <React.Fragment key={index}>
@@ -109,7 +111,7 @@ export default function Row({
                                               </button>
                                           </DefaultTooltip>
                                       </React.Fragment>
-                                  )
+                                  );
                               })
                             : ''}
 
@@ -144,5 +146,5 @@ export default function Row({
                 <div id="sub-row">{rowSub ? rowSub : ''}</div>
             </Transition>
         </div>
-    )
+    );
 }

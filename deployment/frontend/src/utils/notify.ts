@@ -1,22 +1,23 @@
-import { toast, type ToastContent, ToastOptions } from "react-toastify";
+import { toast } from 'react-toastify';
 
 export default function notify(
-  text: any,
-  severity: "success" | "error" = "success"
+    text: any,
+    severity: 'success' | 'error' = 'success'
 ) {
-  /*
-   * Using this wrapper so that default options
-   * can be set
-   *
-   */
-  const options = {};
+    /*
+     * Using this wrapper so that default options
+     * can be set
+     *
+     */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const options = {};
 
-  switch (severity) {
-    case "success":
-      toast(text, { type: "success" });
-      break;
-    case "error":
-      toast.error(text, { type: "error"});
-      break;
-  }
+    switch (severity) {
+        case 'success':
+            toast(text, { type: 'success' });
+            break;
+        case 'error':
+            toast.error(text, { type: 'error' });
+            break;
+    }
 }

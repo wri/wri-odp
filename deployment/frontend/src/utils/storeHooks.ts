@@ -1,27 +1,27 @@
-import { shallow } from 'zustand/shallow'
-import { useStore } from './store'
+import { shallow } from 'zustand/shallow';
+import { useStore } from './store';
 
 export const useVizIndex = () => {
     const { vizIndex, setVizIndex } = useStore((store) => ({
         vizIndex: store.vizIndex,
         setVizIndex: store.setVizIndex,
-    }))
-    return { vizIndex, setVizIndex }
-}
+    }));
+    return { vizIndex, setVizIndex };
+};
 
 export const useDataset = () => {
-    const { dataset } = useStore((store) => ({ dataset: store.dataset }))
+    const { dataset } = useStore((store) => ({ dataset: store.dataset }));
 
-    return { dataset }
-}
+    return { dataset };
+};
 
 export const useLayerAsLayerObj = () => {
     const { layerAsLayerObj } = useStore((store) => ({
         layerAsLayerObj: store.layerAsLayerObj,
-    }))
+    }));
 
-    return { layerAsLayerObj }
-}
+    return { layerAsLayerObj };
+};
 export const useActiveCharts = () => {
     return useStore((store) => ({
         activeCharts: store.activeCharts,
@@ -29,24 +29,24 @@ export const useActiveCharts = () => {
         removeCharts: store.removeCharts,
         selectedChart: store.selectedChart,
         selectChart: store.selectChart,
-    }))
-}
+    }));
+};
 
 export const useRelatedDatasets = () => {
     const { relatedDatasets } = useStore((store) => ({
         relatedDatasets: store.relatedDatasets,
-    }))
+    }));
 
-    return { relatedDatasets }
-}
+    return { relatedDatasets };
+};
 
 export const useIsEmbeddingMap = () => {
     const { isEmbedding } = useStore((store) => ({
         isEmbedding: store.mapView.isEmbedding,
-    }))
+    }));
 
-    return { isEmbedding }
-}
+    return { isEmbedding };
+};
 
 export const useToggleLayergroups = () => {
     const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
@@ -54,18 +54,18 @@ export const useToggleLayergroups = () => {
             tempLayerAsLayerobj: store.tempLayerAsLayerobj,
             prevLayerGroups: store.prevLayerGroups,
             setToggleLayergroups: store.toggleActiveLayerGroup,
-        }))
-    return { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups }
-}
+        }));
+    return { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups };
+};
 
 export const useIsAddingLayers = () => {
     const { isAddingLayers, setIsAddingLayers } = useStore((store) => ({
         isAddingLayers: store.mapView.isAddingLayers,
         setIsAddingLayers: store.setIsAddingLayers,
-    }))
+    }));
 
-    return { isAddingLayers, setIsAddingLayers }
-}
+    return { isAddingLayers, setIsAddingLayers };
+};
 
 export const useMapState = () => {
     const { viewState, setViewState } = useStore(
@@ -74,9 +74,9 @@ export const useMapState = () => {
             setViewState: store.setViewState,
         }),
         shallow
-    )
-    return { viewState, setViewState }
-}
+    );
+    return { viewState, setViewState };
+};
 
 export const useBasemap = () => {
     const { selectedBasemap, setBasemap } = useStore(
@@ -85,10 +85,21 @@ export const useBasemap = () => {
             setBasemap: store.setBaseMap,
         }),
         shallow
-    )
+    );
 
-    return { selectedBasemap, setBasemap }
-}
+    return { selectedBasemap, setBasemap };
+};
+
+export const useInitialRender = () => {
+    const { isInitialrender } = useStore(
+        (store) => ({
+            isInitialrender: store.mapView.initialrender,
+        }),
+        shallow
+    );
+
+    return { isInitialrender };
+};
 
 export const useInitialRender = () => {
     const { isInitialrender } = useStore(
@@ -108,10 +119,10 @@ export const useIsDrawing = () => {
             setIsDrawing: store.setIsDrawing,
         }),
         shallow
-    )
+    );
 
-    return { isDrawing, setIsDrawing }
-}
+    return { isDrawing, setIsDrawing };
+};
 
 export const useLabels = () => {
     const { selectedLabels, setLabels } = useStore(
@@ -120,10 +131,10 @@ export const useLabels = () => {
             setLabels: store.setLabels,
         }),
         shallow
-    )
+    );
 
-    return { selectedLabels, setLabels }
-}
+    return { selectedLabels, setLabels };
+};
 
 export const useBoundaries = () => {
     const { showBoundaries, setShowBoundaries } = useStore(
@@ -132,10 +143,10 @@ export const useBoundaries = () => {
             setShowBoundaries: store.setBoundaries,
         }),
         shallow
-    )
+    );
 
-    return { showBoundaries, setShowBoundaries }
-}
+    return { showBoundaries, setShowBoundaries };
+};
 
 export const useActiveLayerGroups = () => {
     const {
@@ -156,7 +167,7 @@ export const useActiveLayerGroups = () => {
         removeLayerFromLayerGroup: store.removeLayerFromLayerGroup,
         addLayerToLayerGroup: store.addLayerToLayerGroup,
         replaceLayersForLayerGroup: store.replaceLayersForLayerGroup,
-    }))
+    }));
 
     return {
         activeLayerGroups,
@@ -167,32 +178,32 @@ export const useActiveLayerGroups = () => {
         removeLayerFromLayerGroup,
         addLayerToLayerGroup,
         replaceLayersForLayerGroup,
-    }
-}
+    };
+};
 
 export const useLayerStates = () => {
     const { currentLayers, updateLayerState } = useStore((store) => ({
         currentLayers: store.mapView.layers,
         updateLayerState: store.updateLayerState,
-    }))
+    }));
 
-    return { currentLayers, updateLayerState }
-}
+    return { currentLayers, updateLayerState };
+};
 
 export const useBounds = () => {
     const { bounds, setBounds } = useStore((store) => ({
         bounds: store.mapView.bounds,
         setBounds: store.setBounds,
-    }))
+    }));
 
-    return { bounds, setBounds }
-}
+    return { bounds, setBounds };
+};
 
 export const useStoreDirtyFields = () => {
     const { storeDirtyFields, setStoreDirtyFields } = useStore((store) => ({
         storeDirtyFields: store.storeDirtyFields,
         setStoreDirtyFields: store.setStoreDirtyFields,
-    }))
+    }));
 
-    return { storeDirtyFields, setStoreDirtyFields }
-}
+    return { storeDirtyFields, setStoreDirtyFields };
+};

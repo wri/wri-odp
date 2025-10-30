@@ -1,34 +1,34 @@
-import { Fragment, useState } from 'react'
-import { Listbox, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import classNames from '@/utils/classnames'
+import { Fragment, useState } from 'react';
+import { Listbox, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import classNames from '@/utils/classnames';
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
-    UseFormReturn,
+    type FieldValues,
+    type Path,
+    type PathValue,
+    type UseFormReturn,
     useForm,
-} from 'react-hook-form'
+} from 'react-hook-form';
 
 export interface Option<V> {
-    label: string
-    value: V
-    default?: boolean
-    disbaled?: boolean
+    label: string;
+    value: V;
+    default?: boolean;
+    disbaled?: boolean;
 }
 
-interface SimpleSelectProps<T extends FieldValues, V extends Object> {
-    options: PathValue<T, Path<T> & Option<V>>[]
-    placeholder?: string
-    className?: string
-    maxWidth?: string
-    formObj?: UseFormReturn<T>
-    name: Path<T>
-    id?: string
+interface SimpleSelectProps<T extends FieldValues, V extends object> {
+    options: PathValue<T, Path<T> & Option<V>>[];
+    placeholder?: string;
+    className?: string;
+    maxWidth?: string;
+    formObj?: UseFormReturn<T>;
+    name: Path<T>;
+    id?: string;
 }
 
-export default function SimpleSelect<T extends FieldValues, V extends Object>({
+export default function SimpleSelect<T extends FieldValues, V extends object>({
     options,
     placeholder,
     className,
@@ -40,11 +40,11 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
     disabled,
     str,
 }: SimpleSelectProps<T, V> & {
-    onChange?: (val: any) => void
-    disabled?: boolean
-    str?: boolean
+    onChange?: (val: any) => void;
+    disabled?: boolean;
+    str?: boolean;
 }) {
-    const { control } = formObj ?? useForm()
+    const { control } = formObj ?? useForm();
     return (
         <Controller
             control={control}
@@ -59,16 +59,15 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
             render={({ field: { onChange: setSelected, value: selected } }) => {
                 const selectedFull = options.find(
                     (o) => o.value === (str ? selected : selected?.value)
-                )
-                console.log('SELECTED', selected)
+                );
                 return (
                     <Listbox
                         value={selected}
                         onChange={(e) => {
                             if (_onChange && e != null) {
-                                _onChange(e.value)
+                                _onChange(e.value);
                             }
-                            setSelected(str ? e.value : e)
+                            setSelected(str ? e.value : e);
                         }}
                         disabled={disabled}
                     >
@@ -177,8 +176,8 @@ export default function SimpleSelect<T extends FieldValues, V extends Object>({
                             </>
                         )}
                     </Listbox>
-                )
+                );
             }}
         />
-    )
+    );
 }

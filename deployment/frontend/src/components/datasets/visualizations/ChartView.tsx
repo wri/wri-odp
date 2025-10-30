@@ -1,22 +1,22 @@
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { View } from '@/interfaces/dataset.interface'
-import { useActiveCharts } from '@/utils/storeHooks'
-import { useEffect, useState } from 'react'
-import ChartViewExport from './ChartViewExport'
-import { useForm } from 'react-hook-form'
-import { InputGroup } from '@/components/_shared/InputGroup'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import dynamic from 'next/dynamic'
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { type View } from '@/interfaces/dataset.interface';
+import { useActiveCharts } from '@/utils/storeHooks';
+import { useEffect, useState } from 'react';
+import ChartViewExport from './ChartViewExport';
+import { useForm } from 'react-hook-form';
+import { InputGroup } from '@/components/_shared/InputGroup';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import dynamic from 'next/dynamic';
 const Chart = dynamic(
     () => import('@/components/datasets/visualizations/Chart'),
     {
         ssr: false,
     }
-)
+);
 
 export default function ChartView() {
-    const { activeCharts, selectedChart, selectChart } = useActiveCharts()
+    const { activeCharts, selectedChart, selectChart } = useActiveCharts();
 
     const viewOptionsSchema = z.object({
         x_tick_angle: z.object({
@@ -27,40 +27,40 @@ export default function ChartView() {
             value: z.number().or(z.literal('auto')),
             label: z.string(),
         }),
-    })
+    });
 
-    type ViewOptionSchema = z.infer<typeof viewOptionsSchema>
+    type ViewOptionSchema = z.infer<typeof viewOptionsSchema>;
 
     const formObj = useForm<ViewOptionSchema>({
         resolver: zodResolver(viewOptionsSchema),
         defaultValues: {},
-    })
+    });
 
-    const { watch, handleSubmit, reset } = formObj
+    const { watch, handleSubmit, reset } = formObj;
 
     // TODO: we should group options by data file
     const chartOptions = activeCharts
         .filter((v: View) => v?.config_obj?.type == 'chart')
-        .map((v: View) => ({ label: v.title, value: v }))
+        .map((v: View) => ({ label: v.title, value: v }));
 
     if (chartOptions?.length) {
-        chartOptions[0].default = true
+        chartOptions[0].default = true;
     }
 
     useEffect(() => {
         if (chartOptions) {
-            const defaultChart = chartOptions.find((co: any) => co.default)
+            const defaultChart = chartOptions.find((co: any) => co.default);
 
             if (defaultChart) {
-                selectChart(defaultChart.value)
+                selectChart(defaultChart.value);
             } else {
-                selectChart(chartOptions[0])
+                selectChart(chartOptions[0]);
             }
         }
-    }, [activeCharts])
+    }, [activeCharts]);
 
     const onChange = (selected: View) => {
-        selectChart(selected)
+        selectChart(selected);
         reset({
             x_tick_angle:
                 selected.config_obj.form_state.config.chart?.labels?.x?.angle
@@ -68,31 +68,31 @@ export default function ChartView() {
             y_tick_angle:
                 selected.config_obj.form_state.config.chart?.labels?.y?.angle
                     ?.value ?? labelAngleOptions[0],
-        })
-    }
+        });
+    };
 
     const getConfigWithOverrides = () => {
         // @ts-ignore
-        const config = selectedChart.config_obj?.config
+        const config = selectedChart.config_obj?.config;
 
-        const xTickAngle = watch('x_tick_angle')?.value
+        const xTickAngle = watch('x_tick_angle')?.value;
         if (xTickAngle) {
             config.props.layout.xaxis = {
                 ...config.props.layout.xaxis,
                 tickangle: xTickAngle,
-            }
+            };
         }
 
-        const yTickAngle = watch('y_tick_angle')?.value
+        const yTickAngle = watch('y_tick_angle')?.value;
         if (yTickAngle) {
             config.props.layout.yaxis = {
                 ...config.props.layout.yaxis,
                 tickangle: yTickAngle,
-            }
+            };
         }
 
-        return config
-    }
+        return config;
+    };
 
     return (
         <div className="px-5 py-5 xl:px-10 xl:py-5">
@@ -141,7 +141,7 @@ export default function ChartView() {
                 </div>
             </form>
         </div>
-    )
+    );
 }
 
 const labelAngleOptions = [
@@ -150,4 +150,4 @@ const labelAngleOptions = [
     { value: 45, label: '45º' },
     { value: 90, label: '90º' },
     { value: 180, label: '180º' },
-]
+];

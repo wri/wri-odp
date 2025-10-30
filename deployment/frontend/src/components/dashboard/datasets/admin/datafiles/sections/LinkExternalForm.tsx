@@ -1,26 +1,26 @@
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { TextArea } from '@/components/_shared/SimpleTextArea'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { UseFormReturn } from 'react-hook-form'
-import FormatInput from '../FormatInput'
-import { DatafileLocation } from '../DatafileLocation'
-import DefaultTooltip from '@/components/_shared/Tooltip'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { SimpleEditor } from '../../metadata/RTE/SimpleEditor'
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { TextArea } from '@/components/_shared/SimpleTextArea';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { type UseFormReturn } from 'react-hook-form';
+import FormatInput from '../FormatInput';
+import { DatafileLocation } from '../DatafileLocation';
+import DefaultTooltip from '@/components/_shared/Tooltip';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { SimpleEditor } from '../../metadata/RTE/SimpleEditor';
 
 export function LinkExternalForm({
     formObj,
     index,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    index: number
+    formObj: UseFormReturn<DatasetFormType>;
+    index: number;
 }) {
     const {
         register,
         formState: { errors },
-    } = formObj
+    } = formObj;
     return (
         <div className="flex flex-col gap-y-4">
             <InputGroup label="Link" required className="whitespace-nowrap">
@@ -114,5 +114,5 @@ export function LinkExternalForm({
                 <DatafileLocation formObj={formObj} index={index} />
             </div>
         </div>
-    )
+    );
 }
