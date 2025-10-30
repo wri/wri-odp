@@ -91,7 +91,7 @@
         "math.gl": "^3.4.2",
         "moment": "^2.29.2",
         "next": "^13.5.7",
-        "next-auth": "^4.24.5",
+        "next-auth": "^4.24.12",
         "next-seo": "^6.1.0",
         "next-sitemap": "^4.2.3",
         "nodemailer": "^6.7.8",
