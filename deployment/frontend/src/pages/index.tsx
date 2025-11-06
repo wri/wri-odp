@@ -108,10 +108,10 @@ export default function Home(
             </Head>
             <NextSeo
                 title="Home Page"
-                description={`WRI Open Data Catalog - Home Page`}
+                description={`WRI Open Data Catalog, WRI Data Explorer - Home Page`}
                 openGraph={{
                     title: `Home Page`,
-                    description: `WRI Open Data Catalog - Home Page`,
+                    description: `WRI Open Data Catalog, WRI Data Explorer - Home Page`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
                 }}
             />

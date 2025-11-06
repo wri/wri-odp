@@ -51,10 +51,10 @@ export default function topics() {
         <>
             <NextSeo
                 title={`Topics - Dashboard`}
-                description={`Topics - Dashboard -- WRI Open Data Catalog`}
+                description={`Topics - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`}
                 openGraph={{
                     title: `Topics - Dashboard`,
-                    description: `Topics - Dashboard -- WRI Open Data Catalog`,
+                    description: `Topics - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/topics`,
                 }}
             />
