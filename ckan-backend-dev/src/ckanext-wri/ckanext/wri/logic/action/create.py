@@ -42,6 +42,7 @@ from ckan.logic.action.get import (
     organization_show as old_organization_show)
 
 import ckan.authz as authz
+from ckanext.wri.logic import validators as wri_validators
 
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
@@ -435,6 +436,15 @@ def migration_status(context: Context, data_dict: DataDict):
 def package_create(context: Context, data_dict: DataDict):
 
     validate_visibility(context, data_dict)
+    try:
+        wri_validators.dataset_cross_fields(context, data_dict)
+    except Exception as e:
+        import ckan.plugins.toolkit as tk
+        if isinstance(e, tk.ValidationError):
+            raise
+        raise tk.ValidationError(str(e))
+    
+
     if data_dict.get("type") == "harvest":
         return old_package_create(context, data_dict)
 

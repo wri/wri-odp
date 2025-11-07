@@ -29,6 +29,7 @@ from ckanext.wri.logic.action.get import validate_visibility
 import json
 from typing import Any, Dict, List, Tuple
 from ckan.lib.search import index_for
+from ckanext.wri.logic import validators as wri_validators
 
 # encoding: utf-8
 
@@ -450,6 +451,12 @@ def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.Pa
 
     # Override for authors/maintainers validation/formatting
     data_dict = stringify_actor_objects(data_dict)
+    try:
+        wri_validators.dataset_cross_fields(context, data_dict)
+    except tk.ValidationError:
+        raise
+    except Exception as e:
+        raise tk.ValidationError(str(e))
 
     # immutable fields
     data_dict["id"] = pkg.id
