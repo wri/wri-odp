@@ -439,7 +439,6 @@ def package_create(context: Context, data_dict: DataDict):
     try:
         wri_validators.dataset_cross_fields(context, data_dict)
     except Exception as e:
-        import ckan.plugins.toolkit as tk
         if isinstance(e, tk.ValidationError):
             raise
         raise tk.ValidationError(str(e))

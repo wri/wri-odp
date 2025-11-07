@@ -218,7 +218,7 @@ def agents_json_object(value: Any, context: Context):
     ]
     """
     if not value:
-        return
+        raise Invalid("At least one agent is required")
 
     loaded_value = value
 
