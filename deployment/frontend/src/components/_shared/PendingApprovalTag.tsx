@@ -6,13 +6,17 @@ import { type WriDataset } from "@/schema/ckan.schema";
 export default function PendingApprovalTag({
   dataset
 }: {
-    dataset: WriDataset
+  dataset: WriDataset
 }) {
   const session = useSession();
   const userCapacity = api.user.getUserCapacity.useQuery(undefined, {
     enabled: !!session?.data?.user,
   });
   if (!session?.data?.user) return <></>;
+  const userId = session.data.user.id
+  if (userId === dataset.creator_user_id) {
+    return <Chip text="Pending Approval" />
+  }
   const adminOfDatasetOrg = userCapacity.data?.adminOrg.some(o => o.id === dataset.owner_org) ?? false;
   if (!adminOfDatasetOrg) return <></>;
   if (dataset.approval_status === 'approved') return <></>;
