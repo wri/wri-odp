@@ -57,6 +57,13 @@ import ckan.lib.app_globals as app_globals
 
 from ckan.common import _, config
 from ckan.types import Context, DataDict, ErrorDict, Schema
+from ckan.logic.action.update import (
+    group_update as old_group_update,
+)
+from ckanext.wri.logic import validators as wri_validators
+from ckan.logic.action.patch import (
+    group_patch as old_group_patch,
+)
 
 _validate = dfunc.validate
 _get_action = logic.get_action
@@ -900,3 +907,22 @@ def package_update(context: Context, data_dict: DataDict) -> ActionResult.Packag
             )
 
     return old_package_update(context, data_dict)
+
+
+def _validate_group_title_in_payload(data_dict, context):
+    try:
+        wri_validators.title_validator(data_dict.get("title", ""),context)
+    except Exception as e:
+        if isinstance(e, tk.ValidationError):
+            raise
+        raise tk.ValidationError(str(e))
+
+@logic.side_effect_free
+def group_update(context: Context, data_dict: DataDict):
+    _validate_group_title_in_payload(data_dict, context)
+    return old_group_update(context, data_dict)
+
+@logic.side_effect_free
+def group_patch(context: Context, data_dict: DataDict):
+    _validate_group_title_in_payload(data_dict, context)
+    return old_group_patch(context, data_dict)

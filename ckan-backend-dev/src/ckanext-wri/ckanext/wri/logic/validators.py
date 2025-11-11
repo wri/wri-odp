@@ -229,11 +229,9 @@ def agents_json_object(value: Any, context: Context):
             log.error(f"Value must be a valid JSON object: {e}")
             raise Invalid("Value must be a valid JSON object")
     if not isinstance(loaded_value, list):
-        log.error("Value must be a JSON array of agent objects")
         raise Invalid("Value must be a JSON array of agent objects")
 
     if len(loaded_value) == 0:
-        log.error("At least one agent is required")
         raise Invalid("At least one agent is required")
 
     for agent in loaded_value:
@@ -400,3 +398,10 @@ def dataset_cross_fields(context: Context, data_dict: dict):
     resource_cross_fields(context, data_dict)
 
     return True
+
+def title_validator(value, context):
+    if value is None:
+        return value
+    if isinstance(value, str) and len(value.strip()) < 2:
+        raise Invalid("Title is required (minimum of 2 characters)")
+    return value

@@ -36,7 +36,8 @@ from ckanext.wri.logic.action.action_helpers import (
 )
 import uuid
 from ckan.logic.action.create import (
-    organization_create as old_organization_create)
+    organization_create as old_organization_create,
+    group_create as old_group_create,)
 
 from ckan.logic.action.get import ( 
     organization_show as old_organization_show)
@@ -436,16 +437,16 @@ def migration_status(context: Context, data_dict: DataDict):
 def package_create(context: Context, data_dict: DataDict):
 
     validate_visibility(context, data_dict)
+
+    if data_dict.get("type") == "harvest":
+        return old_package_create(context, data_dict)
+    
     try:
         wri_validators.dataset_cross_fields(context, data_dict)
     except Exception as e:
         if isinstance(e, tk.ValidationError):
             raise
         raise tk.ValidationError(str(e))
-    
-
-    if data_dict.get("type") == "harvest":
-        return old_package_create(context, data_dict)
 
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
@@ -914,4 +915,16 @@ def organization_create(context, data_dict):
 
     
     result = old_organization_create(context, data_dict)
+    return result
+
+
+@logic.side_effect_free
+def group_create(context, data_dict):
+    try:
+        wri_validators.title_validator(data_dict.get("title", ""),context)
+    except Exception as e:
+        if isinstance(e, tk.ValidationError):
+            raise
+        raise tk.ValidationError(str(e))
+    result = old_group_create(context, data_dict)
     return result
