@@ -168,12 +168,6 @@ ckan:
       - hosts:
           - wri.dev.ckan.datopian.com
         secretName: wri.dev.ckan.datopian.com
-      - hosts:
-          - wri.dev.data.datopian.com
-        secretName: wri.dev.data.datopian.com
-      - hosts:
-          - wri.dev.console.datopian.com
-        secretName: wri.dev.console.datopian.com
   solr:
     enable: false
     image:
