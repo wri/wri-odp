@@ -198,10 +198,10 @@ export default function SearchPage(
                 const extGlobalQFilter = filters.find(
                     (f) => f.key == 'extGlobalQ'
                 );
-                if (extGlobalQFilter && extGlobalQFilter.value === 'exclude') {
+                if (extGlobalQFilter?.value === 'exclude') {
                     fq['!spatial_address'] = 'Global';
                 }
-                if (extGlobalQFilter && extGlobalQFilter.value === 'only') {
+                if (extGlobalQFilter?.value === 'only') {
                     fq.spatial_address = 'Global';
                 }
             } else {

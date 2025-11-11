@@ -314,8 +314,7 @@ export const DatasetRouter = createTRPCRouter({
                     console.log('dataset', dataset);
                     if (
                         //@ts-ignore
-                        dataset.error.name &&
-                        dataset.error.name[0] === 'That URL is already in use.'
+                        dataset.error.name?.[0] === 'That URL is already in use.'
                     ) {
                         throw Error(
                             '[!] A page with this URL slug already exists. Please try something different in the URL field.'
