@@ -339,7 +339,7 @@ def resource_cross_fields(context: Context, data_dict: dict):
                 ] = "Required"
 
         # title must be at least 2 chars (frontend enforces this)
-        title = r.get("title")
+        title = r.get("title", r.get("name", None))
         if title is None or (isinstance(title, str) and len(title.strip()) < 2):
             errors_for_resources.setdefault(i, {})[
                 "title"
@@ -369,7 +369,7 @@ def dataset_cross_fields(context: Context, data_dict: dict):
         if not isinstance(title, str) or len(title.strip()) < 2:
             raise tk.ValidationError({"title": "Title is required (minimum 2 characters)"})
 
-    vis = data_dict.get("visibility_type")
+    vis = data_dict.get("visibility_type", "public")
     vis_value = None
     if isinstance(vis, dict):
         vis_value = vis.get("value") or vis.get("label")

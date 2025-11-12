@@ -12,12 +12,15 @@ import unittest.mock as mock
 )
 def test_pending_dataset_create(mail_user):
     user = factories.Sysadmin()
+    organization = factories.Organization()
     dataset = factories.Dataset(
         notes="My dataset description",
         private=False,
         rw_dataset=True,
         title="My dataset",
         wri_data=False,
+        owner_org=organization['id'],
+        technical_notes="http://example.com/technical_notes.pdf"
     )
 
     data_dict = {
@@ -43,12 +46,15 @@ def test_pending_dataset_create(mail_user):
 )
 def test_pending_dataset_show(mail_user):
     user = factories.Sysadmin()
+    organization = factories.Organization()
     dataset = factories.Dataset(
         notes="My dataset description",
         private=False,
         rw_dataset=True,
         title="My dataset",
         wri_data=False,
+        owner_org=organization['id'],
+        technical_notes="http://example.com/technical_notes.pdf"
     )
 
     data_dict = {
@@ -76,12 +82,15 @@ def test_pending_dataset_show(mail_user):
 )
 def test_pending_dataset_update(mail_user):
     user = factories.Sysadmin()
+    organization = factories.Organization()
     dataset = factories.Dataset(
         notes="My dataset description",
         private=False,
         rw_dataset=True,
         title="My dataset",
         wri_data=False,
+        owner_org=organization['id'],
+        technical_notes="http://example.com/technical_notes.pdf"
     )
 
     data_dict = {
@@ -122,12 +131,15 @@ def test_pending_dataset_update(mail_user):
 )
 def test_pending_dataset_delete(mail_user):
     user = factories.Sysadmin()
+    organization = factories.Organization()
     dataset = factories.Dataset(
         notes="My dataset description",
         private=False,
         rw_dataset=True,
         title="My dataset",
         wri_data=False,
+        owner_org=organization['id'],
+        technical_notes="http://example.com/technical_notes.pdf"
     )
 
     data_dict = {
@@ -169,6 +181,7 @@ def test_pending_diff_show(mail_user):
         "user": userobj_sysadmin["name"],
         "user_obj": userobj_sysadmin,
     }
+    organization = factories.Organization()
     dataset_public = {
         "type": "dataset",
         "title": "Test Dataset Schema",
@@ -198,6 +211,7 @@ def test_pending_diff_show(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "owner_org": organization['id'],
     }
     try:
         get_action("dataset_purge")(
