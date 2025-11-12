@@ -22,11 +22,11 @@ export default function PendingApprovalTag({
     enabled: !!session?.data?.user,
   });
   if (!session?.data?.user) return <></>;
-  const userId = session.data.user.id
+  const userId = session.data.user.id;
   if (userId === dataset.creator_user_id) {
-    return <StatusChip status={dataset.approval_status} />
+    return <StatusChip status={dataset.approval_status} />;
   }
   const adminOfDatasetOrg = userCapacity.data?.adminOrg.some(o => o.id === dataset.owner_org) ?? false;
   if (!adminOfDatasetOrg) return <></>;
-  return <StatusChip status={dataset.approval_status} />
+  return <StatusChip status={dataset.approval_status} />;
 }
