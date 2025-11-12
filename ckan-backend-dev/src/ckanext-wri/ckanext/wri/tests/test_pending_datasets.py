@@ -20,7 +20,10 @@ def test_pending_dataset_create(mail_user):
         title="My dataset",
         wri_data=False,
         owner_org=organization['id'],
-        technical_notes="http://example.com/technical_notes.pdf"
+        technical_notes="http://example.com/technical_notes.pdf",
+        connectorType="rest",
+        provider="cartodb",
+        connectorUrl="https://example.com/api/data"
     )
 
     data_dict = {
@@ -54,7 +57,10 @@ def test_pending_dataset_show(mail_user):
         title="My dataset",
         wri_data=False,
         owner_org=organization['id'],
-        technical_notes="http://example.com/technical_notes.pdf"
+        technical_notes="http://example.com/technical_notes.pdf",
+        connectorType="rest",
+        provider="cartodb",
+        connectorUrl="https://example.com/api/data"
     )
 
     data_dict = {
@@ -90,7 +96,10 @@ def test_pending_dataset_update(mail_user):
         title="My dataset",
         wri_data=False,
         owner_org=organization['id'],
-        technical_notes="http://example.com/technical_notes.pdf"
+        technical_notes="http://example.com/technical_notes.pdf",
+        connectorType="rest",
+        provider="cartodb",
+        connectorUrl="https://example.com/api/data"
     )
 
     data_dict = {
@@ -139,7 +148,10 @@ def test_pending_dataset_delete(mail_user):
         title="My dataset",
         wri_data=False,
         owner_org=organization['id'],
-        technical_notes="http://example.com/technical_notes.pdf"
+        technical_notes="http://example.com/technical_notes.pdf",
+        connectorType="rest",
+        provider="cartodb",
+        connectorUrl="https://example.com/api/data"
     )
 
     data_dict = {
