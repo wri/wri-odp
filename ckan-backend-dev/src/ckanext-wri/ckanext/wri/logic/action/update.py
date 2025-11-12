@@ -204,6 +204,14 @@ def package_patch(context: Context, data_dict: DataDict):
     validate_visibility(context, data_dict)
     context["for_update"] = True
     dataset_id = data_dict.get("id")
+
+    try:
+        wri_validators.dataset_cross_fields(context, data_dict)
+    except tk.ValidationError:
+        raise
+    except Exception as e:
+        raise tk.ValidationError(str(e))
+    
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
             context, {"package_id": dataset_id}
@@ -458,12 +466,6 @@ def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.Pa
 
     # Override for authors/maintainers validation/formatting
     data_dict = stringify_actor_objects(data_dict)
-    try:
-        wri_validators.dataset_cross_fields(context, data_dict)
-    except tk.ValidationError:
-        raise
-    except Exception as e:
-        raise tk.ValidationError(str(e))
 
     # immutable fields
     data_dict["id"] = pkg.id
@@ -895,6 +897,13 @@ def resource_update(
 # We need to move the applications back to the groups field before calling the original package_update function
 def package_update(context: Context, data_dict: DataDict) -> ActionResult.PackageUpdate:
     applications = data_dict.get("applications", [])
+
+    try:
+        wri_validators.dataset_cross_fields(context, data_dict)
+    except tk.ValidationError:
+        raise
+    except Exception as e:
+        raise tk.ValidationError(str(e))
 
     if applications:
         if isinstance(applications, list) and all(
