@@ -50,6 +50,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover';
 import { env } from '@/env.mjs';
 import { useRouter } from 'next/router';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
+import PendingApprovalTag from '../_shared/PendingApprovalTag';
 
 const CopyButton = ({ content }: { content: string }) => {
     const [copied, setCopied] = useState(false);
@@ -756,6 +757,7 @@ export function DatasetHeader({
                                 {dataset?.visibility_type}
                             </span>
                         )}
+                        <PendingApprovalTag dataset={dataset!} />
                         <div className="">
                             <CopyButton
                                 content={`${env.NEXT_PUBLIC_NEXTAUTH_URL.replace(/\/+$/, '')}/datasets/${dataset?.name}`}
