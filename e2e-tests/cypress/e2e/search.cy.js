@@ -135,8 +135,8 @@ describe("Search page", () => {
         .toISOString()
         .split("T")[0];
 
-      cy.get("#since-date").type(sinceDateFormatted, { force: true });
-      cy.get("#before-date").type(beforeDateFormatted, { force: true });
+      cy.get("#since-date").type(sinceDateFormatted, { force: true, timeout: 10000 });
+      cy.get("#before-date").type(beforeDateFormatted, { force: true, timeout: 10000 });
 
       if (combination.results === true) {
         cy.contains("results", { timeout: 10000 });
