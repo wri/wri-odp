@@ -1588,18 +1588,18 @@ INVALID_TAGS = [
 ]
 
 ORGS = [
-    {"id": "afe1d718-7853-4a88-9386-cd81459f0519", "name": "climate-economics-finance"},
-    {"id": "ad461dbd-f646-4080-94a9-c10005c42a43", "name": "land-carbon-lab"},
-    {"id": "164c340b-5cf2-49da-98f9-024fdb7e0e42", "name": "electric-school-bus-initiative"}
+    {"id": "afe1d718-7853-4a88-9386-cd81459f0519", "name": "climate-economics-finance", "title": "climate-economics-finance"},
+    {"id": "ad461dbd-f646-4080-94a9-c10005c42a43", "name": "land-carbon-lab", "title": "land-carbon-lab"},
+    {"id": "164c340b-5cf2-49da-98f9-024fdb7e0e42", "name": "electric-school-bus-initiative", "title": "electric-school-bus-initiative"}
 ]
 
 GROUPS = [
-    {"id": "bcf5398c-4880-4678-a934-f741e1b426bc", "name": "economy-industry"},
-    {"id": "a82e7d91-8c0f-429f-b145-ab7f52ea9723", "name": "power-sector"},
-    {"id": "c74fae7a-9b54-4c02-b7b5-e3ca00bff8ef", "name": "forests"},
-    {"id": "80539133-5aaa-4257-9aeb-fe6f56e2837f", "name": "cities"},
-    {"id": "4926571e-a4e5-403d-8278-31a570039cc3", "name": "mobility"},
-    {"id": "c1427a08-9de5-4182-9c05-b6a61fda3127", "name": "land"}
+    {"id": "bcf5398c-4880-4678-a934-f741e1b426bc", "name": "economy-industry", "title": "economy-industry" },
+    {"id": "a82e7d91-8c0f-429f-b145-ab7f52ea9723", "name": "power-sector", "title": "power-sector"},
+    {"id": "c74fae7a-9b54-4c02-b7b5-e3ca00bff8ef", "name": "forests", "title": "forests"},
+    {"id": "80539133-5aaa-4257-9aeb-fe6f56e2837f", "name": "cities", "title": "cities"},
+    {"id": "4926571e-a4e5-403d-8278-31a570039cc3", "name": "mobility", "title": "mobility"},
+    {"id": "c1427a08-9de5-4182-9c05-b6a61fda3127", "name": "land", "title": "land"}
 ]
 
 REVISIONS = [
