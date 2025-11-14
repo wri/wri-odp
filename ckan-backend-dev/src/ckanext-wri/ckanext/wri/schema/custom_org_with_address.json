@@ -6,7 +6,7 @@
       {
         "field_name": "title",
         "label": "Name",
-        "validators": "ignore_missing unicode_safe",
+        "validators": "ignore_missing unicode_safe title_validator",
         "form_snippet": "large_text.html",
         "form_attrs": {"data-module": "slug-preview-target"},
         "form_placeholder": "My theme"

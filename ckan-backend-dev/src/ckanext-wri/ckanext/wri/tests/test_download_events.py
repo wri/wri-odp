@@ -11,7 +11,7 @@ def test_download_event_create_basic(mail_user):
     # Setup test data
     user = factories.Sysadmin()
     organization = factories.Organization()
-    dataset = factories.Dataset(owner_org=organization['id'])
+    dataset = factories.Dataset(owner_org=organization['id'], technical_notes="http://example.com/technical_notes.pdf")
     resource1 = factories.Resource(package_id=dataset['id'])
     resource2 = factories.Resource(package_id=dataset['id'])
 
@@ -46,7 +46,7 @@ def test_download_event_create_all_fields(mail_user):
     # Setup test data
     user = factories.Sysadmin()
     organization = factories.Organization()
-    dataset = factories.Dataset(owner_org=organization['id'])
+    dataset = factories.Dataset(owner_org=organization['id'], technical_notes="http://example.com/technical_notes.pdf")
     resource = factories.Resource(package_id=dataset['id'])
 
     context = {
@@ -92,8 +92,8 @@ def test_download_event_list(mail_user):
     org1 = factories.Organization()
     org2 = factories.Organization()
     
-    dataset1 = factories.Dataset(owner_org=org1['id'])
-    dataset2 = factories.Dataset(owner_org=org2['id'])
+    dataset1 = factories.Dataset(owner_org=org1['id'], technical_notes="http://example.com/notes1.pdf")
+    dataset2 = factories.Dataset(owner_org=org2['id'], technical_notes="http://example.com/notes2.pdf")
     
     resource1 = factories.Resource(package_id=dataset1['id'])
     resource2 = factories.Resource(package_id=dataset2['id'])
