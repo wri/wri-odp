@@ -15,90 +15,93 @@ import { signOut } from 'next-auth/react';
 import { toast } from 'react-toastify';
 
 const getBaseUrl = () => {
-    if (typeof window !== 'undefined') return ''; // browser should use relative url
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
-    return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+  if (typeof window !== 'undefined') return ''; // browser should use relative url
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
+  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
 /** A set of type-safe react-query hooks for your tRPC API. */
 export const api = createTRPCNext<AppRouter>({
-    config() {
-        return {
-            /**
-             * Transformer used for data de-serialization from the server.
-             *
-             * @see https://trpc.io/docs/data-transformers
-             */
-            transformer: superjson,
+  config() {
+    return {
+      /**
+       * Transformer used for data de-serialization from the server.
+       *
+       * @see https://trpc.io/docs/data-transformers
+       */
+      transformer: superjson,
 
-            // Custom global error callback
-            queryClientConfig: {
-                queryCache: new QueryCache({
-                    onError: (error) => {
-                        verifyAuthorizationError(error);
-                    },
-                    onSuccess: (r) => {
-                        verifyAuthorizationError(r);
-                    },
-                }),
-                mutationCache: new MutationCache({
-                    onError: (error) => {
-                        verifyAuthorizationError(error);
-                    },
-                    onSuccess: (r) => {
-                        verifyAuthorizationError(r);
-                    },
-                }),
-            },
+      // Custom global error callback
+      queryClientConfig: {
+        queryCache: new QueryCache({
+          onError: (error) => {
+            verifyAuthorizationError(error);
+          },
+          onSuccess: (r) => {
+            verifyAuthorizationError(r);
+          },
+        }),
+        mutationCache: new MutationCache({
+          onError: (error) => {
+            verifyAuthorizationError(error);
+          },
+          onSuccess: (r) => {
+            verifyAuthorizationError(r);
+          },
+        }),
+      },
 
-            /**
-             * Links used to determine request flow from client to server.
-             *
-             * @see https://trpc.io/docs/links
-             */
-            links: [
-                loggerLink({
-                    enabled: (opts) => {
-                        if (
-                            process.env.NODE_ENV === 'production' &&
-                            opts.direction === 'down' &&
-                            opts.result instanceof Error &&
-                            opts.result.data?.code === 'FORBIDDEN'
-                        )
-                            return false;
-                        return (
-                            process.env.NODE_ENV === 'development' ||
-                            (opts.direction === 'down' &&
-                                opts.result instanceof Error)
-                        );
-                    },
-                }),
-                httpBatchLink({
-                    url: `${getBaseUrl()}/api/trpc`,
-                }),
-            ],
-        };
-    },
-    /**
-     * Whether tRPC should await queries when server rendering pages.
-     *
-     * @see https://trpc.io/docs/nextjs#ssr-boolean-default-false
-     */
-    ssr: false,
+      /**
+       * Links used to determine request flow from client to server.
+       *
+       * @see https://trpc.io/docs/links
+       */
+      links: [
+        loggerLink({
+          enabled: (opts) => {
+            if (
+              process.env.NODE_ENV === 'production' &&
+              opts.direction === 'down' &&
+              opts.result instanceof Error &&
+              opts.result.data?.code === 'FORBIDDEN'
+            )
+              return false;
+            return (
+              process.env.NODE_ENV === 'development' ||
+              (opts.direction === 'down' &&
+                opts.result instanceof Error)
+            );
+          },
+        }),
+        httpBatchLink({
+          url: `${getBaseUrl()}/api/trpc`,
+        }),
+      ],
+    };
+  },
+  /**
+   * Whether tRPC should await queries when server rendering pages.
+   *
+   * @see https://trpc.io/docs/nextjs#ssr-boolean-default-false
+   */
+  ssr: false,
 });
 
 function verifyAuthorizationError(response: any) {
-    if (
-        response?.data?.stack?.includes('Access denied') ||
-        response?.error?.message?.includes('Access denied')
-    ) {
-        toast('Your session is no longer valid, please sign in again.', {
-            type: 'warning',
-        });
-        setTimeout(() => {
-            signOut();
-        }, 3000);
-    }
+  if (
+    response?.data?.stack?.includes('Access denied') ||
+    response?.error?.message?.includes('Access denied')
+  ) {
+    console.log('Authorization error detected.');
+    console.log('response:', JSON.stringify(response));
+    console.log('Error', response?.error);
+    //toast('Your session is no longer valid, please sign in again.', {
+    //    type: 'warning',
+    //});
+    //setTimeout(() => {
+    //    signOut();
+    //}, 3000);
+  }
 }
 
 /**
