@@ -1,5 +1,5 @@
 diff --git a/ckanext/issues/tests/logic/action/test_issue.py b/ckanext/issues/tests/logic/action/test_issue.py
-index 76c7474..7623a5e 100644
+index 76c7474..e301bed 100644
 --- a/ckanext/issues/tests/logic/action/test_issue.py
 +++ b/ckanext/issues/tests/logic/action/test_issue.py
 @@ -281,6 +281,7 @@ class TestIssueComment(object):
@@ -10,11 +10,11 @@ index 76c7474..7623a5e 100644
              dataset_id=dataset['id'],
              context={'user': user['name']},
              status='closed'
-@@ -513,6 +514,7 @@ class TestIssueUpdate(object):
-             'issue_update',
-             context={'user': user['name']},
-             issue_number=issue['number'],
-+            description='new description',
+@@ -539,6 +540,7 @@ class TestIssueUpdate(object):
              dataset_id=dataset['id'],
-             title='new title',
-             description='new description'
+             issue_number=issue['number'],
+             status='closed'
++            description='some description',
+         )
+         assert 'closed' == closed['status']
+ 
