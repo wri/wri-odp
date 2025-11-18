@@ -111,6 +111,8 @@ def test_dataset_success():
         "owner_org": "org-id",
         "title": "Valid title",
         "visibility_type": "private",
+        "authors": [{"name": "Author Name", "email": "author@example.com"}],
+        "maintainers": [{"name": "Maintainer Name", "email": "maintainer@example.com"}],
         "rw_dataset": False,
     }
     assert validators.dataset_cross_fields(context, data) is True
