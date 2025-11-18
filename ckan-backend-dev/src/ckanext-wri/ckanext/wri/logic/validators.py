@@ -381,6 +381,12 @@ def dataset_cross_fields(context: Context, data_dict: dict):
         if not data_dict.get("technical_notes"):
             raise tk.ValidationError({"technical_notes": "Technical notes are required for public Datasets"})
 
+    if data_dict.get("authors", None) == None:
+        raise tk.ValidationError({"authors": "At least one author is required"})
+    
+    if data_dict.get("maintainers", None) == None:
+        raise tk.ValidationError({"maintainers": "At least one maintainer is required"})
+
     # RW dataset rules
     if data_dict.get("rw_dataset"):
         connector_type = data_dict.get("connectorType")

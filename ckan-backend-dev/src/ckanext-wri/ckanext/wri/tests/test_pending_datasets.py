@@ -23,7 +23,9 @@ def test_pending_dataset_create(mail_user):
         technical_notes="http://example.com/technical_notes.pdf",
         connectorType="rest",
         provider="cartodb",
-        connectorUrl="https://example.com/api/data"
+        connectorUrl="https://example.com/api/data",
+        authors=[{"name": "Datopian", "email": "datopian@example.com"}],
+        maintainers=[{"name": "Datopian", "email": "datopian@example.com"}]
     )
 
     data_dict = {
@@ -60,7 +62,9 @@ def test_pending_dataset_show(mail_user):
         technical_notes="http://example.com/technical_notes.pdf",
         connectorType="rest",
         provider="cartodb",
-        connectorUrl="https://example.com/api/data"
+        connectorUrl="https://example.com/api/data",
+        authors=[{"name": "Datopian", "email": "datopian@example.com"}],
+        maintainers=[{"name": "Datopian", "email": "datopian@example.com"}]
     )
 
     data_dict = {
@@ -99,7 +103,9 @@ def test_pending_dataset_update(mail_user):
         technical_notes="http://example.com/technical_notes.pdf",
         connectorType="rest",
         provider="cartodb",
-        connectorUrl="https://example.com/api/data"
+        connectorUrl="https://example.com/api/data",
+        authors=[{"name": "Datopian", "email": "datopian@example.com"}],
+        maintainers=[{"name": "Datopian", "email": "datopian@example.com"}]
     )
 
     data_dict = {
@@ -151,7 +157,9 @@ def test_pending_dataset_delete(mail_user):
         technical_notes="http://example.com/technical_notes.pdf",
         connectorType="rest",
         provider="cartodb",
-        connectorUrl="https://example.com/api/data"
+        connectorUrl="https://example.com/api/data",
+        authors=[{"name": "Datopian", "email": "datopian@example.com"}],
+        maintainers=[{"name": "Datopian", "email": "datopian@example.com"}]
     )
 
     data_dict = {
@@ -224,6 +232,8 @@ def test_pending_diff_show(mail_user):
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
         "owner_org": organization['id'],
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}]
     }
     try:
         get_action("dataset_purge")(
