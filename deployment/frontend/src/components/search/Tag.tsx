@@ -28,7 +28,6 @@ export default function Tags({
     value: string[];
     setValue: Dispatch<SetStateAction<string[]>>;
 }) {
-    // console.log('Facetselect79000: ', facetSelectedCount)
     const getUpdatedOptionsState = () => {
         return options.reduce((a, v) => {
             const checked = filters.find(
