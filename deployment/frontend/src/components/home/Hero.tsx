@@ -59,17 +59,10 @@ export function Hero() {
         <div className="bg-gray-900">
             <header className="absolute inset-x-0 top-0 z-50">
                 <div className=" w-full bg-wri-green  py-2 text-center  text-white font-acumin text-lg leading-normal">
-                    This site updates WRI’s Open Data Portal. If you cannot find
-                    what you’re looking for, you can access the former Open Data
-                    Portal{' '}
-                    <a
-                        target="_blank"
-                        href="https://old-datasets.wri.org"
-                        aria-label="https://old-datasets.wri.org"
-                        className="underline font-semibold"
-                    >
-                        here
-                    </a>
+                    This site replaces WRI’s former Open Data Portal. We are still in the process of adding more datasets. 
+                    If you are not able to find the data you're looking for, please reach out to us at {''}
+                    <a href="mailto:data@wri.org" className="underline font-semibold">data@wri.org</a>.
+                    
                 </div>
                 <nav
                     className="flex items-center justify-between p-6 lg:px-8"
