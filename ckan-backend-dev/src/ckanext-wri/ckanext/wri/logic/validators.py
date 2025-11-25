@@ -200,6 +200,31 @@ def _validate_agent(agent: dict, context: Context):
             agent[key] = email_validator(agent[key], context)
 
 
+def _validate_agents_list(value: Any, context: Context, field_name: str = "agent"):
+    if not value:
+        raise Invalid(f"At least one {field_name} is required")
+
+    loaded_value = value
+
+    if isinstance(value, str):
+        try:
+            loaded_value = json.loads(value)
+        except Exception as e:
+            log.error(f"Value must be a valid JSON object: {e}")
+            raise Invalid("Value must be a valid JSON object")
+    
+    if not isinstance(loaded_value, list):
+        raise Invalid(f"Value must be a JSON array of {field_name} objects")
+
+    if len(loaded_value) == 0:
+        raise Invalid(f"At least one {field_name} is required")
+
+    for agent in loaded_value:
+        _validate_agent(agent, context)
+
+    return value
+
+
 def agents_json_object(value: Any, context: Context):
     """
     Confirms that the value is a valid JSON object (array of objects).
@@ -218,7 +243,7 @@ def agents_json_object(value: Any, context: Context):
     ]
     """
     if not value:
-        raise Invalid("At least one agent is required")
+        return
 
     loaded_value = value
 
@@ -228,14 +253,9 @@ def agents_json_object(value: Any, context: Context):
         except Exception as e:
             log.error(f"Value must be a valid JSON object: {e}")
             raise Invalid("Value must be a valid JSON object")
-    if not isinstance(loaded_value, list):
-        raise Invalid("Value must be a JSON array of agent objects")
-
-    if len(loaded_value) == 0:
-        raise Invalid("At least one agent is required")
-
-    for agent in loaded_value:
-        _validate_agent(agent, context)
+    elif isinstance(value, list):
+        for agent in loaded_value:
+            _validate_agent(agent, context)
 
     return value
 
@@ -381,11 +401,21 @@ def dataset_cross_fields(context: Context, data_dict: dict):
         if not data_dict.get("technical_notes"):
             raise tk.ValidationError({"technical_notes": "Technical notes are required for public Datasets"})
 
-    if data_dict.get("authors", None) == None:
+    authors = data_dict.get("authors", None)
+    if authors is None:
         raise tk.ValidationError({"authors": "At least one author is required"})
+    try:
+        _validate_agents_list(authors, context, "author")
+    except Invalid as e:
+        raise tk.ValidationError({"authors": str(e)})
     
-    if data_dict.get("maintainers", None) == None:
+    maintainers = data_dict.get("maintainers", None)
+    if maintainers is None:
         raise tk.ValidationError({"maintainers": "At least one maintainer is required"})
+    try:
+        _validate_agents_list(maintainers, context, "maintainer")
+    except Invalid as e:
+        raise tk.ValidationError({"maintainers": str(e)})
 
     # RW dataset rules
     if data_dict.get("rw_dataset"):
