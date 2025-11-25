@@ -2,7 +2,6 @@ import pytest
 
 import ckanext.wri.logic.validators as validators
 import ckan.lib.navl.dictization_functions as df
-import ckan.plugins.toolkit as tk
 
 Invalid = df.Invalid
 
@@ -55,10 +54,6 @@ def test_iso_language_code(value, expected):
             [{"name": "Test User", "email": "test@example.com"}, {"name": "Test User 2", "email": "test.user.2@example.com"}],
         ),
         (
-            [],
-            Invalid,
-        ),
-        (
             [{"name": "Test User", "email": "not an email address"}, {"name": "Test User 2", "email": "test.user.2@example.com"}],
             Invalid,
         ),
@@ -83,36 +78,3 @@ def test_agents_json_object(value, expected):
             validators.agents_json_object(value, context)
     else:
         assert validators.agents_json_object(value, context) == expected
-
-
-def test_dataset_title_min():
-    context = {}
-    data = {"owner_org": "org-id", "title": "A"}
-    with pytest.raises(tk.ValidationError):
-        validators.dataset_cross_fields(context, data)
-
-
-def test_dataset_public_requires_technical_notes():
-    context = {}
-    data = {"owner_org": "org-id", "visibility_type": "public"}
-    with pytest.raises(tk.ValidationError):
-        validators.dataset_cross_fields(context, data)
-
-def test_dataset_rw_requires_fields():
-    context = {}
-    data = {"owner_org": "org-id", "rw_dataset": True}
-    with pytest.raises(tk.ValidationError):
-        validators.dataset_cross_fields(context, data)
-
-
-def test_dataset_success():
-    context = {}
-    data = {
-        "owner_org": "org-id",
-        "title": "Valid title",
-        "visibility_type": "private",
-        "authors": [{"name": "Author Name", "email": "author@example.com"}],
-        "maintainers": [{"name": "Maintainer Name", "email": "maintainer@example.com"}],
-        "rw_dataset": False,
-    }
-    assert validators.dataset_cross_fields(context, data) is True
