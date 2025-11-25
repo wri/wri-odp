@@ -5,6 +5,7 @@ import Link from 'next/link';
 import MapViewIcon from './datasets/view-icons/MapViewIcon';
 import TabularViewIcon from './datasets/view-icons/TabularViewIcon';
 import ChartViewIcon from './datasets/view-icons/ChartViewIcon';
+import PendingApprovalTag from './_shared/PendingApprovalTag';
 
 export default function Card({ dataset }: { dataset: WriDataset }) {
     return (
@@ -15,9 +16,12 @@ export default function Card({ dataset }: { dataset: WriDataset }) {
             <div className="bg-white text-wri-green font-bold text-[0.938rem] leading-[1.125rem] w-full pt-4 pb-2 line-clamp-1 h-[2.5em]">
                 {dataset?.organization?.title ?? dataset?.organization?.name}
             </div>
-            <h2 className="text-wri-black text-2xl font-bold w-full line-clamp-2 h-[2.5em]">
-                {dataset?.title ?? dataset?.name}
-            </h2>
+            <div className="flex items-center gap-x-2">
+                <h2 className="text-wri-black text-2xl font-bold w-full line-clamp-2 h-[2.5em]">
+                    {dataset?.title ?? dataset?.name}
+                </h2>
+                <PendingApprovalTag dataset={dataset} />
+            </div>
             <article className=" line-clamp-3 w-[88%] font-light text-base mt-4 leading-[1.375rem] h-[4em]">
                 {dataset?.short_description ?? ''}
             </article>

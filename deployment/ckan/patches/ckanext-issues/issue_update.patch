@@ -1,0 +1,16 @@
+diff --git a/ckanext/issues/logic/action/action.py b/ckanext/issues/logic/action/action.py
+index 285146d..107ce9e 100644
+--- a/ckanext/issues/logic/action/action.py
++++ b/ckanext/issues/logic/action/action.py
+@@ -263,6 +263,11 @@ def issue_update(context, data_dict):
+         if k not in ignored_keys:
+             setattr(issue, k, v)
+ 
++    status = data_dict.get("status")
++    description = data_dict.get("description", None)
++    if status == "closed" and not description:
++        raise p.toolkit.ValidationError("Description is required when closing an issue")
++    
+     if status_change:
+         if data_dict['status'] == issuemodel.ISSUE_STATUS.closed:
+             issue.resolved = datetime.utcnow()

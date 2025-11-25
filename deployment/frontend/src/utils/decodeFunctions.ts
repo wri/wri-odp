@@ -52,274 +52,273 @@ import { differenceInDays } from 'date-fns';
 //};
 //
 const getDayRange = (params: any) => {
-    const {
-        startDate,
-        endDate,
-        minDate,
-        maxDate,
-        weeks,
-        minDateAbsolut = null,
-    } = params || {};
-    // If min date absolut, always take its value (dynamic timeline)
-    const minDateTime = new Date(minDateAbsolut || minDate);
-    const maxDateTime = new Date(maxDate);
-    const numberOfDays = differenceInDays(maxDateTime, minDateTime);
+  const {
+    startDate,
+    endDate,
+    minDate,
+    maxDate,
+    weeks,
+    minDateAbsolut = null,
+  } = params || {};
+  // If min date absolut, always take its value (dynamic timeline)
+  const minDateTime = new Date(minDateAbsolut || minDate);
+  const maxDateTime = new Date(maxDate);
+  const numberOfDays = differenceInDays(maxDateTime, minDateTime);
 
-    // timeline or hover effect active range
-    const startDateTime = new Date(startDate);
-    const endDateTime = new Date(endDate);
-    const activeStartDay =
-        numberOfDays - differenceInDays(maxDateTime, startDateTime);
-    const activeEndDay =
-        numberOfDays - differenceInDays(maxDateTime, endDateTime);
+  // timeline or hover effect active range
+  const startDateTime = new Date(startDate);
+  const endDateTime = new Date(endDate);
+  const activeStartDay =
+    numberOfDays - differenceInDays(maxDateTime, startDateTime);
+  const activeEndDay =
+    numberOfDays - differenceInDays(maxDateTime, endDateTime);
 
-    // show specified weeks from end date
-    const rangeStartDate = weeks && numberOfDays - 7 * weeks;
+  // show specified weeks from end date
+  const rangeStartDate = weeks && numberOfDays - 7 * weeks;
 
-    // get start and end day
-    const startDayIndex = activeStartDay || rangeStartDate || 0;
-    const endDayIndex = activeEndDay || numberOfDays;
-    const obj = {
-        startDayIndex,
-        endDayIndex,
-        numberOfDays,
-    };
-    return obj;
+  // get start and end day
+  const startDayIndex = activeStartDay || rangeStartDate || 0;
+  const endDayIndex = activeEndDay || numberOfDays;
+  const obj = {
+    startDayIndex,
+    endDayIndex,
+    numberOfDays,
+  };
+  return obj;
 };
 
 export const getDecodeParams = {
-    '3c4225a4-a8d8-4d73-b12d-0c47dec84c76': async () => ({
-        startYear: 2001,
-        endYear: 2022,
-    }),
-    '929662b6-3bf8-4413-b4b3-9b8c116f68bb': async () => ({
-        startYear: 2001,
-        endYear: 2022,
-    }),
-    '0ffc5ce2-e284-42e0-aa00-89e0728f476e': async () => ({
-        startYear: 2001,
-        endYear: 2020,
-    }),
-    '04774cb7-912c-4612-bbd8-ba982d532c88': async () => ({
-        startYear: 2001,
-        endYear: 2019,
-    }),
-    '1e7f2868-7fcd-46b2-bbc8-64ec78f95cca': async () => {
-        const endDateRes = await fetch(
-            'https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest'
-        );
-        const endDateJson = await endDateRes.json();
-        const {
-            metadata: {
-                content_date_range: { end_date },
-            },
-        } = endDateJson.data;
-        const dayRange = getDayRange({
-            endDate: end_date,
-            endDateAbsolute: end_date,
-            latestUrl: 'dataset/gfw_integrated_alerts/latest',
-            maxDate: end_date,
-            minDate: '2022-02-11',
-            minDateAbsolut: '2014-12-31',
-            raddOnly: 0,
-            startDate: '2022-08-01',
-            startDateAbsolute: '2022-08-01',
-            trimEndDate: 549,
-        });
-        return { ...dayRange, confirmedOnly: 0 };
-    },
-    'ff797c8d-0c1b-4df5-beb3-20a9b900716a': async () => {
-        const endDateRes = await fetch(
-            'https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest'
-        );
-        const endDateJson = await endDateRes.json();
-        const {
-            metadata: {
-                content_date_range: { end_date },
-            },
-        } = endDateJson.data;
-        const dayRange = getDayRange({
-            endDate: end_date,
-            endDateAbsolute: end_date,
-            maxDate: end_date,
-            minDate: '2022-02-11',
-            minDateAbsolut: '2014-12-31',
-            raddOnly: 0,
-            startDate: '2022-08-01',
-            startDateAbsolute: '2022-08-01',
-            trimEndDate: 549,
-        });
-        return { ...dayRange, confirmedOnly: 0 };
-    },
-    'e969a15c-f06b-40f6-9a3e-f206277dc216': async () => {
-        const endDateRes = await fetch(
-            'https://data-api.globalforestwatch.org/dataset/umd_glad_landsat_alerts/latest'
-        );
-        const endDateJson = await endDateRes.json();
-        const {
-            metadata: {
-                content_date_range: { end_date },
-            },
-        } = endDateJson.data;
-        const dayRange = getDayRange({
-            endDate: end_date,
-            endDateAbsolute: end_date,
-            maxDate: end_date,
-            minDate: '2022-02-11',
-            minDateAbsolut: '2014-12-31',
-            raddOnly: 0,
-            startDate: '2022-08-01',
-            startDateAbsolute: '2022-08-01',
-            trimEndDate: 549,
-        });
-        return { ...dayRange, confirmedOnly: 0 };
-    },
-    'cb184858-4501-4e18-bdf4-8fc4150b9f6e': async () => {
-        const endDateRes = await fetch(
-            'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
-        );
-        const endDateJson = await endDateRes.json();
-        const {
-            metadata: {
-                content_date_range: { end_date },
-            },
-        } = endDateJson.data;
-        const dayRange = getDayRange({
-            endDate: end_date,
-            maxDate: end_date,
-            minDate: '2022-02-11',
-            minDateAbsolut: '2014-12-31',
-            raddOnly: 0,
-            startDate: '2022-08-01',
-            startDateAbsolute: '2022-08-01',
-            trimEndDate: 549,
-        });
-        return { ...dayRange, confirmedOnly: 0 };
-    },
-    'ff8e8721-c66e-42eb-9738-f1ba6990b8cc': async () => {
-        const endDateRes = await fetch(
-            'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
-        );
-        const endDateJson = await endDateRes.json();
-        const {
-            metadata: {
-                content_date_range: { end_date },
-            },
-        } = endDateJson.data;
-        const dayRange = getDayRange({
-            endDate: end_date,
-            maxDate: end_date,
-            minDate: '2022-02-11',
-            minDateAbsolut: '2014-12-31',
-            raddOnly: 0,
-            startDate: '2022-08-01',
-            startDateAbsolute: '2022-08-01',
-            trimEndDate: 549,
-        });
-        console.log('day range', dayRange);
-        return { ...dayRange, confirmedOnly: 0 };
-    },
-    '512d9984-2965-484a-b72c-de0f4d24237e': async () => {
-        const endDateRes = await fetch(
-            'https://data-api.globalforestwatch.org/dataset/wur_radd_alerts/latest'
-        );
-        const endDateJson = await endDateRes.json();
-        const {
-            metadata: {
-                content_date_range: { end_date },
-            },
-        } = endDateJson.data;
-        const dayRange = getDayRange({
-            endDate: end_date,
-            endDateAbsolute: end_date,
-            latestUrl: 'dataset/gfw_integrated_alerts/latest',
-            maxDate: end_date,
-            minDate: '2022-02-11',
-            minDateAbsolut: '2014-12-31',
-            raddOnly: 0,
-            startDate: '2022-08-01',
-            startDateAbsolute: '2022-08-01',
-            trimEndDate: 549,
-        });
-        return { ...dayRange, confirmedOnly: 0 };
-    },
-    '5f6819a7-ad89-4c40-8715-9f859cb5e827': async () => {
-        const endDateRes = await fetch(
-            'https://data-api.globalforestwatch.org/dataset/wur_radd_alerts/latest'
-        );
-        const endDateJson = await endDateRes.json();
-        const {
-            metadata: {
-                content_date_range: { end_date },
-            },
-        } = endDateJson.data;
-        const dayRange = getDayRange({
-            endDate: end_date,
-            endDateAbsolute: end_date,
-            latestUrl: 'dataset/gfw_integrated_alerts/latest',
-            maxDate: end_date,
-            minDate: '2022-02-11',
-            minDateAbsolut: '2014-12-31',
-            raddOnly: 0,
-            startDate: '2022-08-01',
-            startDateAbsolute: '2022-08-01',
-            trimEndDate: 549,
-        });
-        return { ...dayRange, confirmedOnly: 0 };
-    },
+  '3c4225a4-a8d8-4d73-b12d-0c47dec84c76': async () => ({
+    startYear: 2001,
+    endYear: 2022,
+  }),
+  '929662b6-3bf8-4413-b4b3-9b8c116f68bb': async () => ({
+    startYear: 2001,
+    endYear: 2022,
+  }),
+  '0ffc5ce2-e284-42e0-aa00-89e0728f476e': async () => ({
+    startYear: 2001,
+    endYear: 2020,
+  }),
+  '04774cb7-912c-4612-bbd8-ba982d532c88': async () => ({
+    startYear: 2001,
+    endYear: 2019,
+  }),
+  '1e7f2868-7fcd-46b2-bbc8-64ec78f95cca': async () => {
+    const endDateRes = await fetch(
+      'https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest'
+    );
+    const endDateJson = await endDateRes.json();
+    const {
+      metadata: {
+        content_date_range: { end_date },
+      },
+    } = endDateJson.data;
+    const dayRange = getDayRange({
+      endDate: end_date,
+      endDateAbsolute: end_date,
+      latestUrl: 'dataset/gfw_integrated_alerts/latest',
+      maxDate: end_date,
+      minDate: '2022-02-11',
+      minDateAbsolut: '2014-12-31',
+      raddOnly: 0,
+      startDate: '2022-08-01',
+      startDateAbsolute: '2022-08-01',
+      trimEndDate: 549,
+    });
+    return { ...dayRange, confirmedOnly: 0 };
+  },
+  'ff797c8d-0c1b-4df5-beb3-20a9b900716a': async () => {
+    const endDateRes = await fetch(
+      'https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest'
+    );
+    const endDateJson = await endDateRes.json();
+    const {
+      metadata: {
+        content_date_range: { end_date },
+      },
+    } = endDateJson.data;
+    const dayRange = getDayRange({
+      endDate: end_date,
+      endDateAbsolute: end_date,
+      maxDate: end_date,
+      minDate: '2022-02-11',
+      minDateAbsolut: '2014-12-31',
+      raddOnly: 0,
+      startDate: '2022-08-01',
+      startDateAbsolute: '2022-08-01',
+      trimEndDate: 549,
+    });
+    return { ...dayRange, confirmedOnly: 0 };
+  },
+  'e969a15c-f06b-40f6-9a3e-f206277dc216': async () => {
+    const endDateRes = await fetch(
+      'https://data-api.globalforestwatch.org/dataset/umd_glad_landsat_alerts/latest'
+    );
+    const endDateJson = await endDateRes.json();
+    const {
+      metadata: {
+        content_date_range: { end_date },
+      },
+    } = endDateJson.data;
+    const dayRange = getDayRange({
+      endDate: end_date,
+      endDateAbsolute: end_date,
+      maxDate: end_date,
+      minDate: '2022-02-11',
+      minDateAbsolut: '2014-12-31',
+      raddOnly: 0,
+      startDate: '2022-08-01',
+      startDateAbsolute: '2022-08-01',
+      trimEndDate: 549,
+    });
+    return { ...dayRange, confirmedOnly: 0 };
+  },
+  'cb184858-4501-4e18-bdf4-8fc4150b9f6e': async () => {
+    const endDateRes = await fetch(
+      'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
+    );
+    const endDateJson = await endDateRes.json();
+    const {
+      metadata: {
+        content_date_range: { end_date },
+      },
+    } = endDateJson.data;
+    const dayRange = getDayRange({
+      endDate: end_date,
+      maxDate: end_date,
+      minDate: '2022-02-11',
+      minDateAbsolut: '2014-12-31',
+      raddOnly: 0,
+      startDate: '2022-08-01',
+      startDateAbsolute: '2022-08-01',
+      trimEndDate: 549,
+    });
+    return { ...dayRange, confirmedOnly: 0 };
+  },
+  'ff8e8721-c66e-42eb-9738-f1ba6990b8cc': async () => {
+    const endDateRes = await fetch(
+      'https://data-api.globalforestwatch.org/dataset/umd_glad_sentinel2_alerts/latest'
+    );
+    const endDateJson = await endDateRes.json();
+    const {
+      metadata: {
+        content_date_range: { end_date },
+      },
+    } = endDateJson.data;
+    const dayRange = getDayRange({
+      endDate: end_date,
+      maxDate: end_date,
+      minDate: '2022-02-11',
+      minDateAbsolut: '2014-12-31',
+      raddOnly: 0,
+      startDate: '2022-08-01',
+      startDateAbsolute: '2022-08-01',
+      trimEndDate: 549,
+    });
+    return { ...dayRange, confirmedOnly: 0 };
+  },
+  '512d9984-2965-484a-b72c-de0f4d24237e': async () => {
+    const endDateRes = await fetch(
+      'https://data-api.globalforestwatch.org/dataset/wur_radd_alerts/latest'
+    );
+    const endDateJson = await endDateRes.json();
+    const {
+      metadata: {
+        content_date_range: { end_date },
+      },
+    } = endDateJson.data;
+    const dayRange = getDayRange({
+      endDate: end_date,
+      endDateAbsolute: end_date,
+      latestUrl: 'dataset/gfw_integrated_alerts/latest',
+      maxDate: end_date,
+      minDate: '2022-02-11',
+      minDateAbsolut: '2014-12-31',
+      raddOnly: 0,
+      startDate: '2022-08-01',
+      startDateAbsolute: '2022-08-01',
+      trimEndDate: 549,
+    });
+    return { ...dayRange, confirmedOnly: 0 };
+  },
+  '5f6819a7-ad89-4c40-8715-9f859cb5e827': async () => {
+    const endDateRes = await fetch(
+      'https://data-api.globalforestwatch.org/dataset/wur_radd_alerts/latest'
+    );
+    const endDateJson = await endDateRes.json();
+    const {
+      metadata: {
+        content_date_range: { end_date },
+      },
+    } = endDateJson.data;
+    const dayRange = getDayRange({
+      endDate: end_date,
+      endDateAbsolute: end_date,
+      latestUrl: 'dataset/gfw_integrated_alerts/latest',
+      maxDate: end_date,
+      minDate: '2022-02-11',
+      minDateAbsolut: '2014-12-31',
+      raddOnly: 0,
+      startDate: '2022-08-01',
+      startDateAbsolute: '2022-08-01',
+      trimEndDate: 549,
+    });
+    return { ...dayRange, confirmedOnly: 0 };
+  },
 } as const;
 
 export function createDeckLayer(
-    layer: layerConfigSpec,
-    id: string,
-    layerState?: LayerState
+  layer: layerConfigSpec,
+  id: string,
+  layerState?: LayerState
 ) {
-    // @ts-ignore
-    let tileUrl = layer.source.tiles[0] ?? '';
-    const threshold =
-        layer.params_config &&
-        (layer.params_config as unknown as Array<any>).find(
-            (p) => p.key === 'threshold' || p.key === 'thresh'
-        );
-    tileUrl = tileUrl
-        .replace(
-            '{thresh}',
-            layerState?.threshold
-                ? layerState?.threshold
-                : (threshold?.default ?? 30)
-        )
-        .replace(
-            '{threshold}',
-            layerState?.threshold
-                ? layerState?.threshold
-                : (threshold?.default ?? 30)
-        );
-    let obj = {
-        ...layer,
-        source: {
-            ...layer.source,
-            tiles: [tileUrl],
-        },
-        visibility: true,
-        decodeFunction: decodes[layer.decode_function as keyof typeof decodes],
-        decodeParams: layer.decodeParams ?? {},
+  // @ts-ignore
+  let tileUrl = layer.source.tiles[0] ?? '';
+  const threshold =
+    layer.params_config &&
+    (layer.params_config as unknown as Array<any>).find(
+      (p) => p.key === 'threshold' || p.key === 'thresh'
+    );
+  tileUrl = tileUrl
+    .replace(
+      '{thresh}',
+      layerState?.threshold
+        ? layerState?.threshold
+        : (threshold?.default ?? 30)
+    )
+    .replace(
+      '{threshold}',
+      layerState?.threshold
+        ? layerState?.threshold
+        : (threshold?.default ?? 30)
+    );
+  let obj = {
+    ...layer,
+    source: {
+      ...layer.source,
+      tiles: [tileUrl],
+    },
+    visibility: true,
+    decodeFunction: decodes[layer.decode_function as keyof typeof decodes],
+    decodeParams: layer.decodeParams ?? {},
+  };
+  if (layerState) {
+    obj = {
+      ...obj,
+      ...layerState,
+      visibility: layerState.active
+        ? typeof layerState.visibility !== 'undefined'
+          ? layerState.visibility
+          : true
+        : false,
     };
-    if (layerState) {
-        obj = {
-            ...obj,
-            ...layerState,
-            visibility: layerState.active
-                ? typeof layerState.visibility !== 'undefined'
-                    ? layerState.visibility
-                    : true
-                : false,
-        };
-    }
-    return obj;
+  }
+  return obj;
 }
 
 const decodes = {
-    treeCover: `
+  treeCover: `
     // values for creating power scale, domain (input), and range (output)
     float domainMin = 0.;
     float domainMax = 255.;
@@ -343,7 +342,7 @@ const decodes = {
     color.g = 189. / 255.;
     color.b = 61. / 255.;
   `,
-    treeCoverLoss: `
+  treeCoverLoss: `
     // values for creating power scale, domain (input), and range (output)
     float domainMin = 0.;
     float domainMax = 255.;
@@ -373,7 +372,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    treeCoverLossFire: `
+  treeCoverLossFire: `
   // values for creating power scale, domain (input), and range (output)
   float domainMin = 0.;
   float domainMax = 255.;
@@ -404,7 +403,7 @@ const decodes = {
     alpha = 0.;
   }
 `,
-    treeLossByDriver: `
+  treeLossByDriver: `
     float year = 2000.0 + (color.b * 255.);
     // map to years
     if (year >= startYear && year <= endYear && year >= 2001.) {
@@ -462,7 +461,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    integratedAlerts8Bitprevious: `
+  integratedAlerts8Bitprevious: `
     // First 6 bits Alpha channel used to individual alert confidence
     // First two bits (leftmost) are GLAD-L
     // Next, 3rd and 4th bits are GLAD-S2
@@ -571,7 +570,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    integratedAlerts8Bit: `
+  integratedAlerts8Bit: `
   // First 6 bits Alpha channel used to individual alert confidence
     // First two bits (leftmost) are GLAD-L
     // Next, 3rd and 4th bits are GLAD-S2
@@ -633,7 +632,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    integratedAlerts16Bit: `
+  integratedAlerts16Bit: `
     // The Red, Green, and Blue bands are GLAD, GLAD-S2 and RADD, respectively.
     // They are 16-bit unsigned, abbbb where a is the confirmation status (2 for unconfirmed, 3 for confirmed)
     // bbbb is the number of days past Dec. 31, 2014 (with 1 being January 1st, 2015).
@@ -741,7 +740,7 @@ const decodes = {
       alpha = 1.;
     }
     `,
-    GLADs: `
+  GLADs: `
     // values for creating power scale, domain (input), and range (output)
     float confidenceValue = 0.;
     if (confirmedOnly > 0.) {
@@ -776,7 +775,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    RADDs: `
+  RADDs: `
   // todo: this decode function would be deprecated when replacing indicidual radd and glads alerts by integrated alerts
   // values for creating power scale, domain (input), and range (output)
     float confidenceValue = 0.;
@@ -821,7 +820,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    RADDs2yearsTimeline: `
+  RADDs2yearsTimeline: `
   // values for creating power scale, domain (input), and range (output)
     float confidenceValue = 0.;
     if (confirmedOnly > 0.) {
@@ -865,7 +864,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    RADDsCoverage: `
+  RADDsCoverage: `
     float red = color.r;
     float green = color.g;
     float blue = color.b;
@@ -879,7 +878,7 @@ const decodes = {
       alpha = 1.;
     }
   `,
-    staticRemap: `
+  staticRemap: `
     float red = color.r;
     float green = color.g;
     float blue = color.b;
@@ -894,7 +893,7 @@ const decodes = {
     color.g = green;
     color.b = blue;
   `,
-    staticRemapAlpha: `
+  staticRemapAlpha: `
     float red = color.r;
     float green = color.g;
     float blue = color.b;
@@ -910,7 +909,7 @@ const decodes = {
     color.g = green;
     color.b = blue; 
   `,
-    treeGain: `
+  treeGain: `
     // Multiply alpha (opacity) by a function that drops super low opacity
     // pixels and scales the rest to higher values
     // TODO: Explain the various coefficients and how they effect alpha
@@ -923,7 +922,7 @@ const decodes = {
       }
     }
 `,
-    newCarbonFlux: `
+  newCarbonFlux: `
     float red = color.r;
     float green = color.g;
     float blue = color.b;
@@ -938,7 +937,7 @@ const decodes = {
     color.g = green;
     color.b = blue;
   `,
-    forestHeight: `
+  forestHeight: `
     float h = color.r * 255.;
     float heightMax = 41.;
 
@@ -965,7 +964,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    biomassLoss: `
+  biomassLoss: `
     float countBuckets = 5.; // buckets length / 3: three bands
     float year = 2000.0 + (color.r * 255.);
 
@@ -1013,14 +1012,14 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    woodyBiomass: `
+  woodyBiomass: `
     float intensity = color.b * 255.;
     color.r = (255. - intensity) / 255.;
     color.g = 128. / 255.;
     color.b = 0.;
     alpha = intensity / 255.;
   `,
-    forma: `
+  forma: `
     float day = color.g * 255. * 255. + (color.b * 255.);
 
     if (day >= startDayIndex && day <= endDayIndex) {
@@ -1042,7 +1041,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    terrai: `
+  terrai: `
     float day = color.r * 255. + color.g * 255.;
 
     if (
@@ -1069,7 +1068,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    braLandCover: `
+  braLandCover: `
     float domainMin = 0.;
     float domainMax = 255.;
     float rangeMin = 0.;
@@ -1176,7 +1175,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    grossCarbonEmissions: `
+  grossCarbonEmissions: `
     float rCol = color.r;
     float bCol = color.b;
     float threshold = bCol * 255.;
@@ -1228,7 +1227,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    cumulativeCarbonGain: `
+  cumulativeCarbonGain: `
     float rCol = color.r;
     float gCol = color.g;
     float threshold = gCol * 255.;
@@ -1280,7 +1279,7 @@ const decodes = {
       alpha = 0.;
     }
   `,
-    netCarbonFlux: `
+  netCarbonFlux: `
     float rCol = color.r;
     float gCol = color.g;
     float threshold = gCol * 255.;

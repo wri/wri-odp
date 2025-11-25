@@ -1,25 +1,25 @@
 import { z } from 'zod';
 import {
-    createTRPCRouter,
-    protectedProcedure,
-    publicProcedure,
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
 } from '@/server/api/trpc';
 import { env } from '@/env.mjs';
 import {
-    getGroups,
-    getGroup,
-    searchHierarchy,
-    getUserGroups,
-    findAllNameInTree,
-    getAllDatasetFq,
-    groupList,
-    fetchFacets,
+  getGroups,
+  getGroup,
+  searchHierarchy,
+  getUserGroups,
+  findAllNameInTree,
+  getAllDatasetFq,
+  groupList,
+  fetchFacets,
 } from '@/utils/apiUtils';
 import { searchSchema } from '@/schema/search.schema';
 import type {
-    FolloweeList,
-    GroupTree,
-    GroupsmDetails,
+  FolloweeList,
+  GroupTree,
+  GroupsmDetails,
 } from '@/schema/ckan.schema';
 import { searchArrayForKeyword } from '@/utils/general';
 import type { CkanResponse, User } from '@/schema/ckan.schema';
@@ -34,538 +34,536 @@ import { flattenTree } from '@/utils/flattenGroupTree';
 import { group } from 'console';
 
 export const TopicRouter = createTRPCRouter({
-    getUsersTopics: protectedProcedure
-        .input(searchSchema)
-        .query(async ({ input, ctx }) => {
-            let groupTree: GroupTree[] = [];
-            const allGroups = (await getUserGroups({
-                apiKey: ctx.session.user.apikey,
-                userId: ctx.session.user.id,
-            }))!;
-            const topic2Image = allGroups.reduce(
-                (acc, org) => {
-                    acc[org.id] = org.image_display_url!;
-                    return acc;
-                },
-                {} as Record<string, string>
-            );
-            if (input.search) {
-                groupTree = await searchHierarchy({
-                    isSysadmin: ctx.session.user.sysadmin,
-                    apiKey: ctx.session.user.apikey,
-                    q: input.search,
-                    group_type: 'group',
-                });
-            } else {
-                groupTree = await searchHierarchy({
-                    isSysadmin: ctx.session.user.sysadmin,
-                    apiKey: ctx.session.user.apikey,
-                    group_type: 'group',
-                });
-            }
+  getUsersTopics: protectedProcedure
+    .input(searchSchema)
+    .query(async ({ input, ctx }) => {
+      let groupTree: GroupTree[] = [];
+      const allGroups = (await getUserGroups({
+        apiKey: ctx.session.user.apikey,
+        userId: ctx.session.user.id,
+      }))!;
+      const topic2Image = allGroups.reduce(
+        (acc, org) => {
+          acc[org.id] = org.image_display_url!;
+          return acc;
+        },
+        {} as Record<string, string>
+      );
+      if (input.search) {
+        groupTree = await searchHierarchy({
+          isSysadmin: ctx.session.user.sysadmin,
+          apiKey: ctx.session.user.apikey,
+          q: input.search,
+          group_type: 'group',
+        });
+      } else {
+        groupTree = await searchHierarchy({
+          isSysadmin: ctx.session.user.sysadmin,
+          apiKey: ctx.session.user.apikey,
+          group_type: 'group',
+        });
+      }
 
-            const result = groupTree;
-            return {
-                topics: input.pageEnabled
-                    ? result.slice(
-                          input.page.start,
-                          input.page.start + input.page.rows
-                      )
-                    : result,
-                topic2Image: topic2Image,
-                count: result.length,
-            };
-        }),
-    getTopicsHierarchy: protectedProcedure.query(async ({ ctx }) => {
+      const result = groupTree;
+      return {
+        topics: input.pageEnabled
+          ? result.slice(
+            input.page.start,
+            input.page.start + input.page.rows
+          )
+          : result,
+        topic2Image: topic2Image,
+        count: result.length,
+      };
+    }),
+  getTopicsHierarchy: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const topicHierarchyRes = await fetch(
+      `${env.CKAN_URL}/api/action/group_tree`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${user.apikey}`,
+        },
+      }
+    );
+    let userTopics = null;
+    const userTopicsRes = await fetch(
+      `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${user.apikey}`,
+        },
+      }
+    );
+    const _userTopics: CkanResponse<Group[]> = await userTopicsRes.json();
+    if (!_userTopics.success && _userTopics.error)
+      throw Error(replaceNames(_userTopics.error.message));
+    userTopics = _userTopics.result.map((topic) => topic.name);
+    const tree: CkanResponse<TopicHierarchy[]> =
+      await topicHierarchyRes.json();
+    if (!tree.success && tree.error)
+      throw Error(replaceNames(tree.error.message));
+    return { hierarchy: tree.result, userTopics };
+  }),
+  getTopicsHomePage: publicProcedure.query(async ({ ctx }) => {
+    const user = ctx.session?.user;
+    const apiKey = user ? user.apikey : null;
+    const [topics, groupTree] = await Promise.all([
+      groupList({ apiKey }),
+      searchHierarchy({
+        isSysadmin: true,
+        apiKey: apiKey ?? '',
+        q: '',
+        group_type: 'group',
+      }),
+    ]);
+    const topicDetails = topics.reduce(
+      (acc, org) => {
+        acc[org.id] = {
+          img_url: org.image_display_url,
+          description: org.description,
+          package_count: org.package_count,
+          name: org.name,
+        };
+        return acc;
+      },
+      {} as Record<string, GroupsmDetails>
+    );
+    if (user) {
+      const facets = await fetchFacets(
+        topicDetails,
+        'groups',
+        ctx?.session?.user.apikey ?? ''
+      );
+      for (const group in topicDetails) {
+        const topic = topicDetails[group]!;
+        topic.package_count = facets[topic.name] ?? 0;
+      }
+    }
+    return {
+      topics: groupTree,
+      topicDetails: topicDetails,
+      count: groupTree.length,
+    };
+  }),
+  getAllTopics: protectedProcedure.query(async ({ ctx }) => {
+    return await groupList({ apiKey: ctx.session.user.apikey ?? null });
+  }),
+  editTopic: protectedProcedure
+    .input(TopicSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
         const user = ctx.session.user;
-        const topicHierarchyRes = await fetch(
-            `${env.CKAN_URL}/api/action/group_tree`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${user.apikey}`,
-                },
-            }
-        );
-        let userTopics = null;
-        const userTopicsRes = await fetch(
-            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${user.apikey}`,
-                },
-            }
-        );
-        const _userTopics: CkanResponse<Group[]> = await userTopicsRes.json();
-        if (!_userTopics.success && _userTopics.error)
-            throw Error(replaceNames(_userTopics.error.message));
-        userTopics = _userTopics.result.map((topic) => topic.name);
-        const tree: CkanResponse<TopicHierarchy[]> =
-            await topicHierarchyRes.json();
-        if (!tree.success && tree.error)
-            throw Error(replaceNames(tree.error.message));
-        return { hierarchy: tree.result, userTopics };
-    }),
-    getTopicsHomePage: publicProcedure.query(async ({ ctx }) => {
-        const user = ctx.session?.user;
-        const apiKey = user ? user.apikey : null;
-        const [topics, groupTree] = await Promise.all([
-            groupList({ apiKey }),
-            searchHierarchy({
-                isSysadmin: true,
-                apiKey: apiKey ?? '',
-                q: '',
-                group_type: 'group',
-            }),
-        ]);
-        const topicDetails = topics.reduce(
-            (acc, org) => {
-                acc[org.id] = {
-                    img_url: org.image_display_url,
-                    description: org.description,
-                    package_count: org.package_count,
-                    name: org.name,
-                };
-                return acc;
-            },
-            {} as Record<string, GroupsmDetails>
-        );
-        if (user) {
-            const facets = await fetchFacets(
-                topicDetails,
-                'groups',
-                ctx?.session?.user.apikey ?? ''
-            );
-            for (const group in topicDetails) {
-                const topic = topicDetails[group]!;
-                topic.package_count = facets[topic.name] ?? 0;
-            }
+        const newMembers = [];
+        for (const member of input.members) {
+          newMembers.push({
+            name: member.user.value,
+            capacity: member.capacity.value,
+          });
         }
-        return {
-            topics: groupTree,
-            topicDetails: topicDetails,
-            count: groupTree.length,
-        };
-    }),
-    getAllTopics: protectedProcedure.query(async ({ ctx }) => {
-        return await groupList({ apiKey: ctx.session.user.apikey ?? null });
-    }),
-    editTopic: protectedProcedure
-        .input(TopicSchema)
-        .mutation(async ({ ctx, input }) => {
-            try {
-                const user = ctx.session.user;
-                const newMembers = [];
-                for (const member of input.members) {
-                    newMembers.push({
-                        name: member.user.value,
-                        capacity: member.capacity.value,
-                    });
-                }
-                try {
-                    sendMemberNotifications(
-                        user.id,
-                        newMembers,
-                        input.users,
-                        input.id,
-                        'topic'
-                    );
-                } catch (e) {
-                    console.error(e);
-                }
-                input.users = newMembers;
-                const body = JSON.stringify({
-                    ...input,
-                    groups:
-                        input.parent && input.parent.value !== ''
-                            ? [{ name: input.parent.value }]
-                            : [],
-                });
-                const topicRes = await fetch(
-                    `${env.CKAN_URL}/api/action/group_patch`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `${user.apikey}`,
-                        },
-                        body,
-                    }
-                );
-                const topic: CkanResponse<Group> = await topicRes.json();
-                if (!topic.success && topic.error) {
-                    if (topic.error.message)
-                        throw Error(replaceNames(topic.error.message));
-                    throw Error(replaceNames(JSON.stringify(topic.error)));
-                }
-                return topic.result;
-            } catch (e) {
-                let error =
-                    'Something went wrong please contact the System Administrator';
-                if (e instanceof Error) error = e.message;
-                throw Error(replaceNames(error));
-            }
-        }),
-    getTopic: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .query(async ({ ctx, input }) => {
-            const user = ctx.session.user;
-            const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            );
-            const topic: CkanResponse<Topic & { groups: Topic[] }> =
-                await topicRes.json();
-            if (!topic.success && topic.error)
-                throw Error(replaceNames(topic.error.message));
-            return {
-                ...topic.result,
-                parent: topic.result.groups[0]?.name ?? null,
-            };
-        }),
-    deleteTopic: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .mutation(async ({ ctx, input }) => {
-            const user = ctx.session.user;
-            const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_delete`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                    body: JSON.stringify({ id: input.id }),
-                }
-            );
-            const topic: CkanResponse<Topic> = await topicRes.json();
-            if (!topic.success && topic.error) {
-                if (topic.error.message)
-                    throw Error(replaceNames(topic.error.message));
-                throw Error(replaceNames(JSON.stringify(topic.error)));
-            }
-            return {
-                ...topic.result,
-            };
-        }),
-    getTopicUsers: protectedProcedure
-        .input(z.object({ id: z.string(), capacity: z.string() }))
-        .query(async ({ ctx, input }) => {
-            const user = ctx.session.user;
-            const membersListRes = await fetch(
-                `${env.CKAN_URL}/api/action/member_list?id=${input.id}${
-                    input.capacity ? `&capacity=${input.capacity}` : ''
-                }&object_type=user`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            );
-            const membersList: CkanResponse<string[][]> =
-                await membersListRes.json();
-            return membersList.result;
-        }),
-    createTopic: protectedProcedure
-        .input(TopicSchema)
-        .mutation(async ({ ctx, input }) => {
-            try {
-                const user = ctx.session.user;
-                const body = JSON.stringify({
-                    ...input,
-                    groups:
-                        input.parent && input.parent.value !== ''
-                            ? [{ name: input.parent.value }]
-                            : [],
-                });
-                const topicRes = await fetch(
-                    `${env.CKAN_URL}/api/action/group_create`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `${user.apikey}`,
-                        },
-                        body,
-                    }
-                );
-                const topic: CkanResponse<Group> = await topicRes.json();
-                if (!topic.success && topic.error) {
-                    console.log('TOPIC ERROR', topic);
-                    if (
-                        //@ts-ignore
-                        topic.error.name[0] ===
-                        'Group name already exists in database'
-                    ) {
-                        throw Error(
-                            '[!] A page with this URL already exists. Please choose a different URL.'
-                        );
-                    }
-                    if (topic.error.message)
-                        throw Error(replaceNames(topic.error.message));
-                    throw Error(replaceNames(JSON.stringify(topic.error)));
-                }
-                return topic.result;
-            } catch (e) {
-                let error =
-                    'Something went wrong please contact the System Administrator';
-                if (e instanceof Error) error = e.message;
-                if (
-                    replaceNames(error) ==
-                    'Topic name already exists in database or there is a Team with this name'
-                ) {
-                    throw Error(
-                        '[!] A page with this URL already exists. Please choose a different URL.'
-                    );
-                }
-                throw Error(replaceNames(error));
-            }
-        }),
-    deleteDashBoardTopic: protectedProcedure
-        .input(z.string())
-        .mutation(async ({ input, ctx }) => {
-            const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/group_delete`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify({ id: input }),
-                    headers: {
-                        Authorization: ctx.session.user.apikey,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-            const data = (await response.json()) as CkanResponse<null>;
-            if (!data.success && data.error)
-                throw Error(replaceNames(data.error.message));
-            return data;
-        }),
-    getGeneralTopics: publicProcedure
-        .input(searchSchema)
-        .query(async ({ input, ctx }) => {
-            const [groupTree, allGroups] = await Promise.all([
-                searchHierarchy({
-                    isSysadmin: true,
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    q: '',
-                    group_type: 'group',
-                }),
-                getUserGroups({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    userId: '',
-                }),
-            ]);
-            if (groupTree.length === 0) {
-                return {
-                    topics: groupTree,
-                    topicDetails: {} as Record<string, GroupsmDetails>,
-                    count: 0,
-                };
-            }
-            const topicDetails = (allGroups ?? []).reduce(
-                (acc, org) => {
-                    acc[org.id] = {
-                        img_url: org.image_display_url,
-                        description: org.description,
-                        package_count: org.package_count,
-                        name: org.name,
-                    };
-                    return acc;
-                },
-                {} as Record<string, GroupsmDetails>
-            );
-
-            const facets = await fetchFacets(
-                topicDetails,
-                'groups',
-                ctx?.session?.user.apikey ?? ''
-            );
-
-            for (const group in topicDetails) {
-                const topic = topicDetails[group]!;
-                topic.package_count = facets[topic.name] ?? 0;
-            }
-
-            const result = groupTree;
-            return {
-                topics: result,
-                allTopics: allGroups,
-                topicDetails: topicDetails,
-                count: result.length,
-            };
-        }),
-    getTopicV2: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .query(async ({ ctx, input }) => {
-            const user = ctx.session.user;
-            const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            );
-            const topic: CkanResponse<Group> = await topicRes.json();
-            if (!topic.success && topic.error)
-                throw Error(replaceNames(topic.error.message));
-            return {
-                topic: topic.result,
-            };
-        }),
-    list: publicProcedure.query(async ({ ctx, input }) => {
+        try {
+          sendMemberNotifications(
+            user.id,
+            newMembers,
+            input.users,
+            input.id,
+            'topic'
+          );
+        } catch (e) {
+          console.error(e);
+        }
+        input.users = newMembers;
+        const body = JSON.stringify({
+          ...input,
+          groups:
+            input.parent && input.parent.value !== ''
+              ? [{ name: input.parent.value }]
+              : [],
+        });
         const topicRes = await fetch(
-            `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
+          `${env.CKAN_URL}/api/action/group_patch`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `${user.apikey}`,
+            },
+            body,
+          }
         );
-        const topic: CkanResponse<Group[]> = await topicRes.json();
-        if (!topic.success && topic.error)
+        const topic: CkanResponse<Group> = await topicRes.json();
+        if (!topic.success && topic.error) {
+          if (topic.error.message)
             throw Error(replaceNames(topic.error.message));
-        return {
-            topics: topic.result,
-        };
+          throw Error(replaceNames(JSON.stringify(topic.error)));
+        }
+        return topic.result;
+      } catch (e) {
+        let error =
+          'Something went wrong please contact the System Administrator';
+        if (e instanceof Error) error = e.message;
+        throw Error(replaceNames(error));
+      }
     }),
-    getNumberOfSubtopics: publicProcedure.query(async ({ ctx, input }) => {
+  getTopic: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      );
+      const topic: CkanResponse<Topic & { groups: Topic[] }> =
+        await topicRes.json();
+      if (!topic.success && topic.error)
+        throw Error(replaceNames(topic.error.message));
+      return {
+        ...topic.result,
+        parent: topic.result.groups[0]?.name ?? null,
+      };
+    }),
+  deleteTopic: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_delete`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+          body: JSON.stringify({ id: input.id }),
+        }
+      );
+      const topic: CkanResponse<Topic> = await topicRes.json();
+      if (!topic.success && topic.error) {
+        if (topic.error.message)
+          throw Error(replaceNames(topic.error.message));
+        throw Error(replaceNames(JSON.stringify(topic.error)));
+      }
+      return {
+        ...topic.result,
+      };
+    }),
+  getTopicUsers: protectedProcedure
+    .input(z.object({ id: z.string(), capacity: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const membersListRes = await fetch(
+        `${env.CKAN_URL}/api/action/member_list?id=${input.id}${input.capacity ? `&capacity=${input.capacity}` : ''
+        }&object_type=user`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      );
+      const membersList: CkanResponse<string[][]> =
+        await membersListRes.json();
+      return membersList.result;
+    }),
+  createTopic: protectedProcedure
+    .input(TopicSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const user = ctx.session.user;
+        const body = JSON.stringify({
+          ...input,
+          groups:
+            input.parent && input.parent.value !== ''
+              ? [{ name: input.parent.value }]
+              : [],
+        });
         const topicRes = await fetch(
-            `${env.CKAN_URL}/api/action/group_list_wri?q=`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
+          `${env.CKAN_URL}/api/action/group_create`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `${user.apikey}`,
+            },
+            body,
+          }
         );
-        const topics: CkanResponse<GroupTree[]> = await topicRes.json();
-        if (!topics.success && topics.error)
-            throw Error(replaceNames(topics.error.message));
-        const numOfSubtopics = flattenTree(topics.result);
-        return numOfSubtopics;
+        const topic: CkanResponse<Group> = await topicRes.json();
+        if (!topic.success && topic.error) {
+          if (
+            //@ts-ignore
+            topic.error.name[0] ===
+            'Group name already exists in database'
+          ) {
+            throw Error(
+              '[!] A page with this URL already exists. Please choose a different URL.'
+            );
+          }
+          if (topic.error.message)
+            throw Error(replaceNames(topic.error.message));
+          throw Error(replaceNames(JSON.stringify(topic.error)));
+        }
+        return topic.result;
+      } catch (e) {
+        let error =
+          'Something went wrong please contact the System Administrator';
+        if (e instanceof Error) error = e.message;
+        if (
+          replaceNames(error) ==
+          'Topic name already exists in database or there is a Team with this name'
+        ) {
+          throw Error(
+            '[!] A page with this URL already exists. Please choose a different URL.'
+          );
+        }
+        throw Error(replaceNames(error));
+      }
     }),
-
-    getFollowedTopics: protectedProcedure.query(async ({ ctx }) => {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${ctx.session.user.apikey}`,
-                },
-            }
-        );
-        const data = (await response.json()) as CkanResponse<FolloweeList[]>;
-        if (!data.success && data.error) throw Error(data.error.message);
-        const result = data.result.reduce((acc, item) => {
-            if (item.type === 'group') {
-                const t = item.dict as Group;
-                acc.push(t);
-            }
-            return acc;
-        }, [] as Group[]);
-        return result;
+  deleteDashBoardTopic: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const response = await fetch(
+        `${env.CKAN_URL}/api/3/action/group_delete`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ id: input }),
+          headers: {
+            Authorization: ctx.session.user.apikey,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const data = (await response.json()) as CkanResponse<null>;
+      if (!data.success && data.error)
+        throw Error(replaceNames(data.error.message));
+      return data;
     }),
-    getPossibleMembers: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .query(async ({ ctx, input }) => {
-            const user = ctx.session.user;
-            const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            );
-            const topic: CkanResponse<Topic & { groups: Topic[] }> =
-                await topicRes.json();
-            if (!topic.success && topic.error) {
-                if (topic.error.message)
-                    throw Error(replaceNames(topic.error.message));
-                throw Error(replaceNames(JSON.stringify(topic.error)));
-            }
-            const topicUsers = topic?.result?.users?.map(
-                (user) => user.name
-            ) as string[];
-            const usersRes = await fetch(
-                `${env.CKAN_URL}/api/action/user_list?all_fields=True&limit=1000`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            );
-            const users: CkanResponse<User[]> = await usersRes.json();
-            if (!users.success && users.error) {
-                if (users.error.message)
-                    throw Error(replaceNames(users.error.message));
-                throw Error(replaceNames(JSON.stringify(users.error)));
-            }
+  getGeneralTopics: publicProcedure
+    .input(searchSchema)
+    .query(async ({ input, ctx }) => {
+      const [groupTree, allGroups] = await Promise.all([
+        searchHierarchy({
+          isSysadmin: true,
+          apiKey: ctx?.session?.user.apikey ?? '',
+          q: '',
+          group_type: 'group',
+        }),
+        getUserGroups({
+          apiKey: ctx?.session?.user.apikey ?? '',
+          userId: '',
+        }),
+      ]);
+      if (groupTree.length === 0) {
+        return {
+          topics: groupTree,
+          topicDetails: {} as Record<string, GroupsmDetails>,
+          count: 0,
+        };
+      }
+      const topicDetails = (allGroups ?? []).reduce(
+        (acc, org) => {
+          acc[org.id] = {
+            img_url: org.image_display_url,
+            description: org.description,
+            package_count: org.package_count,
+            name: org.name,
+          };
+          return acc;
+        },
+        {} as Record<string, GroupsmDetails>
+      );
 
-            return users.result.filter(
-                (user) => user.name && !topicUsers.includes(user.name)
-            );
-        }),
-    getCurrentMembers: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .query(async ({ ctx, input }) => {
-            const user = ctx.session.user;
-            const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                }
-            );
-            const topic: CkanResponse<Topic & { groups: Topic[] }> =
-                await topicRes.json();
-            if (!topic.success && topic.error) {
-                if (topic.error.message)
-                    throw Error(replaceNames(topic.error.message, true));
-                throw Error(replaceNames(JSON.stringify(topic.error), true));
-            }
+      const facets = await fetchFacets(
+        topicDetails,
+        'groups',
+        ctx?.session?.user.apikey ?? ''
+      );
 
-            return topic.result.users;
-        }),
-    removeMember: protectedProcedure
-        .input(z.object({ id: z.string(), username: z.string() }))
-        .mutation(async ({ ctx, input }) => {
-            const user = ctx.session.user;
-            const topicRes = await fetch(
-                `${env.CKAN_URL}/api/action/member_delete`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user.apikey}`,
-                    },
-                    body: JSON.stringify({
-                        id: input.id,
-                        object: input.username,
-                        object_type: 'user',
-                    }),
-                }
-            );
-            const topic: CkanResponse<Topic & { groups: Topic[] }> =
-                await topicRes.json();
-            if (!topic.success && topic.error) {
-                if (topic.error.message)
-                    throw Error(replaceNames(topic.error.message, true));
-                throw Error(replaceNames(JSON.stringify(topic.error), true));
-            }
-            return topic.result;
-        }),
+      for (const group in topicDetails) {
+        const topic = topicDetails[group]!;
+        topic.package_count = facets[topic.name] ?? 0;
+      }
+
+      const result = groupTree;
+      return {
+        topics: result,
+        allTopics: allGroups,
+        topicDetails: topicDetails,
+        count: result.length,
+      };
+    }),
+  getTopicV2: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      );
+      const topic: CkanResponse<Group> = await topicRes.json();
+      if (!topic.success && topic.error)
+        throw Error(replaceNames(topic.error.message));
+      return {
+        topic: topic.result,
+      };
+    }),
+  list: publicProcedure.query(async ({ ctx, input }) => {
+    const topicRes = await fetch(
+      `${env.CKAN_URL}/api/action/group_list?all_fields=True`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const topic: CkanResponse<Group[]> = await topicRes.json();
+    if (!topic.success && topic.error)
+      throw Error(replaceNames(topic.error.message));
+    return {
+      topics: topic.result,
+    };
+  }),
+  getNumberOfSubtopics: publicProcedure.query(async ({ ctx, input }) => {
+    const topicRes = await fetch(
+      `${env.CKAN_URL}/api/action/group_list_wri?q=`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const topics: CkanResponse<GroupTree[]> = await topicRes.json();
+    if (!topics.success && topics.error)
+      throw Error(replaceNames(topics.error.message));
+    const numOfSubtopics = flattenTree(topics.result);
+    return numOfSubtopics;
+  }),
+
+  getFollowedTopics: protectedProcedure.query(async ({ ctx }) => {
+    const response = await fetch(
+      `${env.CKAN_URL}/api/3/action/followee_list?id=${ctx.session.user.id}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${ctx.session.user.apikey}`,
+        },
+      }
+    );
+    const data = (await response.json()) as CkanResponse<FolloweeList[]>;
+    if (!data.success && data.error) throw Error(data.error.message);
+    const result = data.result.reduce((acc, item) => {
+      if (item.type === 'group') {
+        const t = item.dict as Group;
+        acc.push(t);
+      }
+      return acc;
+    }, [] as Group[]);
+    return result;
+  }),
+  getPossibleMembers: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      );
+      const topic: CkanResponse<Topic & { groups: Topic[] }> =
+        await topicRes.json();
+      if (!topic.success && topic.error) {
+        if (topic.error.message)
+          throw Error(replaceNames(topic.error.message));
+        throw Error(replaceNames(JSON.stringify(topic.error)));
+      }
+      const topicUsers = topic?.result?.users?.map(
+        (user) => user.name
+      ) as string[];
+      const usersRes = await fetch(
+        `${env.CKAN_URL}/api/action/user_list?all_fields=True&limit=1000`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      );
+      const users: CkanResponse<User[]> = await usersRes.json();
+      if (!users.success && users.error) {
+        if (users.error.message)
+          throw Error(replaceNames(users.error.message));
+        throw Error(replaceNames(JSON.stringify(users.error)));
+      }
+
+      return users.result.filter(
+        (user) => user.name && !topicUsers.includes(user.name)
+      );
+    }),
+  getCurrentMembers: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/group_show?id=${input.id}&include_users=True`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+        }
+      );
+      const topic: CkanResponse<Topic & { groups: Topic[] }> =
+        await topicRes.json();
+      if (!topic.success && topic.error) {
+        if (topic.error.message)
+          throw Error(replaceNames(topic.error.message, true));
+        throw Error(replaceNames(JSON.stringify(topic.error), true));
+      }
+
+      return topic.result.users;
+    }),
+  removeMember: protectedProcedure
+    .input(z.object({ id: z.string(), username: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+      const topicRes = await fetch(
+        `${env.CKAN_URL}/api/action/member_delete`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user.apikey}`,
+          },
+          body: JSON.stringify({
+            id: input.id,
+            object: input.username,
+            object_type: 'user',
+          }),
+        }
+      );
+      const topic: CkanResponse<Topic & { groups: Topic[] }> =
+        await topicRes.json();
+      if (!topic.success && topic.error) {
+        if (topic.error.message)
+          throw Error(replaceNames(topic.error.message, true));
+        throw Error(replaceNames(JSON.stringify(topic.error), true));
+      }
+      return topic.result;
+    }),
 });
