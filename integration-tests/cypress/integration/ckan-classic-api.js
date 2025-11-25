@@ -102,7 +102,10 @@ describe('CKAN Classic API Are Working', () => {
       headers: headers,
       body: {
         name: packageName,
-        owner_org: orgName
+        owner_org: orgName,
+        technical_notes: "http://example.com/technical_notes.pdf",
+        authors: [{"name": "Datopian", "email": "datopian@example.com"}],
+        maintainers: [{"name": "Datopian", "email": "datopian@example.com"}]
       }
     }).then((resp) => {
       expect(resp.body.success).to.eq(true)
