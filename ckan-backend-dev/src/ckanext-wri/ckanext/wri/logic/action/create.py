@@ -787,11 +787,19 @@ def resource_create(
     model = context["model"]
 
     package_id = _get_or_bust(data_dict, "package_id")
-    if not data_dict.get("url"):
-        data_dict["url"] = ""
+    # if not data_dict.get("url"):
+    #     data_dict["url"] = ""
 
     if not data_dict.get("id"):
         data_dict["id"] = str(uuid.uuid4())
+
+    try:
+        wri_validators.resource_cross_fields(context, data_dict)
+    except Exception as e:
+        if isinstance(e, tk.ValidationError):
+            raise
+        raise tk.ValidationError(str(e))
+
 
     package_show_context: Union[Context, Any] = dict(context, for_update=True)
     pkg_dict = _get_action("package_show")(package_show_context, {"id": package_id})

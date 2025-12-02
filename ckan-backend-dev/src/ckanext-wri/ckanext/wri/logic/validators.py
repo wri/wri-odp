@@ -332,7 +332,10 @@ def resource_cross_fields(context: Context, data_dict: dict):
     """
     import ckan.plugins.toolkit as tk
 
-    resources = data_dict.get("resources") or []
+    if data_dict.get("resources") is None:
+        resources = [data_dict]
+    else:
+        resources = data_dict.get("resources") or []
     errors_for_resources = {}
 
     for i, r in enumerate(resources):
