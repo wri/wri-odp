@@ -831,9 +831,16 @@ def resource_update(
     model = context["model"]
     id: str = _get_or_bust(data_dict, "id")
 
-    if not data_dict.get("url"):
-        data_dict["url"] = ""
+    # if not data_dict.get("url"):
+    #     data_dict["url"] = ""
 
+    try:
+        wri_validators.resource_cross_fields(context, data_dict)
+    except tk.ValidationError:
+        raise
+    except Exception as e:
+        raise tk.ValidationError(str(e))
+    
     resource = model.Resource.get(id)
     if resource is None:
         raise NotFound("Resource was not found.")
