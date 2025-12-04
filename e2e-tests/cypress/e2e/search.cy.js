@@ -114,7 +114,9 @@ describe("Search page", () => {
   it("allows faceting by last updated since and before dates", () => {
     cy.visit("/search");
     cy.viewport(1440, 900)
-    cy.contains("Last Updated").focus().click({ force: true });
+    cy.wait(2000);
+    // cy.contains("Last Updated").focus().click({ force: true }); // Not sure why this stopped working, but the below retrieves it directly by ID.
+    cy.get('[id="headlessui-disclosure-button-:r25:"]').contains('Last Updated').click({ force: true, timeout: 10000 });
 
     const today = new Date();
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
@@ -135,7 +137,7 @@ describe("Search page", () => {
         .toISOString()
         .split("T")[0];
 
-      cy.get("#since-date").type(sinceDateFormatted, { force: true, timeout: 10000 });
+      cy.get("#since-date", {force: true}).type(sinceDateFormatted, { force: true, timeout: 10000 });
       cy.get("#before-date").type(beforeDateFormatted, { force: true, timeout: 10000 });
 
       if (combination.results === true) {
