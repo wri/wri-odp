@@ -115,8 +115,10 @@ describe("Search page", () => {
     cy.visit("/search");
     cy.viewport(1440, 900)
     cy.wait(2000);
-    // cy.contains("Last Updated").focus().click({ force: true }); // Not sure why this stopped working, but the below retrieves it directly by ID.
-    cy.get('[id="headlessui-disclosure-button-:r25:"]').contains('Last Updated').click({ force: true, timeout: 10000 });
+    cy.contains('button', 'Last Updated', { timeout: 15000 })
+      .scrollIntoView()
+      .should('be.visible')
+      .click({ force: true });
 
     const today = new Date();
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
