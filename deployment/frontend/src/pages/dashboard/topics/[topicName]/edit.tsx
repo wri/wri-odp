@@ -29,16 +29,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
     }
 
-    // Restrict edit page to sysadmin users only
-    if (!session.user.sysadmin) {
-        return {
-            redirect: {
-                destination: '/dashboard/topics',
-                permanent: false,
-            },
-        }
-    }
-
     return {
         props: {
             session,

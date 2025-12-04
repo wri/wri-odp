@@ -11,13 +11,13 @@ import compact from 'lodash/compact';
 import isEmpty from 'lodash/isEmpty';
 import { type APILayerSpec } from '@/interfaces/layer.interface';
 import {
-    useActiveLayerGroups,
-    useLayerStates,
-    useLayerAsLayerObj,
+  useActiveLayerGroups,
+  useLayerStates,
+  useLayerAsLayerObj,
 } from './storeHooks';
 import {
-    type ActiveLayerGroup,
-    type LayerState,
+  type ActiveLayerGroup,
+  type LayerState,
 } from '@/interfaces/state.interface';
 import { env } from '@/env.mjs';
 import { useSession } from 'next-auth/react';
@@ -26,189 +26,188 @@ import { type Resource } from '@/interfaces/dataset.interface';
 import { getDecodeParams } from './decodeFunctions';
 
 async function getLayersFromRW(
-    queryKey: any,
-    currentLayers: Map<string, LayerState>,
-    layerAsLayerObj: Map<string, string>,
-    session: Session | null
+  queryKey: any,
+  currentLayers: Map<string, LayerState>,
+  layerAsLayerObj: Map<string, string>,
+  session: Session | null
 ) {
-    const [, activeLayerGroups] = queryKey;
-    if (activeLayerGroups.length === 0) return [];
-    const countdown = 10;
-    const apikey = session?.user?.apikey ?? '';
+  const [, activeLayerGroups] = queryKey;
+  if (activeLayerGroups.length === 0) return [];
+  const countdown = 10;
+  const apikey = session?.user?.apikey ?? '';
 
-    return await Promise.all(
-        activeLayerGroups.map(
-            async (layerGroup: ActiveLayerGroup, index: number) => {
-                const { datasetId, layers } = layerGroup;
-                if (layers.length === 0) return [];
-                const layersData = await Promise.all(
-                    layers.map(async (layer: string) => {
-                        if (!layer) return;
-                        let layerInfo = layerAsLayerObj.get(layer);
-                        if (!layerInfo) {
-                            layerInfo =
-                                currentLayers.get(layer)?.layerSource === 'ckan'
-                                    ? 'pending'
-                                    : 'approved';
-                        }
-                        layerInfo = layerInfo ?? 'approved';
-                        if (layerInfo === 'approved') {
-                            const response = await fetch(
-                                `https://api.resourcewatch.org/v1/layer/${layer}`
-                            );
-                            const layerData = await response.json();
-                            const { id, attributes } = layerData.data;
-                            const currentLayer = currentLayers.get(id);
-                            let decodeParams = null;
-                            if (
-                                attributes.layerConfig.decode_config &&
-                                getDecodeParams[
-                                    id as keyof typeof getDecodeParams
-                                ] !== undefined
-                            ) {
-                                decodeParams = await (
-                                    getDecodeParams[
-                                        id as keyof typeof getDecodeParams
-                                    ] as any
-                                )();
-                            }
-                            return {
-                                id: id,
-                                ...attributes,
-                                layerConfig: {
-                                    ...attributes.layerConfig,
-                                    decodeParams,
-                                    zIndex: countdown - index,
-                                    visibility:
-                                        layers.length > 1
-                                            ? attributes.default
-                                            : true,
-                                    ...currentLayer,
-                                    _ogSource: attributes.layerConfig.source,
-                                },
-                                active:
-                                    layers.length > 1
-                                        ? attributes.default
-                                        : true,
-                            };
-                        } else if (layerInfo === 'pending') {
-                            // something here
-                            const fieldsRes = await fetch(
-                                `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetId}`,
-                                {
-                                    headers: {
-                                        Authorization: apikey,
-                                        'Content-Type': 'application/json',
-                                    },
-                                }
-                            );
-                            const responseData = await fieldsRes.json();
-
-                            const resourcePackage = responseData.result
-                                .package_data.resources as Resource[];
-                            const layerdata = resourcePackage.filter(
-                                (l) => l.id === layer
-                            );
-
-                            const resource = layerdata[0]!;
-
-                            const resourceLayer =
-                                resource?.layerObj ?? resource?.layerObjRaw;
-                            const currentLayer = currentLayers.get(resource.id);
-                            const layerPackage = {
-                                ...resourceLayer,
-                                id: resource.id,
-                                layerConfig: {
-                                    ...resourceLayer?.layerConfig,
-                                    zIndex: countdown - index,
-                                    visibility:
-                                        layers.length > 1
-                                            ? resourceLayer?.default
-                                            : true,
-                                    ...currentLayer,
-                                    _ogSource:
-                                        resourceLayer?.layerConfig.source,
-                                },
-                                active:
-                                    layers.length > 1
-                                        ? resourceLayer?.default
-                                        : true,
-                            };
-                            console.log('LAYER PACKAGE', layerPackage);
-                            return layerPackage;
-                        } else {
-                            // for prevdataset
-                            const fieldsRes = await fetch(
-                                `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/resource_show?id=${layer}`,
-                                {
-                                    headers: {
-                                        Authorization: apikey,
-                                        'Content-Type': 'application/json',
-                                    },
-                                }
-                            );
-                            const responseData = await fieldsRes.json();
-
-                            const resource = responseData.result;
-                            const resourceLayer =
-                                resource.layerObj ?? resource.layerObjRaw;
-                            const currentLayer = currentLayers.get(resource.id);
-                            const layerPackage = {
-                                ...resourceLayer,
-                                id: resource.id,
-                                layerConfig: {
-                                    ...resourceLayer.layerConfig,
-                                    zIndex: countdown - index,
-                                    visibility:
-                                        layers.length > 1
-                                            ? resourceLayer.default
-                                            : true,
-                                    ...currentLayer,
-                                    _ogSource: resourceLayer.layerConfig.source,
-                                },
-                                active:
-                                    layers.length > 1
-                                        ? resourceLayer.default
-                                        : true,
-                            };
-
-                            return layerPackage;
-                        }
-                    })
-                );
-                return {
-                    dataset: datasetId,
-                    layers: layersData.filter(Boolean),
-                };
+  return await Promise.all(
+    activeLayerGroups.map(
+      async (layerGroup: ActiveLayerGroup, index: number) => {
+        const { datasetId, layers } = layerGroup;
+        if (layers.length === 0) return [];
+        const layersData = await Promise.all(
+          layers.map(async (layer: string) => {
+            if (!layer) return;
+            let layerInfo = layerAsLayerObj.get(layer);
+            if (!layerInfo) {
+              layerInfo =
+                currentLayers.get(layer)?.layerSource === 'ckan'
+                  ? 'pending'
+                  : 'approved';
             }
-        )
-    );
+            layerInfo = layerInfo ?? 'approved';
+            if (layerInfo === 'approved') {
+              const response = await fetch(
+                `https://api.resourcewatch.org/v1/layer/${layer}`
+              );
+              const layerData = await response.json();
+              const { id, attributes } = layerData.data;
+              const currentLayer = currentLayers.get(id);
+              let decodeParams = null;
+              if (
+                attributes.layerConfig.decode_config &&
+                getDecodeParams[
+                id as keyof typeof getDecodeParams
+                ] !== undefined
+              ) {
+                decodeParams = await (
+                  getDecodeParams[
+                  id as keyof typeof getDecodeParams
+                  ] as any
+                )();
+              }
+              return {
+                id: id,
+                ...attributes,
+                layerConfig: {
+                  ...attributes.layerConfig,
+                  decodeParams,
+                  zIndex: countdown - index,
+                  visibility:
+                    layers.length > 1
+                      ? attributes.default
+                      : true,
+                  ...currentLayer,
+                  _ogSource: attributes.layerConfig.source,
+                },
+                active:
+                  layers.length > 1
+                    ? attributes.default
+                    : true,
+              };
+            } else if (layerInfo === 'pending') {
+              // something here
+              const fieldsRes = await fetch(
+                `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetId}`,
+                {
+                  headers: {
+                    Authorization: apikey,
+                    'Content-Type': 'application/json',
+                  },
+                }
+              );
+              const responseData = await fieldsRes.json();
+
+              const resourcePackage = responseData.result
+                .package_data.resources as Resource[];
+              const layerdata = resourcePackage.filter(
+                (l) => l.id === layer
+              );
+
+              const resource = layerdata[0]!;
+
+              const resourceLayer =
+                resource?.layerObj ?? resource?.layerObjRaw;
+              const currentLayer = currentLayers.get(resource.id);
+              const layerPackage = {
+                ...resourceLayer,
+                id: resource.id,
+                layerConfig: {
+                  ...resourceLayer?.layerConfig,
+                  zIndex: countdown - index,
+                  visibility:
+                    layers.length > 1
+                      ? resourceLayer?.default
+                      : true,
+                  ...currentLayer,
+                  _ogSource:
+                    resourceLayer?.layerConfig.source,
+                },
+                active:
+                  layers.length > 1
+                    ? resourceLayer?.default
+                    : true,
+              };
+              return layerPackage;
+            } else {
+              // for prevdataset
+              const fieldsRes = await fetch(
+                `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/resource_show?id=${layer}`,
+                {
+                  headers: {
+                    Authorization: apikey,
+                    'Content-Type': 'application/json',
+                  },
+                }
+              );
+              const responseData = await fieldsRes.json();
+
+              const resource = responseData.result;
+              const resourceLayer =
+                resource.layerObj ?? resource.layerObjRaw;
+              const currentLayer = currentLayers.get(resource.id);
+              const layerPackage = {
+                ...resourceLayer,
+                id: resource.id,
+                layerConfig: {
+                  ...resourceLayer.layerConfig,
+                  zIndex: countdown - index,
+                  visibility:
+                    layers.length > 1
+                      ? resourceLayer.default
+                      : true,
+                  ...currentLayer,
+                  _ogSource: resourceLayer.layerConfig.source,
+                },
+                active:
+                  layers.length > 1
+                    ? resourceLayer.default
+                    : true,
+              };
+
+              return layerPackage;
+            }
+          })
+        );
+        return {
+          dataset: datasetId,
+          layers: layersData.filter(Boolean),
+        };
+      }
+    )
+  );
 }
 
 export const useLayerGroupsFromRW = () => {
-    const { activeLayerGroups } = useActiveLayerGroups();
-    const { currentLayers } = useLayerStates();
-    const { layerAsLayerObj } = useLayerAsLayerObj();
-    const { data: session } = useSession();
-    return useQuery({
-        queryKey: ['layers', activeLayerGroups],
-        queryFn: ({ queryKey }) =>
-            getLayersFromRW(queryKey, currentLayers, layerAsLayerObj, session),
-    });
+  const { activeLayerGroups } = useActiveLayerGroups();
+  const { currentLayers } = useLayerStates();
+  const { layerAsLayerObj } = useLayerAsLayerObj();
+  const { data: session } = useSession();
+  return useQuery({
+    queryKey: ['layers', activeLayerGroups],
+    queryFn: ({ queryKey }) =>
+      getLayersFromRW(queryKey, currentLayers, layerAsLayerObj, session),
+  });
 };
 
 export const useLayersFromRW = () => {
-    const result = useLayerGroupsFromRW();
+  const result = useLayerGroupsFromRW();
 
-    if (result.data) {
-        const data: APILayerSpec[] = result.data
-            .filter((lg) => lg.layers?.length > 0)
-            .reduce((acc: any, layerGroup: any) => {
-                return [...acc, ...layerGroup.layers];
-            }, []);
-        return { ...result, data };
-    }
-    return { ...result, data: [] };
+  if (result.data) {
+    const data: APILayerSpec[] = result.data
+      .filter((lg) => lg.layers?.length > 0)
+      .reduce((acc: any, layerGroup: any) => {
+        return [...acc, ...layerGroup.layers];
+      }, []);
+    return { ...result, data };
+  }
+  return { ...result, data: [] };
 };
 
 /**
@@ -217,34 +216,34 @@ export const useLayersFromRW = () => {
  * @returns {string[]} Array of Mapbox layers ids that mean to be interactive
  */
 export function getInteractiveLayers(activeLayers: any): string[] | null {
-    return flatten(
-        compact(
-            activeLayers.map((_activeLayer: any) => {
-                const { id, layerConfig } = _activeLayer;
-                if (isEmpty(layerConfig)) return null;
+  return flatten(
+    compact(
+      activeLayers.map((_activeLayer: any) => {
+        const { id, layerConfig } = _activeLayer;
+        if (isEmpty(layerConfig)) return null;
 
-                // * keeps backward compatibility for now
-                const vectorLayers =
-                    layerConfig.render?.layers ||
-                    layerConfig.body?.vectorLayers;
+        // * keeps backward compatibility for now
+        const vectorLayers =
+          layerConfig.render?.layers ||
+          layerConfig.body?.vectorLayers;
 
-                if (vectorLayers) {
-                    return vectorLayers.map((l: any, i: number) => {
-                        const { id: vectorLayerId, type: vectorLayerType } = l;
-                        return vectorLayerId || `${id}-${vectorLayerType}-${i}`;
-                    });
-                }
-                return null;
-            })
-        )
-    );
+        if (vectorLayers) {
+          return vectorLayers.map((l: any, i: number) => {
+            const { id: vectorLayerId, type: vectorLayerType } = l;
+            return vectorLayerId || `${id}-${vectorLayerType}-${i}`;
+          });
+        }
+        return null;
+      })
+    )
+  );
 }
 
 export const useInteractiveLayers = () => {
-    const result = useLayersFromRW();
-    if (result.data) {
-        const data = getInteractiveLayers(result.data);
-        return { ...result, data };
-    }
-    return { ...result, data: [] };
+  const result = useLayersFromRW();
+  if (result.data) {
+    const data = getInteractiveLayers(result.data);
+    return { ...result, data };
+  }
+  return { ...result, data: [] };
 };

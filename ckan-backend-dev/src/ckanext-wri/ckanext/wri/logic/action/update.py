@@ -29,6 +29,7 @@ from ckanext.wri.logic.action.get import validate_visibility
 import json
 from typing import Any, Dict, List, Tuple
 from ckan.lib.search import index_for
+from ckanext.wri.logic import validators as wri_validators
 
 # encoding: utf-8
 
@@ -56,6 +57,13 @@ import ckan.lib.app_globals as app_globals
 
 from ckan.common import _, config
 from ckan.types import Context, DataDict, ErrorDict, Schema
+from ckan.logic.action.update import (
+    group_update as old_group_update,
+)
+from ckanext.wri.logic import validators as wri_validators
+from ckan.logic.action.patch import (
+    group_patch as old_group_patch,
+)
 
 _validate = dfunc.validate
 _get_action = logic.get_action
@@ -196,6 +204,14 @@ def package_patch(context: Context, data_dict: DataDict):
     validate_visibility(context, data_dict)
     context["for_update"] = True
     dataset_id = data_dict.get("id")
+
+    try:
+        wri_validators.dataset_cross_fields(context, data_dict)
+    except tk.ValidationError:
+        raise
+    except Exception as e:
+        raise tk.ValidationError(str(e))
+    
     try:
         pending_dataset_dict = tk.get_action("pending_dataset_show")(
             context, {"package_id": dataset_id}
@@ -815,9 +831,16 @@ def resource_update(
     model = context["model"]
     id: str = _get_or_bust(data_dict, "id")
 
-    if not data_dict.get("url"):
-        data_dict["url"] = ""
+    # if not data_dict.get("url"):
+    #     data_dict["url"] = ""
 
+    try:
+        wri_validators.resource_cross_fields(context, data_dict)
+    except tk.ValidationError:
+        raise
+    except Exception as e:
+        raise tk.ValidationError(str(e))
+    
     resource = model.Resource.get(id)
     if resource is None:
         raise NotFound("Resource was not found.")
@@ -882,6 +905,13 @@ def resource_update(
 def package_update(context: Context, data_dict: DataDict) -> ActionResult.PackageUpdate:
     applications = data_dict.get("applications", [])
 
+    try:
+        wri_validators.dataset_cross_fields(context, data_dict)
+    except tk.ValidationError:
+        raise
+    except Exception as e:
+        raise tk.ValidationError(str(e))
+
     if applications:
         if isinstance(applications, list) and all(
             isinstance(app, dict) for app in applications
@@ -893,3 +923,22 @@ def package_update(context: Context, data_dict: DataDict) -> ActionResult.Packag
             )
 
     return old_package_update(context, data_dict)
+
+
+def _validate_group_title_in_payload(data_dict, context):
+    try:
+        wri_validators.title_validator(data_dict.get("title", ""),context)
+    except Exception as e:
+        if isinstance(e, tk.ValidationError):
+            raise
+        raise tk.ValidationError(str(e))
+
+@logic.side_effect_free
+def group_update(context: Context, data_dict: DataDict):
+    _validate_group_title_in_payload(data_dict, context)
+    return old_group_update(context, data_dict)
+
+@logic.side_effect_free
+def group_patch(context: Context, data_dict: DataDict):
+    _validate_group_title_in_payload(data_dict, context)
+    return old_group_patch(context, data_dict)

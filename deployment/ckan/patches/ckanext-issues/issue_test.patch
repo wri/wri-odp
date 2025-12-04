@@ -1,0 +1,26 @@
+diff --git a/ckanext/issues/tests/logic/action/test_issue.py b/ckanext/issues/tests/logic/action/test_issue.py
+index 76c7474..2b6ffb2 100644
+--- a/ckanext/issues/tests/logic/action/test_issue.py
++++ b/ckanext/issues/tests/logic/action/test_issue.py
+@@ -281,9 +281,10 @@ class TestIssueComment(object):
+         closed = helpers.call_action(
+             'issue_update',
+             issue_number=issue['number'],
++            description='some description',
+             dataset_id=dataset['id'],
+             context={'user': user['name']},
+-            status='closed'
++            status='closed',
+         )
+         assert 'closed' == closed['status']
+ 
+@@ -538,7 +539,8 @@ class TestIssueUpdate(object):
+             context={'user': user['name']},
+             dataset_id=dataset['id'],
+             issue_number=issue['number'],
+-            status='closed'
++            status='closed',
++            description='some description',
+         )
+         assert 'closed' == closed['status']
+ 

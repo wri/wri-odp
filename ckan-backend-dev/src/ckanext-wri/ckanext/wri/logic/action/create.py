@@ -36,12 +36,14 @@ from ckanext.wri.logic.action.action_helpers import (
 )
 import uuid
 from ckan.logic.action.create import (
-    organization_create as old_organization_create)
+    organization_create as old_organization_create,
+    group_create as old_group_create,)
 
 from ckan.logic.action.get import ( 
     organization_show as old_organization_show)
 
 import ckan.authz as authz
+from ckanext.wri.logic import validators as wri_validators
 
 NotificationGetUserViewedActivity: TypeAlias = None
 log = logging.getLogger(__name__)
@@ -435,8 +437,16 @@ def migration_status(context: Context, data_dict: DataDict):
 def package_create(context: Context, data_dict: DataDict):
 
     validate_visibility(context, data_dict)
+
     if data_dict.get("type") == "harvest":
         return old_package_create(context, data_dict)
+    
+    try:
+        wri_validators.dataset_cross_fields(context, data_dict)
+    except Exception as e:
+        if isinstance(e, tk.ValidationError):
+            raise
+        raise tk.ValidationError(str(e))
 
     data_dict["is_pending"] = True
     data_dict["is_approved"] = False
@@ -777,11 +787,19 @@ def resource_create(
     model = context["model"]
 
     package_id = _get_or_bust(data_dict, "package_id")
-    if not data_dict.get("url"):
-        data_dict["url"] = ""
+    # if not data_dict.get("url"):
+    #     data_dict["url"] = ""
 
     if not data_dict.get("id"):
         data_dict["id"] = str(uuid.uuid4())
+
+    try:
+        wri_validators.resource_cross_fields(context, data_dict)
+    except Exception as e:
+        if isinstance(e, tk.ValidationError):
+            raise
+        raise tk.ValidationError(str(e))
+
 
     package_show_context: Union[Context, Any] = dict(context, for_update=True)
     pkg_dict = _get_action("package_show")(package_show_context, {"id": package_id})
@@ -905,4 +923,16 @@ def organization_create(context, data_dict):
 
     
     result = old_organization_create(context, data_dict)
+    return result
+
+
+@logic.side_effect_free
+def group_create(context, data_dict):
+    try:
+        wri_validators.title_validator(data_dict.get("title", ""),context)
+    except Exception as e:
+        if isinstance(e, tk.ValidationError):
+            raise
+        raise tk.ValidationError(str(e))
+    result = old_group_create(context, data_dict)
     return result

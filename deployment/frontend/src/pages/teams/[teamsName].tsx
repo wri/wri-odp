@@ -115,10 +115,10 @@ export default function teams(
         <>
             <NextSeo
                 title={`${teamTitle} - Teams`}
-                description={`WRI Open Data Catalog Teams - ${teamTitle}`}
+                description={`WRI Open Data Catalog, WRI Data Explorer Teams - ${teamTitle}`}
                 openGraph={{
                     title: `${teamTitle} - Teams`,
-                    description: `WRI Open Data Catalog Teams - ${teamTitle}`,
+                    description: `WRI Open Data Catalog, WRI Data Explorer Teams - ${teamTitle}`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/teams/${teamName}`,
                 }}
             />
