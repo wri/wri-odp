@@ -92,18 +92,15 @@ function verifyAuthorizationError(response: any) {
     response?.data?.stack?.includes('Access denied') ||
     response?.error?.message?.includes('Access denied')
   ) {
-    try {
-      console.log('Access denied');
-      console.log(JSON.stringify(response));
-    } catch (e) {
-      console.log('Could not stringify response');
-    }
-    //toast('Your session is no longer valid, please sign in again.', {
-    //    type: 'warning',
-    //});
-    //setTimeout(() => {
-    //    signOut();
-    //}, 3000);
+    console.log('Authorization error detected.');
+    console.log('response:', JSON.stringify(response));
+    console.log('Error', response?.error);
+    toast('Your session is no longer valid, please sign in again.', {
+      type: 'warning',
+    });
+    setTimeout(() => {
+      signOut();
+    }, 3000);
   }
 }
 

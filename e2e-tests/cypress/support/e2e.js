@@ -334,6 +334,7 @@ Cypress.Commands.add(
         is_approved: "true",
         draft: "false",
         tags: [{ display_name: "subscriable", name: "subscriable" }],
+        technical_notes: "http://example.com/technical_notes.pdf",
         ...otherFields,
       },
     });

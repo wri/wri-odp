@@ -35,7 +35,8 @@ class TestGenNewName(object):
     )
     def test_without_config(self):
         """Tests if the number suffix is used when no config is set."""
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert WRIHarvesterBase._gen_new_name("Trees") == "trees1"
 
     @patch.dict(
@@ -43,7 +44,8 @@ class TestGenNewName(object):
         {"ckanext.harvest.default_dataset_name_append": "number-sequence"},
     )
     def test_number_config(self):
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert WRIHarvesterBase._gen_new_name("Trees") == "trees1"
 
     @patch.dict(
@@ -51,7 +53,8 @@ class TestGenNewName(object):
         {"ckanext.harvest.default_dataset_name_append": "random-hex"},
     )
     def test_random_config(self):
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         new_name = WRIHarvesterBase._gen_new_name("Trees")
 
         assert re.match(r"trees[\da-f]{5}", new_name)
@@ -62,7 +65,8 @@ class TestGenNewName(object):
     )
     def test_config_override(self):
         """Tests if a parameter has precedence over a config value."""
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert (
             WRIHarvesterBase._gen_new_name("Trees", append_type="number-sequence")
             == "trees1"
@@ -73,16 +77,19 @@ class TestGenNewName(object):
 class TestEnsureNameIsUnique(object):
 
     def test_no_existing_datasets(self):
-        factories.Dataset(name="unrelated", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="unrelated", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert _ensure_name_is_unique("trees") == "trees"
 
     def test_existing_dataset(self):
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert _ensure_name_is_unique("trees") == "trees1"
 
     def test_two_existing_datasets(self):
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
-        factories.Dataset(name="trees1", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
+        factories.Dataset(name="trees1", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert _ensure_name_is_unique("trees") == "trees2"
 
     def test_no_existing_datasets_and_long_name(self):
@@ -90,42 +97,49 @@ class TestEnsureNameIsUnique(object):
 
     def test_existing_dataset_and_long_name(self):
         # because PACKAGE_NAME_MAX_LENGTH = 100
-        factories.Dataset(name="x" * 100, approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="x" * 100, approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert _ensure_name_is_unique("x" * 101) == "x" * 99 + "1"
 
     def test_update_dataset_with_new_name(self):
-        factories.Dataset(name="trees1", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees1", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert _ensure_name_is_unique("tree", existing_name="trees1") == "tree"
 
     def test_update_dataset_but_with_same_name(self):
         # this can happen if you remove a trailing space from the title - the
         # harvester sees the title changed and thinks it should have a new
         # name, but clearly it can reuse its existing one
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
-        factories.Dataset(name="trees1", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
+        factories.Dataset(name="trees1", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert _ensure_name_is_unique("trees", existing_name="trees") == "trees"
 
     def test_update_dataset_to_available_shorter_name(self):
         # this can be handy when if reharvesting, you got duplicates and
         # managed to purge one set and through a minor title change you can now
         # lose the appended number. users don't like unnecessary numbers.
-        factories.Dataset(name="trees1")
+        organization = factories.Organization()
+        factories.Dataset(name="trees1", owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert _ensure_name_is_unique("trees", existing_name="trees1") == "trees"
 
     def test_update_dataset_but_doesnt_change_to_other_number(self):
         # there's no point changing one number for another though
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
-        factories.Dataset(name="trees2", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
+        factories.Dataset(name="trees2", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert _ensure_name_is_unique("trees", existing_name="trees2") == "trees2"
 
     def test_update_dataset_with_new_name_with_numbers(self):
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
-        factories.Dataset(name="trees2", approval_status="approved", is_approved=True)
-        factories.Dataset(name="frogs", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
+        factories.Dataset(name="trees2", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
+        factories.Dataset(name="frogs", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         assert _ensure_name_is_unique("frogs", existing_name="trees2") == "frogs1"
 
     def test_existing_dataset_appending_hex(self):
-        factories.Dataset(name="trees", approval_status="approved", is_approved=True)
+        organization = factories.Organization()
+        factories.Dataset(name="trees", approval_status="approved", is_approved=True, owner_org=organization['id'], technical_notes="http://example.com/notes.pdf", authors=[{"name": "Datopian", "email": "datopian@example.com"}], maintainers=[{"name": "Datopian", "email": "datopian@example.com"}])
         name = _ensure_name_is_unique("trees", append_type="random-hex")
         # e.g. 'trees0b53f'
         assert re.match(r"trees[\da-f]{5}", name)

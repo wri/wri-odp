@@ -11,7 +11,7 @@ export default function LegendTypeGradient(
     }
 ) {
     const { legendConfig } = activeLayer;
-    return !legendConfig || legendConfig.type !== 'proportional' ? null : (
+    return legendConfig?.type !== 'proportional' ? null : (
         <ul className="flex m-0 p-0 items-end list-none">
             {legendConfig.items.map(({ name, color, size }) => (
                 <li

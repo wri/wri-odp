@@ -54,6 +54,8 @@ def test_search_queries(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "authors": [{"name": "Author Name", "email": "author@example.com"}],
+        "maintainers": [{"name": "Maintainer Name", "email": "maintainer@example.com"}],
     }
 
     try:

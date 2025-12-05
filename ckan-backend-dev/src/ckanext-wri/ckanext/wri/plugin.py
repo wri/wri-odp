@@ -33,7 +33,8 @@ from ckanext.wri.logic.action.create import (
     resource_create,
     old_package_create,
     download_event_create,
-    organization_create
+    organization_create,
+    group_create,
 )
 from ckanext.wri.logic.action.update import (
     notification_update,
@@ -45,7 +46,9 @@ from ckanext.wri.logic.action.update import (
     resource_update,
     old_package_patch,
     old_package_update,
-    package_update
+    package_update,
+    group_patch,
+    group_update,
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -195,6 +198,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "year_validator": wri_validators.year_validator,
             "agents_json_object": wri_validators.agents_json_object,
             "url_or_email_validator": wri_validators.url_or_email_validator,
+            "title_validator": wri_validators.title_validator,
         }
 
     # IFacets
@@ -277,6 +281,10 @@ class WriPlugin(plugins.SingletonPlugin):
             "organization_create": organization_create,
             
             "prefect_send_error_callback": send_error_callback,
+            "group_create": group_create,
+            "group_update": group_update,
+            "group_patch": group_patch,
+            
         }
 
     # IPermissionLabels
