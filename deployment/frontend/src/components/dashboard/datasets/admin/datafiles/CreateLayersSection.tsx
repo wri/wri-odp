@@ -54,7 +54,6 @@ export function CreateLayersSection({
 
     return (
         <>
-            <RWDatasetForm formObj={formObj} />
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
                     swap(oldIdx, newIdx);
