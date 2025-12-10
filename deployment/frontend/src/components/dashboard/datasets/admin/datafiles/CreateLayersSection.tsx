@@ -26,8 +26,8 @@ export function CreateLayersSection({
 }: {
     formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { control, watch } = formObj;
-    const { fields, append, prepend, remove, swap, move, insert } =
+    const { control } = formObj;
+    const { fields, append, remove, swap } =
         useFieldArray({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
