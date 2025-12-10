@@ -17,7 +17,6 @@ import {
 } from '@/schema/dataset.schema';
 import { v4 as uuidv4 } from 'uuid';
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection';
-import { RWDatasetForm } from '../metadata/RWDataset';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import SortableList, { SortableItem } from 'react-easy-sort';
 import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm';
