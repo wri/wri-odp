@@ -17,7 +17,6 @@ import {
 } from '@/schema/dataset.schema';
 import { v4 as uuidv4 } from 'uuid';
 import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection';
-import { RWDatasetForm } from '../metadata/RWDataset';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import SortableList, { SortableItem } from 'react-easy-sort';
 import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm';
@@ -27,8 +26,8 @@ export function CreateLayersSection({
 }: {
     formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { control, watch } = formObj;
-    const { fields, append, prepend, remove, swap, move, insert } =
+    const { control } = formObj;
+    const { fields, append, remove, swap } =
         useFieldArray({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
@@ -54,7 +53,6 @@ export function CreateLayersSection({
 
     return (
         <>
-            <RWDatasetForm formObj={formObj} />
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
                     swap(oldIdx, newIdx);
