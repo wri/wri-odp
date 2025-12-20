@@ -60,7 +60,7 @@
         "@trpc/client": "^10.37.1",
         "@trpc/next": "^10.37.1",
         "@trpc/react-query": "^10.37.1",
-        "@trpc/server": "^10.37.1",
+        "@trpc/server": "^10.45.3",
         "@turf/turf": "^7.1.0",
         "@types/flexsearch": "0.7.3",
         "@types/mdx": "^2.0.13",
