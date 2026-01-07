@@ -67,7 +67,7 @@ export function Versioning({
                                 releaseNotes={rn.release_notes}
                                 date={rn.date}
                                 version={`Version ${
-                                    sortedReleaseNotes?.length - i
+                                    sortedReleaseNotes.length - i
                                 }`}
                                 key={`release-notes-${i}`}
                                 defaultOpen={!isReleaseNotesChanged && i == 0}

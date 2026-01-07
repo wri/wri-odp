@@ -44,5 +44,5 @@ def test_storage_report(s3_boto):
     total_cost = get_total_costs(bucket, "")
     all_orgs = get_all_orgs(bucket)
     assert total_cost['storage'] == 22
-    storage_report = get_storage_for_every_org(bucket, total_cost['storage'], all_orgs, "", "dev")
+    storage_report = get_storage_for_every_org(bucket, total_cost['storage'], all_orgs, "", "staging")
     assert storage_report[0]['storage'] == 11
