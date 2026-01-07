@@ -279,7 +279,7 @@ export function AddLayer({
                                                     selected ? 'font-bold' : ''
                                                 )}
                                             >
-                                                Build a referenced layer
+                                                Reference an existing RW layer
                                                 (read-only)
                                                 {watch('rw_dataset') ===
                                                     false && (
