@@ -6,6 +6,7 @@
   - [CKAN Backend Development](#ckan-backend-development)
   - [CKAN Deployment](#ckan-deployment)
   - [Updating READMEs](#updating-readmes)
+  - [Syncing Strategy for Different Environments](#syncing-strategy-for-different-environments)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -47,6 +48,3 @@ Follow these additional steps:
 
 2. Create a release from the `dev` branch.
 3. Merge changes from `dev` into `staging`.
-
-
-
