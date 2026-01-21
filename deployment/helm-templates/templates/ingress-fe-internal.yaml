@@ -3,8 +3,6 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cert-manager
-    meta.helm.sh/release-name: dx-helm-wri-dev-release
-    meta.helm.sh/release-namespace: wri-odp-dev
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "server: hide";
       more_set_headers "X-Content-Type-Options: nosniff";
@@ -41,22 +39,21 @@ metadata:
   generation: 1
   labels:
     app.kubernetes.io/managed-by: Helm
-  name: wri-dev-ingress-fe-internal
-  namespace: wri-odp-dev
+  name: wri-odp-ingress-fe-internal
 spec:
   ingressClassName: nginx
   rules:
-  - host: wri.dev.frontend.datopian.com
+  - host: {{ .Values.ckan.frontend.ingress.domain }}
     http:
       paths:
       - backend:
           service:
-            name: wri-dev-frontend-svc
+            name: wri-odp-frontend-svc
             port:
               number: 80
         path: /(.*)
         pathType: ImplementationSpecific
   tls:
   - hosts:
-    - wri.dev.frontend.datopian.com
-    secretName: wri.dev.frontend.datopian.com
+    - {{ .Values.ckan.frontend.ingress.domain }}
+    secretName: {{ .Values.ckan.frontend.ingress.domain }}

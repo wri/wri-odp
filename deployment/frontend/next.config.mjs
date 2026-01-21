@@ -41,7 +41,7 @@ const config = {
     },
     images: {
         domains: [
-            'wri-dev-ckan-svc',
+            'wri-odp-ckan-svc',
             'wri.dev.ckan.datopian.com',
             'wri.staging.ckan.datopian.com',
             'wri.prod.ckan.datopian.com',

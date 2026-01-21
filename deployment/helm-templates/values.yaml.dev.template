@@ -15,7 +15,7 @@ ckan:
       CKAN__SITE_URL: https://wri.dev.frontend.datopian.com
       CKAN_SITE_URL: https://wri.dev.frontend.datopian.com
       CKAN_HOMEPAGE_STYLE: "2"
-      CKAN__DATAPUSHER__URL: http://wri-dev-datapusher-svc:80/
+      CKAN__DATAPUSHER__URL: http://wri-odp-datapusher-svc:80/
       CKAN_SVC_PORT_80_TCP_PROTO: tcp
       CKAN__AUTH__ANON_CREATE_DATASET: "False"
       CKAN__AUTH__CREATE_DATASET_IF_NOT_IN_ORGANIZATION: "True"
@@ -111,6 +111,8 @@ ckan:
     replicaCount: 1
   frontend:
     enable: true
+    ingress:
+      domain: wri.dev.frontend.datopian.com
     hpa:
       enable: false
     resources:
@@ -131,7 +133,7 @@ ckan:
     autoscaling:
       enable: false
     customResource: true
-    projectId: wri-dev
+    projectId: wri-odp
     resources: {}
     useProductionCerts: true
   ingress:
@@ -161,7 +163,7 @@ ckan:
         paths:
           - path: /(.*)
             port: 80
-            service: wri-dev-ckan-svc
+            service: wri-odp-ckan-svc
     ingressNamespace: nginx-ingress
     ingressClass: nginx
     tls:
