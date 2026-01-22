@@ -190,6 +190,9 @@ ckan:
   xloader:
     enable: false
 solr:
+  zookeeper:
+    headless:
+      publishNotReadyAddresses: true
   nodeSelector: {}
   image:
     repository: ckan/ckan-solr
