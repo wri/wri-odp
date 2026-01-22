@@ -654,6 +654,7 @@ jobs:
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
           IMAGE_TAG: ${{ github.sha }}
+          CKAN_DATASTORE_WRITE_URL: ${{ secrets.CKAN_DATASTORE_WRITE_URL_STAGING }}
         run: |
           cd deployment
           curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
