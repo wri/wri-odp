@@ -3,8 +3,8 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cert-manager
-    meta.helm.sh/release-name: dx-helm-wri-dev-release
-    meta.helm.sh/release-namespace: wri-odp-dev
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "server: hide";
       more_set_headers "X-Content-Type-Options: nosniff";
@@ -38,25 +38,24 @@ metadata:
          rewrite ^/dataset/school_bus_fleets$ /datasets/usa-school-bus-fleets permanent;
         }
     nginx.ingress.kubernetes.io/use-regex: "true"
-  generation: 1
   labels:
     app.kubernetes.io/managed-by: Helm
-  name: wri-dev-ingress-fe-internal
-  namespace: wri-odp-dev
+  name: {{ .Values.ckan.general.projectId }}-ingress-fe-internal
+  namespace: {{ .Release.Namespace }}
 spec:
   ingressClassName: nginx
   rules:
-  - host: wri.dev.frontend.datopian.com
+  - host: {{ .Values.ingress.frontendInternal.host }}
     http:
       paths:
       - backend:
           service:
-            name: wri-dev-frontend-svc
+            name: {{ .Values.ckan.general.projectId }}-frontend-svc
             port:
               number: 80
         path: /(.*)
         pathType: ImplementationSpecific
   tls:
   - hosts:
-    - wri.dev.frontend.datopian.com
-    secretName: wri.dev.frontend.datopian.com
+    - {{ .Values.ingress.frontendInternal.host }}
+    secretName: {{ .Values.ingress.frontendInternal.secretName }}
