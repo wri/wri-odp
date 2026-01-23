@@ -24,8 +24,6 @@ jobs:
   build-and-push-datapusher-latest:
     name: Build and Push Datapusher Latest
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.event.inputs.branch_name || github.ref_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
