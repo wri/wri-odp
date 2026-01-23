@@ -42,6 +42,9 @@ ENV NEXT_PUBLIC_GFW_API_KEY=$NEXT_PUBLIC_GFW_API_KEY
 ENV NEXT_PUBLIC_DEPLOYMENT_TYPE=$NEXT_PUBLIC_DEPLOYMENT_TYPE
 ENV OSANO_URL=$OSANO_URL
 
+# Debugging: Print NEXTAUTH_URL to verify it's being passed correctly
+RUN echo "Debug: NEXTAUTH_URL is '$NEXTAUTH_URL'"
+
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
