@@ -2,9 +2,8 @@ import json
 import logging
 import os.path
 
-from shapely import Polygon, concave_hull
+from shapely import concave_hull
 import shapely.geometry
-from shapely import make_valid
 from shapely.wkt import loads
 from shapely.geometry import MultiPolygon
 
@@ -236,6 +235,7 @@ you need to split the geometry in order to fit the parts. Not indexing"""
         geometry = self.parse_geojson(geom_from_metadata)
 
         if geometry:
+
             # We allow multiple geometries as GeometryCollections
             if geometry["type"] == "GeometryCollection":
                 geometries = geometry["geometries"]
@@ -305,11 +305,6 @@ you need to split the geometry in order to fit the parts. Not indexing"""
             spatial_geom = get_shape_from_dataapi(address, [point["x"], point["y"]])
             if spatial_geom:
                 multipolygon = loads(spatial_geom)
-                bbox = Polygon([(-180, -90), (180, -90), (180, 90), (-180, 90)])
-                multipolygon = make_valid(multipolygon)
-                multipolygon = multipolygon.intersection(bbox)
-                polygons = [geom for geom in multipolygon.geoms if isinstance(geom, (Polygon, MultiPolygon))]
-                multipolygon = MultiPolygon(polygons)
                 spatial_geom = multipolygon.wkt
                 _queries.append(self.get_wkt_query(spatial_geom, include_global=include_global))
                 _queries = _queries + self.build_spatial_address_query(segments)
