@@ -1,0 +1,61 @@
+name: Build and Push Latest Datapusher Image
+
+on:
+  push:
+    paths:
+      - 'datapusher/**'
+    branches:
+      - dev
+      - staging
+      - prod
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Branch name to tag (e.g., dev, staging, prod)'
+        required: true
+        default: 'dev'
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-datapusher-latest:
+    name: Build and Push Datapusher Latest
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.branch_name || github.ref_name }}
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch_name || github.ref_name }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Build and push Datapusher image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
+          IMAGE_TAG: ${{ github.event.inputs.branch_name || github.ref_name }}-latest
+          SHA_TAG: ${{ github.event.inputs.branch_name || github.ref_name }}-${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG datapusher
+          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
+          
+          # Also push with SHA tag so other workflows can reference a specific commit if needed
+          docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG $REGISTRY/$DATAPUSHER_REPO:$SHA_TAG
+          docker push $REGISTRY/$DATAPUSHER_REPO:$SHA_TAG
+          
+          echo "Successfully pushed $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG and $SHA_TAG"
