@@ -31,6 +31,8 @@ jobs:
   build-ckan:
     name: Build CKAN Image
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -58,6 +60,8 @@ jobs:
   build-datapusher:
     name: Build Datapusher Image
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -85,6 +89,8 @@ jobs:
   build-migration:
     name: Build Migration Image
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -112,6 +118,8 @@ jobs:
   build-frontend:
     name: Build Frontend Image
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -149,6 +157,8 @@ jobs:
   build-prefect:
     name: Build Prefect Image
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -176,6 +186,8 @@ jobs:
   build-postgresql:
     name: Build PostgreSQL Image
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -203,6 +215,8 @@ jobs:
   build-solr:
     name: Build Solr Image
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -229,6 +243,8 @@ jobs:
   test-integration:
     name: Run Integration Tests
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     needs:
       - build-ckan
       - build-frontend
@@ -338,6 +354,8 @@ jobs:
   test-unit:
     name: Run Unit Tests
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     needs:
       - build-ckan
       - build-frontend
@@ -429,6 +447,8 @@ jobs:
   test-frontend:
     name: Run Frontend E2E Tests (Group ${{ matrix.group }})
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     needs: [
       build-ckan,
       build-frontend,
@@ -551,6 +571,8 @@ jobs:
   trivy-ckan:
     name: Trivy Security Scan - CKAN
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     needs: [build-ckan]
     if: always() && needs.build-ckan.result == 'success'
     steps:
@@ -588,6 +610,8 @@ jobs:
   trivy-frontend:
     name: Trivy Security Scan - Frontend
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ (github.event_name == 'pull_request' && github.base_ref) || github.ref_name }}
     needs: [build-frontend]
     if: always() && needs.build-frontend.result == 'success'
     steps:
@@ -626,6 +650,8 @@ jobs:
   deploy:
     name: Deploy To AWS
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
     needs:
       - test-integration
       - test-unit
