@@ -49,8 +49,7 @@ COPY . .
 # Disable telemetry during build for slight speedup
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN echo "Debug: NEXTAUTH_URL is '$NEXTAUTH_URL'" && \
-    SKIP_ENV_VALIDATION=1 npm run build
+RUN SKIP_ENV_VALIDATION=1 npm run build
 
 FROM --platform=linux/amd64 node:20-alpine AS runner
 WORKDIR /app
