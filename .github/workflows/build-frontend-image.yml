@@ -1,0 +1,71 @@
+name: Build and Push Frontend Image
+
+on:
+  workflow_call:
+    inputs:
+      branch_name:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Branch name to tag (e.g., dev, staging, prod)'
+        required: true
+        default: 'dev'
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-frontend:
+    name: Build and Push Frontend
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.branch_name || github.ref_name }}
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch_name || github.ref_name }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Build and push Frontend image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
+          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
+          SHA_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
+          --build-arg NEXTAUTH_SECRET=${{ secrets.FRONTEND_NEXTAUTH_SECRET }} \
+          --build-arg NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }} \
+          --build-arg CKAN_URL=${{ vars.FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_CKAN_URL=${{ vars.FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }} \
+          --build-arg NEXT_PUBLIC_GTM_ID=${{ vars.NEXT_PUBLIC_GTM_ID }} \
+          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ vars.NEXT_PUBLIC_HOTJAR_ID }} \
+          --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
+          --build-arg OSANO_URL=${{ vars.OSANO_URL }} \
+          --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
+          deployment/frontend
+          
+          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
+          
+          # Also push with SHA tag
+          docker tag $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG $REGISTRY/$FRONTEND_REPO:$SHA_TAG
+          docker push $REGISTRY/$FRONTEND_REPO:$SHA_TAG
+          
+          echo "Successfully pushed $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG and $SHA_TAG"
