@@ -94,35 +94,6 @@ jobs:
             -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG \
             deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
-
-  build-datapusher:
-    name: Build Datapusher Image
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Build and push Datapusher image to ECR
-        if: ${{ env.ENABLE_BUILD_DATAPUSHER == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
-          datapusher
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
-
   build-migration:
     name: Build Migration Image
     runs-on: ubuntu-latest
@@ -280,7 +251,6 @@ jobs:
       - setup
       - build-ckan
       - build-frontend
-      - build-datapusher
       - build-migration
       - build-prefect
       - build-postgresql
@@ -289,7 +259,6 @@ jobs:
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
-      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
       (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
       (needs.build-prefect.result == 'success' || needs.build-prefect.result == 'skipped') &&
       (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&
@@ -311,7 +280,8 @@ jobs:
         run: |
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          # Use latest tag for datapusher since it is built in a separate workflow
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr" >> $GITHUB_ENV
@@ -390,7 +360,6 @@ jobs:
       - setup
       - build-ckan
       - build-frontend
-      - build-datapusher
       - build-migration
       - build-prefect
       - build-postgresql
@@ -399,7 +368,6 @@ jobs:
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
-      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
       (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
       (needs.build-prefect.result == 'success' || needs.build-prefect.result == 'skipped') &&
       (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&
@@ -421,7 +389,8 @@ jobs:
         run: |
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          # Use latest tag for datapusher since it is built in a separate workflow
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr" >> $GITHUB_ENV
@@ -482,7 +451,6 @@ jobs:
       - setup
       - build-ckan
       - build-frontend
-      - build-datapusher
       - build-migration
       - build-prefect
       - build-postgresql
@@ -491,7 +459,6 @@ jobs:
       always() && 
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
-      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
       (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
       (needs.build-prefect.result == 'success' || needs.build-prefect.result == 'skipped') &&
       (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&
@@ -517,7 +484,8 @@ jobs:
         run: |
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          # Use latest tag for datapusher since it is built in a separate workflow
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ needs.setup.outputs.frontend_ckan_url }}" >> $GITHUB_ENV
