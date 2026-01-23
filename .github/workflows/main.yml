@@ -516,6 +516,8 @@ jobs:
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Pull Docker Images
+        env:
+          CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
         run: |
           docker pull $CKAN_IMAGE
           docker pull $DATAPUSHER_IMAGE
