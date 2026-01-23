@@ -51,7 +51,7 @@ jobs:
           IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
         with:
-          context: .
+          context: deployment/frontend
           file: deployment/frontend/Dockerfile
           push: true
           tags: |
