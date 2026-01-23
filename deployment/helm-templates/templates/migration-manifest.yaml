@@ -106,7 +106,6 @@ spec:
     app: migration-app
 {{ end }}
 
----
 {{- if .Values.ckan.migrationApp.enable -}}
 apiVersion: v1
 kind: Secret
