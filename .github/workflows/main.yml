@@ -68,7 +68,11 @@ jobs:
           IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
         run: |
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
-          docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
+          # Build the CKAN image from the cached Dockerfile.Base image
+          docker build -f deployment/ckan/Dockerfile.cached \
+            --build-arg REGISTRY=$REGISTRY \
+            -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG \
+            deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
 
   build-datapusher:
