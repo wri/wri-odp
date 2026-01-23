@@ -45,7 +45,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
           IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
-          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest-datapusher
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG datapusher
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
