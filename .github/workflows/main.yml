@@ -281,7 +281,7 @@ jobs:
           # Use latest tag for frontend since it is built in a separate workflow
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
           # Use latest tag for datapusher since it is built in a separate workflow
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr" >> $GITHUB_ENV
@@ -300,7 +300,7 @@ jobs:
       - name: Pull Docker Images
         env:
           CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest
+          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}
           PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
           POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql
           SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
@@ -404,7 +404,7 @@ jobs:
           # Use latest tag for frontend since it is built in a separate workflow
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
           # Use latest tag for datapusher since it is built in a separate workflow
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr" >> $GITHUB_ENV
@@ -423,7 +423,7 @@ jobs:
       - name: Pull Docker Images
         env:
           CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest
+          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}
           PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
           POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql
           SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
@@ -514,7 +514,7 @@ jobs:
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
           # Use latest tag for datapusher since it is built in a separate workflow
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ needs.setup.outputs.frontend_ckan_url }}" >> $GITHUB_ENV
@@ -533,7 +533,7 @@ jobs:
       - name: Pull Docker Images
         env:
           CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest
+          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}
           PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
           POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql
           SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
