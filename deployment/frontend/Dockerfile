@@ -1,12 +1,14 @@
 FROM --platform=linux/amd64 node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
-RUN npm install -g npm@latest
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
 COPY tableschema-1.12.6.tgz ./
 
-RUN npm ci -f
+# Omit npm update to save time (node:20 comes with a recent enough npm)
+# Use cache mount to speed up repeated installs if lockfile changes
+# Use --legacy-peer-deps to resolve react version conflicts
+RUN --mount=type=cache,target=/root/.npm npm ci --legacy-peer-deps
 
 FROM --platform=linux/amd64 node:20-alpine AS builder
 ARG NEXTAUTH_SECRET
@@ -44,14 +46,17 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN SKIP_ENV_VALIDATION=1 npm run build
+# Disable telemetry during build for slight speedup
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN echo "Debug: NEXTAUTH_URL is '$NEXTAUTH_URL'" && \
+    SKIP_ENV_VALIDATION=1 npm run build
 
 FROM --platform=linux/amd64 node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
-
-# ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -61,6 +66,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/bypassApiTrackingFetch.js ./bypassApiTrackingFetch.js
 
+# Copy only the necessary files for standalone mode
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
