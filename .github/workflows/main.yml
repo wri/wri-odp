@@ -38,6 +38,7 @@ jobs:
       next_public_hotjar_id: ${{ steps.vars.outputs.next_public_hotjar_id }}
       osano_url: ${{ steps.vars.outputs.osano_url }}
       datapusher_changed: ${{ steps.check_changes.outputs.datapusher_changed }}
+      frontend_changed: ${{ steps.check_changes.outputs.frontend_changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,11 +61,21 @@ jobs:
             else
               echo "datapusher_changed=true" >> $GITHUB_OUTPUT
             fi
+            if git diff --quiet origin/${{ github.base_ref }} HEAD -- deployment/frontend/; then
+              echo "frontend_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "frontend_changed=true" >> $GITHUB_OUTPUT
+            fi
           else
             if git diff --quiet HEAD^ HEAD -- datapusher/; then
               echo "datapusher_changed=false" >> $GITHUB_OUTPUT
             else
               echo "datapusher_changed=true" >> $GITHUB_OUTPUT
+            fi
+            if git diff --quiet HEAD^ HEAD -- deployment/frontend/; then
+              echo "frontend_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "frontend_changed=true" >> $GITHUB_OUTPUT
             fi
           fi
       - id: prefix
@@ -155,41 +166,12 @@ jobs:
 
   build-frontend:
     name: Build Frontend Image
-    runs-on: ubuntu-latest
     needs: setup
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Build and push Frontend image to ECR
-        if: ${{ env.ENABLE_BUILD_FRONTEND == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
-          IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-          --build-arg NEXTAUTH_SECRET="this-is-a-fake-secret" \
-          --build-arg NEXTAUTH_URL=${{ needs.setup.outputs.frontend_nextauth_url }} \
-          --build-arg CKAN_URL=${{ needs.setup.outputs.frontend_ckan_url }} \
-          --build-arg NEXT_PUBLIC_CKAN_URL=${{ needs.setup.outputs.frontend_ckan_url }} \
-          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ needs.setup.outputs.frontend_nextauth_url }} \
-          --build-arg NEXT_PUBLIC_GTM_ID=${{ needs.setup.outputs.next_public_gtm_id }} \
-          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ needs.setup.outputs.next_public_hotjar_id }} \
-          --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
-          --build-arg OSANO_URL=${{ needs.setup.outputs.osano_url }} \
-          --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ needs.setup.outputs.branch_name }}" \
-          deployment/frontend
-          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
+    if: needs.setup.outputs.frontend_changed == 'true'
+    uses: ./.github/workflows/build-frontend-image.yml
+    with:
+      branch_name: ${{ needs.setup.outputs.branch_name }}
+    secrets: inherit
 
   build-prefect:
     name: Build Prefect Image
@@ -312,7 +294,8 @@ jobs:
       - name: Set image environment variables
         run: |
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          # Use latest tag for frontend since it is built in a separate workflow
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
           # Use latest tag for datapusher since it is built in a separate workflow
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
@@ -428,7 +411,8 @@ jobs:
       - name: Set image environment variables
         run: |
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          # Use latest tag for frontend since it is built in a separate workflow
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
           # Use latest tag for datapusher since it is built in a separate workflow
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
