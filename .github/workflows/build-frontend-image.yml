@@ -44,8 +44,9 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
-          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
-          SHA_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          # Primary tag is now the SHA tag (unique per commit)
+          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
         run: |
           docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
           --build-arg NEXTAUTH_SECRET="dummy-secret-for-build" \
@@ -62,8 +63,13 @@ jobs:
           
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
           
-          # Also push with SHA tag
-          docker tag $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG $REGISTRY/$FRONTEND_REPO:$SHA_TAG
-          docker push $REGISTRY/$FRONTEND_REPO:$SHA_TAG
+          # Only push 'latest' tag if this is NOT a Pull Request
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            docker tag $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
+            docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
+            echo "Successfully pushed $LATEST_TAG"
+          else
+            echo "Skipping 'latest' tag push for Pull Request"
+          fi
           
-          echo "Successfully pushed $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG and $SHA_TAG"
+          echo "Successfully pushed $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG"
