@@ -37,13 +37,35 @@ jobs:
       next_public_gtm_id: ${{ steps.vars.outputs.next_public_gtm_id }}
       next_public_hotjar_id: ${{ steps.vars.outputs.next_public_hotjar_id }}
       osano_url: ${{ steps.vars.outputs.osano_url }}
+      datapusher_changed: ${{ steps.check_changes.outputs.datapusher_changed }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - id: branch
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             echo "name=${{ github.base_ref }}" >> $GITHUB_OUTPUT
           else
             echo "name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+      - id: check_changes
+        run: |
+          # If it's a PR, check against base branch. If push, check against previous commit.
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git fetch origin ${{ github.base_ref }}
+            if git diff --quiet origin/${{ github.base_ref }} HEAD -- datapusher/; then
+              echo "datapusher_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "datapusher_changed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            if git diff --quiet HEAD^ HEAD -- datapusher/; then
+              echo "datapusher_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "datapusher_changed=true" >> $GITHUB_OUTPUT
+            fi
           fi
       - id: prefix
         run: |
@@ -94,6 +116,15 @@ jobs:
             -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG \
             deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
+  build-datapusher:
+    name: Build Datapusher Image
+    needs: setup
+    if: needs.setup.outputs.datapusher_changed == 'true'
+    uses: ./.github/workflows/build-datapusher-image.yml
+    with:
+      branch_name: ${{ needs.setup.outputs.branch_name }}
+    secrets: inherit
+
   build-migration:
     name: Build Migration Image
     runs-on: ubuntu-latest
@@ -251,6 +282,7 @@ jobs:
       - setup
       - build-ckan
       - build-frontend
+      - build-datapusher
       - build-migration
       - build-prefect
       - build-postgresql
@@ -259,6 +291,7 @@ jobs:
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
+      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
       (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
       (needs.build-prefect.result == 'success' || needs.build-prefect.result == 'skipped') &&
       (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&
@@ -465,6 +498,7 @@ jobs:
       - setup
       - build-ckan
       - build-frontend
+      - build-datapusher
       - build-migration
       - build-prefect
       - build-postgresql
@@ -473,6 +507,7 @@ jobs:
       always() && 
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
+      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
       (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
       (needs.build-prefect.result == 'success' || needs.build-prefect.result == 'skipped') &&
       (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&

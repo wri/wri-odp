@@ -1,13 +1,11 @@
 name: Build and Push Latest Datapusher Image
 
 on:
-  push:
-    paths:
-      - 'datapusher/**'
-    branches:
-      - dev
-      - staging
-      - prod
+  workflow_call:
+    inputs:
+      branch_name:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       branch_name:
@@ -28,7 +26,7 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch_name || github.ref_name }}
+          ref: ${{ inputs.branch_name || github.ref_name }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -46,8 +44,8 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
-          IMAGE_TAG: ${{ github.event.inputs.branch_name || github.ref_name }}-latest
-          SHA_TAG: ${{ github.event.inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
+          SHA_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG datapusher
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
