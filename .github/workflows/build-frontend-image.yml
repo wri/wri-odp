@@ -40,36 +40,33 @@ jobs:
         with:
           mask-password: 'true'
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push Frontend image
+        uses: docker/build-push-action@v5
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
-          # Primary tag is now the SHA tag (unique per commit)
           IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
-        run: |
-          docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-          --build-arg NEXTAUTH_SECRET="dummy-secret-for-build" \
-          --build-arg NEXTAUTH_URL="http://localhost:3000" \
-          --build-arg CKAN_URL="http://localhost:5000" \
-          --build-arg NEXT_PUBLIC_CKAN_URL="http://localhost:5000" \
-          --build-arg NEXT_PUBLIC_NEXTAUTH_URL="http://localhost:3000" \
-          --build-arg NEXT_PUBLIC_GTM_ID="dummy-gtm-id" \
-          --build-arg NEXT_PUBLIC_HOTJAR_ID="dummy-hotjar-id" \
-          --build-arg NEXT_PUBLIC_GFW_API_KEY="dummy-api-key" \
-          --build-arg OSANO_URL="http://dummy-osano-url.com" \
-          --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
-          deployment/frontend
-          
-          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
-          
-          # Only push 'latest' tag if this is NOT a Pull Request
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            docker tag $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
-            docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
-            echo "Successfully pushed $LATEST_TAG"
-          else
-            echo "Skipping 'latest' tag push for Pull Request"
-          fi
-          
-          echo "Successfully pushed $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG"
+        with:
+          context: .
+          file: deployment/frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.FRONTEND_REPO }}:${{ env.IMAGE_TAG }}
+            ${{ github.event_name != 'pull_request' && format('{0}/{1}:{2}', env.REGISTRY, env.FRONTEND_REPO, env.LATEST_TAG) || '' }}
+          build-args: |
+            NEXTAUTH_SECRET="dummy-secret-for-build"
+            NEXTAUTH_URL="http://localhost:3000"
+            CKAN_URL="http://localhost:5000"
+            NEXT_PUBLIC_CKAN_URL="http://localhost:5000"
+            NEXT_PUBLIC_NEXTAUTH_URL="http://localhost:3000"
+            NEXT_PUBLIC_GTM_ID="dummy-gtm-id"
+            NEXT_PUBLIC_HOTJAR_ID="dummy-hotjar-id"
+            NEXT_PUBLIC_GFW_API_KEY="dummy-api-key"
+            OSANO_URL="http://dummy-osano-url.com"
+            NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
