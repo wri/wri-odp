@@ -32,6 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       branch_name: ${{ steps.branch.outputs.name }}
+      frontend_ckan_url: ${{ steps.vars.outputs.frontend_ckan_url }}
+      frontend_nextauth_url: ${{ steps.vars.outputs.frontend_nextauth_url }}
+      next_public_gtm_id: ${{ steps.vars.outputs.next_public_gtm_id }}
+      next_public_hotjar_id: ${{ steps.vars.outputs.next_public_hotjar_id }}
+      osano_url: ${{ steps.vars.outputs.osano_url }}
     steps:
       - id: branch
         run: |
@@ -40,6 +45,23 @@ jobs:
           else
             echo "name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           fi
+      - id: prefix
+        run: |
+          BRANCH="${{ steps.branch.outputs.name }}"
+          if [ "$BRANCH" == "prod" ]; then
+            echo "val=PROD" >> $GITHUB_OUTPUT
+          elif [ "$BRANCH" == "staging" ]; then
+            echo "val=STAGING" >> $GITHUB_OUTPUT
+          else
+            echo "val=DEV" >> $GITHUB_OUTPUT
+          fi
+      - id: vars
+        run: |
+          echo "frontend_ckan_url=${{ vars[format('{0}_FRONTEND_CKAN_URL', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
+          echo "frontend_nextauth_url=${{ vars[format('{0}_FRONTEND_NEXTAUTH_URL', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
+          echo "next_public_gtm_id=${{ vars[format('{0}_NEXT_PUBLIC_GTM_ID', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
+          echo "next_public_hotjar_id=${{ vars[format('{0}_NEXT_PUBLIC_HOTJAR_ID', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
+          echo "osano_url=${{ vars[format('{0}_OSANO_URL', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
 
   build-ckan:
     name: Build CKAN Image
@@ -133,8 +155,6 @@ jobs:
     name: Build Frontend Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -156,15 +176,15 @@ jobs:
           IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-          --build-arg NEXTAUTH_SECRET=${{ secrets.FRONTEND_NEXTAUTH_SECRET }} \
-          --build-arg NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }} \
-          --build-arg CKAN_URL=${{ vars.FRONTEND_CKAN_URL }} \
-          --build-arg NEXT_PUBLIC_CKAN_URL=${{ vars.FRONTEND_CKAN_URL }} \
-          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }} \
-          --build-arg NEXT_PUBLIC_GTM_ID=${{ vars.NEXT_PUBLIC_GTM_ID }} \
-          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ vars.NEXT_PUBLIC_HOTJAR_ID }} \
+          --build-arg NEXTAUTH_SECRET="this-is-a-fake-secret" \
+          --build-arg NEXTAUTH_URL=${{ needs.setup.outputs.frontend_nextauth_url }} \
+          --build-arg CKAN_URL=${{ needs.setup.outputs.frontend_ckan_url }} \
+          --build-arg NEXT_PUBLIC_CKAN_URL=${{ needs.setup.outputs.frontend_ckan_url }} \
+          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ needs.setup.outputs.frontend_nextauth_url }} \
+          --build-arg NEXT_PUBLIC_GTM_ID=${{ needs.setup.outputs.next_public_gtm_id }} \
+          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ needs.setup.outputs.next_public_hotjar_id }} \
           --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
-          --build-arg OSANO_URL=${{ vars.OSANO_URL }} \
+          --build-arg OSANO_URL=${{ needs.setup.outputs.osano_url }} \
           --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ needs.setup.outputs.branch_name }}" \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
@@ -265,8 +285,6 @@ jobs:
       - build-prefect
       - build-postgresql
       - build-solr
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: |
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
@@ -469,8 +487,6 @@ jobs:
       - build-prefect
       - build-postgresql
       - build-solr
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: |
       always() && 
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
@@ -504,13 +520,13 @@ jobs:
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_CKAN_URL=${{ vars.FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_GTM_ID=${{ vars.NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CKAN_URL=${{ needs.setup.outputs.frontend_ckan_url }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ needs.setup.outputs.frontend_nextauth_url }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_GTM_ID=${{ needs.setup.outputs.next_public_gtm_id }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
           echo "CKAN__AUTH__ALLOW_DATASET_COLLABORATORS=true" >> $GITHUB_ENV
           echo "OSANO_URL=http://localhost:3000/osano-stub.js" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_HOTJAR_ID=${{ vars.NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_HOTJAR_ID=${{ needs.setup.outputs.next_public_hotjar_id }}" >> $GITHUB_ENV
       - name: Add url(s) to hosts
         run: |
           sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
