@@ -518,6 +518,10 @@ jobs:
       - name: Pull Docker Images
         env:
           CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
+          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest
+          PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
+          POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-postgresql
+          SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
         run: |
           docker pull $CKAN_IMAGE
           docker pull $DATAPUSHER_IMAGE
