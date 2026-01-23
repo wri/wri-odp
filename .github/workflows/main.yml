@@ -262,7 +262,7 @@ jobs:
       - name: Set image environment variables
         run: |
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-postgresql" >> $GITHUB_ENV
@@ -370,12 +370,12 @@ jobs:
           mask-password: 'true'
       - name: Set image environment variables
         run: |
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
-          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-prefect" >> $GITHUB_ENV
-          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-postgresql" >> $GITHUB_ENV
-          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-solr" >> $GITHUB_ENV
+          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
+          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-postgresql" >> $GITHUB_ENV
+          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
@@ -466,7 +466,7 @@ jobs:
           mask-password: 'true'
       - name: Set image environment variables
         run: |
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
