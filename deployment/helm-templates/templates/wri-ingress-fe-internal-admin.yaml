@@ -3,8 +3,8 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cert-manager
-    meta.helm.sh/release-name: dx-helm-wri-staging-release
-    meta.helm.sh/release-namespace: wri-odp-staging
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "server: hide";
       more_set_headers "X-Content-Type-Options: nosniff";
@@ -17,36 +17,33 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 1000M
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
-    nginx.ingress.kubernetes.io/rewrite-target: /api/action/$1
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/use-regex: "true"
   labels:
     app.kubernetes.io/managed-by: Helm
-  name: wri-staging-ingress-fe-internal-api
-  namespace: wri-odp-staging
+  name: {{ .Values.ckan.general.projectId }}-ingress-fe-internal-admin
+  namespace: {{ .Release.Namespace }}
 spec:
   ingressClassName: nginx
   rules:
-  - host: wri.staging.frontend.datopian.com
+  - host: {{ .Values.ingress.frontendInternalAdmin.host }}
     http:
       paths:
       - backend:
           service:
-            name: wri-staging-ckan-svc
+            name: {{ .Values.ckan.general.projectId }}-ckan-svc
             port:
               number: 80
-        path: /api/action/(.*)
+        path: /private-admin/(.*)
         pathType: ImplementationSpecific
-  - host: wri.staging.frontend.datopian.com
-    http:
-      paths:
       - backend:
           service:
-            name: wri-staging-ckan-svc
+            name: {{ .Values.ckan.general.projectId }}-ckan-svc
             port:
               number: 80
-        path: /api/3/action/(.*)
+        path: /private-admin
         pathType: ImplementationSpecific
   tls:
   - hosts:
-    - wri.staging.frontend.datopian.com
-    secretName: wri.staging.frontend.datopian.com
+    - {{ .Values.ingress.frontendInternalAdmin.host }}
+    secretName: {{ .Values.ingress.frontendInternalAdmin.secretName }}

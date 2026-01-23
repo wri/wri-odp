@@ -72,8 +72,6 @@ export const Provider = zustandContext.Provider;
 export const useStore = zustandContext.useStore;
 
 export const initializeStore = (preloadedState: any = {}) => {
-    console.log('Initializing store with preloaded state', preloadedState);
-    console.log('Default initial state', getDefaultInitialState());
     return create(
         combine(
             {

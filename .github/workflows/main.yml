@@ -2,13 +2,17 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
+      - prod
       - staging
+      - dev
   pull_request:
     branches:
+      - dev
       - staging
+      - prod
 env:
   PROJECT_NAME: wri-odp
-  BRANCH_NAME: staging
+  BRANCH_NAME: ${{ github.ref_name }}
   ENABLE_TRIVY_SCANNING: true
   ENABLE_BUILD_CKAN: true
   ENABLE_BUILD_FRONTEND: true
@@ -45,7 +49,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}-${{ github.sha }}
         run: |
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
           docker build -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG deployment/ckan
@@ -72,7 +76,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
           datapusher
@@ -99,7 +103,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration \
           migration
@@ -126,19 +130,19 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-          --build-arg NEXTAUTH_SECRET=${{ secrets.STAGING_FRONTEND_NEXTAUTH_SECRET }} \
-          --build-arg NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
-          --build-arg CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
-          --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.STAGING_FRONTEND_CKAN_URL }} \
-          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.STAGING_FRONTEND_NEXTAUTH_URL }} \
-          --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.STAGING_NEXT_PUBLIC_GTM_ID }} \
-          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.STAGING_NEXT_PUBLIC_HOTJAR_ID }} \
+          --build-arg NEXTAUTH_SECRET=${{ secrets.DEV_FRONTEND_NEXTAUTH_SECRET }} \
+          --build-arg NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
+          --build-arg CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }} \
+          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }} \
+          --build-arg NEXT_PUBLIC_GTM_ID=${{ secrets.DEV_NEXT_PUBLIC_GTM_ID }} \
+          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ secrets.DEV_NEXT_PUBLIC_HOTJAR_ID }} \
           --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
           --build-arg OSANO_URL=${{ secrets.DEV_OSANO_URL }} \
-          --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="staging" \
+          --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="dev" \
           deployment/frontend
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
 
@@ -163,7 +167,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-prefect \
           ckan-backend-dev/prefect-server
@@ -190,7 +194,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql \
           ckan-backend-dev/postgresql
@@ -217,7 +221,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: staging-${{ github.sha }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-solr \
           ckan-backend-dev/solr
@@ -257,12 +261,12 @@ jobs:
           mask-password: 'true'
       - name: Set image environment variables
         run: |
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:staging-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}" >> $GITHUB_ENV
-          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}-prefect" >> $GITHUB_ENV
-          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}-postgresql" >> $GITHUB_ENV
-          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}-solr" >> $GITHUB_ENV
+          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
+          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-postgresql" >> $GITHUB_ENV
+          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
@@ -366,12 +370,12 @@ jobs:
           mask-password: 'true'
       - name: Set image environment variables
         run: |
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:staging-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}" >> $GITHUB_ENV
-          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}-prefect" >> $GITHUB_ENV
-          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}-postgresql" >> $GITHUB_ENV
-          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}-solr" >> $GITHUB_ENV
+          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-prefect" >> $GITHUB_ENV
+          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-postgresql" >> $GITHUB_ENV
+          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:dev-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
@@ -462,12 +466,10 @@ jobs:
           mask-password: 'true'
       - name: Set image environment variables
         run: |
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:staging-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}" >> $GITHUB_ENV
-          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}-prefect" >> $GITHUB_ENV
-          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}-postgresql" >> $GITHUB_ENV
-          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:staging-${{ github.sha }}-solr" >> $GITHUB_ENV
+          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ secrets.DEV_FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ secrets.DEV_FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
@@ -484,7 +486,7 @@ jobs:
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
       - name: Set up Docker Containers (without frontend)
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}'
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
@@ -503,13 +505,13 @@ jobs:
       - name: Set up Frontend Docker Container
         if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example up -d frontend
         working-directory: ./ckan-backend-dev
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
       - name: Cypress Install and Frontend setup
         if: ${{ env.ENABLE_FRONTEND_TESTS == 'true' }}
@@ -536,13 +538,13 @@ jobs:
       - name: Print Error Logs
         if: failure()
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example logs
         working-directory: ./ckan-backend-dev
       - name: Tear down containers
         if: failure() || success()
         env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:staging-${{ github.sha }}'
+          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ env.BRANCH_NAME }}-${{ github.sha }}'
         run: docker compose -f docker-compose.test.yml --env-file .env.example down -v --remove-orphans
         working-directory: ./ckan-backend-dev
 
@@ -571,7 +573,7 @@ jobs:
           REPOSITORY: ${{ secrets.ECR_CKAN_REPO }}
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:staging-${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.BRANCH_NAME }}-${{ github.sha }}'
           format: 'sarif'
           output: ckan-trivy-results.sarif
           exit-code: '0'
@@ -608,7 +610,7 @@ jobs:
           REPOSITORY: ${{ secrets.ECR_FRONTEND_REPO }}
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:staging-${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ env.BRANCH_NAME }}-${{ github.sha }}'
           format: 'sarif'
           output: frontend-trivy-results.sarif
           exit-code: '0'
