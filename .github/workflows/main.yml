@@ -297,6 +297,13 @@ jobs:
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Pull Docker Images
+        run: |
+          docker pull $CKAN_IMAGE
+          docker pull $DATAPUSHER_IMAGE
+          docker pull $PREFECT_IMAGE
+          docker pull $POSTGRESQL_IMAGE
+          docker pull $SOLR_IMAGE
       - name: Set up Docker Containers (without frontend)
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up -d
@@ -406,6 +413,13 @@ jobs:
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Pull Docker Images
+        run: |
+          docker pull $CKAN_IMAGE
+          docker pull $DATAPUSHER_IMAGE
+          docker pull $PREFECT_IMAGE
+          docker pull $POSTGRESQL_IMAGE
+          docker pull $SOLR_IMAGE
       - name: Set up Docker Containers
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up -d
@@ -501,6 +515,13 @@ jobs:
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Pull Docker Images
+        run: |
+          docker pull $CKAN_IMAGE
+          docker pull $DATAPUSHER_IMAGE
+          docker pull $PREFECT_IMAGE
+          docker pull $POSTGRESQL_IMAGE
+          docker pull $SOLR_IMAGE
       - name: Set up Docker Containers (without frontend)
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}'
