@@ -50,7 +50,7 @@ jobs:
           SHA_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-          --build-arg NEXTAUTH_SECRET="${{ secrets.FRONTEND_NEXTAUTH_SECRET }}" \
+          --build-arg NEXTAUTH_SECRET="this-is-top-secret" \
           --build-arg NEXTAUTH_URL="${{ vars.FRONTEND_NEXTAUTH_URL }}" \
           --build-arg CKAN_URL="${{ vars.FRONTEND_CKAN_URL }}" \
           --build-arg NEXT_PUBLIC_CKAN_URL="${{ vars.FRONTEND_CKAN_URL }}" \
