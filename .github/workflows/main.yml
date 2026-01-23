@@ -45,8 +45,6 @@ jobs:
     name: Build CKAN Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -79,8 +77,6 @@ jobs:
     name: Build Datapusher Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -109,8 +105,6 @@ jobs:
     name: Build Migration Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -179,8 +173,6 @@ jobs:
     name: Build Prefect Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -209,8 +201,6 @@ jobs:
     name: Build PostgreSQL Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -239,8 +229,6 @@ jobs:
     name: Build Solr Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -389,8 +377,6 @@ jobs:
       - build-prefect
       - build-postgresql
       - build-solr
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: |
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
@@ -601,8 +587,6 @@ jobs:
     needs:
       - setup
       - build-ckan
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: always() && needs.build-ckan.result == 'success'
     steps:
       - name: Git clone the repository
@@ -642,8 +626,6 @@ jobs:
     needs:
       - setup
       - build-frontend
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: always() && needs.build-frontend.result == 'success'
     steps:
       - name: Git clone the repository
