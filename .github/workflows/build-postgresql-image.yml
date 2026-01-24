@@ -57,7 +57,7 @@ jobs:
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql \
           ckan-backend-dev/postgresql
           
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
+          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql
           
           # Only push 'latest' tag if this is NOT a Pull Request
           if [ "${{ github.event_name }}" != "pull_request" ]; then
