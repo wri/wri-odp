@@ -83,7 +83,7 @@
         "highlight.js": "^11.9.0",
         "js-deep-equals": "^2.1.1",
         "jwks-rsa": "^3.1.0",
-        "lodash": "^4.17.21",
+        "lodash": "^4.17.23",
         "lowlight": "^3.1.0",
         "luma.gl": "^7.3.2",
         "mapbox-gl": "^2.15.0",
