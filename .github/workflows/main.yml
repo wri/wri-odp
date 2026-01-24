@@ -602,7 +602,7 @@ jobs:
           runTests: false
           working-directory: ./integration-tests
       - name: Cypress setup print
-        run: cat integration-tests/cypress.json
+        run: cat integration-tests/cypress.json.example || echo "No cypress.json file found"
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         env:
