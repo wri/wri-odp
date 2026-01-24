@@ -105,6 +105,7 @@ class HTTPError(Exception):
 
         """
         super(HTTPError, self).__init__(message)
+        self.message = message
         self.status_code = status_code
         self.request_url = request_url
         self.response = response
@@ -130,7 +131,7 @@ class HTTPError(Exception):
     def __str__(self):
         return "{} status={} url={} response={}".format(
             self.message, self.status_code, self.request_url, self.response
-        ).encode("ascii", "replace")
+        )
 
 
 def datastore_resource_exists(resource_id, api_key, ckan_url):

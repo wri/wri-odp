@@ -61,7 +61,7 @@ describe("Chart view", () => {
     "should not be accessible for non logged in users",
     {
       retries: {
-        runMode: 10,
+        runMode: 3,
         openMode: 0,
       },
     },
@@ -74,7 +74,7 @@ describe("Chart view", () => {
     "should be accessible for logged in users",
     {
       retries: {
-        runMode: 10,
+        runMode: 3,
         openMode: 0,
       },
     },

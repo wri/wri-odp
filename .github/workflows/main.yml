@@ -36,6 +36,7 @@ jobs:
       frontend_nextauth_url: ${{ steps.vars.outputs.frontend_nextauth_url }}
       next_public_gtm_id: ${{ steps.vars.outputs.next_public_gtm_id }}
       next_public_hotjar_id: ${{ steps.vars.outputs.next_public_hotjar_id }}
+      ckan_changed: ${{ steps.check_changes.outputs.ckan_changed }}
       datapusher_changed: ${{ steps.check_changes.outputs.datapusher_changed }}
       frontend_changed: ${{ steps.check_changes.outputs.frontend_changed }}
       migration_changed: ${{ steps.check_changes.outputs.migration_changed }}
@@ -57,6 +58,11 @@ jobs:
           # If it's a PR, check against base branch. If push, check against previous commit.
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             git fetch origin ${{ github.base_ref }}
+            if git diff --quiet origin/${{ github.base_ref }} HEAD -- ckan-backend-dev/ deployment/ckan/; then
+              echo "ckan_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "ckan_changed=true" >> $GITHUB_OUTPUT
+            fi
             if git diff --quiet origin/${{ github.base_ref }} HEAD -- datapusher/; then
               echo "datapusher_changed=false" >> $GITHUB_OUTPUT
             else
@@ -78,6 +84,11 @@ jobs:
               echo "postgresql_changed=true" >> $GITHUB_OUTPUT
             fi
           else
+            if git diff --quiet HEAD^ HEAD -- ckan-backend-dev/ deployment/ckan/; then
+              echo "ckan_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "ckan_changed=true" >> $GITHUB_OUTPUT
+            fi
             if git diff --quiet HEAD^ HEAD -- datapusher/; then
               echo "datapusher_changed=false" >> $GITHUB_OUTPUT
             else
@@ -120,6 +131,7 @@ jobs:
     name: Build CKAN Image
     runs-on: ubuntu-latest
     needs: setup
+    if: needs.setup.outputs.ckan_changed == 'true'
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -139,6 +151,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
           IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
+          LATEST_TAG: ${{ needs.setup.outputs.branch_name }}-latest
         run: |
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
           # Build the CKAN image from the cached Dockerfile.Base image
@@ -147,6 +160,12 @@ jobs:
             -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG \
             deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
+          
+          # Also push latest tag for use when build is skipped
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            docker tag $REGISTRY/$CKAN_REPO:$IMAGE_TAG $REGISTRY/$CKAN_REPO:$LATEST_TAG
+            docker push $REGISTRY/$CKAN_REPO:$LATEST_TAG
+          fi
   build-datapusher:
     name: Build Datapusher Image
     needs: setup
@@ -288,8 +307,8 @@ jobs:
           echo "NEXT_PUBLIC_GTM_ID=${{ vars.NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ vars.NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed != 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
+          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
@@ -390,8 +409,8 @@ jobs:
           echo "NEXT_PUBLIC_GTM_ID=${{ vars.NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ vars.NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed != 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
+          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
@@ -464,7 +483,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [1, 2, 3, 4, 5, 6]
+        group: [1, 2, 3, 4, 5, 6, 7, 8, 9]
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -489,8 +508,8 @@ jobs:
           echo "CKAN__AUTH__ALLOW_DATASET_COLLABORATORS=true" >> $GITHUB_ENV
           echo "OSANO_URL="YOUR_OSANO_URL/osano.js"" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ needs.setup.outputs.next_public_hotjar_id }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed != 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
+          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
