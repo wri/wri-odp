@@ -1,0 +1,178 @@
+version: "3"
+
+volumes:
+  ckan_storage:
+  pg_data:
+  solr_data:
+  minio_data:
+
+services:
+
+  ckan-dev:
+    container_name: ${CKAN_CONTAINER_NAME}
+    image: ${CKAN_IMAGE}
+    environment:
+      - GITHUB_ACTIONS=true
+    env_file:
+      - ".env.example"
+    depends_on:
+      db:
+        condition: service_healthy
+      solr:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "0.0.0.0:${CKAN_PORT_HOST}:${CKAN_PORT}"
+    volumes:
+      - ckan_storage:/var/lib/ckan
+      - ./src:/srv/app/src_extensions
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://ckan-dev:5000/private-admin/en"]
+
+  frontend:
+    container_name: wri-frontend
+    image: ${FRONTEND_IMAGE}
+    environment:
+      - NEXTAUTH_SECRET=secret
+      - NEXTAUTH_URL=http://localhost:3000
+      - CKAN_URL=http://ckan-dev:5000/private-admin/en
+      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+      - S3_BUCKET_NAME=ckan
+      - S3_BUCKET_REGION=us-east-1
+      - RW_API_KEY=${RW_API_KEY}
+      - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID}
+      - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}
+      - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET}
+      - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+      - PREFECT_INTERNAL_URL=http://prefect:4200
+      - NEXT_PUBLIC_GFW_API_KEY="1111"
+      - OSANO_URL="YOUR_OSANO_URL/osano.js"
+      - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
+      - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default
+      - OKTA_CLIENT_SECRET=ffffffffffffffffffffffffffffffff
+      - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
+    depends_on:
+      ckan-dev:
+        condition: service_healthy
+      prefect:
+        condition: service_healthy
+      my-datapusher:
+        condition: service_started
+    ports:
+      - "0.0.0.0:3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
+
+  prefect:
+    container_name: prefect-server
+    image: ${PREFECT_IMAGE:-prefect-server}
+    restart: always
+    environment:
+      - PREFECT_UI_URL=http://prefect:4200/api
+      - PREFECT_API_URL=http://prefect:4200/api
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://ckandbuser:ckandbpassword@db/prefect
+      - FLOW_DEPLOYMENT_ENV=test
+    ports:
+      - "0.0.0.0:4200:4200"
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:4200"]
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      ckan-dev:
+        condition: service_healthy
+
+  my-datapusher:
+    container_name: my-datapusher
+    image: ${DATAPUSHER_IMAGE:-my-datapusher}
+    restart: always
+    environment:
+      - PREFECT_API_URL=http://prefect:4200/api
+      - DEPLOYMENT_NAME=datapusher-dev
+      - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+      - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+      - S3_BUCKET_NAME=ckan
+      - S3_BUCKET_REGION=us-east-1
+      - FLOW_DEPLOYMENT_ENV=test
+    depends_on:
+      prefect:
+        condition: service_healthy
+
+  db:
+    container_name: ${POSTGRESQL_CONTAINER_NAME}
+    image: ${POSTGRESQL_IMAGE:-wri-postgresql}
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+      - CKAN_DB_USER
+      - CKAN_DB_PASSWORD
+      - CKAN_DB
+      - DATASTORE_READONLY_USER
+      - DATASTORE_READONLY_PASSWORD
+      - DATASTORE_DB
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+
+  solr:
+    container_name: ${SOLR_CONTAINER_NAME}
+    image: ${SOLR_IMAGE:-wri-solr}
+      #image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
+    volumes:
+      - solr_data:/var/solr
+      - ./ckan/setup/schema.xml:/opt/solr/server/solr/configsets/ckan/conf/managed-schema
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:8983/solr/"]
+
+  redis:
+    container_name: ${REDIS_CONTAINER_NAME}
+    image: redis:${REDIS_VERSION}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-e", "QUIT"]
+
+  minio:
+    container_name: ${MINIO_CONTAINER_NAME}
+    image: minio/minio
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "39323:39323"
+    command: server --console-address ":39323" /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    depends_on:
+      - ckan-dev
+
+  minio-setup:
+    image: minio/mc
+    entrypoint: ["/bin/sh"]
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./ckan/setup/create_minio_bucket.sh:/srv/app/create_minio_bucket.sh
+    command: ["-c", "/srv/app/create_minio_bucket.sh"]

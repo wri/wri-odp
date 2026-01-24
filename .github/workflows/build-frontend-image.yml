@@ -6,6 +6,10 @@ on:
       branch_name:
         required: true
         type: string
+      datapusher_changed:
+        required: false
+        type: string
+        default: 'false'
   workflow_dispatch:
     inputs:
       branch_name:
@@ -40,33 +44,88 @@ jobs:
         with:
           mask-password: 'true'
 
+      - name: Set image environment variables
+        run: |
+          BRANCH="${{ inputs.branch_name || github.ref_name }}"
+          REGISTRY="${{ steps.login-ecr.outputs.registry }}"
+          echo "CKAN_IMAGE=$REGISTRY/${{ secrets.ECR_CKAN_REPO }}:$BRANCH-${{ github.sha }}" >> $GITHUB_ENV
+          if [ "${{ inputs.datapusher_changed }}" == "true" ]; then
+            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}" >> $GITHUB_ENV
+          else
+            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+          fi
+          echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-prefect" >> $GITHUB_ENV
+          echo "POSTGRESQL_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
+          echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-solr" >> $GITHUB_ENV
+
+      - name: Add url(s) to hosts
+        run: |
+          sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+
+      - name: Pull Docker Images
+        run: |
+          docker pull $CKAN_IMAGE
+          docker pull $DATAPUSHER_IMAGE
+          docker pull $PREFECT_IMAGE
+          docker pull $POSTGRESQL_IMAGE
+          docker pull $SOLR_IMAGE
+
+      - name: Set up Docker Containers (without frontend)
+        run: |
+          docker compose -f docker-compose.test.ci.yml --env-file .env.example up -d ckan-dev db solr redis minio minio-setup
+        working-directory: ./ckan-backend-dev
+
+      - name: Wait for CKAN to be ready
+        run: |
+          timeout 120 bash -c 'until curl -f http://localhost:5000/private-admin/en > /dev/null 2>&1; do sleep 2; done'
+
+      - name: Create sysadmin API for Authorization
+        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
+
+      - name: Get Sysadmin API Key
+        id: get-api-key
+        run: |
+          TOKEN=$(grep "SYS_ADMIN_API_KEY=" ckan-backend-dev/.env.example | cut -d'=' -f2)
+          echo "::add-mask::$TOKEN"
+          echo "SYS_ADMIN_API_KEY=$TOKEN" >> $GITHUB_ENV
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push Frontend image
-        uses: docker/build-push-action@v5
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
           IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
-        with:
-          context: deployment/frontend
-          file: deployment/frontend/Dockerfile
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.FRONTEND_REPO }}:${{ env.IMAGE_TAG }}
-            ${{ github.event_name != 'pull_request' && format('{0}/{1}:{2}', env.REGISTRY, env.FRONTEND_REPO, env.LATEST_TAG) || '' }}
-          build-args: |
-            NEXTAUTH_SECRET="dummy-secret-for-build"
-            NEXTAUTH_URL="http://localhost:3000"
-            CKAN_URL="http://localhost:5000"
-            NEXT_PUBLIC_CKAN_URL="http://localhost:5000"
-            NEXT_PUBLIC_NEXTAUTH_URL="http://localhost:3000"
-            NEXT_PUBLIC_GTM_ID="dummy-gtm-id"
-            NEXT_PUBLIC_HOTJAR_ID="dummy-hotjar-id"
-            NEXT_PUBLIC_GFW_API_KEY="dummy-api-key"
-            OSANO_URL="http://dummy-osano-url.com"
-            NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}"
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: |
+          docker build \
+            --network host \
+            --build-arg NEXTAUTH_SECRET="dummy-secret-for-build" \
+            --build-arg NEXTAUTH_URL="http://localhost:3000" \
+            --build-arg CKAN_URL="http://localhost:5000" \
+            --build-arg NEXT_PUBLIC_CKAN_URL="http://localhost:5000" \
+            --build-arg NEXT_PUBLIC_NEXTAUTH_URL="http://localhost:3000" \
+            --build-arg NEXT_PUBLIC_GTM_ID="dummy-gtm-id" \
+            --build-arg NEXT_PUBLIC_HOTJAR_ID="dummy-hotjar-id" \
+            --build-arg NEXT_PUBLIC_GFW_API_KEY="dummy-api-key" \
+            --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js" \
+            --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
+            --build-arg SYS_ADMIN_API_KEY=${{ env.SYS_ADMIN_API_KEY }} \
+            -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
+            deployment/frontend
+          
+          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
+          
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            docker tag $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
+            docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
+          fi
+
+      - name: Tear down containers
+        if: always()
+        run: docker compose -f docker-compose.test.ci.yml --env-file .env.example down -v --remove-orphans
+        working-directory: ./ckan-backend-dev
