@@ -126,7 +126,7 @@ jobs:
       - name: Get Sysadmin API Key
         id: get-api-key
         run: |
-          TOKEN=$(grep "SYS_ADMIN_API_KEY=" ckan-backend-dev/.env.example | cut -d'=' -f2)
+          TOKEN=$(grep -m1 "SYS_ADMIN_API_KEY=" ckan-backend-dev/.env.example | cut -d'=' -f2)
           echo "::add-mask::$TOKEN"
           echo "SYS_ADMIN_API_KEY=$TOKEN" >> $GITHUB_ENV
 
