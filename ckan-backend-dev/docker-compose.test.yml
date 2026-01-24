@@ -38,7 +38,7 @@ services:
       context: ../deployment/frontend/
       args:
         - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000/private-admin/en
-        - NEXTAUTH_URL=http://localhost:3000
+        - NEXTAUTH_URL=http://wri-frontend:3000
         - NEXTAUTH_SECRET=secret
         - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
         - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
@@ -52,7 +52,7 @@ services:
         - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
     environment:
       - NEXTAUTH_SECRET=secret
-      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_URL=http://wri-frontend:3000
       - CKAN_URL=http://ckan-dev:5000/private-admin/en
       - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
       - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
