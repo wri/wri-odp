@@ -221,6 +221,8 @@ jobs:
       branch_name: ${{ needs.setup.outputs.branch_name }}
       datapusher_changed: ${{ needs.setup.outputs.datapusher_changed }}
       ckan_changed: ${{ needs.setup.outputs.ckan_changed }}
+      prefect_changed: ${{ needs.setup.outputs.prefect_changed }}
+      solr_changed: ${{ needs.setup.outputs.solr_changed }}
     secrets: inherit
 
   build-prefect:

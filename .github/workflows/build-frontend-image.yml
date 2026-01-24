@@ -14,6 +14,14 @@ on:
         required: false
         type: string
         default: 'false'
+      prefect_changed:
+        required: false
+        type: string
+        default: 'false'
+      solr_changed:
+        required: false
+        type: string
+        default: 'false'
   workflow_dispatch:
     inputs:
       branch_name:
@@ -53,6 +61,9 @@ jobs:
           BRANCH="${{ inputs.branch_name || github.ref_name }}"
           REGISTRY="${{ steps.login-ecr.outputs.registry }}"
           
+          # FRONTEND_IMAGE is set to latest for docker-compose validation (we're building it, not pulling)
+          echo "FRONTEND_IMAGE=$REGISTRY/${{ secrets.ECR_FRONTEND_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+          
           # Use latest tags for all containers when triggered via workflow_dispatch
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "CKAN_IMAGE=$REGISTRY/${{ secrets.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
@@ -72,9 +83,17 @@ jobs:
             else
               echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
             fi
-            echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-prefect" >> $GITHUB_ENV
+            if [ "${{ inputs.prefect_changed }}" == "true" ]; then
+              echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-prefect" >> $GITHUB_ENV
+            else
+              echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-prefect" >> $GITHUB_ENV
+            fi
             echo "POSTGRESQL_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
-            echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-solr" >> $GITHUB_ENV
+            if [ "${{ inputs.solr_changed }}" == "true" ]; then
+              echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-solr" >> $GITHUB_ENV
+            else
+              echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-solr" >> $GITHUB_ENV
+            fi
           fi
 
       - name: Add url(s) to hosts
