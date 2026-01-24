@@ -52,7 +52,7 @@ jobs:
           if [ "${{ inputs.datapusher_changed }}" == "true" ]; then
             echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}" >> $GITHUB_ENV
           else
-            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
           fi
           echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
@@ -105,11 +105,12 @@ jobs:
           docker build \
             --network host \
             --build-arg NEXTAUTH_SECRET="dummy-secret-for-build" \
-            --build-arg NEXTAUTH_URL="http://localhost:3000" \
-            --build-arg CKAN_URL="http://localhost:5000" \
-            --build-arg NEXT_PUBLIC_CKAN_URL="http://localhost:5000" \
+            --build-arg NEXTAUTH_URL="http://wri-frontend:3000" \
+            --build-arg CKAN_URL="http://ckan-dev:5000/private-admin/en" \
+            --build-arg NEXT_PUBLIC_CKAN_URL="http://ckan-dev:5000/private-admin/en" \
             --build-arg NEXT_PUBLIC_NEXTAUTH_URL="http://localhost:3000" \
             --build-arg NEXT_PUBLIC_GTM_ID="dummy-gtm-id" \
+            --build-arg NEXT_PUBLIC_DISABLE_HOTJAR="disabled" \
             --build-arg NEXT_PUBLIC_HOTJAR_ID="dummy-hotjar-id" \
             --build-arg NEXT_PUBLIC_GFW_API_KEY="dummy-api-key" \
             --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js" \

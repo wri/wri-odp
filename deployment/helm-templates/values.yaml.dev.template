@@ -84,7 +84,7 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: dev-latest
+      tag: dev-{{GITHUB_SHA}}
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
