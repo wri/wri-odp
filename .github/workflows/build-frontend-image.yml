@@ -52,7 +52,7 @@ jobs:
           if [ "${{ inputs.datapusher_changed }}" == "true" ]; then
             echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}" >> $GITHUB_ENV
           else
-            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
           fi
           echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
