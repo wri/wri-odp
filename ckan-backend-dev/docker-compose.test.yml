@@ -38,6 +38,8 @@ services:
       context: ../deployment/frontend/
       args:
         - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000/private-admin/en
+        - NEXTAUTH_URL=http://localhost:3000
+        - NEXTAUTH_SECRET=secret
         - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
         - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
         - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
