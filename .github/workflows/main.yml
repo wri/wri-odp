@@ -601,8 +601,13 @@ jobs:
           wait-on-timeout: 120
           runTests: false
           working-directory: ./integration-tests
+      - name: Create sysadmin API for Authorization
+        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Cypress setup print
-        run: cat integration-tests/cypress.json.example || echo "No cypress.json file found"
+        run: cat integration-tests/cypress.json
+      - name: Restart Frontend container with updated API token
+        run: docker compose -f docker-compose.test.ci.yml --env-file .env.example up -d frontend
+        working-directory: ./ckan-backend-dev
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         env:
