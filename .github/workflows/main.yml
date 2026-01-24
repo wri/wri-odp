@@ -366,13 +366,6 @@ jobs:
           mask-password: 'true'
       - name: Set image environment variables
         run: |
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          # Use latest tag for datapusher since it is built in a separate workflow
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
-          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
-          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ vars.FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
@@ -384,21 +377,14 @@ jobs:
           sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
-          sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
-      - name: Pull Docker Images
+          sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts    
+      - name: Set up Docker Containers
         env:
           CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
           DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}
           PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
           POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql
           SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
-        run: |
-          docker pull $CKAN_IMAGE
-          docker pull $DATAPUSHER_IMAGE
-          docker pull $PREFECT_IMAGE
-          docker pull $POSTGRESQL_IMAGE
-          docker pull $SOLR_IMAGE
-      - name: Set up Docker Containers
         run: |
           docker compose -f docker-compose.test.ci.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
@@ -482,13 +468,6 @@ jobs:
           mask-password: 'true'
       - name: Set image environment variables
         run: |
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          # Use latest tag for datapusher since it is built in a separate workflow
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
-          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
-          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ vars.FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
@@ -501,20 +480,14 @@ jobs:
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
-      - name: Pull Docker Images
+      - name: Set up Docker Containers
         env:
+          FRONTEND_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed != 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}
           CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
           DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}
           PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
           POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql
           SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
-        run: |
-          docker pull $CKAN_IMAGE
-          docker pull $DATAPUSHER_IMAGE
-          docker pull $PREFECT_IMAGE
-          docker pull $POSTGRESQL_IMAGE
-          docker pull $SOLR_IMAGE
-      - name: Set up Docker Containers
         run: |
           docker compose -f docker-compose.test.ci.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
@@ -592,13 +565,7 @@ jobs:
           mask-password: 'true'
       - name: Set image environment variables
         run: |
-          echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           # Use latest tag for datapusher since it is built in a separate workflow
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
-          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
-          echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ needs.setup.outputs.frontend_ckan_url }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ needs.setup.outputs.frontend_nextauth_url }}" >> $GITHUB_ENV
@@ -613,20 +580,15 @@ jobs:
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
-      - name: Pull Docker Images
+          
+      - name: Set up Docker Containers
         env:
+          FRONTEND_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed != 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}
           CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
           DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}
           PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
           POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql
           SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
-        run: |
-          docker pull $CKAN_IMAGE
-          docker pull $DATAPUSHER_IMAGE
-          docker pull $PREFECT_IMAGE
-          docker pull $POSTGRESQL_IMAGE
-          docker pull $SOLR_IMAGE
-      - name: Set up Docker Containers
         run: |
           docker compose -f docker-compose.test.ci.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
