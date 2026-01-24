@@ -23,6 +23,21 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+// Ignore uncaught exceptions from Osano/Hotjar which are not critical for tests
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // Ignore Osano-related errors (cookie consent manager not loaded in test environment)
+  if (err.message.includes('Osano is not defined') || err.message.includes('Osano')) {
+    return false;
+  }
+  // Ignore Hotjar-related errors
+  if (err.message.includes('hj is not defined') || err.message.includes('Hotjar')) {
+    return false;
+  }
+  // Let other errors fail the test
+  return true;
+});
+
 import 'cypress-terminal-report/src/installLogsCollector';
 import "cypress-axe";
 import 'cypress-plugin-tab';
