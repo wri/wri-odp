@@ -36,7 +36,6 @@ jobs:
       frontend_nextauth_url: ${{ steps.vars.outputs.frontend_nextauth_url }}
       next_public_gtm_id: ${{ steps.vars.outputs.next_public_gtm_id }}
       next_public_hotjar_id: ${{ steps.vars.outputs.next_public_hotjar_id }}
-      osano_url: ${{ steps.vars.outputs.osano_url }}
       datapusher_changed: ${{ steps.check_changes.outputs.datapusher_changed }}
       frontend_changed: ${{ steps.check_changes.outputs.frontend_changed }}
       migration_changed: ${{ steps.check_changes.outputs.migration_changed }}
@@ -116,7 +115,6 @@ jobs:
           echo "frontend_nextauth_url=${{ vars[format('{0}_FRONTEND_NEXTAUTH_URL', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
           echo "next_public_gtm_id=${{ vars[format('{0}_NEXT_PUBLIC_GTM_ID', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
           echo "next_public_hotjar_id=${{ vars[format('{0}_NEXT_PUBLIC_HOTJAR_ID', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
-          echo "osano_url=${{ vars[format('{0}_OSANO_URL', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
 
   build-ckan:
     name: Build CKAN Image
@@ -248,7 +246,7 @@ jobs:
             --build-arg NEXT_PUBLIC_GTM_ID="dummy-gtm-id" \
             --build-arg NEXT_PUBLIC_HOTJAR_ID="dummy-hotjar-id" \
             --build-arg NEXT_PUBLIC_GFW_API_KEY="dummy-api-key" \
-            --build-arg OSANO_URL="http://dummy-osano-url.com" \
+            --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js"" \
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ needs.setup.outputs.branch_name }}" \
             --build-arg SYS_ADMIN_API_KEY=${{ env.SYS_ADMIN_API_KEY }} \
             -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
@@ -571,7 +569,7 @@ jobs:
           echo "NEXT_PUBLIC_GTM_ID=${{ needs.setup.outputs.next_public_gtm_id }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
           echo "CKAN__AUTH__ALLOW_DATASET_COLLABORATORS=true" >> $GITHUB_ENV
-          echo "OSANO_URL=http://localhost:3000/osano-stub.js" >> $GITHUB_ENV
+          echo "OSANO_URL="YOUR_OSANO_URL/osano.js"" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ needs.setup.outputs.next_public_hotjar_id }}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed != 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
