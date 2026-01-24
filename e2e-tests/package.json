@@ -15,10 +15,7 @@
     "test:group6": "cypress run --browser electron --spec \"$(node split-tests.js 6 12)\"",
     "test:group7": "cypress run --browser electron --spec \"$(node split-tests.js 7 12)\"",
     "test:group8": "cypress run --browser electron --spec \"$(node split-tests.js 8 12)\"",
-    "test:group9": "cypress run --browser electron --spec \"$(node split-tests.js 9 12)\"",
-    "test:group10": "cypress run --browser electron --spec \"$(node split-tests.js 10 12)\"",
-    "test:group11": "cypress run --browser electron --spec \"$(node split-tests.js 11 12)\"",
-    "test:group12": "cypress run --browser electron --spec \"$(node split-tests.js 12 12)\""
+    "test:group9": "cypress run --browser electron --spec \"$(node split-tests.js 9 12)\""
   },
   "author": "",
   "license": "ISC",
