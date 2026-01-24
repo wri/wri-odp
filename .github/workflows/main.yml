@@ -398,7 +398,7 @@ jobs:
           docker pull $PREFECT_IMAGE
           docker pull $POSTGRESQL_IMAGE
           docker pull $SOLR_IMAGE
-      - name: Set up Docker Containers (without frontend)
+      - name: Set up Docker Containers
         run: |
           docker compose -f docker-compose.test.ci.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
@@ -410,12 +410,6 @@ jobs:
           wait-on-timeout: 120
           runTests: false
           working-directory: ./integration-tests
-      - name: Create sysadmin API for Authorization
-        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
-      - name: Recreate Frontend container with updated API token
-        if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
-        run: docker compose -f docker-compose.test.ci.yml --env-file .env.example up -d frontend
-        working-directory: ./ckan-backend-dev
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         run: docker compose -f docker-compose.test.ci.yml --env-file .env.example logs
@@ -631,12 +625,13 @@ jobs:
           docker pull $PREFECT_IMAGE
           docker pull $POSTGRESQL_IMAGE
           docker pull $SOLR_IMAGE
-      - name: Set up Docker Containers (without frontend)
-        env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}'
+      - name: Set up Docker Containers
         run: |
           docker compose -f docker-compose.test.ci.yml --env-file .env.example up -d
         working-directory: ./ckan-backend-dev
+      - name: Wait for CKAN to be ready
+        run: |
+          timeout 120 bash -c 'until curl -f http://localhost:5000/private-admin/en > /dev/null 2>&1; do sleep 2; done'
       - name: Cypress Install and CKAN setup
         if: ${{ env.ENABLE_INT_TESTS == 'true' }}
         uses: cypress-io/github-action@v6
@@ -645,16 +640,8 @@ jobs:
           wait-on-timeout: 120
           runTests: false
           working-directory: ./integration-tests
-      - name: Create sysadmin API for Authorization
-        run: bash ./ckan-backend-dev/ckan/scripts/cypress_setup.sh
       - name: Cypress setup print
         run: cat integration-tests/cypress.json
-      - name: Set up Frontend Docker Container
-        if: ${{ env.ENABLE_FRONTEND_DOCKER == 'true' }}
-        env:
-          CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}'
-        run: docker compose -f docker-compose.test.ci.yml --env-file .env.example up -d frontend
-        working-directory: ./ckan-backend-dev
       - name: Print Logs
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         env:
