@@ -61,9 +61,9 @@ jobs:
           
           # Only push 'latest' tag if this is NOT a Pull Request
           if [ "${{ github.event_name }}" != "pull_request" ]; then
-            docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG-postgresql
-            docker push $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG-postgresql
-            echo "Successfully pushed $LATEST_TAG-postgresql"
+            docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
+            docker push $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
+            echo "Successfully pushed $LATEST_TAG"
           else
             echo "Skipping 'latest' tag push for Pull Request"
           fi
