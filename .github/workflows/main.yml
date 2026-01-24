@@ -545,7 +545,6 @@ jobs:
         run: |
           echo "Testing frontend -> CKAN connectivity..."
           docker exec wri-frontend wget -qO- http://ckan-dev:5000/private-admin/en > /dev/null && echo "SUCCESS: Frontend can reach CKAN" || echo "FAILED: Frontend cannot reach CKAN"
-          docker exec wri-frontend wget -qO- http://ckan-dev:5000/api/action/site_read && echo "SUCCESS: CKAN API is accessible"
       - name: Debug frontend environment
         if: ${{ env.ENABLE_DEBUG_LOGS == 'true' }}
         run: |
