@@ -32,7 +32,20 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       branch_name: ${{ steps.branch.outputs.name }}
+      frontend_ckan_url: ${{ steps.vars.outputs.frontend_ckan_url }}
+      frontend_nextauth_url: ${{ steps.vars.outputs.frontend_nextauth_url }}
+      next_public_gtm_id: ${{ steps.vars.outputs.next_public_gtm_id }}
+      next_public_hotjar_id: ${{ steps.vars.outputs.next_public_hotjar_id }}
+      osano_url: ${{ steps.vars.outputs.osano_url }}
+      datapusher_changed: ${{ steps.check_changes.outputs.datapusher_changed }}
+      frontend_changed: ${{ steps.check_changes.outputs.frontend_changed }}
+      migration_changed: ${{ steps.check_changes.outputs.migration_changed }}
+      postgresql_changed: ${{ steps.check_changes.outputs.postgresql_changed }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - id: branch
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
@@ -40,13 +53,75 @@ jobs:
           else
             echo "name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           fi
+      - id: check_changes
+        run: |
+          # If it's a PR, check against base branch. If push, check against previous commit.
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git fetch origin ${{ github.base_ref }}
+            if git diff --quiet origin/${{ github.base_ref }} HEAD -- datapusher/; then
+              echo "datapusher_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "datapusher_changed=true" >> $GITHUB_OUTPUT
+            fi
+            if git diff --quiet origin/${{ github.base_ref }} HEAD -- deployment/frontend/; then
+              echo "frontend_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "frontend_changed=true" >> $GITHUB_OUTPUT
+            fi
+            if git diff --quiet origin/${{ github.base_ref }} HEAD -- migration/; then
+              echo "migration_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "migration_changed=true" >> $GITHUB_OUTPUT
+            fi
+            if git diff --quiet origin/${{ github.base_ref }} HEAD -- ckan-backend-dev/postgresql/; then
+              echo "postgresql_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "postgresql_changed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            if git diff --quiet HEAD^ HEAD -- datapusher/; then
+              echo "datapusher_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "datapusher_changed=true" >> $GITHUB_OUTPUT
+            fi
+            if git diff --quiet HEAD^ HEAD -- deployment/frontend/; then
+              echo "frontend_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "frontend_changed=true" >> $GITHUB_OUTPUT
+            fi
+            if git diff --quiet HEAD^ HEAD -- migration/; then
+              echo "migration_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "migration_changed=true" >> $GITHUB_OUTPUT
+            fi
+            if git diff --quiet HEAD^ HEAD -- ckan-backend-dev/postgresql/; then
+              echo "postgresql_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "postgresql_changed=true" >> $GITHUB_OUTPUT
+            fi
+          fi
+      - id: prefix
+        run: |
+          BRANCH="${{ steps.branch.outputs.name }}"
+          if [ "$BRANCH" == "prod" ]; then
+            echo "val=PROD" >> $GITHUB_OUTPUT
+          elif [ "$BRANCH" == "staging" ]; then
+            echo "val=STAGING" >> $GITHUB_OUTPUT
+          else
+            echo "val=DEV" >> $GITHUB_OUTPUT
+          fi
+      - id: vars
+        run: |
+          echo "frontend_ckan_url=${{ vars[format('{0}_FRONTEND_CKAN_URL', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
+          echo "frontend_nextauth_url=${{ vars[format('{0}_FRONTEND_NEXTAUTH_URL', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
+          echo "next_public_gtm_id=${{ vars[format('{0}_NEXT_PUBLIC_GTM_ID', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
+          echo "next_public_hotjar_id=${{ vars[format('{0}_NEXT_PUBLIC_HOTJAR_ID', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
+          echo "osano_url=${{ vars[format('{0}_OSANO_URL', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
 
   build-ckan:
     name: Build CKAN Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -74,113 +149,37 @@ jobs:
             -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG \
             deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
-
   build-datapusher:
     name: Build Datapusher Image
-    runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Build and push Datapusher image to ECR
-        if: ${{ env.ENABLE_BUILD_DATAPUSHER == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG \
-          datapusher
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
+    if: needs.setup.outputs.datapusher_changed == 'true'
+    uses: ./.github/workflows/build-datapusher-image.yml
+    with:
+      branch_name: ${{ needs.setup.outputs.branch_name }}
+    secrets: inherit
 
   build-migration:
     name: Build Migration Image
-    runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Build and push Migration image to ECR
-        if: ${{ env.ENABLE_BUILD_MIGRATION == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration \
-          migration
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-migration
+    if: needs.setup.outputs.migration_changed == 'true'
+    uses: ./.github/workflows/build-migration-image.yml
+    with:
+      branch_name: ${{ needs.setup.outputs.branch_name }}
+    secrets: inherit
 
   build-frontend:
     name: Build Frontend Image
-    runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Build and push Frontend image to ECR
-        if: ${{ env.ENABLE_BUILD_FRONTEND == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
-          IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-          --build-arg NEXTAUTH_SECRET=${{ secrets.FRONTEND_NEXTAUTH_SECRET }} \
-          --build-arg NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }} \
-          --build-arg CKAN_URL=${{ vars.FRONTEND_CKAN_URL }} \
-          --build-arg NEXT_PUBLIC_CKAN_URL=${{ vars.FRONTEND_CKAN_URL }} \
-          --build-arg NEXT_PUBLIC_NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }} \
-          --build-arg NEXT_PUBLIC_GTM_ID=${{ vars.NEXT_PUBLIC_GTM_ID }} \
-          --build-arg NEXT_PUBLIC_HOTJAR_ID=${{ vars.NEXT_PUBLIC_HOTJAR_ID }} \
-          --build-arg NEXT_PUBLIC_GFW_API_KEY=${{ secrets.NEXT_PUBLIC_GFW_API_KEY }} \
-          --build-arg OSANO_URL=${{ vars.OSANO_URL }} \
-          --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ needs.setup.outputs.branch_name }}" \
-          deployment/frontend
-          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
+    if: needs.setup.outputs.frontend_changed == 'true'
+    uses: ./.github/workflows/build-frontend-image.yml
+    with:
+      branch_name: ${{ needs.setup.outputs.branch_name }}
+    secrets: inherit
 
   build-prefect:
     name: Build Prefect Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -207,40 +206,17 @@ jobs:
 
   build-postgresql:
     name: Build PostgreSQL Image
-    runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Build and push PostgreSQL image to ECR
-        if: ${{ env.ENABLE_BUILD_DATAPUSHER == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO}}
-          IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-        run: |
-          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql \
-          ckan-backend-dev/postgresql
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql
+    if: needs.setup.outputs.postgresql_changed == 'true'
+    uses: ./.github/workflows/build-postgresql-image.yml
+    with:
+      branch_name: ${{ needs.setup.outputs.branch_name }}
+    secrets: inherit
 
   build-solr:
     name: Build Solr Image
     runs-on: ubuntu-latest
     needs: setup
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -277,8 +253,6 @@ jobs:
       - build-prefect
       - build-postgresql
       - build-solr
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: |
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
@@ -304,10 +278,12 @@ jobs:
       - name: Set image environment variables
         run: |
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          # Use latest tag for frontend since it is built in a separate workflow
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
+          # Use latest tag for datapusher since it is built in a separate workflow
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
-          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-postgresql" >> $GITHUB_ENV
+          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ vars.FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
@@ -321,6 +297,19 @@ jobs:
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Pull Docker Images
+        env:
+          CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
+          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}
+          PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
+          POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql
+          SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
+        run: |
+          docker pull $CKAN_IMAGE
+          docker pull $DATAPUSHER_IMAGE
+          docker pull $PREFECT_IMAGE
+          docker pull $POSTGRESQL_IMAGE
+          docker pull $SOLR_IMAGE
       - name: Set up Docker Containers (without frontend)
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up -d
@@ -384,18 +373,14 @@ jobs:
       - setup
       - build-ckan
       - build-frontend
-      - build-datapusher
       - build-migration
       - build-prefect
       - build-postgresql
       - build-solr
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: |
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
-      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
       (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
       (needs.build-prefect.result == 'success' || needs.build-prefect.result == 'skipped') &&
       (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&
@@ -416,10 +401,12 @@ jobs:
       - name: Set image environment variables
         run: |
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          # Use latest tag for frontend since it is built in a separate workflow
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-latest" >> $GITHUB_ENV
+          # Use latest tag for datapusher since it is built in a separate workflow
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
-          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-postgresql" >> $GITHUB_ENV
+          echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_CKAN_URL=${{ vars.FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
@@ -433,6 +420,19 @@ jobs:
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Pull Docker Images
+        env:
+          CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
+          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}
+          PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
+          POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql
+          SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
+        run: |
+          docker pull $CKAN_IMAGE
+          docker pull $DATAPUSHER_IMAGE
+          docker pull $PREFECT_IMAGE
+          docker pull $POSTGRESQL_IMAGE
+          docker pull $SOLR_IMAGE
       - name: Set up Docker Containers
         run: |
           docker compose -f docker-compose.test.yml --env-file .env.example up -d
@@ -483,8 +483,6 @@ jobs:
       - build-prefect
       - build-postgresql
       - build-solr
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: |
       always() && 
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
@@ -515,22 +513,36 @@ jobs:
         run: |
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:dev-${{ github.sha }}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}" >> $GITHUB_ENV
+          # Use latest tag for datapusher since it is built in a separate workflow
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect" >> $GITHUB_ENV
           echo "SCRIPT_NAME=/private-admin" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_CKAN_URL=${{ vars.FRONTEND_CKAN_URL }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ vars.FRONTEND_NEXTAUTH_URL }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_GTM_ID=${{ vars.NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_CKAN_URL=${{ needs.setup.outputs.frontend_ckan_url }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_NEXTAUTH_URL=${{ needs.setup.outputs.frontend_nextauth_url }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_GTM_ID=${{ needs.setup.outputs.next_public_gtm_id }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
           echo "CKAN__AUTH__ALLOW_DATASET_COLLABORATORS=true" >> $GITHUB_ENV
           echo "OSANO_URL=http://localhost:3000/osano-stub.js" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_HOTJAR_ID=${{ vars.NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_HOTJAR_ID=${{ needs.setup.outputs.next_public_hotjar_id }}" >> $GITHUB_ENV
       - name: Add url(s) to hosts
         run: |
           sudo echo "127.0.0.1 ckan-dev" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 minio" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 frontend" | sudo tee -a /etc/hosts
           sudo echo "127.0.0.1 prefect" | sudo tee -a /etc/hosts
+      - name: Pull Docker Images
+        env:
+          CKAN_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
+          DATAPUSHER_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}
+          PREFECT_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-prefect
+          POSTGRESQL_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql
+          SOLR_IMAGE: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}-solr
+        run: |
+          docker pull $CKAN_IMAGE
+          docker pull $DATAPUSHER_IMAGE
+          docker pull $PREFECT_IMAGE
+          docker pull $POSTGRESQL_IMAGE
+          docker pull $SOLR_IMAGE
       - name: Set up Docker Containers (without frontend)
         env:
           CKAN_IMAGE: '${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}'
@@ -601,8 +613,6 @@ jobs:
     needs:
       - setup
       - build-ckan
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: always() && needs.build-ckan.result == 'success'
     steps:
       - name: Git clone the repository
@@ -642,8 +652,6 @@ jobs:
     needs:
       - setup
       - build-frontend
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: always() && needs.build-frontend.result == 'success'
     steps:
       - name: Git clone the repository

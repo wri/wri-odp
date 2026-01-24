@@ -51,16 +51,21 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
-          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
-          SHA_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest-postgresql
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql \
           ckan-backend-dev/postgresql
           
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql
           
-          # Also push with SHA tag
-          docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql $REGISTRY/$DATAPUSHER_REPO:$SHA_TAG-postgresql
-          docker push $REGISTRY/$DATAPUSHER_REPO:$SHA_TAG-postgresql
+          # Only push 'latest' tag if this is NOT a Pull Request
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG-postgresql
+            docker push $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG-postgresql
+            echo "Successfully pushed $LATEST_TAG-postgresql"
+          else
+            echo "Skipping 'latest' tag push for Pull Request"
+          fi
           
           echo "Successfully pushed postgresql image"

@@ -16,7 +16,6 @@ jobs:
   build-and-push-base:
     name: Build and Push CKAN Base Image
     runs-on: ubuntu-latest
-    environment: dev # Uses 'dev' environment to access AWS credentials
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4

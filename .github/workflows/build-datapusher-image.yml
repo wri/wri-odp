@@ -1,13 +1,11 @@
 name: Build and Push Latest Datapusher Image
 
 on:
-  push:
-    paths:
-      - 'datapusher/**'
-    branches:
-      - dev
-      - staging
-      - prod
+  workflow_call:
+    inputs:
+      branch_name:
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       branch_name:
@@ -24,13 +22,11 @@ jobs:
   build-and-push-datapusher-latest:
     name: Build and Push Datapusher Latest
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.event.inputs.branch_name || github.ref_name }}
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.branch_name || github.ref_name }}
+          ref: ${{ inputs.branch_name || github.ref_name }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -48,14 +44,19 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
-          IMAGE_TAG: ${{ github.event.inputs.branch_name || github.ref_name }}-latest
-          SHA_TAG: ${{ github.event.inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest-datapusher
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG datapusher
           docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG
           
-          # Also push with SHA tag so other workflows can reference a specific commit if needed
-          docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG $REGISTRY/$DATAPUSHER_REPO:$SHA_TAG
-          docker push $REGISTRY/$DATAPUSHER_REPO:$SHA_TAG
+          # Only push 'latest' tag if this is NOT a Pull Request
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
+            docker push $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
+            echo "Successfully pushed $LATEST_TAG"
+          else
+            echo "Skipping 'latest' tag push for Pull Request"
+          fi
           
-          echo "Successfully pushed $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG and $SHA_TAG"
+          echo "Successfully pushed $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG"
