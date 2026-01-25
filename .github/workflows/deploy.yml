@@ -58,47 +58,50 @@ jobs:
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
         run: |
           # Function to resolve the SHA tag from a latest tag in ECR
-          # This ensures we always deploy images that actually exist
+          # Returns the SHA tag that points to the same image as the latest tag
+          # Note: All log messages go to stderr, only the final tag goes to stdout
           resolve_sha_from_latest() {
             local repo=$1
             local latest_tag=$2
             local sha_pattern=$3  # regex pattern to match SHA tag
-            local fallback_tag=$4
+            local service_name=$4
             
-            echo "Resolving SHA for $repo from tag $latest_tag..." >&2
+            echo "Resolving SHA for $service_name from $repo:$latest_tag..." >&2
             
             # Get the digest of the latest tag
             DIGEST=$(aws ecr describe-images \
               --repository-name "$repo" \
               --image-ids imageTag="$latest_tag" \
               --query 'imageDetails[0].imageDigest' \
-              --output text 2>/dev/null || echo "")
+              --output text 2>&1)
             
-            if [ -z "$DIGEST" ] || [ "$DIGEST" == "None" ]; then
-              echo "::warning::Could not find image with tag $latest_tag in $repo, using fallback: $fallback_tag" >&2
-              echo "$fallback_tag"
-              return
+            if [ -z "$DIGEST" ] || [ "$DIGEST" == "None" ] || echo "$DIGEST" | grep -q "ImageNotFoundException"; then
+              echo "::error::Could not find image with tag $latest_tag in $repo" >&2
+              echo "FAILED"
+              return 1
             fi
+            
+            echo "  Digest: $DIGEST" >&2
             
             # Get all tags for this digest
             TAGS=$(aws ecr describe-images \
               --repository-name "$repo" \
               --image-ids imageDigest="$DIGEST" \
-              --query 'imageDetails[0].imageTags' \
+              --query 'imageDetails[0].imageTags[]' \
               --output text 2>/dev/null || echo "")
             
-            echo "  Found tags: $TAGS" >&2
+            echo "  All tags: $TAGS" >&2
             
             # Find the SHA tag using the provided pattern
             SHA_TAG=$(echo "$TAGS" | tr '\t' '\n' | grep -E "$sha_pattern" | head -1)
             
             if [ -z "$SHA_TAG" ]; then
-              echo "::warning::Could not find SHA tag matching pattern, using fallback: $fallback_tag" >&2
-              echo "$fallback_tag"
-              return
+              echo "::warning::No SHA tag found matching pattern '$sha_pattern', using latest tag" >&2
+              echo "$latest_tag"
+              return 0
             fi
             
-            echo "  Resolved: $SHA_TAG" >&2
+            echo "  Resolved SHA tag: $SHA_TAG" >&2
             echo "$SHA_TAG"
           }
           
@@ -108,25 +111,44 @@ jobs:
           echo "=============================================="
           echo ""
           
+          FAILED=0
+          
           # Resolve CKAN (pattern: branch-sha, no suffix)
-          CKAN_TAG=$(resolve_sha_from_latest "$CKAN_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$" "${BRANCH_NAME}-latest")
+          echo "--- CKAN ---"
+          CKAN_TAG=$(resolve_sha_from_latest "$CKAN_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$" "CKAN")
+          [ "$CKAN_TAG" == "FAILED" ] && FAILED=1
+          echo ""
           
           # Resolve Frontend (pattern: branch-sha, no suffix)
-          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$" "${BRANCH_NAME}-latest")
+          echo "--- Frontend ---"
+          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$" "Frontend")
+          [ "$FRONTEND_TAG" == "FAILED" ] && FAILED=1
+          echo ""
           
           # Resolve Datapusher (pattern: branch-sha-datapusher)
-          DATAPUSHER_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-datapusher" "^${BRANCH_NAME}-[a-f0-9]{40}-datapusher$" "${BRANCH_NAME}-latest-datapusher")
+          echo "--- Datapusher ---"
+          DATAPUSHER_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-datapusher" "^${BRANCH_NAME}-[a-f0-9]{40}-datapusher$" "Datapusher")
+          [ "$DATAPUSHER_TAG" == "FAILED" ] && FAILED=1
+          echo ""
           
           # Resolve Migration (pattern: branch-sha-migration)
-          MIGRATION_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-migration" "^${BRANCH_NAME}-[a-f0-9]{40}-migration$" "${BRANCH_NAME}-latest-migration")
-          
+          echo "--- Migration ---"
+          MIGRATION_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-migration" "^${BRANCH_NAME}-[a-f0-9]{40}-migration$" "Migration")
+          [ "$MIGRATION_TAG" == "FAILED" ] && FAILED=1
           echo ""
-          echo "=== Resolved Image Tags ==="
+          
+          if [ $FAILED -eq 1 ]; then
+            echo "::error::One or more images could not be resolved!"
+            exit 1
+          fi
+          
+          echo "=============================================="
+          echo "=== Final Resolved Image Tags ==="
           echo "CKAN:       $CKAN_TAG"
           echo "Frontend:   $FRONTEND_TAG"
           echo "Datapusher: $DATAPUSHER_TAG"
           echo "Migration:  $MIGRATION_TAG"
-          echo ""
+          echo "=============================================="
           
           echo "ckan_tag=$CKAN_TAG" >> $GITHUB_OUTPUT
           echo "frontend_tag=$FRONTEND_TAG" >> $GITHUB_OUTPUT
