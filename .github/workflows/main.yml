@@ -57,81 +57,33 @@ jobs:
           fi
       - id: check_changes
         run: |
-          # If it's a PR, check against base branch. If push, check against previous commit.
+          # Determine base ref: PR compares against base branch, push compares against previous commit
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             git fetch origin ${{ github.base_ref }}
-            if git diff --quiet origin/${{ github.base_ref }} HEAD -- ckan-backend-dev/ deployment/ckan/; then
-              echo "ckan_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "ckan_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet origin/${{ github.base_ref }} HEAD -- datapusher/; then
-              echo "datapusher_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "datapusher_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet origin/${{ github.base_ref }} HEAD -- deployment/frontend/; then
-              echo "frontend_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "frontend_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet origin/${{ github.base_ref }} HEAD -- migration/; then
-              echo "migration_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "migration_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet origin/${{ github.base_ref }} HEAD -- ckan-backend-dev/postgresql/; then
-              echo "postgresql_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "postgresql_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet origin/${{ github.base_ref }} HEAD -- ckan-backend-dev/solr/; then
-              echo "solr_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "solr_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet origin/${{ github.base_ref }} HEAD -- ckan-backend-dev/prefect-server/; then
-              echo "prefect_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "prefect_changed=true" >> $GITHUB_OUTPUT
-            fi
+            BASE_REF="origin/${{ github.base_ref }}"
           else
-            if git diff --quiet HEAD^ HEAD -- ckan-backend-dev/ deployment/ckan/; then
-              echo "ckan_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "ckan_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet HEAD^ HEAD -- datapusher/; then
-              echo "datapusher_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "datapusher_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet HEAD^ HEAD -- deployment/frontend/; then
-              echo "frontend_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "frontend_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet HEAD^ HEAD -- migration/; then
-              echo "migration_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "migration_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet HEAD^ HEAD -- ckan-backend-dev/postgresql/; then
-              echo "postgresql_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "postgresql_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet HEAD^ HEAD -- ckan-backend-dev/solr/; then
-              echo "solr_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "solr_changed=true" >> $GITHUB_OUTPUT
-            fi
-            if git diff --quiet HEAD^ HEAD -- ckan-backend-dev/prefect-server/; then
-              echo "prefect_changed=false" >> $GITHUB_OUTPUT
-            else
-              echo "prefect_changed=true" >> $GITHUB_OUTPUT
-            fi
+            BASE_REF="HEAD^"
           fi
+
+          # Function to check if paths have changed
+          check_changed() {
+            local name=$1
+            shift
+            if git diff --quiet "$BASE_REF" HEAD -- "$@"; then
+              echo "${name}_changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "${name}_changed=true" >> $GITHUB_OUTPUT
+            fi
+          }
+
+          # Check each component for changes
+          check_changed "ckan"       "ckan-backend-dev/" "deployment/ckan/"
+          check_changed "datapusher" "datapusher/"
+          check_changed "frontend"   "deployment/frontend/"
+          check_changed "migration"  "migration/"
+          check_changed "postgresql" "ckan-backend-dev/postgresql/"
+          check_changed "solr"       "ckan-backend-dev/solr/"
+          check_changed "prefect"    "ckan-backend-dev/prefect-server/"
       - id: prefix
         run: |
           BRANCH="${{ steps.branch.outputs.name }}"
@@ -296,7 +248,7 @@ jobs:
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}-datapusher', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.prefect_changed == 'true' && format('{0}-{1}-prefect', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-prefect', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.branch_name }}-latest-postgresql" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.solr_changed == 'true' && format('{0}-{1}-solr', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-solr', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
@@ -402,7 +354,7 @@ jobs:
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}-datapusher', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.prefect_changed == 'true' && format('{0}-{1}-prefect', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-prefect', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.postgresql_changed == 'true' && format('{0}-{1}-postgresql', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-postgresql', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.solr_changed == 'true' && format('{0}-{1}-solr', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-solr', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
@@ -505,7 +457,7 @@ jobs:
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ needs.setup.outputs.next_public_hotjar_id }}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.frontend_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
-          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
+          echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && format('{0}-{1}-datapusher', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-datapusher', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.prefect_changed == 'true' && format('{0}-{1}-prefect', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-prefect', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "POSTGRESQL_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.postgresql_changed == 'true' && format('{0}-{1}-postgresql', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-postgresql', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "SOLR_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.solr_changed == 'true' && format('{0}-{1}-solr', needs.setup.outputs.branch_name, github.sha) || format('{0}-latest-solr', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
@@ -677,59 +629,19 @@ jobs:
 
   deploy:
     name: Deploy To AWS
-    runs-on: ubuntu-latest
     needs:
       - setup
       - test-integration
       - test-unit
       - test-frontend
-    environment:
-      name: ${{ needs.setup.outputs.branch_name }}
     if: |
       github.event_name != 'pull_request' && 
       always() && 
       (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped') && 
       (needs.test-unit.result == 'success' || needs.test-unit.result == 'skipped') && 
       (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
-    env:
-      BRANCH_NAME: ${{ needs.setup.outputs.branch_name }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          mask-password: 'true'
-      - name: Run Templater and update values.yaml
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO}}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          cd deployment
-          curl https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
-          bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
-      - name: Configure Kubeconfig
-        run: |
-          echo $BRANCH_NAME
-          mkdir -p /home/runner/.kube
-          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }}
-          chmod 600 ~/.kube/config
-        env:
-          GITHUB_SHA: '${{ github.sha }}'
-      - name: Install Helm
-        uses: azure/setup-helm@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: 'Deploy using Helm Upgrade'
-        run: |
-          set -e
-          helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./deployment/helm-templates -f ./deployment/helm-templates/values.yaml -n $PROJECT_NAME-$BRANCH_NAME --create-namespace --wait
+    uses: ./.github/workflows/deploy.yml
+    with:
+      branch_name: ${{ needs.setup.outputs.branch_name }}
+      image_tag: ${{ github.sha }}
+    secrets: inherit

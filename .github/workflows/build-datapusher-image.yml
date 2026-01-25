@@ -1,4 +1,4 @@
-name: Build and Push Latest Datapusher Image
+name: Build and Push Datapusher Image
 
 on:
   workflow_call:
@@ -44,7 +44,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
-          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}-datapusher
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest-datapusher
         run: |
           docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG datapusher
@@ -59,4 +59,4 @@ jobs:
             echo "Skipping 'latest' tag push for Pull Request"
           fi
           
-          echo "Successfully pushed $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG"
+          echo "Successfully pushed $IMAGE_TAG"

@@ -1,0 +1,216 @@
+name: Deploy to AWS
+
+on:
+  workflow_call:
+    inputs:
+      branch_name:
+        description: 'Target branch/environment (dev, staging, prod)'
+        required: true
+        type: string
+      image_tag:
+        description: 'Git SHA for image tags'
+        required: true
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Target environment to deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      image_tag:
+        description: 'Image tag (git SHA or "latest" to use branch-latest)'
+        required: false
+        default: 'latest'
+        type: string
+
+env:
+  PROJECT_NAME: wri-odp
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to ${{ inputs.branch_name }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.branch_name }}
+    env:
+      BRANCH_NAME: ${{ inputs.branch_name }}
+      IMAGE_TAG: ${{ inputs.image_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Resolve image tags from latest
+        id: resolve-tags
+        env:
+          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
+        run: |
+          # Function to resolve SHA from a latest tag
+          resolve_sha() {
+            local repo=$1
+            local latest_tag=$2
+            local sha_pattern=$3  # regex pattern to match SHA tag
+            
+            echo "Resolving SHA for $repo from tag $latest_tag..." >&2
+            
+            # Get the digest of the latest tag
+            DIGEST=$(aws ecr describe-images \
+              --repository-name "$repo" \
+              --image-ids imageTag="$latest_tag" \
+              --query 'imageDetails[0].imageDigest' \
+              --output text 2>/dev/null || echo "")
+            
+            if [ -z "$DIGEST" ] || [ "$DIGEST" == "None" ]; then
+              echo "::warning::Could not find image with tag $latest_tag in $repo" >&2
+              echo ""
+              return
+            fi
+            
+            # Get all tags for this digest
+            TAGS=$(aws ecr describe-images \
+              --repository-name "$repo" \
+              --image-ids imageDigest="$DIGEST" \
+              --query 'imageDetails[0].imageTags' \
+              --output text 2>/dev/null || echo "")
+            
+            echo "  Found tags: $TAGS" >&2
+            
+            # Find the SHA tag using the provided pattern
+            SHA_TAG=$(echo "$TAGS" | tr '\t' '\n' | grep -E "$sha_pattern" | head -1)
+            
+            if [ -z "$SHA_TAG" ]; then
+              echo "::warning::Could not find SHA tag matching pattern $sha_pattern" >&2
+              echo ""
+              return
+            fi
+            
+            echo "  Resolved: $SHA_TAG" >&2
+            echo "$SHA_TAG"
+          }
+          
+          if [ "$IMAGE_TAG" == "latest" ]; then
+            echo "Resolving SHAs from latest tags for each service..."
+            
+            # Resolve CKAN SHA (pattern: branch-sha, no suffix)
+            CKAN_TAG=$(resolve_sha "$CKAN_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$")
+            if [ -z "$CKAN_TAG" ]; then
+              CKAN_TAG="${BRANCH_NAME}-latest"
+            fi
+            
+            # Resolve Frontend SHA (pattern: branch-sha, no suffix)
+            FRONTEND_TAG=$(resolve_sha "$FRONTEND_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$")
+            if [ -z "$FRONTEND_TAG" ]; then
+              FRONTEND_TAG="${BRANCH_NAME}-latest"
+            fi
+            
+            # Resolve Datapusher SHA (pattern: branch-sha-datapusher)
+            DATAPUSHER_TAG=$(resolve_sha "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-datapusher" "^${BRANCH_NAME}-[a-f0-9]{40}-datapusher$")
+            if [ -z "$DATAPUSHER_TAG" ]; then
+              DATAPUSHER_TAG="${BRANCH_NAME}-latest-datapusher"
+            fi
+            
+            # Resolve Migration SHA (pattern: branch-sha-migration)
+            MIGRATION_TAG=$(resolve_sha "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-migration" "^${BRANCH_NAME}-[a-f0-9]{40}-migration$")
+            if [ -z "$MIGRATION_TAG" ]; then
+              MIGRATION_TAG="${BRANCH_NAME}-latest-migration"
+            fi
+            
+          else
+            echo "Using provided SHA: $IMAGE_TAG"
+            # When SHA is provided, construct full tags
+            CKAN_TAG="${BRANCH_NAME}-${IMAGE_TAG}"
+            FRONTEND_TAG="${BRANCH_NAME}-${IMAGE_TAG}"
+            DATAPUSHER_TAG="${BRANCH_NAME}-${IMAGE_TAG}-datapusher"
+            MIGRATION_TAG="${BRANCH_NAME}-${IMAGE_TAG}-migration"
+          fi
+          
+          echo ""
+          echo "=== Resolved Image Tags ==="
+          echo "CKAN:       $CKAN_TAG"
+          echo "Frontend:   $FRONTEND_TAG"
+          echo "Datapusher: $DATAPUSHER_TAG"
+          echo "Migration:  $MIGRATION_TAG"
+          
+          echo "ckan_tag=$CKAN_TAG" >> $GITHUB_OUTPUT
+          echo "frontend_tag=$FRONTEND_TAG" >> $GITHUB_OUTPUT
+          echo "datapusher_tag=$DATAPUSHER_TAG" >> $GITHUB_OUTPUT
+          echo "migration_tag=$MIGRATION_TAG" >> $GITHUB_OUTPUT
+
+      - name: Run Templater and update values.yaml
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
+          CKAN_IMAGE_TAG: ${{ steps.resolve-tags.outputs.ckan_tag }}
+          FRONTEND_IMAGE_TAG: ${{ steps.resolve-tags.outputs.frontend_tag }}
+          DATAPUSHER_IMAGE_TAG: ${{ steps.resolve-tags.outputs.datapusher_tag }}
+          MIGRATION_IMAGE_TAG: ${{ steps.resolve-tags.outputs.migration_tag }}
+        run: |
+          cd deployment
+          curl -sS https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
+          
+          echo "Deploying with image tags:"
+          echo "  CKAN:       $CKAN_IMAGE_TAG"
+          echo "  Frontend:   $FRONTEND_IMAGE_TAG"
+          echo "  Datapusher: $DATAPUSHER_IMAGE_TAG"
+          echo "  Migration:  $MIGRATION_IMAGE_TAG"
+          
+          bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
+          
+          echo ""
+          echo "=== Generated image tags in values.yaml ==="
+          grep -E "^\s+tag:" helm-templates/values.yaml | head -10
+
+      - name: Configure Kubeconfig
+        run: |
+          echo "Deploying to: $BRANCH_NAME"
+          mkdir -p /home/runner/.kube
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }}
+          chmod 600 ~/.kube/config
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy using Helm Upgrade
+        run: |
+          set -e
+          helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./deployment/helm-templates \
+            -f ./deployment/helm-templates/values.yaml \
+            -n $PROJECT_NAME-$BRANCH_NAME \
+            --create-namespace \
+            --wait \
+            --timeout 10m
+
+      - name: Show deployment status
+        if: always()
+        run: |
+          echo "=== Deployment Status ==="
+          helm status dx-helm-wri-$BRANCH_NAME-release -n $PROJECT_NAME-$BRANCH_NAME || true
+          echo ""
+          echo "=== Pod Status ==="
+          kubectl get pods -n $PROJECT_NAME-$BRANCH_NAME -o wide || true

@@ -62,7 +62,7 @@ ckan:
     image:
       pullPolicy: Always
       repository: {{REGISTRY}}/{{CKAN_REPO}}
-      tag: staging-{{GITHUB_SHA}}
+      tag: {{CKAN_IMAGE_TAG}}
     runInitContainers: false
     service:
       port: 80
@@ -85,7 +85,7 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: staging-{{GITHUB_SHA}}
+      tag: {{DATAPUSHER_IMAGE_TAG}}
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -107,7 +107,7 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: staging-{{GITHUB_SHA}}-migration
+      tag: {{MIGRATION_IMAGE_TAG}}
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -125,7 +125,7 @@ ckan:
     replicaCount: 1
     image:
       repository: {{REGISTRY}}/{{FRONTEND_REPO}}
-      tag: staging-{{GITHUB_SHA}}
+      tag: {{FRONTEND_IMAGE_TAG}}
     env:
       SITE_TITLE: WRI ODP
     targetPort: 3000

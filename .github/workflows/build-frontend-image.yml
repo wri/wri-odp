@@ -79,7 +79,7 @@ jobs:
               echo "CKAN_IMAGE=$REGISTRY/${{ secrets.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
             fi
             if [ "${{ inputs.datapusher_changed }}" == "true" ]; then
-              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}" >> $GITHUB_ENV
+              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-datapusher" >> $GITHUB_ENV
             else
               echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
             fi
