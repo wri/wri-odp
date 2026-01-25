@@ -643,5 +643,4 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
-      image_tag: ${{ github.sha }}
     secrets: inherit

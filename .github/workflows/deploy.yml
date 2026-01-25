@@ -7,10 +7,6 @@ on:
         description: 'Target branch/environment (dev, staging, prod)'
         required: true
         type: string
-      image_tag:
-        description: 'Git SHA for image tags'
-        required: true
-        type: string
 
   workflow_dispatch:
     inputs:
@@ -22,11 +18,6 @@ on:
           - dev
           - staging
           - prod
-      image_tag:
-        description: 'Image tag (git SHA or "latest" to use branch-latest)'
-        required: false
-        default: 'latest'
-        type: string
 
 env:
   PROJECT_NAME: wri-odp
@@ -43,7 +34,6 @@ jobs:
       name: ${{ inputs.branch_name }}
     env:
       BRANCH_NAME: ${{ inputs.branch_name }}
-      IMAGE_TAG: ${{ inputs.image_tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,18 +50,20 @@ jobs:
         with:
           mask-password: 'true'
 
-      - name: Resolve image tags from latest
+      - name: Resolve image tags from ECR latest
         id: resolve-tags
         env:
           CKAN_REPO: ${{ secrets.ECR_CKAN_REPO }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
           DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
         run: |
-          # Function to resolve SHA from a latest tag
-          resolve_sha() {
+          # Function to resolve the SHA tag from a latest tag in ECR
+          # This ensures we always deploy images that actually exist
+          resolve_sha_from_latest() {
             local repo=$1
             local latest_tag=$2
             local sha_pattern=$3  # regex pattern to match SHA tag
+            local fallback_tag=$4
             
             echo "Resolving SHA for $repo from tag $latest_tag..." >&2
             
@@ -83,8 +75,8 @@ jobs:
               --output text 2>/dev/null || echo "")
             
             if [ -z "$DIGEST" ] || [ "$DIGEST" == "None" ]; then
-              echo "::warning::Could not find image with tag $latest_tag in $repo" >&2
-              echo ""
+              echo "::warning::Could not find image with tag $latest_tag in $repo, using fallback: $fallback_tag" >&2
+              echo "$fallback_tag"
               return
             fi
             
@@ -101,8 +93,8 @@ jobs:
             SHA_TAG=$(echo "$TAGS" | tr '\t' '\n' | grep -E "$sha_pattern" | head -1)
             
             if [ -z "$SHA_TAG" ]; then
-              echo "::warning::Could not find SHA tag matching pattern $sha_pattern" >&2
-              echo ""
+              echo "::warning::Could not find SHA tag matching pattern, using fallback: $fallback_tag" >&2
+              echo "$fallback_tag"
               return
             fi
             
@@ -110,41 +102,23 @@ jobs:
             echo "$SHA_TAG"
           }
           
-          if [ "$IMAGE_TAG" == "latest" ]; then
-            echo "Resolving SHAs from latest tags for each service..."
-            
-            # Resolve CKAN SHA (pattern: branch-sha, no suffix)
-            CKAN_TAG=$(resolve_sha "$CKAN_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$")
-            if [ -z "$CKAN_TAG" ]; then
-              CKAN_TAG="${BRANCH_NAME}-latest"
-            fi
-            
-            # Resolve Frontend SHA (pattern: branch-sha, no suffix)
-            FRONTEND_TAG=$(resolve_sha "$FRONTEND_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$")
-            if [ -z "$FRONTEND_TAG" ]; then
-              FRONTEND_TAG="${BRANCH_NAME}-latest"
-            fi
-            
-            # Resolve Datapusher SHA (pattern: branch-sha-datapusher)
-            DATAPUSHER_TAG=$(resolve_sha "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-datapusher" "^${BRANCH_NAME}-[a-f0-9]{40}-datapusher$")
-            if [ -z "$DATAPUSHER_TAG" ]; then
-              DATAPUSHER_TAG="${BRANCH_NAME}-latest-datapusher"
-            fi
-            
-            # Resolve Migration SHA (pattern: branch-sha-migration)
-            MIGRATION_TAG=$(resolve_sha "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-migration" "^${BRANCH_NAME}-[a-f0-9]{40}-migration$")
-            if [ -z "$MIGRATION_TAG" ]; then
-              MIGRATION_TAG="${BRANCH_NAME}-latest-migration"
-            fi
-            
-          else
-            echo "Using provided SHA: $IMAGE_TAG"
-            # When SHA is provided, construct full tags
-            CKAN_TAG="${BRANCH_NAME}-${IMAGE_TAG}"
-            FRONTEND_TAG="${BRANCH_NAME}-${IMAGE_TAG}"
-            DATAPUSHER_TAG="${BRANCH_NAME}-${IMAGE_TAG}-datapusher"
-            MIGRATION_TAG="${BRANCH_NAME}-${IMAGE_TAG}-migration"
-          fi
+          echo "=============================================="
+          echo "Resolving image tags from ECR latest tags"
+          echo "Branch: $BRANCH_NAME"
+          echo "=============================================="
+          echo ""
+          
+          # Resolve CKAN (pattern: branch-sha, no suffix)
+          CKAN_TAG=$(resolve_sha_from_latest "$CKAN_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$" "${BRANCH_NAME}-latest")
+          
+          # Resolve Frontend (pattern: branch-sha, no suffix)
+          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$" "${BRANCH_NAME}-latest")
+          
+          # Resolve Datapusher (pattern: branch-sha-datapusher)
+          DATAPUSHER_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-datapusher" "^${BRANCH_NAME}-[a-f0-9]{40}-datapusher$" "${BRANCH_NAME}-latest-datapusher")
+          
+          # Resolve Migration (pattern: branch-sha-migration)
+          MIGRATION_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-migration" "^${BRANCH_NAME}-[a-f0-9]{40}-migration$" "${BRANCH_NAME}-latest-migration")
           
           echo ""
           echo "=== Resolved Image Tags ==="
@@ -152,6 +126,7 @@ jobs:
           echo "Frontend:   $FRONTEND_TAG"
           echo "Datapusher: $DATAPUSHER_TAG"
           echo "Migration:  $MIGRATION_TAG"
+          echo ""
           
           echo "ckan_tag=$CKAN_TAG" >> $GITHUB_OUTPUT
           echo "frontend_tag=$FRONTEND_TAG" >> $GITHUB_OUTPUT
