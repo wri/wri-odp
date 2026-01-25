@@ -1,4 +1,4 @@
-name: Build and Push Latest Datapusher Image
+name: Build and Push Datapusher Image
 
 on:
   workflow_call:
