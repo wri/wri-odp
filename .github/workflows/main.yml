@@ -109,43 +109,12 @@ jobs:
 
   build-ckan:
     name: Build CKAN Image
-    runs-on: ubuntu-latest
     needs: setup
     if: needs.setup.outputs.ckan_changed == 'true'
-    steps:
-      - name: Git clone the repository
-        uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.OIDC_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
-      - name: Build and push CKAN image to ECR
-        if: ${{ env.ENABLE_BUILD_CKAN == 'true' }}
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO}}
-          IMAGE_TAG: ${{ needs.setup.outputs.branch_name }}-${{ github.sha }}
-          LATEST_TAG: ${{ needs.setup.outputs.branch_name }}-latest
-        run: |
-          mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
-          # Build the CKAN image from the cached Dockerfile.Base image
-          docker build -f deployment/ckan/Dockerfile.cached \
-            --build-arg REGISTRY=$REGISTRY \
-            -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG \
-            deployment/ckan
-          docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
-          
-          # Also push latest tag for use when build is skipped
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            docker tag $REGISTRY/$CKAN_REPO:$IMAGE_TAG $REGISTRY/$CKAN_REPO:$LATEST_TAG
-            docker push $REGISTRY/$CKAN_REPO:$LATEST_TAG
-          fi
+    uses: ./.github/workflows/build-ckan-image.yml
+    with:
+      branch_name: ${{ needs.setup.outputs.branch_name }}
+    secrets: inherit
   build-datapusher:
     name: Build Datapusher Image
     needs: setup
