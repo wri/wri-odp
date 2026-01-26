@@ -62,7 +62,7 @@ ckan:
     image:
       pullPolicy: Always
       repository: {{REGISTRY}}/{{CKAN_REPO}}
-      tag: staging-{{GITHUB_SHA}}
+      tag: {{CKAN_IMAGE_TAG}}
     runInitContainers: false
     service:
       port: 80
@@ -71,7 +71,6 @@ ckan:
     enable: enable
     env:
       DATAPUSHER_MAX_CONTENT_LENGTH: "5368709120"
-      CKAN_DATASTORE_WRITE_URL: "{{CKAN_DATASTORE_WRITE_URL}}"
 
     resources:
       limits:
@@ -86,7 +85,7 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: staging-{{GITHUB_SHA}}
+      tag: {{DATAPUSHER_IMAGE_TAG}}
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -94,7 +93,6 @@ ckan:
     enable: enable
     env:
       DATAPUSHER_MAX_CONTENT_LENGTH: "5368709120"
-      FLOW_DEPLOYMENT_ENV: "staging"
 
     resources:
       limits:
@@ -109,7 +107,7 @@ ckan:
       maxReplicas: 2
       targetMemoryUtilizationPercentage: 80
     image:
-      tag: staging-{{GITHUB_SHA}}-migration
+      tag: {{MIGRATION_IMAGE_TAG}}
       pullPolicy: Always
       repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
     replicaCount: 1
@@ -127,7 +125,7 @@ ckan:
     replicaCount: 1
     image:
       repository: {{REGISTRY}}/{{FRONTEND_REPO}}
-      tag: staging-{{GITHUB_SHA}}
+      tag: {{FRONTEND_IMAGE_TAG}}
     env:
       SITE_TITLE: WRI ODP
     targetPort: 3000

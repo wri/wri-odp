@@ -1,0 +1,69 @@
+name: Build and Push CKAN Image
+
+on:
+  workflow_call:
+    inputs:
+      branch_name:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Branch name to tag (e.g., dev, staging, prod)'
+        required: true
+        default: 'dev'
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-ckan:
+    name: Build and Push CKAN
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch_name || github.ref_name }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Build and push CKAN image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO }}
+          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
+        run: |
+          # Move ckanext-wri extension to deployment directory
+          mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
+          
+          # Build the CKAN image from the cached Dockerfile.Base image
+          docker build -f deployment/ckan/Dockerfile.cached \
+            --build-arg REGISTRY=$REGISTRY \
+            -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG \
+            deployment/ckan
+          docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
+          
+          # Only push 'latest' tag if this is NOT a Pull Request
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            docker tag $REGISTRY/$CKAN_REPO:$IMAGE_TAG $REGISTRY/$CKAN_REPO:$LATEST_TAG
+            docker push $REGISTRY/$CKAN_REPO:$LATEST_TAG
+            echo "Successfully pushed $LATEST_TAG"
+          else
+            echo "Skipping 'latest' tag push for Pull Request"
+          fi
+          
+          echo "Successfully pushed $IMAGE_TAG"
