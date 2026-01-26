@@ -9,6 +9,8 @@ COPY tableschema-1.12.6.tgz ./
 RUN npm ci -f
 
 FROM --platform=linux/amd64 node:20-alpine AS builder
+
+# Declare ARGs (values come from --build-arg)
 ARG NEXTAUTH_SECRET
 ARG NEXTAUTH_URL
 ARG CKAN_URL
@@ -27,6 +29,14 @@ ARG OSANO_URL
 ARG OKTA_CLIENT_ID
 ARG OKTA_ISSUER
 ARG OKTA_CLIENT_SECRET
+
+# Set ENV with fallback values for build-time (handles empty --build-arg values)
+ENV NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+ENV NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-build-secret-placeholder}
+ENV CKAN_URL=${CKAN_URL:-http://localhost:5000}
+ENV NEXT_PUBLIC_CKAN_URL=${NEXT_PUBLIC_CKAN_URL:-http://localhost:5000}
+ENV NEXT_PUBLIC_NEXTAUTH_URL=${NEXT_PUBLIC_NEXTAUTH_URL:-http://localhost:3000}
+
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -36,7 +46,7 @@ RUN SKIP_ENV_VALIDATION=1 npm run build
 FROM --platform=linux/amd64 node:20-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
 # ENV NEXT_TELEMETRY_DISABLED 1
 
@@ -53,7 +63,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 EXPOSE 3000
-ENV PORT 3000
+ENV PORT=3000
 ENV NODE_OPTIONS='-r /app/bypassApiTrackingFetch.js --experimental-fetch'
 
 CMD ["node", "server.js"]
