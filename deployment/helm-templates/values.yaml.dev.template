@@ -191,6 +191,7 @@ ckan:
   xloader:
     enable: false
 solr:
+  replicaCount: 1
   nodeSelector: {}
   image:
     repository: ckan/ckan-solr
@@ -202,6 +203,8 @@ solr:
     requests:
       memory: 3G
       cpu: 0.6
+zookeeper:
+  replicaCount: 1
 redis:
   architecture: standalone
   image:
