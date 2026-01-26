@@ -91,7 +91,8 @@ ckan:
   migrationApp:
     enable: enable
     env:
-      DATAPUSHER_MAX_CONTENT_LENGTH: "5368709120"
+      FLOW_DEPLOYMENT_ENV: dev
+      PREFECT_API_URL: http://prefect-server.prefect-server.svc.cluster.local:4200/api
     resources:
       limits:
         cpu: 300m
@@ -190,6 +191,7 @@ ckan:
   xloader:
     enable: false
 solr:
+  replicaCount: 1
   nodeSelector: {}
   image:
     repository: ckan/ckan-solr
@@ -201,6 +203,8 @@ solr:
     requests:
       memory: 3G
       cpu: 0.6
+zookeeper:
+  replicaCount: 1
 redis:
   architecture: standalone
   image:
