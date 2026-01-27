@@ -36,6 +36,8 @@ ENV NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-build-secret-placeholder}
 ENV CKAN_URL=${CKAN_URL:-http://localhost:5000}
 ENV NEXT_PUBLIC_CKAN_URL=${NEXT_PUBLIC_CKAN_URL:-http://localhost:5000}
 ENV NEXT_PUBLIC_NEXTAUTH_URL=${NEXT_PUBLIC_NEXTAUTH_URL:-http://localhost:3000}
+ENV NEXT_PUBLIC_GTM_ID=${NEXT_PUBLIC_GTM_ID:-placeholder}
+ENV NEXT_PUBLIC_HOTJAR_ID=${NEXT_PUBLIC_HOTJAR_ID:-placeholder}
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
