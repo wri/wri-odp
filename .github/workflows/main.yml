@@ -142,7 +142,7 @@ jobs:
       - build-prefect
       - build-postgresql
       - build-solr
-    if: needs.setup.outputs.frontend_changed == 'true'
+    if: needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.ckan_changed == 'true'
     uses: ./.github/workflows/build-frontend-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
