@@ -77,8 +77,10 @@ jobs:
             shift
             if git diff --quiet "$BASE_REF" HEAD -- "$@"; then
               echo "${name}_changed=false" >> $GITHUB_OUTPUT
+              echo "::notice::${name}_changed=false (paths: $@)"
             else
               echo "${name}_changed=true" >> $GITHUB_OUTPUT
+              echo "::notice::${name}_changed=true (paths: $@)"
             fi
           }
 
