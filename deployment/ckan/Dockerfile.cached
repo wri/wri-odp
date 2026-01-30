@@ -1,0 +1,34 @@
+ARG REGISTRY
+ARG BASE_IMAGE_TAG=latest
+FROM ${REGISTRY}/wri-ckan-base:${BASE_IMAGE_TAG}
+
+ENV APP_DIR=/srv/app
+
+USER root
+
+# 1. Install WRI Extension Dependencies (Optimization)
+# Copy ONLY requirements first. This allows Docker to cache the pip install step
+# even if the source code in ckanext-wri changes.
+COPY ckanext-wri/requirements.txt ckanext-wri/dev-requirements.txt ${APP_DIR}/src/ckanext-wri/
+RUN cd ${APP_DIR}/src/ckanext-wri && \
+    pip3 install -r requirements.txt && \
+    pip3 install -r dev-requirements.txt
+
+# 2. Copy WRI Extension Source & Install
+COPY ckanext-wri ${APP_DIR}/src/ckanext-wri
+RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -e .
+
+# 3. Final User & Config
+USER ckan
+
+ENV CKAN__PLUGINS text_view image_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest hierarchy_display wri wri_harvester auth issues envvars
+
+# Combine config tool commands
+RUN ckan config-tool ${CKAN_INI} \
+    "ckan.plugins = ${CKAN__PLUGINS}" \
+    "ckan.auth.create_user_via_web = False" \
+    "ckan.root_path = /private-admin/{{LANG}}" \
+    "ckan.auth.create_unowned_dataset = False" \
+    "ckan.views.default_views = 'image_view'"
+
+RUN if [ "$GITHUB_ACTIONS" = "true" ]; then ckan config-tool ${CKAN_INI} "ckan.cors.origin_allow_all = True"; fi

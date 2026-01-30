@@ -34,7 +34,7 @@ export function InputGroup({
             {typeof label === 'string' ? (
                 <span
                     className={classNames(
-                        'col-span-2 text-left sm:text-end font-acumin xxl:text-lg font-normal leading-tight text-black lg:max-w-[5rem] flex ',
+                        'col-span-2 text-left sm:text-end font-acumin xxl:text-lg font-normal leading-tight text-black lg:max-w-[6rem] flex ',
                         labelClassName ?? ''
                     )}
                 >

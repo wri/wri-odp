@@ -70,7 +70,7 @@ describe("Search page", () => {
     "displays all facets",
     {
       retries: {
-        runMode: 10,
+        runMode: 3,
         openMode: 0,
       },
     },
@@ -88,7 +88,7 @@ describe("Search page", () => {
     "allows filtering by facets",
     {
       retries: {
-        runMode: 10,
+        runMode: 3,
         openMode: 0,
       },
     },

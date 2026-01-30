@@ -33,23 +33,7 @@ services:
 
   frontend:
     container_name: wri-frontend
-
-    build:
-      context: ../deployment/frontend/
-      args:
-        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000/private-admin/en
-        - NEXTAUTH_URL=http://wri-frontend:3000
-        - NEXTAUTH_SECRET=secret
-        - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
-        - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
-        - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
-        - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
-        - NEXT_PUBLIC_GFW_API_KEY="1111"
-        - OSANO_URL="YOUR_OSANO_URL/osano.js"
-        - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
-        - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default
-        - OKTA_CLIENT_SECRET=ffffffffffffffffffffffffffffffff
-        - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
+    image: ${FRONTEND_IMAGE}
     environment:
       - NEXTAUTH_SECRET=secret
       - NEXTAUTH_URL=http://wri-frontend:3000
@@ -90,8 +74,6 @@ services:
   prefect:
     container_name: prefect-server
     image: ${PREFECT_IMAGE:-prefect-server}
-    build:
-      context: ./prefect-server
     restart: always
     environment:
       - PREFECT_UI_URL=http://prefect:4200/api
@@ -114,8 +96,6 @@ services:
   my-datapusher:
     container_name: my-datapusher
     image: ${DATAPUSHER_IMAGE:-my-datapusher}
-    build:
-      context: ../datapusher
     restart: always
     environment:
       - PREFECT_API_URL=http://prefect:4200/api
@@ -134,8 +114,6 @@ services:
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}
     image: ${POSTGRESQL_IMAGE:-wri-postgresql}
-    build:
-      context: postgresql/
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -156,8 +134,6 @@ services:
     container_name: ${SOLR_CONTAINER_NAME}
     image: ${SOLR_IMAGE:-wri-solr}
       #image: ckan/ckan-solr:${SOLR_IMAGE_VERSION}
-    build:
-      context: solr/
     volumes:
       - solr_data:/var/solr
       - ./ckan/setup/schema.xml:/opt/solr/server/solr/configsets/ckan/conf/managed-schema

@@ -3,9 +3,8 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cert-manager
-    kubernetes.io/ingress.class: nginx
-    meta.helm.sh/release-name: dx-helm-wri-prod-release
-    meta.helm.sh/release-namespace: wri-odp-prod
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
     nginx.ingress.kubernetes.io/configuration-snippet: |
       more_set_headers "server: hide";
       more_set_headers "X-Content-Type-Options: nosniff";
@@ -21,30 +20,30 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/use-regex: "true"
   labels:
-    app.kubernetes.io/managed-by: Helm
-  name: wri-prod-ingress-fe-internal-admin
-  namespace: wri-odp-prod
+    app.kubernetes.io/managed-by: Helm  
+  name: {{ .Values.ckan.general.projectId }}-ingress-fe-internal-admin
+  namespace: {{ .Release.Namespace }}
 spec:
   ingressClassName: nginx
   rules:
-  - host: datasets.wri.org
+  - host: {{ .Values.ingress.frontendInternalAdmin.host }}
     http:
       paths:
       - backend:
           service:
-            name: wri-prod-ckan-svc
+            name: {{ .Values.ckan.general.projectId }}-ckan-svc
             port:
               number: 80
         path: /private-admin/(.*)
         pathType: ImplementationSpecific
       - backend:
           service:
-            name: wri-prod-ckan-svc
+            name: {{ .Values.ckan.general.projectId }}-ckan-svc
             port:
               number: 80
         path: /private-admin
         pathType: ImplementationSpecific
   tls:
   - hosts:
-    - datasets.wri.org
-    secretName: datasets.wri.org
+    - {{ .Values.ingress.frontendInternalAdmin.host }}
+    secretName: {{ .Values.ingress.frontendInternalAdmin.secretName }}
