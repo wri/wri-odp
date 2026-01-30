@@ -144,7 +144,15 @@ jobs:
       - build-prefect
       - build-postgresql
       - build-solr
-    if: needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.ckan_changed == 'true'
+    if: |
+      always() &&
+      (needs.setup.result == 'success') &&
+      (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
+      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
+      (needs.build-prefect.result == 'success' || needs.build-prefect.result == 'skipped') &&
+      (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&
+      (needs.build-solr.result == 'success' || needs.build-solr.result == 'skipped') &&
+      (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.ckan_changed == 'true')
     uses: ./.github/workflows/build-frontend-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
