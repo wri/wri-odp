@@ -108,6 +108,7 @@ then
 fi
 
 # Start supervisord
+export ENV_SUPERVISOR_USER=$(whoami)
 supervisord --configuration /etc/supervisord.conf &
 
 # Start the development server with automatic reload

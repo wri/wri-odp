@@ -1,0 +1,49 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cert-manager
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "server: hide";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-Xss-Protection: 1";
+      more_set_headers "Referrer-Policy: origin";
+      more_set_headers "Expect-CT: max-age=86400, enforce, report-uri='[reportURL]'";
+      more_set_headers "X-Permitted-Cross-Domain-Policies: none";
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/proxy-body-size: 1000M
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  labels:
+    app.kubernetes.io/managed-by: Helm  
+  name: {{ .Values.ckan.general.projectId }}-ingress-fe-internal-admin
+  namespace: {{ .Release.Namespace }}
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.ingress.frontendInternalAdmin.host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Values.ckan.general.projectId }}-ckan-svc
+            port:
+              number: 80
+        path: /private-admin/(.*)
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: {{ .Values.ckan.general.projectId }}-ckan-svc
+            port:
+              number: 80
+        path: /private-admin
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - {{ .Values.ingress.frontendInternalAdmin.host }}
+    secretName: {{ .Values.ingress.frontendInternalAdmin.secretName }}

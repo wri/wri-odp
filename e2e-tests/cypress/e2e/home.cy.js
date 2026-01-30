@@ -78,7 +78,6 @@ describe("Home page", () => {
     cy.contains("Highlights");
   });
 
-
   it("contains topics", () => {
     cy.viewport(1440, 2800);
     cy.visit("/");

@@ -6,10 +6,10 @@ import { type MapRef } from 'react-map-gl';
 import Boundaries from './Boundaries';
 import { SettingsIcon } from '../../icons/SettingsIcon';
 
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-});
+})
 
 export default function Settings({
     mapRef,
