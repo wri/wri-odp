@@ -85,6 +85,15 @@ resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-datapusher" "^${BRANCH}-[a-
 # Migration (pattern: branch-sha-migration)
 resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-migration" "^${BRANCH}-[a-f0-9]{40}-migration$" "Migration"
 
+# Prefect (pattern: branch-latest-prefect)
+resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-prefect" "^${BRANCH}-[a-f0-9]{40}-prefect$" "Prefect"
+
+# PostgreSQL (pattern: branch-latest-postgresql)
+resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-postgresql" "^${BRANCH}-[a-f0-9]{40}-postgresql$" "PostgreSQL"
+
+# Solr (pattern: branch-latest-solr)
+resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-solr" "^${BRANCH}-[a-f0-9]{40}-solr$" "Solr"
+
 echo ""
 echo "=========================================="
 echo "These are the tags that would be deployed"
