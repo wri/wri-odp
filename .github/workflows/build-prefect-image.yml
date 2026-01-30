@@ -1,0 +1,69 @@
+name: Build and Push Prefect Image
+
+on:
+  workflow_call:
+    inputs:
+      branch_name:
+        required: true
+        type: string
+  push:
+    paths:
+      - 'ckan-backend-dev/prefect-server/**'
+    branches:
+      - dev
+      - staging
+      - prod
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Branch name to tag (e.g., dev, staging, prod)'
+        required: true
+        default: 'dev'
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-prefect:
+    name: Build and Push Prefect
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Build and push Prefect image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
+          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest-prefect
+        run: |
+          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-prefect \
+          ckan-backend-dev/prefect-server
+          
+          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-prefect
+          
+          # Only push 'latest' tag if this is NOT a Pull Request
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-prefect $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
+            docker push $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
+            echo "Successfully pushed $LATEST_TAG"
+          else
+            echo "Skipping 'latest' tag push for Pull Request"
+          fi
+          
+          echo "Successfully pushed prefect image"
