@@ -395,8 +395,8 @@ class WriPlugin(plugins.SingletonPlugin):
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
 
-        if pkg_dict.get("is_approved", False):
-            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
         # We want to ignore changes when its only setting approve to pending
@@ -414,8 +414,8 @@ class WriPlugin(plugins.SingletonPlugin):
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment
 
-        if pkg_dict.get("is_approved", False):
-            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_show(self, context, pkg_dict):
         authors = pkg_dict.get("authors")
