@@ -16,8 +16,8 @@
         "postbuild": "next-sitemap"
     },
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.441.0",
-        "@aws-sdk/s3-request-presigner": "^3.441.0",
+        "@aws-sdk/client-s3": "^3.894.0",
+        "@aws-sdk/s3-request-presigner": "^3.894.0",
         "@deck.gl/core": "7.3.6",
         "@headlessui/react": "^1.7.17",
         "@heroicons/react": "^2.0.18",
@@ -90,7 +90,7 @@
         "mapbox-gl-draw-rectangle-mode": "^1.0.4",
         "math.gl": "^3.4.2",
         "moment": "^2.29.2",
-        "next": "^13.5.7",
+        "next": "^15.5.10",
         "next-auth": "^4.24.5",
         "next-seo": "^6.1.0",
         "next-sitemap": "^4.2.3",
