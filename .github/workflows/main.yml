@@ -616,12 +616,26 @@ jobs:
     name: Deploy To AWS
     needs:
       - setup
+      - build-ckan
+      - build-frontend
+      - build-datapusher
+      - build-migration
+      - build-prefect
+      - build-postgresql
+      - build-solr
       - test-integration
       - test-unit
       - test-frontend
     if: |
       github.event_name != 'pull_request' && 
       always() && 
+      (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
+      (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
+      (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
+      (needs.build-migration.result == 'success' || needs.build-migration.result == 'skipped') &&
+      (needs.build-prefect.result == 'success' || needs.build-prefect.result == 'skipped') &&
+      (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&
+      (needs.build-solr.result == 'success' || needs.build-solr.result == 'skipped') &&
       (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped') && 
       (needs.test-unit.result == 'success' || needs.test-unit.result == 'skipped') && 
       (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
