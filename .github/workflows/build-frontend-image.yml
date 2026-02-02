@@ -67,7 +67,7 @@ jobs:
             echo "CKAN_IMAGE=$REGISTRY/${{ vars.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
             echo "DATAPUSHER_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
             echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_PREFECT_REPO }}:$BRANCH" >> $GITHUB_ENV
-            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
+            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_POSTGRESQL_REPO }}:$BRANCH" >> $GITHUB_ENV
             echo "SOLR_IMAGE=$REGISTRY/${{ vars.ECR_SOLR_REPO }}:$BRANCH" >> $GITHUB_ENV
           else
             # Use SHA-tagged images when called from workflow_call
@@ -86,7 +86,7 @@ jobs:
             else
               echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_PREFECT_REPO }}:$BRANCH" >> $GITHUB_ENV
             fi
-            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
+            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_POSTGRESQL_REPO }}:$BRANCH" >> $GITHUB_ENV
             if [ "${{ inputs.solr_changed }}" == "true" ]; then
               echo "SOLR_IMAGE=$REGISTRY/${{ vars.ECR_SOLR_REPO }}:${{ github.sha }}" >> $GITHUB_ENV
             else
