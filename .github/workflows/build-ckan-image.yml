@@ -42,8 +42,8 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
-          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
-          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
+          IMAGE_TAG: ${{ github.sha }}
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}
         run: |
           # Move ckanext-wri extension to deployment directory
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
