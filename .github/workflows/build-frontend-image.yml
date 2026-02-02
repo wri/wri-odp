@@ -66,7 +66,7 @@ jobs:
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "CKAN_IMAGE=$REGISTRY/${{ vars.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
             echo "DATAPUSHER_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
-            echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-prefect" >> $GITHUB_ENV
+            echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_PREFECT_REPO }}:$BRANCH" >> $GITHUB_ENV
             echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
             echo "SOLR_IMAGE=$REGISTRY/${{ vars.ECR_SOLR_REPO }}:$BRANCH" >> $GITHUB_ENV
           else
@@ -82,9 +82,9 @@ jobs:
               echo "DATAPUSHER_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
             fi
             if [ "${{ inputs.prefect_changed }}" == "true" ]; then
-              echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-prefect" >> $GITHUB_ENV
+              echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_PREFECT_REPO }}:${{ github.sha }}" >> $GITHUB_ENV
             else
-              echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-prefect" >> $GITHUB_ENV
+              echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_PREFECT_REPO }}:$BRANCH" >> $GITHUB_ENV
             fi
             echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
             if [ "${{ inputs.solr_changed }}" == "true" ]; then
