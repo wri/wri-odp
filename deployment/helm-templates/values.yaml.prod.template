@@ -110,7 +110,7 @@ ckan:
     image:
       tag: {{MIGRATION_IMAGE_TAG}}
       pullPolicy: Always
-      repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
+      repository: {{REGISTRY}}/{{MIGRATION_REPO}}
     replicaCount: 1
   frontend:
     enable: true

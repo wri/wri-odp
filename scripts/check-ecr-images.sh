@@ -16,6 +16,7 @@ DATAPUSHER_REPO="datapusher-ecr"
 SOLR_REPO="solr"
 PREFECT_REPO="prefect"
 POSTGRESQL_REPO="postgresql"
+MIGRATION_REPO="migration"
 
 # Colors for output
 RED='\033[0;31m'
@@ -85,8 +86,8 @@ resolve_sha_tag "$FRONTEND_REPO" "${BRANCH}-latest" "^${BRANCH}-[a-f0-9]{40}$" "
 # Datapusher (pattern: branch-sha-datapusher)
 resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-datapusher" "^${BRANCH}-[a-f0-9]{40}-datapusher$" "Datapusher"
 
-# Migration (pattern: branch-sha-migration)
-resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-migration" "^${BRANCH}-[a-f0-9]{40}-migration$" "Migration"
+# Migration (pattern: sha only, no branch prefix)
+resolve_sha_tag "$MIGRATION_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Migration"
 
 # Prefect (pattern: sha only, no branch prefix)
 resolve_sha_tag "$PREFECT_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Prefect"
