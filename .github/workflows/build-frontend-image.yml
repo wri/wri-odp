@@ -60,37 +60,37 @@ jobs:
           REGISTRY="${{ steps.login-ecr.outputs.registry }}"
           
           # FRONTEND_IMAGE is set to latest for docker-compose validation (we're building it, not pulling)
-          echo "FRONTEND_IMAGE=$REGISTRY/${{ secrets.ECR_FRONTEND_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=$REGISTRY/${{ vars.ECR_FRONTEND_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
           
           # Use latest tags for all containers when triggered via workflow_dispatch
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "CKAN_IMAGE=$REGISTRY/${{ secrets.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
-            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
-            echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-prefect" >> $GITHUB_ENV
-            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
-            echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-solr" >> $GITHUB_ENV
+            echo "CKAN_IMAGE=$REGISTRY/${{ vars.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
+            echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-prefect" >> $GITHUB_ENV
+            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
+            echo "SOLR_IMAGE=$REGISTRY/${{ vars.ECR_SOLR_REPO }}:$BRANCH" >> $GITHUB_ENV
           else
             # Use SHA-tagged images when called from workflow_call
             if [ "${{ inputs.ckan_changed }}" == "true" ]; then
-              echo "CKAN_IMAGE=$REGISTRY/${{ secrets.ECR_CKAN_REPO }}:$BRANCH-${{ github.sha }}" >> $GITHUB_ENV
+              echo "CKAN_IMAGE=$REGISTRY/${{ vars.ECR_CKAN_REPO }}:$BRANCH-${{ github.sha }}" >> $GITHUB_ENV
             else
-              echo "CKAN_IMAGE=$REGISTRY/${{ secrets.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+              echo "CKAN_IMAGE=$REGISTRY/${{ vars.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
             fi
             if [ "${{ inputs.datapusher_changed }}" == "true" ]; then
-              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-datapusher" >> $GITHUB_ENV
+              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-datapusher" >> $GITHUB_ENV
             else
-              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
+              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
             fi
             if [ "${{ inputs.prefect_changed }}" == "true" ]; then
-              echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-prefect" >> $GITHUB_ENV
+              echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-prefect" >> $GITHUB_ENV
             else
-              echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-prefect" >> $GITHUB_ENV
+              echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-prefect" >> $GITHUB_ENV
             fi
-            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
+            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
             if [ "${{ inputs.solr_changed }}" == "true" ]; then
-              echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-solr" >> $GITHUB_ENV
+              echo "SOLR_IMAGE=$REGISTRY/${{ vars.ECR_SOLR_REPO }}:${{ github.sha }}" >> $GITHUB_ENV
             else
-              echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-solr" >> $GITHUB_ENV
+              echo "SOLR_IMAGE=$REGISTRY/${{ vars.ECR_SOLR_REPO }}:$BRANCH" >> $GITHUB_ENV
             fi
           fi
 
@@ -134,7 +134,7 @@ jobs:
       - name: Build and push Frontend image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
           IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
         run: |

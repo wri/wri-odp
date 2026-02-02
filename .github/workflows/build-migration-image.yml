@@ -48,7 +48,7 @@ jobs:
       - name: Build and push Migration image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
+          DATAPUSHER_REPO: ${{ vars.ECR_DATAPUSHER_REPO }}
           IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}-migration
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest-migration
         run: |

@@ -41,7 +41,7 @@ jobs:
       - name: Build and push CKAN image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO }}
+          CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
           IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
         run: |

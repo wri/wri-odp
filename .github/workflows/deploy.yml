@@ -53,9 +53,10 @@ jobs:
       - name: Resolve image tags from ECR latest
         id: resolve-tags
         env:
-          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO }}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
+          CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ vars.ECR_DATAPUSHER_REPO }}
+          SOLR_REPO: ${{ vars.ECR_SOLR_REPO }}
         run: |
           # Function to resolve the SHA tag from a latest tag in ECR
           # Returns the SHA tag that points to the same image as the latest tag
@@ -137,6 +138,12 @@ jobs:
           [ "$MIGRATION_TAG" == "FAILED" ] && FAILED=1
           echo ""
           
+          # Resolve Solr (pattern: sha only, latest tag is just branch name)
+          echo "--- Solr ---"
+          SOLR_TAG=$(resolve_sha_from_latest "$SOLR_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "Solr")
+          [ "$SOLR_TAG" == "FAILED" ] && FAILED=1
+          echo ""
+          
           if [ $FAILED -eq 1 ]; then
             echo "::error::One or more images could not be resolved!"
             exit 1
@@ -148,23 +155,27 @@ jobs:
           echo "Frontend:   $FRONTEND_TAG"
           echo "Datapusher: $DATAPUSHER_TAG"
           echo "Migration:  $MIGRATION_TAG"
+          echo "Solr:       $SOLR_TAG"
           echo "=============================================="
           
           echo "ckan_tag=$CKAN_TAG" >> $GITHUB_OUTPUT
           echo "frontend_tag=$FRONTEND_TAG" >> $GITHUB_OUTPUT
           echo "datapusher_tag=$DATAPUSHER_TAG" >> $GITHUB_OUTPUT
           echo "migration_tag=$MIGRATION_TAG" >> $GITHUB_OUTPUT
+          echo "solr_tag=$SOLR_TAG" >> $GITHUB_OUTPUT
 
       - name: Run Templater and update values.yaml
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO }}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
+          CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ vars.ECR_DATAPUSHER_REPO }}
+          SOLR_REPO: ${{ vars.ECR_SOLR_REPO }}
           CKAN_IMAGE_TAG: ${{ steps.resolve-tags.outputs.ckan_tag }}
           FRONTEND_IMAGE_TAG: ${{ steps.resolve-tags.outputs.frontend_tag }}
           DATAPUSHER_IMAGE_TAG: ${{ steps.resolve-tags.outputs.datapusher_tag }}
           MIGRATION_IMAGE_TAG: ${{ steps.resolve-tags.outputs.migration_tag }}
+          SOLR_IMAGE_TAG: ${{ steps.resolve-tags.outputs.solr_tag }}
         run: |
           cd deployment
           curl -sS https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
@@ -174,6 +185,7 @@ jobs:
           echo "  Frontend:   $FRONTEND_IMAGE_TAG"
           echo "  Datapusher: $DATAPUSHER_IMAGE_TAG"
           echo "  Migration:  $MIGRATION_IMAGE_TAG"
+          echo "  Solr:       $SOLR_IMAGE_TAG"
           
           bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
           

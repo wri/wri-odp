@@ -13,6 +13,8 @@ PROFILE=${2:-"AWSAdministratorAccess-245948672511"}
 CKAN_REPO="ckan-ecr"
 FRONTEND_REPO="frontend-ecr"
 DATAPUSHER_REPO="datapusher-ecr"
+SOLR_REPO="solr"
+PREFECT_REPO="prefect"
 
 # Colors for output
 RED='\033[0;31m'
@@ -85,14 +87,14 @@ resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-datapusher" "^${BRANCH}-[a-
 # Migration (pattern: branch-sha-migration)
 resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-migration" "^${BRANCH}-[a-f0-9]{40}-migration$" "Migration"
 
-# Prefect (pattern: branch-latest-prefect)
-resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-prefect" "^${BRANCH}-[a-f0-9]{40}-prefect$" "Prefect"
+# Prefect (pattern: sha only, no branch prefix)
+resolve_sha_tag "$PREFECT_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Prefect"
 
 # PostgreSQL (pattern: branch-latest-postgresql)
 resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-postgresql" "^${BRANCH}-[a-f0-9]{40}-postgresql$" "PostgreSQL"
 
-# Solr (pattern: branch-latest-solr)
-resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-solr" "^${BRANCH}-[a-f0-9]{40}-solr$" "Solr"
+# Solr (pattern: sha only, no branch prefix)
+resolve_sha_tag "$SOLR_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Solr"
 
 echo ""
 echo "=========================================="
