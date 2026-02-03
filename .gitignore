@@ -177,3 +177,5 @@ test_tests.sh
 load-testing/results/*
 !load-testing/results/.gitkeep
 load-testing/.env
+
+/deployment/helm-templates/values.yaml

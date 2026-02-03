@@ -12,8 +12,8 @@ ckan:
       CKANEXT__REPO__SRCPATH: /srv/app/src
       CKAN_INI: /srv/app/production.ini
       CKAN_SITE_ID: wri-dev 
-      CKAN__SITE_URL: https://wri.dev.frontend.datopian.com
-      CKAN_SITE_URL: https://wri.dev.frontend.datopian.com
+      CKAN__SITE_URL: https://datasets-dev.wri.org
+      CKAN_SITE_URL: https://datasets-dev.wri.org
       CKAN_HOMEPAGE_STYLE: "2"
       CKAN__DATAPUSHER__URL: http://wri-dev-datapusher-svc:80/
       CKAN_SVC_PORT_80_TCP_PROTO: tcp
@@ -217,11 +217,11 @@ redis:
 
 ingress:
   frontendInternal:
-    host: wri.dev.frontend.datopian.com
-    secretName: wri.dev.frontend.datopian.com
+    host: datasets-dev.wri.org
+    secretName: datasets-dev.wri.org
   frontendInternalAdmin:
-    host: wri.dev.frontend.datopian.com
-    secretName: wri.dev.frontend.datopian.com
+    host: datasets-dev.wri.org
+    secretName: datasets-dev.wri.org
   frontendInternalApi:
-    host: wri.dev.frontend.datopian.com
-    secretName: wri.dev.frontend.datopian.com
+    host: datasets-dev.wri.org
+    secretName: datasets-dev.wri.org
