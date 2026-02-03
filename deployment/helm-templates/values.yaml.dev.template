@@ -137,7 +137,7 @@ ckan:
     useProductionCerts: true
   ingress:
     domain: wri.dev.ckan.datopian.com
-    enable: true
+    enable: false  # CKAN accessed internally via frontend, no public ingress needed
     enableExternal: false
     extraAnnotations:
       cert-manager.io/cluster-issuer: cert-manager

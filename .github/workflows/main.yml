@@ -560,7 +560,7 @@ jobs:
           REPOSITORY: ${{ vars.ECR_CKAN_REPO }}
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
           format: 'sarif'
           output: ckan-trivy-results.sarif
           exit-code: '0'
@@ -599,7 +599,7 @@ jobs:
           REPOSITORY: ${{ vars.ECR_FRONTEND_REPO }}
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.setup.outputs.branch_name }}-${{ github.sha }}'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}'
           format: 'sarif'
           output: frontend-trivy-results.sarif
           exit-code: '0'
