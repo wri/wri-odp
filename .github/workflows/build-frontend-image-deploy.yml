@@ -64,7 +64,7 @@ jobs:
             --build-arg NEXT_PUBLIC_CKAN_URL="${FRONTEND_CKAN_URL:-http://ckan-dev:5000/private-admin/en}" \
             --build-arg NEXT_PUBLIC_NEXTAUTH_URL="${FRONTEND_NEXTAUTH_URL:-http://localhost:3000}" \
             --build-arg NEXT_PUBLIC_GTM_ID="${NEXT_PUBLIC_GTM_ID:-dummy-gtm-id}" \
-            --build-arg NEXT_PUBLIC_DISABLE_HOTJAR="disabled" \
+            --build-arg NEXT_PUBLIC_DISABLE_HOTJAR="enabled" \
             --build-arg NEXT_PUBLIC_HOTJAR_ID="${NEXT_PUBLIC_HOTJAR_ID:-dummy-hotjar-id}" \
             --build-arg NEXT_PUBLIC_GFW_API_KEY="dummy-api-key" \
             --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js" \

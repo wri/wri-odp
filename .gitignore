@@ -179,3 +179,8 @@ load-testing/results/*
 load-testing/.env
 
 /deployment/helm-templates/values.yaml
+
+# Monitoring - generated values (never commit)
+/deployment/monitoring/values.yaml
+/deployment/monitoring/hidden.sh
+/deployment/monitoring/loki-values-generated.yaml

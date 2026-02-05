@@ -1,5 +1,5 @@
 #!/bin/bash
-env=staging
+env=dev
 PROFILE=${AWS_PROFILE:-"AWSAdministratorAccess-245948672511"}
 
 # ECR repositories
