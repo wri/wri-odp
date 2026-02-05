@@ -1,6 +1,9 @@
 ckan:
   auth:
     enable: false
+  service:
+    type: ClusterIP
+    port: 80
   ckan:
     replicaCount: 2
     envVarsSecretName: ckan-cloud-centeralized-sql
