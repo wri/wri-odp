@@ -27,8 +27,16 @@ permissions:
   contents: read
 
 jobs:
+  build-frontend:
+    name: Build Frontend Image for deployment to ${{ inputs.branch_name }}
+    uses: ./.github/workflows/build-frontend-image-deploy.yml
+    with:
+      branch_name: ${{ inputs.branch_name }}
+    secrets: inherit
+
   deploy:
-    name: Deploy to ${{ inputs.branch_name }}
+    name: Deploy to deployment to ${{ inputs.branch_name }}
+    needs: build-frontend
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.branch_name }}

@@ -1,6 +1,12 @@
 name: Build and Push Frontend Image for Deployment
 
 on:
+  workflow_call:
+    inputs:
+      branch_name:
+        description: 'Branch name to tag (e.g., dev, staging, prod)'
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       branch_name:
