@@ -60,7 +60,7 @@ jobs:
           REGISTRY="${{ steps.login-ecr.outputs.registry }}"
           
           # FRONTEND_IMAGE is set to latest for docker-compose validation (we're building it, not pulling)
-          echo "FRONTEND_IMAGE=$REGISTRY/${{ vars.ECR_FRONTEND_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=$REGISTRY/${{ vars.ECR_FRONTEND_REPO }}:$BRANCH-test" >> $GITHUB_ENV
           
           # Use latest tags for all containers when triggered via workflow_dispatch
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
@@ -136,7 +136,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
           IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
-          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-test
         run: |
           docker build \
             --network host \
