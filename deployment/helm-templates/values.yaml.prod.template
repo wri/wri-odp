@@ -287,11 +287,11 @@ redis:
 
 ingress:
   frontendInternal:
-    host: wri.prod.frontend.datopian.com
-    secretName: wri.prod.frontend.datopian.com
+    host: datasets.wri.org
+    secretName: datasets.wri.org
   frontendInternalAdmin:
-    host: wri.prod.frontend.datopian.com
-    secretName: wri.prod.frontend.datopian.com
+    host: datasets.wri.org
+    secretName: datasets.wri.org
   frontendInternalApi:
-    host: wri.prod.frontend.datopian.com
-    secretName: wri.prod.frontend.datopian.com
+    host: datasets.wri.org
+    secretName: datasets.wri.org
