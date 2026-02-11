@@ -5,9 +5,7 @@ module.exports = {
     generateRobotsTxt: true,
     exclude: ['/server-sitemap.xml', '/dashboard/*', '/dashboard'],
     robotsTxtOptions: {
-        additionalSitemaps: [
-            `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/server-sitemap.xml`,
-        ],
+        additionalSitemaps: [`${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/server-sitemap.xml`],
         policies: [
             {
                 userAgent: '*',

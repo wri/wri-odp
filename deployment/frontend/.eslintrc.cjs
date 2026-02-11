@@ -5,7 +5,7 @@ const config = {
         project: true,
     },
     ignorePatterns: ['*.js', '*.cjs', '*.mjs'],
-    plugins: ['@typescript-eslint'],
+    plugins: ['@typescript-eslint', 'unused-imports'],
     extends: [
         'next/core-web-vitals',
         'plugin:@typescript-eslint/recommended-type-checked',
@@ -24,10 +24,9 @@ const config = {
                 fixStyle: 'inline-type-imports',
             },
         ],
-        '@typescript-eslint/no-unused-vars': [
-            'warn',
-            { argsIgnorePattern: '^_' },
-        ],
+        '@typescript-eslint/no-unused-vars': 'off',
+        'unused-imports/no-unused-imports': 'warn',
+        'unused-imports/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
         '@typescript-eslint/no-misused-promises': [
             'error',
             {
