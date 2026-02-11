@@ -26,6 +26,7 @@ permissions:
   id-token: write
   contents: read
   security-events: write
+  actions: read
 
 # Cancel in-progress runs when a new commit is pushed to the same branch/PR
 concurrency:
