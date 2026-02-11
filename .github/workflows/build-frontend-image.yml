@@ -128,8 +128,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
-          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
-          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-test
+          FRONTEND_TAG: ${{ inputs.branch_name || github.ref_name }}-test
         run: |
           docker build \
             --network host \
@@ -145,11 +144,10 @@ jobs:
             --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js" \
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
             --build-arg SYS_ADMIN_API_KEY="${{ env.SYS_ADMIN_API_KEY }}" \
-            -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
-            -t $REGISTRY/$FRONTEND_REPO:$LATEST_TAG \
+            -t $REGISTRY/$FRONTEND_REPO:$FRONTEND_TAG \
             deployment/frontend
 
-          docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
+          docker push $REGISTRY/$FRONTEND_REPO:$FRONTEND_TAG
 
       - name: Tear down containers
         if: always()
