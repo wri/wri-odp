@@ -22,13 +22,6 @@ on:
         required: false
         type: string
         default: 'false'
-  workflow_dispatch:
-    inputs:
-      branch_name:
-        description: 'Branch name to tag (e.g., dev, staging, prod)'
-        required: true
-        default: 'dev'
-        type: string
 
 permissions:
   id-token: write
@@ -153,14 +146,10 @@ jobs:
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
             --build-arg SYS_ADMIN_API_KEY="${{ env.SYS_ADMIN_API_KEY }}" \
             -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
+            -t $REGISTRY/$FRONTEND_REPO:$LATEST_TAG \
             deployment/frontend
-          
-          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
-          
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            docker tag $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
-            docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
-          fi
+
+          docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
 
       - name: Tear down containers
         if: always()
