@@ -1,6 +1,9 @@
 ckan:
   auth:
     enable: false
+  service:
+    type: ClusterIP
+    port: 80
   ckan:
     replicaCount: 2
     envVarsSecretName: ckan-cloud-centeralized-sql
@@ -110,7 +113,7 @@ ckan:
     image:
       tag: {{MIGRATION_IMAGE_TAG}}
       pullPolicy: Always
-      repository: {{REGISTRY}}/{{DATAPUSHER_REPO}}
+      repository: {{REGISTRY}}/{{MIGRATION_REPO}}
     replicaCount: 1
   frontend:
     enable: true
@@ -284,11 +287,11 @@ redis:
 
 ingress:
   frontendInternal:
-    host: wri.prod.frontend.datopian.com
-    secretName: wri.prod.frontend.datopian.com
+    host: datasets.wri.org
+    secretName: datasets.wri.org
   frontendInternalAdmin:
-    host: wri.prod.frontend.datopian.com
-    secretName: wri.prod.frontend.datopian.com
+    host: datasets.wri.org
+    secretName: datasets.wri.org
   frontendInternalApi:
-    host: wri.prod.frontend.datopian.com
-    secretName: wri.prod.frontend.datopian.com
+    host: datasets.wri.org
+    secretName: datasets.wri.org

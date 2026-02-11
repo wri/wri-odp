@@ -27,8 +27,16 @@ permissions:
   contents: read
 
 jobs:
+  build-frontend:
+    name: Build Frontend Image for deployment to ${{ inputs.branch_name }}
+    uses: ./.github/workflows/build-frontend-image-deploy.yml
+    with:
+      branch_name: ${{ inputs.branch_name }}
+    secrets: inherit
+
   deploy:
-    name: Deploy to ${{ inputs.branch_name }}
+    name: Deploy to deployment to ${{ inputs.branch_name }}
+    needs: build-frontend
     runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.branch_name }}
@@ -50,12 +58,93 @@ jobs:
         with:
           mask-password: 'true'
 
+      - name: Promote images from source environment
+        if: inputs.branch_name == 'staging' || inputs.branch_name == 'prod'
+        env:
+          CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ vars.ECR_DATAPUSHER_REPO }}
+          SOLR_REPO: ${{ vars.ECR_SOLR_REPO }}
+          PREFECT_REPO: ${{ vars.ECR_PREFECT_REPO }}
+          POSTGRESQL_REPO: ${{ vars.ECR_POSTGRESQL_REPO }}
+          MIGRATION_REPO: ${{ vars.ECR_MIGRATION_REPO }}
+        run: |
+          # Determine source environment
+          if [ "${{ inputs.branch_name }}" == "staging" ]; then
+            SOURCE_ENV="dev"
+          else
+            SOURCE_ENV="staging"
+          fi
+          TARGET_ENV="${{ inputs.branch_name }}"
+          
+          echo "=============================================="
+          echo "Promoting images from $SOURCE_ENV to $TARGET_ENV"
+          echo "=============================================="
+          
+          # Function to re-tag an image from source to target environment
+          promote_image() {
+            local repo=$1
+            local service_name=$2
+            
+            echo ""
+            echo "--- $service_name ---"
+            
+            # Get the manifest of the source tag
+            MANIFEST=$(aws ecr batch-get-image \
+              --repository-name "$repo" \
+              --image-ids imageTag="$SOURCE_ENV" \
+              --query 'images[0].imageManifest' \
+              --output text 2>/dev/null)
+            
+            if [ -z "$MANIFEST" ] || [ "$MANIFEST" == "None" ]; then
+              echo "::warning::No image found with tag '$SOURCE_ENV' in $repo - skipping"
+              return 0
+            fi
+            
+            # Check if target tag already exists with same manifest
+            EXISTING_MANIFEST=$(aws ecr batch-get-image \
+              --repository-name "$repo" \
+              --image-ids imageTag="$TARGET_ENV" \
+              --query 'images[0].imageManifest' \
+              --output text 2>/dev/null || echo "")
+            
+            if [ "$MANIFEST" == "$EXISTING_MANIFEST" ]; then
+              echo "Image already tagged as $TARGET_ENV (same manifest)"
+              return 0
+            fi
+            
+            # Put the image with the new tag
+            aws ecr put-image \
+              --repository-name "$repo" \
+              --image-tag "$TARGET_ENV" \
+              --image-manifest "$MANIFEST" \
+              --output text > /dev/null 2>&1 || true
+            
+            echo "✓ Promoted $repo:$SOURCE_ENV → $repo:$TARGET_ENV"
+          }
+          
+          # Promote each image
+          promote_image "$CKAN_REPO" "CKAN"
+          promote_image "$FRONTEND_REPO" "Frontend"
+          promote_image "$DATAPUSHER_REPO" "Datapusher"
+          promote_image "$SOLR_REPO" "Solr"
+          promote_image "$PREFECT_REPO" "Prefect"
+          promote_image "$POSTGRESQL_REPO" "PostgreSQL"
+          promote_image "$MIGRATION_REPO" "Migration"
+          
+          echo ""
+          echo "=============================================="
+          echo "Image promotion complete"
+          echo "=============================================="
+
       - name: Resolve image tags from ECR latest
         id: resolve-tags
         env:
-          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO }}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
+          CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ vars.ECR_DATAPUSHER_REPO }}
+          SOLR_REPO: ${{ vars.ECR_SOLR_REPO }}
+          MIGRATION_REPO: ${{ vars.ECR_MIGRATION_REPO }}
         run: |
           # Function to resolve the SHA tag from a latest tag in ECR
           # Returns the SHA tag that points to the same image as the latest tag
@@ -113,28 +202,34 @@ jobs:
           
           FAILED=0
           
-          # Resolve CKAN (pattern: branch-sha, no suffix)
+          # Resolve CKAN (pattern: sha only, latest tag is just branch name)
           echo "--- CKAN ---"
-          CKAN_TAG=$(resolve_sha_from_latest "$CKAN_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$" "CKAN")
+          CKAN_TAG=$(resolve_sha_from_latest "$CKAN_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "CKAN")
           [ "$CKAN_TAG" == "FAILED" ] && FAILED=1
           echo ""
           
-          # Resolve Frontend (pattern: branch-sha, no suffix)
+          # Resolve Frontend (pattern: sha only, latest tag is just branch name)
           echo "--- Frontend ---"
-          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}-latest" "^${BRANCH_NAME}-[a-f0-9]{40}$" "Frontend")
+          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "Frontend")
           [ "$FRONTEND_TAG" == "FAILED" ] && FAILED=1
           echo ""
           
-          # Resolve Datapusher (pattern: branch-sha-datapusher)
+          # Resolve Datapusher (pattern: sha only, latest tag is just branch name)
           echo "--- Datapusher ---"
-          DATAPUSHER_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-datapusher" "^${BRANCH_NAME}-[a-f0-9]{40}-datapusher$" "Datapusher")
+          DATAPUSHER_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "Datapusher")
           [ "$DATAPUSHER_TAG" == "FAILED" ] && FAILED=1
           echo ""
           
-          # Resolve Migration (pattern: branch-sha-migration)
+          # Resolve Migration (pattern: sha only, latest tag is just branch name)
           echo "--- Migration ---"
-          MIGRATION_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}-latest-migration" "^${BRANCH_NAME}-[a-f0-9]{40}-migration$" "Migration")
+          MIGRATION_TAG=$(resolve_sha_from_latest "$MIGRATION_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "Migration")
           [ "$MIGRATION_TAG" == "FAILED" ] && FAILED=1
+          echo ""
+          
+          # Resolve Solr (pattern: sha only, latest tag is just branch name)
+          echo "--- Solr ---"
+          SOLR_TAG=$(resolve_sha_from_latest "$SOLR_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "Solr")
+          [ "$SOLR_TAG" == "FAILED" ] && FAILED=1
           echo ""
           
           if [ $FAILED -eq 1 ]; then
@@ -148,23 +243,28 @@ jobs:
           echo "Frontend:   $FRONTEND_TAG"
           echo "Datapusher: $DATAPUSHER_TAG"
           echo "Migration:  $MIGRATION_TAG"
+          echo "Solr:       $SOLR_TAG"
           echo "=============================================="
           
           echo "ckan_tag=$CKAN_TAG" >> $GITHUB_OUTPUT
           echo "frontend_tag=$FRONTEND_TAG" >> $GITHUB_OUTPUT
           echo "datapusher_tag=$DATAPUSHER_TAG" >> $GITHUB_OUTPUT
           echo "migration_tag=$MIGRATION_TAG" >> $GITHUB_OUTPUT
+          echo "solr_tag=$SOLR_TAG" >> $GITHUB_OUTPUT
 
       - name: Run Templater and update values.yaml
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          CKAN_REPO: ${{ secrets.ECR_CKAN_REPO }}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
+          CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ vars.ECR_DATAPUSHER_REPO }}
+          SOLR_REPO: ${{ vars.ECR_SOLR_REPO }}
+          MIGRATION_REPO: ${{ vars.ECR_MIGRATION_REPO }}
           CKAN_IMAGE_TAG: ${{ steps.resolve-tags.outputs.ckan_tag }}
           FRONTEND_IMAGE_TAG: ${{ steps.resolve-tags.outputs.frontend_tag }}
           DATAPUSHER_IMAGE_TAG: ${{ steps.resolve-tags.outputs.datapusher_tag }}
           MIGRATION_IMAGE_TAG: ${{ steps.resolve-tags.outputs.migration_tag }}
+          SOLR_IMAGE_TAG: ${{ steps.resolve-tags.outputs.solr_tag }}
         run: |
           cd deployment
           curl -sS https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
@@ -174,6 +274,7 @@ jobs:
           echo "  Frontend:   $FRONTEND_IMAGE_TAG"
           echo "  Datapusher: $DATAPUSHER_IMAGE_TAG"
           echo "  Migration:  $MIGRATION_IMAGE_TAG"
+          echo "  Solr:       $SOLR_IMAGE_TAG"
           
           bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
           

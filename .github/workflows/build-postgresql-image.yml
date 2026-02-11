@@ -48,19 +48,19 @@ jobs:
       - name: Build and push PostgreSQL image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
-          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
-          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest-postgresql
+          POSTGRESQL_REPO: ${{ vars.ECR_POSTGRESQL_REPO }}
+          IMAGE_TAG: ${{ github.sha }}
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}
         run: |
-          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql \
+          docker build -t $REGISTRY/$POSTGRESQL_REPO:$IMAGE_TAG \
           ckan-backend-dev/postgresql
           
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql
+          docker push $REGISTRY/$POSTGRESQL_REPO:$IMAGE_TAG
           
           # Only push 'latest' tag if this is NOT a Pull Request
           if [ "${{ github.event_name }}" != "pull_request" ]; then
-            docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-postgresql $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
-            docker push $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
+            docker tag $REGISTRY/$POSTGRESQL_REPO:$IMAGE_TAG $REGISTRY/$POSTGRESQL_REPO:$LATEST_TAG
+            docker push $REGISTRY/$POSTGRESQL_REPO:$LATEST_TAG
             echo "Successfully pushed $LATEST_TAG"
           else
             echo "Skipping 'latest' tag push for Pull Request"
