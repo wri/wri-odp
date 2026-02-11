@@ -1,11 +1,8 @@
+# Run from main.yml via workflow_call. Do not trigger on push/PR directly.
 name: Check Linter
 
 on:
-  pull_request:
-    branches:
-      - dev
-    paths:
-      - 'deployment/frontend/**'
+  workflow_call:
 
 jobs:
   run-ci:
@@ -14,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -32,4 +29,3 @@ jobs:
       - name: Check lint
         working-directory: deployment/frontend
         run: npm run lint:ci
-

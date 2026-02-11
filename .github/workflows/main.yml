@@ -109,6 +109,16 @@ jobs:
           echo "next_public_gtm_id=${{ vars[format('{0}_NEXT_PUBLIC_GTM_ID', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
           echo "next_public_hotjar_id=${{ vars[format('{0}_NEXT_PUBLIC_HOTJAR_ID', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
 
+  codeql:
+    name: CodeQL Analysis
+    needs: setup
+    uses: ./.github/workflows/codeql.yml
+
+  lint:
+    name: Lint Frontend
+    needs: setup
+    uses: ./.github/workflows/lint-frontend.yml
+
   build-ckan:
     name: Build CKAN Image
     needs: setup
@@ -620,6 +630,8 @@ jobs:
     name: Deploy To AWS
     needs:
       - setup
+      - codeql
+      - lint
       - build-ckan
       - build-frontend
       - build-datapusher
@@ -631,8 +643,10 @@ jobs:
       - test-unit
       - test-frontend
     if: |
-      github.event_name != 'pull_request' && 
-      always() && 
+      github.event_name != 'pull_request' &&
+      always() &&
+      needs.codeql.result == 'success' &&
+      needs.lint.result == 'success' &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
       (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
