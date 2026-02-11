@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: deployment/frontend
-        run: npm ci -f
+        run: npm install --legacy-peer-deps
 
       - name: Check lint
         working-directory: deployment/frontend
