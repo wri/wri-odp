@@ -13,6 +13,10 @@ PROFILE=${2:-"AWSAdministratorAccess-245948672511"}
 CKAN_REPO="ckan-ecr"
 FRONTEND_REPO="frontend-ecr"
 DATAPUSHER_REPO="datapusher-ecr"
+SOLR_REPO="solr"
+PREFECT_REPO="prefect"
+POSTGRESQL_REPO="postgres"
+MIGRATION_REPO="migration"
 
 # Colors for output
 RED='\033[0;31m'
@@ -60,39 +64,39 @@ resolve_sha_tag() {
     sha_tag=$(echo "$all_tags" | tr '\t' '\n' | grep -E "$sha_pattern" | head -1)
     
     if [ -z "$sha_tag" ]; then
-        echo -e "${YELLOW}⚠ No SHA tag found, only: $latest_tag${NC}"
-        echo "    Available tags: $all_tags"
-        return 0
+        echo -e "${YELLOW}⚠ No SHA tag found${NC}"
+    else
+        echo -e "${GREEN}✓ $sha_tag${NC}"
     fi
     
-    echo -e "${GREEN}✓ $sha_tag${NC}"
-    echo "    (from $latest_tag)"
+    # Show all tags
+    echo "    All tags: $(echo "$all_tags" | tr '\t' ', ')"
     return 0
 }
 
 echo "Resolving image tags from ECR latest tags:"
 echo "-------------------------------------------"
 
-# CKAN (pattern: branch-sha, no suffix)
-resolve_sha_tag "$CKAN_REPO" "${BRANCH}-latest" "^${BRANCH}-[a-f0-9]{40}$" "CKAN"
+# CKAN (pattern: sha only, no branch prefix)
+resolve_sha_tag "$CKAN_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "CKAN"
 
-# Frontend (pattern: branch-sha, no suffix)
-resolve_sha_tag "$FRONTEND_REPO" "${BRANCH}-latest" "^${BRANCH}-[a-f0-9]{40}$" "Frontend"
+# Frontend (pattern: sha only, no branch prefix)
+resolve_sha_tag "$FRONTEND_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Frontend"
 
-# Datapusher (pattern: branch-sha-datapusher)
-resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-datapusher" "^${BRANCH}-[a-f0-9]{40}-datapusher$" "Datapusher"
+# Datapusher (pattern: sha only, no branch prefix)
+resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Datapusher"
 
-# Migration (pattern: branch-sha-migration)
-resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-migration" "^${BRANCH}-[a-f0-9]{40}-migration$" "Migration"
+# Migration (pattern: sha only, no branch prefix)
+resolve_sha_tag "$MIGRATION_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Migration"
 
-# Prefect (pattern: branch-latest-prefect)
-resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-prefect" "^${BRANCH}-[a-f0-9]{40}-prefect$" "Prefect"
+# Prefect (pattern: sha only, no branch prefix)
+resolve_sha_tag "$PREFECT_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Prefect"
 
-# PostgreSQL (pattern: branch-latest-postgresql)
-resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-postgresql" "^${BRANCH}-[a-f0-9]{40}-postgresql$" "PostgreSQL"
+# PostgreSQL (pattern: sha only, no branch prefix)
+resolve_sha_tag "$POSTGRESQL_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "PostgreSQL"
 
-# Solr (pattern: branch-latest-solr)
-resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}-latest-solr" "^${BRANCH}-[a-f0-9]{40}-solr$" "Solr"
+# Solr (pattern: sha only, no branch prefix)
+resolve_sha_tag "$SOLR_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Solr"
 
 echo ""
 echo "=========================================="

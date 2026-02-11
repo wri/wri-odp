@@ -22,13 +22,6 @@ on:
         required: false
         type: string
         default: 'false'
-  workflow_dispatch:
-    inputs:
-      branch_name:
-        description: 'Branch name to tag (e.g., dev, staging, prod)'
-        required: true
-        default: 'dev'
-        type: string
 
 permissions:
   id-token: write
@@ -60,37 +53,37 @@ jobs:
           REGISTRY="${{ steps.login-ecr.outputs.registry }}"
           
           # FRONTEND_IMAGE is set to latest for docker-compose validation (we're building it, not pulling)
-          echo "FRONTEND_IMAGE=$REGISTRY/${{ secrets.ECR_FRONTEND_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=$REGISTRY/${{ vars.ECR_FRONTEND_REPO }}:$BRANCH-test" >> $GITHUB_ENV
           
           # Use latest tags for all containers when triggered via workflow_dispatch
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "CKAN_IMAGE=$REGISTRY/${{ secrets.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
-            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
-            echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-prefect" >> $GITHUB_ENV
-            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
-            echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-solr" >> $GITHUB_ENV
+            echo "CKAN_IMAGE=$REGISTRY/${{ vars.ECR_CKAN_REPO }}:$BRANCH" >> $GITHUB_ENV
+            echo "DATAPUSHER_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH" >> $GITHUB_ENV
+            echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_PREFECT_REPO }}:$BRANCH" >> $GITHUB_ENV
+            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_POSTGRESQL_REPO }}:$BRANCH" >> $GITHUB_ENV
+            echo "SOLR_IMAGE=$REGISTRY/${{ vars.ECR_SOLR_REPO }}:$BRANCH" >> $GITHUB_ENV
           else
             # Use SHA-tagged images when called from workflow_call
             if [ "${{ inputs.ckan_changed }}" == "true" ]; then
-              echo "CKAN_IMAGE=$REGISTRY/${{ secrets.ECR_CKAN_REPO }}:$BRANCH-${{ github.sha }}" >> $GITHUB_ENV
+              echo "CKAN_IMAGE=$REGISTRY/${{ vars.ECR_CKAN_REPO }}:${{ github.sha }}" >> $GITHUB_ENV
             else
-              echo "CKAN_IMAGE=$REGISTRY/${{ secrets.ECR_CKAN_REPO }}:$BRANCH-latest" >> $GITHUB_ENV
+              echo "CKAN_IMAGE=$REGISTRY/${{ vars.ECR_CKAN_REPO }}:$BRANCH" >> $GITHUB_ENV
             fi
             if [ "${{ inputs.datapusher_changed }}" == "true" ]; then
-              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-datapusher" >> $GITHUB_ENV
+              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:${{ github.sha }}" >> $GITHUB_ENV
             else
-              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-datapusher" >> $GITHUB_ENV
+              echo "DATAPUSHER_IMAGE=$REGISTRY/${{ vars.ECR_DATAPUSHER_REPO }}:$BRANCH" >> $GITHUB_ENV
             fi
             if [ "${{ inputs.prefect_changed }}" == "true" ]; then
-              echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-prefect" >> $GITHUB_ENV
+              echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_PREFECT_REPO }}:${{ github.sha }}" >> $GITHUB_ENV
             else
-              echo "PREFECT_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-prefect" >> $GITHUB_ENV
+              echo "PREFECT_IMAGE=$REGISTRY/${{ vars.ECR_PREFECT_REPO }}:$BRANCH" >> $GITHUB_ENV
             fi
-            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-postgresql" >> $GITHUB_ENV
+            echo "POSTGRESQL_IMAGE=$REGISTRY/${{ vars.ECR_POSTGRESQL_REPO }}:$BRANCH" >> $GITHUB_ENV
             if [ "${{ inputs.solr_changed }}" == "true" ]; then
-              echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-${{ github.sha }}-solr" >> $GITHUB_ENV
+              echo "SOLR_IMAGE=$REGISTRY/${{ vars.ECR_SOLR_REPO }}:${{ github.sha }}" >> $GITHUB_ENV
             else
-              echo "SOLR_IMAGE=$REGISTRY/${{ secrets.ECR_DATAPUSHER_REPO }}:$BRANCH-latest-solr" >> $GITHUB_ENV
+              echo "SOLR_IMAGE=$REGISTRY/${{ vars.ECR_SOLR_REPO }}:$BRANCH" >> $GITHUB_ENV
             fi
           fi
 
@@ -134,9 +127,8 @@ jobs:
       - name: Build and push Frontend image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
-          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
-          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
+          FRONTEND_TAG: ${{ inputs.branch_name || github.ref_name }}-test
         run: |
           docker build \
             --network host \
@@ -151,16 +143,11 @@ jobs:
             --build-arg NEXT_PUBLIC_GFW_API_KEY="dummy-api-key" \
             --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js" \
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
-            --build-arg SYS_ADMIN_API_KEY=${{ env.SYS_ADMIN_API_KEY }} \
-            -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
+            --build-arg SYS_ADMIN_API_KEY="${{ env.SYS_ADMIN_API_KEY }}" \
+            -t $REGISTRY/$FRONTEND_REPO:$FRONTEND_TAG \
             deployment/frontend
-          
-          docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
-          
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            docker tag $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
-            docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
-          fi
+
+          docker push $REGISTRY/$FRONTEND_REPO:$FRONTEND_TAG
 
       - name: Tear down containers
         if: always()

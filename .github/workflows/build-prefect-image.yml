@@ -48,19 +48,19 @@ jobs:
       - name: Build and push Prefect image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          DATAPUSHER_REPO: ${{ secrets.ECR_DATAPUSHER_REPO }}
-          IMAGE_TAG: ${{ inputs.branch_name || github.ref_name }}-${{ github.sha }}
-          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}-latest-prefect
+          PREFECT_REPO: ${{ vars.ECR_PREFECT_REPO }}
+          IMAGE_TAG: ${{ github.sha }}
+          LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}
         run: |
-          docker build -t $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-prefect \
+          docker build -t $REGISTRY/$PREFECT_REPO:$IMAGE_TAG \
           ckan-backend-dev/prefect-server
           
-          docker push $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-prefect
+          docker push $REGISTRY/$PREFECT_REPO:$IMAGE_TAG
           
           # Only push 'latest' tag if this is NOT a Pull Request
           if [ "${{ github.event_name }}" != "pull_request" ]; then
-            docker tag $REGISTRY/$DATAPUSHER_REPO:$IMAGE_TAG-prefect $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
-            docker push $REGISTRY/$DATAPUSHER_REPO:$LATEST_TAG
+            docker tag $REGISTRY/$PREFECT_REPO:$IMAGE_TAG $REGISTRY/$PREFECT_REPO:$LATEST_TAG
+            docker push $REGISTRY/$PREFECT_REPO:$LATEST_TAG
             echo "Successfully pushed $LATEST_TAG"
           else
             echo "Skipping 'latest' tag push for Pull Request"
