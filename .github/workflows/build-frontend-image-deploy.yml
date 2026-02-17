@@ -55,7 +55,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ github.sha }}-${{ inputs.branch_name || github.ref_name }}
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}
           NEXT_PUBLIC_GTM_ID: ${{ vars[format('{0}_NEXT_PUBLIC_GTM_ID', steps.prefix.outputs.val)] }}
           NEXT_PUBLIC_HOTJAR_ID: ${{ vars[format('{0}_NEXT_PUBLIC_HOTJAR_ID', steps.prefix.outputs.val)] }}
@@ -77,12 +77,8 @@ jobs:
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
             --build-arg SYS_ADMIN_API_KEY=${{ env.SYS_ADMIN_API_KEY }} \
             -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
+            -t $REGISTRY/$FRONTEND_REPO:$LATEST_TAG \
             deployment/frontend
           
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
-          
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            docker tag $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
-            docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
-          fi
-
+          docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG

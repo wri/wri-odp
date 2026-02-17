@@ -123,9 +123,8 @@ jobs:
             echo "✓ Promoted $repo:$SOURCE_ENV → $repo:$TARGET_ENV"
           }
           
-          # Promote each image
+          # Promote each image (Frontend uses env-specific images, not promoted)
           promote_image "$CKAN_REPO" "CKAN"
-          promote_image "$FRONTEND_REPO" "Frontend"
           promote_image "$DATAPUSHER_REPO" "Datapusher"
           promote_image "$SOLR_REPO" "Solr"
           promote_image "$PREFECT_REPO" "Prefect"
@@ -208,9 +207,9 @@ jobs:
           [ "$CKAN_TAG" == "FAILED" ] && FAILED=1
           echo ""
           
-          # Resolve Frontend (pattern: sha only, latest tag is just branch name)
+          # Resolve Frontend (pattern: sha-environment e.g. abc123-dev; latest tag is branch name)
           echo "--- Frontend ---"
-          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "Frontend")
+          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}-" "Frontend")
           [ "$FRONTEND_TAG" == "FAILED" ] && FAILED=1
           echo ""
           
