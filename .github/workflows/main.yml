@@ -112,7 +112,7 @@ jobs:
   build-ckan:
     name: Build CKAN Image
     needs: setup
-    if: needs.setup.outputs.ckan_changed == 'true'
+    if: github.event_name == 'pull_request' && needs.setup.outputs.ckan_changed == 'true'
     uses: ./.github/workflows/build-ckan-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -120,7 +120,7 @@ jobs:
   build-datapusher:
     name: Build Datapusher Image
     needs: setup
-    if: needs.setup.outputs.datapusher_changed == 'true'
+    if: github.event_name == 'pull_request' && needs.setup.outputs.datapusher_changed == 'true'
     uses: ./.github/workflows/build-datapusher-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -129,7 +129,7 @@ jobs:
   build-migration:
     name: Build Migration Image
     needs: setup
-    if: needs.setup.outputs.migration_changed == 'true'
+    if: github.event_name == 'pull_request' && needs.setup.outputs.migration_changed == 'true'
     uses: ./.github/workflows/build-migration-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -145,6 +145,7 @@ jobs:
       - build-postgresql
       - build-solr
     if: |
+      github.event_name == 'pull_request' &&
       always() &&
       (needs.setup.result == 'success') &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
@@ -165,7 +166,7 @@ jobs:
   build-prefect:
     name: Build Prefect Image
     needs: setup
-    if: needs.setup.outputs.prefect_changed == 'true'
+    if: github.event_name == 'pull_request' && needs.setup.outputs.prefect_changed == 'true'
     uses: ./.github/workflows/build-prefect-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -174,7 +175,7 @@ jobs:
   build-postgresql:
     name: Build PostgreSQL Image
     needs: setup
-    if: needs.setup.outputs.postgresql_changed == 'true'
+    if: github.event_name == 'pull_request' && needs.setup.outputs.postgresql_changed == 'true'
     uses: ./.github/workflows/build-postgresql-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -183,7 +184,7 @@ jobs:
   build-solr:
     name: Build Solr Image
     needs: setup
-    if: needs.setup.outputs.solr_changed == 'true'
+    if: github.event_name == 'pull_request' && needs.setup.outputs.solr_changed == 'true'
     uses: ./.github/workflows/build-solr-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -202,6 +203,7 @@ jobs:
       - build-postgresql
       - build-solr
     if: |
+      github.event_name == 'pull_request' &&
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
@@ -309,6 +311,7 @@ jobs:
       - build-postgresql
       - build-solr
     if: |
+      github.event_name == 'pull_request' &&
       always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
@@ -404,7 +407,8 @@ jobs:
       - build-postgresql
       - build-solr
     if: |
-      always() && 
+      github.event_name == 'pull_request' &&
+      always() &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
       (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
@@ -539,7 +543,7 @@ jobs:
     needs:
       - setup
       - build-ckan
-    if: always() && needs.build-ckan.result == 'success'
+    if: github.event_name == 'pull_request' && always() && needs.build-ckan.result == 'success'
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
@@ -578,7 +582,7 @@ jobs:
     needs:
       - setup
       - build-frontend
-    if: always() && needs.build-frontend.result == 'success'
+    if: github.event_name == 'pull_request' && always() && needs.build-frontend.result == 'success'
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v4
