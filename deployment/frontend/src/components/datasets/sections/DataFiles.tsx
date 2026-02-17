@@ -740,8 +740,7 @@ function DatafileCard({
                 )}
               {datafile.datastore_active && (
                 <>
-                  {tabularResource &&
-                    tabularResource.id === datafile.id ? (
+                  {tabularResource?.id === datafile.id ? (
                     <Button
                       variant="outline"
                       size="sm"
@@ -919,8 +918,7 @@ function DatafileCard({
                 )}
                 {datafile.datastore_active && (
                   <>
-                    {tabularResource &&
-                      tabularResource.id === datafile.id ? (
+                    {tabularResource?.id === datafile.id ? (
                       <Button
                         variant="ghost"
                         size="sm"

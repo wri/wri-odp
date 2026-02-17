@@ -936,8 +936,7 @@ export function DatasetHeader({
                         dataset?.provider !== 'gee' &&
                         dataset?.rw_id && (
                             <div className="pt-4">
-                                {tabularResource &&
-                                tabularResource.id === dataset.rw_id ? (
+                                {tabularResource?.id === dataset.rw_id ? (
                                     <Button
                                         size="sm"
                                         onClick={() => setTabularResource(null)}
