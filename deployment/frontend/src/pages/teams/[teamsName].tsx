@@ -1,17 +1,12 @@
 import React from 'react';
 import Header from '@/components/_shared/Header';
 import TeamHeaderCard from '@/components/team/TeamHeaderCard';
-import TeamTab from '@/components/team/TeamTab';
 import Footer from '@/components/_shared/Footer';
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
 import { NextSeo } from 'next-seo';
 import { useRouter } from 'next/router';
-import { api } from '@/utils/api';
-import Spinner from '@/components/_shared/Spinner';
 import SubTeams from '@/components/team/SubTeams';
-import DatasetTopic from '@/components/topics/DatasetTopic';
 import DatasetTeams from '@/components/team/DatasetTeams';
-import GroupBreadcrumb from '@/components/team/GroupBreadcrumb';
 import {
     type GetServerSidePropsContext,
     type InferGetServerSidePropsType,
@@ -23,11 +18,7 @@ import { appRouter } from '@/server/api/root';
 import { createServerSideHelpers } from '@trpc/react-query/server';
 import superjson from 'superjson';
 import { env } from '@/env.mjs';
-
-const links = [
-    { label: 'Teams', url: '/teams', current: false },
-    { label: 'Team 1', url: '/topics/team1', current: true },
-];
+import { useEffect } from 'react';
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ teamsName: string }>
@@ -110,6 +101,20 @@ export default function teams(
             current: true,
         },
     ];
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
+            const w = window as unknown as { dataLayer?: Record<string, unknown>[] };
+            w.dataLayer = w.dataLayer ?? [];
+            w.dataLayer.push({
+                event: 'team_detail_view',
+                page_path: `/teams/${teamName}`,
+                page_section: 'teams',
+                team_name: teamName,
+                team_title: teamTitle,
+            });
+        }
+    }, [teamName, teamTitle]);
 
     return (
         <>
