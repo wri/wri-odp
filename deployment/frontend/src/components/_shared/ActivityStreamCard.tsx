@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 import {

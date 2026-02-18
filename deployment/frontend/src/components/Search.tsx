@@ -4,11 +4,7 @@ import React, {
     useEffect,
     useState,
 } from 'react';
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import classNames from '@/utils/classnames';
-import { SearchInput } from '@/schema/search.schema';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

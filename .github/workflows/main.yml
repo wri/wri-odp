@@ -654,8 +654,8 @@ jobs:
     if: |
       github.event_name != 'pull_request' &&
       always() &&
-      needs.codeql.result == 'success' &&
-      needs.lint.result == 'success' &&
+      (needs.codeql.result == 'success' || needs.codeql.result == 'skipped') &&
+      (needs.lint.result == 'success' || needs.lint.result == 'skipped') &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
       (needs.build-frontend.result == 'success' || needs.build-frontend.result == 'skipped') &&
       (needs.build-datapusher.result == 'success' || needs.build-datapusher.result == 'skipped') &&
