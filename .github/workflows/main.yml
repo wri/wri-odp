@@ -111,11 +111,19 @@ jobs:
           echo "next_public_hotjar_id=${{ vars[format('{0}_NEXT_PUBLIC_HOTJAR_ID', steps.prefix.outputs.val)] }}" >> $GITHUB_OUTPUT
 
   codeql:
+    if: 
+      github.event_name == 'pull_request' &&
+      always() &&
+      (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.ckan_changed == 'true')
     name: CodeQL Analysis
     needs: setup
     uses: ./.github/workflows/codeql.yml
 
   lint:
+    if: 
+      github.event_name == 'pull_request' &&
+      always() &&
+      (needs.setup.outputs.frontend_changed == 'true')
     name: Lint Frontend
     needs: setup
     uses: ./.github/workflows/lint-frontend.yml
