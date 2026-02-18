@@ -1,12 +1,16 @@
-import React, { useState } from 'react'
-import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard'
-import { api } from '@/utils/api'
-import Spinner from '../_shared/Spinner'
-import { Application } from '@/schema/ckan.schema'
-import Pagination from '@/components/datasets/Pagination'
-import type { SearchInput } from '@/schema/search.schema'
+import React, { useState } from 'react';
+import DatasetHorizontalCard from '@/components/search/DatasetHorizontalCard';
+import { api } from '@/utils/api';
+import Spinner from '../_shared/Spinner';
+import { type Application } from '@/schema/ckan.schema';
+import Pagination from '@/components/datasets/Pagination';
+import type { SearchInput } from '@/schema/search.schema';
 
-export default function DatasetApplication({ application }: { application: Application }) {
+export default function DatasetApplication({
+    application,
+}: {
+    application: Application;
+}) {
     const [query, setQuery] = useState<SearchInput>({
         search: '',
         fq: {
@@ -16,8 +20,8 @@ export default function DatasetApplication({ application }: { application: Appli
             start: 0,
             rows: 100,
         },
-    })
-    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query)
+    });
+    const { data, isLoading } = api.dataset.getAllDataset.useQuery(query);
 
     return (
         <section>
@@ -36,5 +40,5 @@ export default function DatasetApplication({ application }: { application: Appli
                 </>
             )}
         </section>
-    )
+    );
 }

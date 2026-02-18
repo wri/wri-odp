@@ -1,13 +1,13 @@
-import React from 'react'
-import Row from '../_shared/Row'
-import { RowProfilev2 } from '../_shared/RowProfile'
-import type { IRowProfile } from '../_shared/RowProfile'
-import { api } from '@/utils/api'
+import React from 'react';
+import Row from '../_shared/Row';
+import { RowProfilev2 } from '../_shared/RowProfile';
+import type { IRowProfile } from '../_shared/RowProfile';
+import { api } from '@/utils/api';
 import {
     CheckIcon,
     InformationCircleIcon,
     XMarkIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 import {
     Table,
     TableBody,
@@ -15,26 +15,26 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/_shared/Table'
-import { User, WriDataset } from '@/schema/ckan.schema'
-import { formatDate, formatDiff } from '@/utils/general'
-import Spinner from '@/components/_shared/Spinner'
+} from '@/components/_shared/Table';
+import { type User, type WriDataset } from '@/schema/ckan.schema';
+import { formatDate, formatDiff } from '@/utils/general';
+import Spinner from '@/components/_shared/Spinner';
 
-import { match, P } from 'ts-pattern'
+import { match, P } from 'ts-pattern';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import { ScrollArea } from '@/components/_shared/ScrollArea'
+} from '@/components/_shared/Popover';
+import { ScrollArea } from '@/components/_shared/ScrollArea';
 
 type IApprovalRow = {
-    dataset: string
-    rowId: string
-    user: IRowProfile
-    date: string
-    status: boolean
-}
+    dataset: string;
+    rowId: string;
+    user: IRowProfile;
+    date: string;
+    status: boolean;
+};
 
 // Define an array of patterns
 const patterns: RegExp[] = [
@@ -47,11 +47,11 @@ const patterns: RegExp[] = [
     /preview/,
     /hash/,
     /total_record_count/,
-]
+];
 
 // Function to test if any pattern matches the string
 function matchesAnyPattern(item: string): boolean {
-    return patterns.some((pattern) => pattern.test(item))
+    return patterns.some((pattern) => pattern.test(item));
 }
 
 // a function that will return this following keys and value from Wridataset object
@@ -78,15 +78,15 @@ function filteredDataset(dataset: WriDataset) {
             description: dataset?.release_notes ?? '',
             isHtml: true,
         },
-    ]
+    ];
 }
 
 function Card({ approvalInfo }: { approvalInfo: WriDataset }) {
-    const user = (approvalInfo.user as User) ?? { email: '', name: '' }
-    user.name = user?.email ?? user?.name ?? 'Unknown'
+    const user = approvalInfo.user! ?? { email: '', name: '' };
+    user.name = user?.email ?? user?.name ?? 'Unknown';
     user.image_display_url = user?.image_display_url
         ? user?.image_display_url
-        : `https://gravatar.com/avatar/${user?.email_hash}?s=270&d=identicon`
+        : `https://gravatar.com/avatar/${user?.email_hash}?s=270&d=identicon`;
 
     // the orange indicator should stand for if nay issue has being created or not
     return (
@@ -115,7 +115,7 @@ function Card({ approvalInfo }: { approvalInfo: WriDataset }) {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 function FormatNewValue(
@@ -128,8 +128,9 @@ function FormatNewValue(
     key: string
 ) {
     if (key === 'Open In') {
-        const open_in_array = JSON.parse(value as string)
-        if (!Array.isArray(open_in_array)) return <span>Not specified</span>
+        const open_in_array = JSON.parse(value as string);
+        if (!Array.isArray(open_in_array)) return <span>Not specified</span>;
+        if (open_in_array.length === 0) return <span>Not specified</span>;
         return (
             <span className="flex gap-x-2 items-center">
                 {(open_in_array as Array<{ title: string; url: string }>).map(
@@ -143,11 +144,11 @@ function FormatNewValue(
                             >
                                 {i.title}
                             </a>
-                        )
+                        );
                     }
                 )}
             </span>
-        )
+        );
     }
     return match(value)
         .with(
@@ -159,14 +160,15 @@ function FormatNewValue(
             ({ title, name }) => <span>{title ?? name}</span>
         )
         .with('notspecified', () => <span>Not specified</span>)
+        .with(P.union('null', '', 'none'), () => <span>Not specified</span>)
         .with(P.boolean, (v) => <span>{v ? 'True' : 'False'}</span>)
         .with(P.string, (value) => {
             if (key === 'spatial_type' || key === 'Update Frequency')
-                return <span className="capitalize">{value}</span>
-            return <div dangerouslySetInnerHTML={{ __html: value }}></div>
+                return <span className="capitalize">{value}</span>;
+            return <div dangerouslySetInnerHTML={{ __html: value }}></div>;
         })
         .with(null, () => <span>Not specified</span>)
-        .with(P.array(P.nullish), () => <span>Empty</span>)
+        .with(P.array(P.nullish), () => <span>Not specified</span>)
         .with(P.number, (value) => <span>{value}</span>)
         .with(P.array(P.string), (value) => {
             if (
@@ -185,18 +187,20 @@ function FormatNewValue(
                             <PopoverContent className="p-4 bg-white shadow-lg rounded-lg lg:max-w-lg max-w-sm w-full">
                                 <ScrollArea className="h-[300px]">
                                     <div className="flex flex-col gap-y-4">
-                                        <pre>{value.map((v) => v)}</pre>
+                                        <pre className="whitespace-pre-wrap text-sm font-mono bg-gray-50 p-3 rounded-md overflow-auto">
+                                            {value.map((v) => v)}
+                                        </pre>
                                     </div>
                                 </ScrollArea>
                             </PopoverContent>
                         </PopoverTrigger>
                     </Popover>
-                )
+                );
             }
             return match(key)
                 .with('Tags', () => <span>{value.join(', ')}</span>)
                 .with('Topics', () => <span>{value.join(', ')}</span>)
-                .otherwise(() => <span>{value.join(', ')}</span>)
+                .otherwise(() => <span>{value.join(', ')}</span>);
         })
         .otherwise(() => {
             if (
@@ -219,10 +223,10 @@ function FormatNewValue(
                             </PopoverContent>
                         </PopoverTrigger>
                     </Popover>
-                )
+                );
             }
-            return JSON.stringify(value)
-        })
+            return JSON.stringify(value);
+        });
 }
 
 function SubCardProfile({
@@ -230,21 +234,21 @@ function SubCardProfile({
     diff,
     data,
 }: {
-    isLoading: boolean
+    isLoading: boolean;
     diff: {
-        diff: Record<string, { old_value: string; new_value: string }>
-        old_dataset: WriDataset | null
-        new_dataset: WriDataset | null
-    }
-    data: WriDataset
+        diff: Record<string, { old_value: string; new_value: string }>;
+        old_dataset: WriDataset | null;
+        new_dataset: WriDataset | null;
+    };
+    data: WriDataset;
 }) {
-    if (isLoading) return <Spinner className="mx-auto my-2" />
-    let diff2 = formatDiff(diff ? diff.diff : null)
+    if (isLoading) return <Spinner className="mx-auto my-2" />;
+    let diff2 = formatDiff(diff ? diff.diff : null);
     // if the diff has tags or topics, instead of showing the diff we show the whole old and new values
     if (diff2 && Object.keys(diff2).some((x) => x.includes('tags'))) {
         diff2 = Object.fromEntries(
             Object.entries(diff2).filter(([key]) => !key.includes('tags'))
-        )
+        );
         diff2 = {
             ...diff2,
             Tags: {
@@ -257,12 +261,12 @@ function SubCardProfile({
                         (t) => t.display_name ?? t.name
                     ) ?? [],
             },
-        }
+        };
     }
     if (diff2 && Object.keys(diff2).some((x) => x.includes('Topics'))) {
         diff2 = Object.fromEntries(
             Object.entries(diff2).filter(([key]) => !key.includes('Topics'))
-        )
+        );
         diff2 = {
             ...diff2,
             Topics: {
@@ -275,23 +279,23 @@ function SubCardProfile({
                         (t) => t.display_name ?? t.name
                     ) ?? [],
             },
-        }
+        };
     }
 
     if (diff2 && Object.keys(diff2).some((x) => x.includes('Authors'))) {
         diff2 = Object.fromEntries(
             Object.entries(diff2).filter(([key]) => !key.includes('Authors'))
-        )
-        let oldAuthors =
+        );
+        const oldAuthors =
             diff.old_dataset?.authors &&
             typeof diff.old_dataset?.authors === 'string'
                 ? JSON.parse(diff.old_dataset?.authors)
-                : (diff.old_dataset?.authors ?? [])
-        let newAuthors =
+                : (diff.old_dataset?.authors ?? []);
+        const newAuthors =
             diff.new_dataset?.authors &&
             typeof diff.new_dataset?.authors === 'string'
                 ? JSON.parse(diff.new_dataset?.authors)
-                : (diff.new_dataset?.authors ?? [])
+                : (diff.new_dataset?.authors ?? []);
         diff2 = {
             ...diff2,
             Authors: {
@@ -300,7 +304,7 @@ function SubCardProfile({
                 new_value:
                     newAuthors?.map((a: any) => `${a.name} (${a.email})`) ?? [],
             },
-        }
+        };
     }
 
     if (diff2 && Object.keys(diff2).some((x) => x.includes('Maintainers'))) {
@@ -308,17 +312,17 @@ function SubCardProfile({
             Object.entries(diff2).filter(
                 ([key]) => !key.includes('Maintainers')
             )
-        )
-        let oldMaintainers =
+        );
+        const oldMaintainers =
             diff.old_dataset?.maintainers &&
             typeof diff.old_dataset?.maintainers === 'string'
                 ? JSON.parse(diff.old_dataset?.maintainers)
-                : (diff.old_dataset?.maintainers ?? [])
-        let newMaintainers =
+                : (diff.old_dataset?.maintainers ?? []);
+        const newMaintainers =
             diff.new_dataset?.maintainers &&
             typeof diff.new_dataset?.maintainers === 'string'
                 ? JSON.parse(diff.new_dataset?.maintainers)
-                : (diff.new_dataset?.maintainers ?? [])
+                : (diff.new_dataset?.maintainers ?? []);
         diff2 = {
             ...diff2,
             Maintainers: {
@@ -329,7 +333,7 @@ function SubCardProfile({
                     newMaintainers?.map((a: any) => `${a.name} (${a.email})`) ??
                     [],
             },
-        }
+        };
     }
 
     return (
@@ -400,7 +404,7 @@ function SubCardProfile({
                                                 </pre>
                                             </TableCell>
                                         </TableRow>
-                                    )
+                                    );
                                 })}
                         </TableBody>
                     </Table>
@@ -449,14 +453,14 @@ function SubCardProfile({
                                                 )}
                                             </TableCell>
                                         </TableRow>
-                                    )
+                                    );
                                 })}
                         </TableBody>
                     </Table>
                 </>
             )}
         </div>
-    )
+    );
 }
 
 export default function ApprovalRow({
@@ -464,16 +468,16 @@ export default function ApprovalRow({
     className,
     handleOpenModal,
 }: {
-    approvalInfo: WriDataset
-    className: string
+    approvalInfo: WriDataset;
+    className: string;
     handleOpenModal: (
         dataset: WriDataset,
         approvalType: 'approve' | 'reject'
-    ) => void
+    ) => void;
 }) {
     const { data, isLoading } = api.dataset.showPendingDiff.useQuery({
         id: approvalInfo.id,
-    })
+    });
 
     return (
         <Row
@@ -515,5 +519,5 @@ export default function ApprovalRow({
             }
             isDropDown
         />
-    )
+    );
 }

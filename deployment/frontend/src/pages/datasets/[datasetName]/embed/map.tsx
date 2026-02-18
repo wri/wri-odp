@@ -1,15 +1,18 @@
-import { Breadcrumbs } from '@/components/_shared/Breadcrumbs'
-import Header from '@/components/_shared/Header'
-import { useRouter } from 'next/router'
-import { api } from '@/utils/api'
-import dynamic from 'next/dynamic'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import Spinner from '@/components/_shared/Spinner'
-import { useSession } from 'next-auth/react'
-import { getOneDataset } from '@/utils/apiUtils'
-import { getServerAuthSession } from '@/server/auth'
+import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
+import Header from '@/components/_shared/Header';
+import { useRouter } from 'next/router';
+import { api } from '@/utils/api';
+import dynamic from 'next/dynamic';
+import {
+    type GetServerSidePropsContext,
+    type InferGetServerSidePropsType,
+} from 'next';
+import Spinner from '@/components/_shared/Spinner';
+import { useSession } from 'next-auth/react';
+import { getOneDataset } from '@/utils/apiUtils';
+import { getServerAuthSession } from '@/server/auth';
 
-import { decodeMapParam } from '@/utils/urlEncoding'
+import { decodeMapParam } from '@/utils/urlEncoding';
 
 const LazyViz = dynamic(
     () => import('@/components/datasets/visualizations/MapView'),
@@ -23,21 +26,28 @@ const LazyViz = dynamic(
             </div>
         ),
     }
-)
+);
 
 export async function getServerSideProps(
     context: GetServerSidePropsContext<{ datasetName: string }>
 ) {
-    const { query } = context
-    const { map } = query
-    const mapState = decodeMapParam(map as string)
+    const { query } = context;
+    const { map } = query;
+    const mapState = decodeMapParam(map as string);
 
-    const datasetName = context.params?.datasetName as string
-    const session = await getServerAuthSession(context)
+    const datasetName = context.params?.datasetName!;
+    const session = await getServerAuthSession(context);
     try {
-        let dataset = await getOneDataset(datasetName, session)
+        let dataset = await getOneDataset(datasetName, session);
         // remove layerObj and layerObjRaw from resources (makes page faster + avoids serializing errors )
-        dataset = {...dataset, resources: dataset.resources.map(r => ({...r, layerObj: null, layerObjRaw: null }))}
+        dataset = {
+            ...dataset,
+            resources: dataset.resources.map((r) => ({
+                ...r,
+                layerObj: null,
+                layerObjRaw: null,
+            })),
+        };
 
         return {
             props: {
@@ -51,7 +61,7 @@ export async function getServerSideProps(
                     mapView: { ...mapState, isEmbedding: true },
                 },
             },
-        }
+        };
     } catch {
         return {
             props: {
@@ -59,20 +69,20 @@ export async function getServerSideProps(
                     destination: '/datasets/404',
                 },
             },
-        }
+        };
     }
 }
 
 export default function DatasetPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const { dataset } = props
+    const { dataset } = props;
 
-    const datasetName = props.datasetName as string
-    const router = useRouter()
-    const { query } = router
-    const isApprovalRequest = query?.approval === 'true'
-    const session = useSession()
+    const datasetName = props.datasetName!;
+    const router = useRouter();
+    const { query } = router;
+    const isApprovalRequest = query?.approval === 'true';
+    const session = useSession();
     const {
         data: datasetData,
         error: datasetError,
@@ -80,23 +90,23 @@ export default function DatasetPage(
     } = api.dataset.getOneDataset.useQuery(
         { id: datasetName },
         { retry: 0, initialData: dataset }
-    )
-    if (!datasetData && datasetError) router.replace('/datasets/404')
+    );
+    if (!datasetData && datasetError) router.replace('/datasets/404');
     const relatedDatasets = api.dataset.getAllDataset.useQuery({
         fq: {
             groups:
                 datasetData?.groups?.map((group) => group.name).join(' OR ') ??
                 '',
         },
-    })
+    });
     const collaborators = api.dataset.getDatasetCollaborators.useQuery(
         { id: datasetName },
         { enabled: !!session.data?.user.apikey }
-    )
+    );
     const issues = api.dataset.getDatasetIssues.useQuery(
         { id: datasetName },
         { enabled: !!session.data?.user.apikey }
-    )
+    );
 
     const links = [
         { label: 'Explore Data', url: '/search', current: false },
@@ -105,7 +115,7 @@ export default function DatasetPage(
             url: `/datasets/${datasetData?.title ?? datasetData?.name ?? ''}`,
             current: true,
         },
-    ]
+    ];
     if (isLoading || !datasetData) {
         return (
             <>
@@ -115,12 +125,12 @@ export default function DatasetPage(
                     <Spinner /> Loading
                 </div>
             </>
-        )
+        );
     }
 
     return (
         <>
             <LazyViz isEmbedding={true} />
         </>
-    )
+    );
 }

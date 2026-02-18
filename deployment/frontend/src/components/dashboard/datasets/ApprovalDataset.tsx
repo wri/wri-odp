@@ -1,45 +1,48 @@
-import React, { useState, useEffect } from 'react'
-import SearchHeader from '../_shared/SearchHeader'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import type { SearchInput } from '@/schema/search.schema'
-import Pagination from '../_shared/Pagination'
-import { ApprovalDatasetRow } from './DatasetRow'
-import type { WriDataset } from '@/schema/ckan.schema'
-import notify from '@/utils/notify'
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import SelectFilter from '../_shared/SelectFilter'
-import { useQuery } from 'react-query'
-import { searchArrayForKeyword, filterObjects } from '@/utils/general'
+import React, { useState, useEffect } from 'react';
+import SearchHeader from '../_shared/SearchHeader';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import type { SearchInput } from '@/schema/search.schema';
+import Pagination from '../_shared/Pagination';
+import { ApprovalDatasetRow } from './DatasetRow';
+import type { WriDataset } from '@/schema/ckan.schema';
+import notify from '@/utils/notify';
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import SelectFilter from '../_shared/SelectFilter';
+import { useQuery } from 'react-query';
+import { searchArrayForKeyword, filterObjects } from '@/utils/general';
 
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
+});
 
 function customSort(obj: WriDataset) {
-    return [obj.approval_status === 'rejected', new Date(obj.metadata_created!)]
+    return [
+        obj.approval_status === 'rejected',
+        new Date(obj.metadata_created!),
+    ];
 }
 
 const sortedArray = (a: WriDataset, b: WriDataset) => {
-    const keyA = customSort(a)
-    const keyB = customSort(b)
+    const keyA = customSort(a);
+    const keyB = customSort(b);
 
     if (keyA[0] !== keyB[0]) {
-        return keyA[0] ? -1 : 1
+        return keyA[0] ? -1 : 1;
     } else {
-        return (keyB[1] as Date).getTime() - (keyA[1] as Date).getTime()
+        return (keyB[1] as Date).getTime() - (keyA[1] as Date).getTime();
     }
-}
+};
 
 function ApprovalSelect({
     setQuery,
     query,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
 }) {
     return (
         <>
@@ -54,70 +57,70 @@ function ApprovalSelect({
                 query={query}
             />
         </>
-    )
+    );
 }
 
 export default function ApprovalDataset({
     setQuery,
     query,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
 }) {
     const { data, isLoading, refetch } =
         api.dataset.getPendingDatasets.useQuery({
             search: '',
             page: { start: 0, rows: 10000 },
             _isUserSearch: true,
-        })
-    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
-    const [open, setOpen] = useState(false)
-    const utils = api.useUtils()
+        });
+    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null);
+    const [open, setOpen] = useState(false);
+    const utils = api.useUtils();
 
     const datasetDelete = api.dataset.deleteDataset.useMutation({
         onSuccess: async (data) => {
-            await refetch()
+            await refetch();
             await utils.dataset.getPendingDatasets.invalidate({
                 search: '',
                 page: { start: 0, rows: 100 },
                 sortBy: 'metadata_modified desc',
-            })
-            setOpen(false)
+            });
+            setOpen(false);
             notify(
                 `Successfully deleted the ${
                     selectDataset?.title ?? selectDataset?.name
                 } Dataset`,
                 'error'
-            )
+            );
         },
-    })
+    });
 
     const filteredDataset = useQuery(['filteredDataset', data, query], () => {
-        if (!data) return { datasets: [], count: 0 }
-        const searchTerm = query.search.toLowerCase()
-        const dataset = data.datasets
-        let filterDataset = dataset
+        if (!data) return { datasets: [], count: 0 };
+        const searchTerm = query.search.toLowerCase();
+        const dataset = data.datasets;
+        let filterDataset = dataset;
 
         if (searchTerm) {
-            filterDataset = searchArrayForKeyword(dataset, searchTerm)
+            filterDataset = searchArrayForKeyword(dataset, searchTerm);
         }
-        const fq = query.fq
+        const fq = query.fq;
         if (fq && Object.keys(fq).length > 0) {
             if (fq.approval_status !== '') {
-                filterDataset = filterObjects(filterDataset, fq)
+                filterDataset = filterObjects(filterDataset, fq);
             }
         }
 
-        const start = query.page.start
-        const rows = query.page.rows
-        const slicedData = filterDataset.slice(start, start + rows)
-        return { datasets: slicedData, count: filterDataset.length }
-    })
+        const start = query.page.start;
+        const rows = query.page.rows;
+        const slicedData = filterDataset.slice(start, start + rows);
+        return { datasets: slicedData, count: filterDataset.length };
+    });
 
     const handleOpenModal = (dataset: WriDataset) => {
-        setSelectDataset(dataset)
-        setOpen(true)
-    }
+        setSelectDataset(dataset);
+        setOpen(true);
+    };
 
     return (
         <section className="w-full max-w-8xl flex flex-col gap-y-5 sm:gap-y-0">
@@ -160,7 +163,7 @@ export default function ApprovalDataset({
                                             : ''
                                     }
                                 />
-                            )
+                            );
                         })
                 )}
                 {selectDataset && (
@@ -213,5 +216,5 @@ export default function ApprovalDataset({
                 )}
             </div>
         </section>
-    )
+    );
 }

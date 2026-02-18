@@ -1,17 +1,17 @@
-import * as React from 'react'
-import { format } from 'date-fns'
-import { cn } from '@/utils/classnames'
-import { Calendar } from '@/components/_shared/Calendar'
+import * as React from 'react';
+import { format } from 'date-fns';
+import { cn } from '@/utils/classnames';
+import { Calendar } from '@/components/_shared/Calendar';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import { Button } from './Button'
-import { CalendarIcon } from '@heroicons/react/24/outline'
+} from '@/components/_shared/Popover';
+import { Button } from './Button';
+import { CalendarIcon } from '@heroicons/react/24/outline';
 
 export function DatePicker({ date, setDate }: { date?: string; setDate: any }) {
-    const dateObj = date ? new Date(date) : undefined
+    const dateObj = date ? new Date(date) : undefined;
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -32,15 +32,15 @@ export function DatePicker({ date, setDate }: { date?: string; setDate: any }) {
                     captionLayout="dropdown-buttons"
                     selected={dateObj}
                     onSelect={(date) => {
-                        const newDate = new Date()
+                        const newDate = new Date();
                         setDate(
                             date ? date.toISOString() : newDate.toISOString()
-                        )
+                        );
                     }}
                     fromYear={1960}
                     toYear={2030}
                 />
             </PopoverContent>
         </Popover>
-    )
+    );
 }

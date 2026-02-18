@@ -1,13 +1,13 @@
-import dynamic from 'next/dynamic'
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { Tab } from '@headlessui/react'
-import { BookOpenIcon } from '@heroicons/react/24/outline'
-import { Fragment, useEffect, useRef, useState } from 'react'
-import classNames from '@/utils/classnames'
-import { env } from '@/env.mjs'
-import { Resource } from '@/interfaces/dataset.interface'
+});
+import { Tab } from '@headlessui/react';
+import { BookOpenIcon } from '@heroicons/react/24/outline';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import classNames from '@/utils/classnames';
+import { env } from '@/env.mjs';
+import { type Resource } from '@/interfaces/dataset.interface';
 import {
     SnippetEndpoint,
     QueryEndpoint,
@@ -15,16 +15,16 @@ import {
     getPythonSnippet,
     getRSnippet,
     RwMoreInfo,
-} from '../APIEndpoint'
-import hljs from 'highlight.js/lib/core'
+} from '../APIEndpoint';
+import hljs from 'highlight.js/lib/core';
 
-import python from 'highlight.js/lib/languages/python'
-import js from 'highlight.js/lib/languages/javascript'
-import r from 'highlight.js/lib/languages/r'
+import python from 'highlight.js/lib/languages/python';
+import js from 'highlight.js/lib/languages/javascript';
+import r from 'highlight.js/lib/languages/r';
 
-hljs.registerLanguage('python', python)
-hljs.registerLanguage('javascript', js)
-hljs.registerLanguage('r', r)
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('javascript', js);
+hljs.registerLanguage('r', r);
 
 function MoreInfo({ gfwapiurl }: { gfwapiurl?: boolean }) {
     return (
@@ -67,11 +67,11 @@ function MoreInfo({ gfwapiurl }: { gfwapiurl?: boolean }) {
                 )}
             </div>
         </div>
-    )
+    );
 }
 
 export function APIButton({ datafile }: { datafile: Resource }) {
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false);
     return (
         <>
             <button
@@ -86,7 +86,7 @@ export function APIButton({ datafile }: { datafile: Resource }) {
             </button>
             <OpenInModal open={open} setOpen={setOpen} datafile={datafile} />
         </>
-    )
+    );
 }
 
 function OpenInModal({
@@ -94,16 +94,16 @@ function OpenInModal({
     setOpen,
     datafile,
 }: {
-    open: boolean
-    setOpen: (open: boolean) => void
-    datafile: Resource
+    open: boolean;
+    setOpen: (open: boolean) => void;
+    datafile: Resource;
 }) {
     const tabs = [
         { name: 'Query' },
         { name: 'JavaScript' },
         { name: 'Python' },
         { name: 'R' },
-    ]
+    ];
     return (
         <Modal open={open} setOpen={setOpen} className="max-w-[64rem]">
             <div className="flex flex-col gap-y-4 p-5 font-acumin">
@@ -190,32 +190,32 @@ function OpenInModal({
                 </Tab.Group>
             </div>
         </Modal>
-    )
+    );
 }
 
 const AdvancedApiUsage = ({
     advancedApiUsage,
     datafileId,
 }: {
-    advancedApiUsage: string
-    datafileId: string
+    advancedApiUsage: string;
+    datafileId: string;
 }) => {
-    const [highlighted, setHighlighted] = useState(false)
-    const divRef = useRef<HTMLDivElement | null>(null)
-    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    const [highlighted, setHighlighted] = useState(false);
+    const divRef = useRef<HTMLDivElement | null>(null);
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL;
     publicCkanUrl = publicCkanUrl.endsWith('/')
         ? publicCkanUrl.slice(0, -1)
-        : publicCkanUrl
+        : publicCkanUrl;
 
-    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
-    const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafileId}`
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`;
+    const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafileId}`;
 
     useEffect(() => {
         if (!highlighted && divRef.current) {
-            setHighlighted(true)
-            hljs.highlightAll()
+            setHighlighted(true);
+            hljs.highlightAll();
         }
-    }, [highlighted])
+    }, [highlighted]);
     return (
         <div>
             <div
@@ -229,65 +229,65 @@ const AdvancedApiUsage = ({
                 }}
             ></div>
         </div>
-    )
-}
+    );
+};
 const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
-    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL;
     publicCkanUrl = publicCkanUrl.endsWith('/')
         ? publicCkanUrl.slice(0, -1)
-        : publicCkanUrl
-    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
-    const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafile.id}`
-    let ckanResourcGetFileUrl: string | undefined
+        : publicCkanUrl;
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`;
+    const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafile.id}`;
+    let ckanResourcGetFileUrl: string | undefined;
     if (datafile.url) {
-        ckanResourcGetFileUrl = datafile.url
+        ckanResourcGetFileUrl = datafile.url;
     }
 
-    let ckanGetDatastoreInfoUrl
-    let ckanResourceGetDatastoreSearchUrl
-    let ckanResourceGetDatastoreSqlUrl
+    let ckanGetDatastoreInfoUrl;
+    let ckanResourceGetDatastoreSearchUrl;
+    let ckanResourceGetDatastoreSqlUrl;
     if (datafile.datastore_active) {
-        ckanGetDatastoreInfoUrl = `${ckanBaseUrl}/datastore_info`
-        ckanResourceGetDatastoreSearchUrl = `${ckanBaseUrl}/datastore_search?resource_id=${datafile.id}&q=foo`
-        ckanResourceGetDatastoreSqlUrl = `${ckanBaseUrl}/datastore_search_sql?sql=SELECT * FROM "${datafile.id}" LIMIT 10`
+        ckanGetDatastoreInfoUrl = `${ckanBaseUrl}/datastore_info`;
+        ckanResourceGetDatastoreSearchUrl = `${ckanBaseUrl}/datastore_search?resource_id=${datafile.id}&q=foo`;
+        ckanResourceGetDatastoreSqlUrl = `${ckanBaseUrl}/datastore_search_sql?sql=SELECT * FROM "${datafile.id}" LIMIT 10`;
     }
 
-    const rwBaseUrl = `https://api.resourcewatch.org/v1`
-    const rwDatasetGetLayerUrl = `${rwBaseUrl}/layer/${datafile.rw_id}`
-    const gfwurl = 'https://data-api.globalforestwatch.org'
+    const rwBaseUrl = `https://api.resourcewatch.org/v1`;
+    const rwDatasetGetLayerUrl = `${rwBaseUrl}/layer/${datafile.rw_id}`;
+    const gfwurl = 'https://data-api.globalforestwatch.org';
 
-    const formRef = useRef<HTMLFormElement>(null)
+    const formRef = useRef<HTMLFormElement>(null);
 
     const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-        event.preventDefault()
+        event.preventDefault();
 
         if (ckanResourcGetFileUrl && formRef.current) {
-            const url = new URL(ckanResourcGetFileUrl)
+            const url = new URL(ckanResourcGetFileUrl);
 
             url.searchParams.forEach((value, key) => {
-                const input = document.createElement('input')
-                input.type = 'hidden'
-                input.name = key
-                input.value = value
-                formRef.current?.appendChild(input)
-            })
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                formRef.current?.appendChild(input);
+            });
 
             if (
                 ckanResourcGetFileUrl.startsWith(
                     'https://data-api.globalforestwatch.org'
                 )
             ) {
-                const input = document.createElement('input')
-                input.type = 'hidden'
-                input.name = 'x-api-key'
-                input.value = env.NEXT_PUBLIC_GFW_API_KEY
-                formRef.current?.appendChild(input)
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'x-api-key';
+                input.value = env.NEXT_PUBLIC_GFW_API_KEY;
+                formRef.current?.appendChild(input);
             }
 
-            formRef.current.action = url.toString()
-            formRef.current.submit()
+            formRef.current.action = url.toString();
+            formRef.current.submit();
         }
-    }
+    };
 
     return (
         <>
@@ -385,72 +385,72 @@ const QueryInstructions = ({ datafile }: { datafile: Resource }) => {
                 </>
             )}
         </>
-    )
-}
+    );
+};
 
 const SnippetInstructions = ({
     datafile,
     getSnippetFn,
     language,
 }: {
-    datafile: Resource
+    datafile: Resource;
     getSnippetFn: (
         url: string,
         method?: string,
         body?: string,
         gfw?: boolean
-    ) => string
-    language: 'javascript' | 'python' | 'r'
+    ) => string;
+    language: 'javascript' | 'python' | 'r';
 }) => {
-    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL;
     publicCkanUrl = publicCkanUrl.endsWith('/')
         ? publicCkanUrl.slice(0, -1)
-        : publicCkanUrl
-    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
-    const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafile.id}`
-    const ckanResourcGetSnippet = getSnippetFn(ckanResourcGetUrl)
+        : publicCkanUrl;
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`;
+    const ckanResourcGetUrl = `${ckanBaseUrl}/resource_show?id=${datafile.id}`;
+    const ckanResourcGetSnippet = getSnippetFn(ckanResourcGetUrl);
 
-    let ckanResourcGetFileUrl
-    let ckanResourcGetFileSnippet
+    let ckanResourcGetFileUrl;
+    let ckanResourcGetFileSnippet;
 
     if (datafile.url) {
-        ckanResourcGetFileUrl = datafile.url
-        ckanResourcGetFileSnippet = getSnippetFn(datafile.url)
+        ckanResourcGetFileUrl = datafile.url;
+        ckanResourcGetFileSnippet = getSnippetFn(datafile.url);
     }
 
-    let ckanGetDatastoreInfoUrl
-    let ckanGetDatastoreInfoSnippet
+    let ckanGetDatastoreInfoUrl;
+    let ckanGetDatastoreInfoSnippet;
 
-    let ckanResourceGetDatastoreSearchUrl
-    let ckanResourceGetDatastoreSearchSnippet
+    let ckanResourceGetDatastoreSearchUrl;
+    let ckanResourceGetDatastoreSearchSnippet;
 
-    let ckanResourceGetDatastoreSqlUrl
-    let ckanResourceGetDatastoreSqlSnippet
+    let ckanResourceGetDatastoreSqlUrl;
+    let ckanResourceGetDatastoreSqlSnippet;
 
     if (datafile.datastore_active) {
-        ckanGetDatastoreInfoUrl = `${ckanBaseUrl}/datastore_info`
+        ckanGetDatastoreInfoUrl = `${ckanBaseUrl}/datastore_info`;
         ckanGetDatastoreInfoSnippet = getSnippetFn(
             ckanGetDatastoreInfoUrl,
             'POST',
             `{ "id": "${datafile.id}" }`
-        )
+        );
 
-        ckanResourceGetDatastoreSearchUrl = `${ckanBaseUrl}/datastore_search?resource_id=${datafile.id}&q=foo`
+        ckanResourceGetDatastoreSearchUrl = `${ckanBaseUrl}/datastore_search?resource_id=${datafile.id}&q=foo`;
         ckanResourceGetDatastoreSearchSnippet = getSnippetFn(
             ckanResourceGetDatastoreSearchUrl
-        )
+        );
 
-        ckanResourceGetDatastoreSqlUrl = `${ckanBaseUrl}/datastore_search_sql?sql=SELECT * FROM "${datafile.id}" LIMIT 10`
+        ckanResourceGetDatastoreSqlUrl = `${ckanBaseUrl}/datastore_search_sql?sql=SELECT * FROM "${datafile.id}" LIMIT 10`;
         ckanResourceGetDatastoreSqlSnippet = getSnippetFn(
             ckanResourceGetDatastoreSqlUrl
-        )
+        );
     }
 
-    const rwBaseUrl = `https://api.resourcewatch.org/v1`
-    const gfwurl = 'https://data-api.globalforestwatch.org'
+    const rwBaseUrl = `https://api.resourcewatch.org/v1`;
+    const gfwurl = 'https://data-api.globalforestwatch.org';
 
-    const rwDatasetGetLayerUrl = `${rwBaseUrl}/layer/${datafile.rw_id}`
-    const rwDatasetGetLayerSnippet = getSnippetFn(rwDatasetGetLayerUrl)
+    const rwDatasetGetLayerUrl = `${rwBaseUrl}/layer/${datafile.rw_id}`;
+    const rwDatasetGetLayerSnippet = getSnippetFn(rwDatasetGetLayerUrl);
 
     return (
         <>
@@ -539,5 +539,5 @@ const SnippetInstructions = ({
                 </>
             )}
         </>
-    )
-}
+    );
+};

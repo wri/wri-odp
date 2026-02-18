@@ -1,43 +1,48 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 // => Tiptap packages
-import { useEditor, EditorContent, Editor, BubbleMenu } from '@tiptap/react'
-import Document from '@tiptap/extension-document'
-import Paragraph from '@tiptap/extension-paragraph'
-import Text from '@tiptap/extension-text'
-import Link from '@tiptap/extension-link'
-import Bold from '@tiptap/extension-bold'
-import Underline from '@tiptap/extension-underline'
-import Italic from '@tiptap/extension-italic'
-import Strike from '@tiptap/extension-strike'
-import Code from '@tiptap/extension-code'
-import History from '@tiptap/extension-history'
+import {
+    useEditor,
+    EditorContent,
+    type Editor,
+    BubbleMenu,
+} from '@tiptap/react';
+import Document from '@tiptap/extension-document';
+import Paragraph from '@tiptap/extension-paragraph';
+import Text from '@tiptap/extension-text';
+import Link from '@tiptap/extension-link';
+import Bold from '@tiptap/extension-bold';
+import Underline from '@tiptap/extension-underline';
+import Italic from '@tiptap/extension-italic';
+import Strike from '@tiptap/extension-strike';
+import Code from '@tiptap/extension-code';
+import History from '@tiptap/extension-history';
 // Custom
-import * as Icons from './Icons'
-import { LinkModal } from './LinkModal'
-import classNames from '@/utils/classnames'
+import * as Icons from './Icons';
+import { LinkModal } from './LinkModal';
+import classNames from '@/utils/classnames';
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
-    UseFormReturn,
-} from 'react-hook-form'
-import { Button } from '@/components/_shared/Button'
+    type FieldValues,
+    type Path,
+    type PathValue,
+    type UseFormReturn,
+} from 'react-hook-form';
+import { Button } from '@/components/_shared/Button';
 
 interface TEditorProps {
-    value: string
-    onChange(body: string): void
-    initialContent?: string | null
-    className: string
-    isSubmitting?: boolean
+    value: string;
+    onChange(body: string): void;
+    initialContent?: string | null;
+    className: string;
+    isSubmitting?: boolean;
 }
 
 interface ControlleRTEEditorProps<T extends FieldValues> {
-    formObj: UseFormReturn<T>
-    name: Path<T>
-    defaultValue?: PathValue<T, Path<T>>
-    className?: string
-    isSubmitting?: boolean
+    formObj: UseFormReturn<T>;
+    name: Path<T>;
+    defaultValue?: PathValue<T, Path<T>>;
+    className?: string;
+    isSubmitting?: boolean;
 }
 
 export function SimpleEditorV2<T extends FieldValues>({
@@ -47,7 +52,7 @@ export function SimpleEditorV2<T extends FieldValues>({
     className,
     isSubmitting,
 }: ControlleRTEEditorProps<T>) {
-    const { control, watch } = formObj
+    const { control, watch } = formObj;
     return (
         <Controller
             control={control}
@@ -61,14 +66,14 @@ export function SimpleEditorV2<T extends FieldValues>({
                             isSubmitting={isSubmitting}
                             initialContent={watch(name) ?? ''}
                             onChange={(value) => {
-                                onChange(value)
+                                onChange(value);
                             }}
                         />
                     )}
                 </>
             )}
         />
-    )
+    );
 }
 
 function TipTapEditor({
@@ -80,8 +85,8 @@ function TipTapEditor({
 }: TEditorProps) {
     const editor = useEditor({
         onUpdate({ editor }) {
-            const value = editor.getHTML()
-            onChange(value)
+            const value = editor.getHTML();
+            onChange(value);
         },
         content: initialContent ?? '',
         extensions: [
@@ -98,68 +103,76 @@ function TipTapEditor({
             Strike,
             Code,
         ],
-    }) as Editor
+    });
 
     useEffect(() => {
-        if (isSubmitting) {
-            editor.commands.setContent('')
+        if (isSubmitting && editor) {
+            editor.commands.setContent('');
         }
-    }, [isSubmitting, editor])
+    }, [isSubmitting, editor]);
 
-    const [modalIsOpen, setIsOpen] = useState(false)
-    const [url, setUrl] = useState<string>('')
+    const [modalIsOpen, setIsOpen] = useState(false);
+    const [url, setUrl] = useState<string>('');
 
     const openModal = useCallback(() => {
-        setUrl(editor.getAttributes('link').href)
-        setIsOpen(true)
-    }, [editor])
+        if (!editor) return;
+        setUrl(editor.getAttributes('link').href);
+        setIsOpen(true);
+    }, [editor]);
 
     const closeModal = useCallback(() => {
-        setIsOpen(false)
-        setUrl('')
-    }, [])
+        setIsOpen(false);
+        setUrl('');
+    }, []);
 
     const saveLink = useCallback(() => {
+        if (!editor) return;
         if (url) {
             editor
                 .chain()
                 .focus()
                 .extendMarkRange('link')
                 .setLink({ href: url, target: '_blank' })
-                .run()
+                .run();
         } else {
-            editor.chain().focus().extendMarkRange('link').unsetLink().run()
+            editor.chain().focus().extendMarkRange('link').unsetLink().run();
         }
-        closeModal()
-    }, [editor, url, closeModal])
+        closeModal();
+    }, [editor, url, closeModal]);
 
     const removeLink = useCallback(() => {
-        editor.chain().focus().extendMarkRange('link').unsetLink().run()
-        closeModal()
-    }, [editor, closeModal])
+        if (!editor) return;
+        editor.chain().focus().extendMarkRange('link').unsetLink().run();
+        closeModal();
+    }, [editor, closeModal]);
 
     const toggleBold = useCallback(() => {
-        editor.chain().focus().toggleBold().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleBold().run();
+    }, [editor]);
 
     const toggleUnderline = useCallback(() => {
-        editor.chain().focus().toggleUnderline().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleUnderline().run();
+    }, [editor]);
 
     const toggleItalic = useCallback(() => {
-        editor.chain().focus().toggleItalic().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleItalic().run();
+    }, [editor]);
 
     const toggleStrike = useCallback(() => {
-        editor.chain().focus().toggleStrike().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleStrike().run();
+    }, [editor]);
 
     const toggleCode = useCallback(() => {
-        editor.chain().focus().toggleCode().run()
-    }, [editor])
+        if (!editor) return;
+        editor.chain().focus().toggleCode().run();
+    }, [editor]);
 
     if (!editor) {
-        return null
+        return null;
     }
 
     return (
@@ -248,7 +261,7 @@ function TipTapEditor({
                 editor={editor}
                 shouldShow={({ editor, view, state, oldState, from, to }) => {
                     // only show the bubble menu for links.
-                    return from === to && editor.isActive('link')
+                    return from === to && editor.isActive('link');
                 }}
             >
                 <Button
@@ -286,5 +299,5 @@ function TipTapEditor({
                 onRemoveLink={removeLink}
             />
         </div>
-    )
+    );
 }

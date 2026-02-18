@@ -1,25 +1,25 @@
 //@ts-ignore
-import { PluginMapboxGl } from 'wri-layer-manager'
-import { useMap } from 'react-map-gl'
+import { PluginMapboxGl } from 'wri-layer-manager';
+import { useMap } from 'react-map-gl';
 import {
     Layer,
     LayerManager as VizzLayerManager,
     //@ts-ignore
-} from 'wri-layer-manager/dist/components'
+} from 'wri-layer-manager/dist/components';
 //@ts-ignore
-import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager'
-import pick from 'lodash/pick'
-import { CartoProvider } from '@/utils/providers/cartoProvider'
-import { TileProvider } from '@/utils/providers/tileProvider'
-import { GeeProvider } from '@/utils/providers/geeProvider'
-import { VectorTileProvider } from '@/utils/providers/vectorProvider'
-import { APILayerSpec } from '@/interfaces/layer.interface'
-import { useMemo } from 'react'
+import type { LayerSpec, ProviderMaker } from '@vizzuality/layer-manager';
+import pick from 'lodash/pick';
+import { CartoProvider } from '@/utils/providers/cartoProvider';
+import { TileProvider } from '@/utils/providers/tileProvider';
+import { GeeProvider } from '@/utils/providers/geeProvider';
+import { VectorTileProvider } from '@/utils/providers/vectorProvider';
+import { type APILayerSpec } from '@/interfaces/layer.interface';
+import { useMemo } from 'react';
 
 const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
     return layers.map((layer): LayerSpec => {
-        const { id, layerConfig } = layer
-        let layerProps: any = pick(layerConfig, [
+        const { id, layerConfig } = layer;
+        const layerProps: any = pick(layerConfig, [
             'deck',
             'images',
             'interactivity',
@@ -32,33 +32,33 @@ const parseLayers = (layers: APILayerSpec[]): LayerSpec[] => {
             'visibility',
             'zIndex',
             'params_config',
-        ])
+        ]);
 
         return {
             id,
             ...layerProps,
-        }
-    })
-}
+        };
+    });
+};
 
-const geeProvider = new GeeProvider()
-const cartoProvider = new CartoProvider()
-const tileProvider = new TileProvider()
-const vectorLayerProvider = new VectorTileProvider()
+const geeProvider = new GeeProvider();
+const cartoProvider = new CartoProvider();
+const tileProvider = new TileProvider();
+const vectorLayerProvider = new VectorTileProvider();
 const providers: Record<string, ProviderMaker['handleData']> = {
     [vectorLayerProvider.name]: vectorLayerProvider.handleData,
     [geeProvider.name]: geeProvider.handleData,
     [cartoProvider.name]: cartoProvider.handleData,
     [tileProvider.name]: tileProvider.handleData,
-}
+};
 
 const LayerManagerPreview = ({
     layers,
 }: {
-    layers: APILayerSpec[]
+    layers: APILayerSpec[];
 }): JSX.Element => {
-    const { current: map } = useMap()
-    const parsedLayers = useMemo(() => parseLayers(layers), [layers])
+    const { current: map } = useMap();
+    const parsedLayers = useMemo(() => parseLayers(layers), [layers]);
 
     return map ? (
         <VizzLayerManager
@@ -68,12 +68,12 @@ const LayerManagerPreview = ({
         >
             {parsedLayers &&
                 parsedLayers.map((_layer: any) => {
-                    return <Layer key={_layer.id} {..._layer} />
+                    return <Layer key={_layer.id} {..._layer} />;
                 })}
         </VizzLayerManager>
     ) : (
         <></>
-    )
-}
+    );
+};
 
-export default LayerManagerPreview
+export default LayerManagerPreview;

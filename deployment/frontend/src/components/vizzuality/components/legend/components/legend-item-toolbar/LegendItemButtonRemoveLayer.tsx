@@ -1,11 +1,11 @@
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { useActiveLayerGroups, useDataset } from '@/utils/storeHooks'
-import { XMarkIcon } from '@heroicons/react/24/solid'
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { useActiveLayerGroups, useDataset } from '@/utils/storeHooks';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 
 export default function LegendItemButtonRemoveLayer(props: any) {
     const { removeLayerFromLayerGroup, addLayerToLayerGroup } =
-        useActiveLayerGroups()
-    const { dataset } = useDataset()
+        useActiveLayerGroups();
+    const { dataset } = useDataset();
 
     return dataset.id != props.dataset ? (
         <DefaultTooltip content="Remove layer">
@@ -15,11 +15,11 @@ export default function LegendItemButtonRemoveLayer(props: any) {
                     removeLayerFromLayerGroup(
                         props.activeLayer.id,
                         props.dataset
-                    )
+                    );
                 }}
             >
                 <XMarkIcon className="w-5" />
             </button>
         </DefaultTooltip>
-    ) : null
+    ) : null;
 }

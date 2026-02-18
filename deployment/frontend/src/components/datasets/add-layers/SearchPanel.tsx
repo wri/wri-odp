@@ -1,17 +1,17 @@
-import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/20/solid'
-import DatasetCard from '../sections/RelatedDatasets'
-import Select from '@/components/_shared/Select'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Filter } from '@/interfaces/search.interface'
-import { useRouter } from 'next/router'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { WriDataset } from '@/schema/ckan.schema'
-import FiltersSelected from '@/components/search/FiltersSelected'
-import { Pagination } from 'swiper/modules'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { SearchInput } from '@/schema/search.schema'
+import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/20/solid';
+import DatasetCard from '../sections/RelatedDatasets';
+import Select from '@/components/_shared/Select';
+import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
+import { type Filter } from '@/interfaces/search.interface';
+import { useRouter } from 'next/router';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type WriDataset } from '@/schema/ckan.schema';
+import FiltersSelected from '@/components/search/FiltersSelected';
+import { Pagination } from 'swiper/modules';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { type SearchInput } from '@/schema/search.schema';
 
 export default function SearchPanel({
     filters,
@@ -19,51 +19,51 @@ export default function SearchPanel({
     data,
     setQuery,
 }: {
-    filters: Filter[]
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    data: { datasets: WriDataset[]; count: number }
-    setQuery: Dispatch<SetStateAction<SearchInput>>
+    filters: Filter[];
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    data: { datasets: WriDataset[]; count: number };
+    setQuery: Dispatch<SetStateAction<SearchInput>>;
 }) {
     const getIsSearching = () => {
-        const filter = filters?.find((f) => f.key == 'search')
+        const filter = filters?.find((f) => f.key == 'search');
 
-        return !!filter
-    }
+        return !!filter;
+    };
 
-    const [isSearch, setIsSearch] = useState(getIsSearching())
+    const [isSearch, setIsSearch] = useState(getIsSearching());
 
-    const router = useRouter()
-    const { pathname } = router
+    const router = useRouter();
+    const { pathname } = router;
 
-    const searchSchema = z.object({ search: z.string() })
-    type searchFormType = z.infer<typeof searchSchema>
+    const searchSchema = z.object({ search: z.string() });
+    type searchFormType = z.infer<typeof searchSchema>;
 
     const { handleSubmit, register, reset, watch } = useForm<searchFormType>({
         resolver: zodResolver(searchSchema),
         defaultValues: {
             search: filters?.find((f) => f.key == 'search')?.value ?? '',
         },
-    })
+    });
 
     useEffect(() => {
-        setIsSearch(getIsSearching())
+        setIsSearch(getIsSearching());
 
         if (watch('search') != filters.find((f) => f.key == 'search')?.value) {
-            reset({ search: '' })
+            reset({ search: '' });
         }
-    }, [filters])
+    }, [filters]);
 
-    type Option = { value: string; label: string; default?: boolean }
+    type Option = { value: string; label: string; default?: boolean };
 
     const showOptions: Option[] = [
         { value: '10', label: '10' },
         { value: '20', label: '20' },
         { value: '30', label: '30' },
-    ]
+    ];
 
     showOptions.forEach((o) => {
-        if (o.value == "10") o.default = true
-    })
+        if (o.value == '10') o.default = true;
+    });
 
     return (
         <div className="pr-6">
@@ -75,16 +75,16 @@ export default function SearchPanel({
                             filters.find((f) => f.key == 'search')?.value
                         ) {
                             setFilters((prev) => {
-                                const newFilters = [...prev]
+                                const newFilters = [...prev];
                                 const searchFilter = newFilters.find(
                                     (filter) => filter.key == 'search'
-                                )
+                                );
 
                                 if (searchFilter) {
                                     if (data.search) {
-                                        searchFilter.value = data.search
-                                        searchFilter.label = data.search
-                                        setIsSearch(true)
+                                        searchFilter.value = data.search;
+                                        searchFilter.label = data.search;
+                                        setIsSearch(true);
                                     } else {
                                         newFilters.splice(
                                             newFilters.findIndex(
@@ -92,8 +92,8 @@ export default function SearchPanel({
                                                     filter.key == 'search'
                                             ),
                                             1
-                                        )
-                                        setIsSearch(false)
+                                        );
+                                        setIsSearch(false);
                                     }
                                 } else if (data.search) {
                                     newFilters.push({
@@ -101,12 +101,12 @@ export default function SearchPanel({
                                         key: 'search',
                                         label: data.search,
                                         value: data.search,
-                                    })
-                                    setIsSearch(true)
+                                    });
+                                    setIsSearch(true);
                                 }
 
-                                return newFilters
-                            })
+                                return newFilters;
+                            });
                         }
                     })}
                     className="relative flex w-full items-start justify-start gap-x-6"
@@ -130,20 +130,20 @@ export default function SearchPanel({
                         <button
                             className="w-5 h-5 text-black absolute top-4 right-4"
                             onClick={(e) => {
-                                e.preventDefault()
+                                e.preventDefault();
                                 setFilters((prev) => {
-                                    const newFilters = [...prev]
+                                    const newFilters = [...prev];
                                     newFilters.splice(
                                         newFilters.findIndex(
                                             (filter) => filter.key == 'search'
                                         ),
                                         1
-                                    )
-                                    return newFilters
-                                })
-                                setIsSearch(false)
+                                    );
+                                    return newFilters;
+                                });
+                                setIsSearch(false);
 
-                                reset({ search: '' })
+                                reset({ search: '' });
                             }}
                         >
                             <XMarkIcon />
@@ -187,5 +187,5 @@ export default function SearchPanel({
                 </div>
             </div>
         </div>
-    )
+    );
 }

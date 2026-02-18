@@ -1007,4 +1007,4 @@ export const countries = [
         iso: 'ALA',
         name: 'Åland',
     },
-]
+];

@@ -1,5 +1,10 @@
-import { type Config } from 'tailwindcss'
-import defaultTheme from 'tailwindcss/defaultTheme'
+import { type Config } from 'tailwindcss';
+import defaultTheme from 'tailwindcss/defaultTheme';
+import containerQueries from '@tailwindcss/container-queries';
+import plugin from 'tailwindcss/plugin';
+import tailwindcssAnimate from 'tailwindcss-animate';
+import forms from '@tailwindcss/forms';
+import typography from '@tailwindcss/typography';
 
 export default {
     content: ['./src/**/*.{js,ts,jsx,tsx}'],
@@ -12,8 +17,7 @@ export default {
             },
             boxShadow: {
                 wri: '0px 4px 4px 0px rgba(147, 147, 147, 0.25)',
-                'wri-small':
-                    'box-shadow: 0px 1px 2px 0px rgba(105, 81, 255, 0.05)',
+                'wri-small': 'box-shadow: 0px 1px 2px 0px rgba(105, 81, 255, 0.05)',
                 'wri-dcard': 'box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);',
             },
             animation: {
@@ -99,16 +103,12 @@ export default {
         },
     },
     plugins: [
-        require('@tailwindcss/container-queries'),
-        require('tailwindcss/plugin')(function ({
-            addVariant,
-        }: {
-            addVariant: any
-        }) {
-            addVariant('not-last', '&:not(:last-child)')
+        containerQueries,
+        plugin((api) => {
+            api.addVariant('not-last', '&:not(:last-child)');
         }),
-        require('tailwindcss-animate'),
-        require('@tailwindcss/forms'),
-        require('@tailwindcss/typography'),
+        tailwindcssAnimate,
+        forms,
+        typography,
     ],
-} satisfies Config
+} satisfies Config;

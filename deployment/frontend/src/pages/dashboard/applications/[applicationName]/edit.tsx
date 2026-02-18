@@ -1,14 +1,14 @@
-import Container from '@/components/_shared/Container'
-import Header from '@/components/_shared/Header'
-import Loading from '@/components/_shared/Loading'
-import EditApplicationForm from '@/components/dashboard/applications/forms/EditApplicationForm'
-import { getServerAuthSession } from '@/server/auth'
-import { api } from '@/utils/api'
-import { GetServerSideProps, NextPage } from 'next'
-import { NextSeo } from 'next-seo'
+import Container from '@/components/_shared/Container';
+import Header from '@/components/_shared/Header';
+import Loading from '@/components/_shared/Loading';
+import EditApplicationForm from '@/components/dashboard/applications/forms/EditApplicationForm';
+import { getServerAuthSession } from '@/server/auth';
+import { api } from '@/utils/api';
+import { type GetServerSideProps, type NextPage } from 'next';
+import { NextSeo } from 'next-seo';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const session = await getServerAuthSession(context)
+    const session = await getServerAuthSession(context);
 
     if (!session) {
         return {
@@ -16,27 +16,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 destination: '/',
                 permanent: false,
             },
-        }
+        };
     }
 
     return {
         props: {
             session,
             applicationName:
-                context.params && typeof context.params.applicationName === 'string'
+                context.params &&
+                typeof context.params.applicationName === 'string'
                     ? context.params.applicationName
                     : null,
         },
-    }
-}
+    };
+};
 
-const EditApplicationPage: NextPage<{ applicationName: string }> = ({ applicationName }) => {
+const EditApplicationPage: NextPage<{ applicationName: string }> = ({
+    applicationName,
+}) => {
     const {
         data: application,
         isLoading,
         isError,
-    } = api.applications.getApplication.useQuery({ id: applicationName })
-    if (isLoading) return <Loading />
+    } = api.applications.getApplication.useQuery({ id: applicationName });
+    if (isLoading) return <Loading />;
     return (
         <>
             <NextSeo
@@ -50,9 +53,11 @@ const EditApplicationPage: NextPage<{ applicationName: string }> = ({ applicatio
                     </h1>
                 </Container>
             )}
-            {!isError && application && <EditApplicationForm application={application} />}
+            {!isError && application && (
+                <EditApplicationForm application={application} />
+            )}
         </>
-    )
-}
+    );
+};
 
-export default EditApplicationPage
+export default EditApplicationPage;

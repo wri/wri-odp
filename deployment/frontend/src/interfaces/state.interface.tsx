@@ -1,36 +1,36 @@
-import { WriDataset } from '@/schema/ckan.schema'
-import { ViewState } from 'react-map-gl'
-import { View } from './dataset.interface'
+import { type WriDataset } from '@/schema/ckan.schema';
+import { type ViewState } from 'react-map-gl';
+import { type View } from './dataset.interface';
 
 export interface State {
-    vizIndex: number
-    dataset: WriDataset | null
-    relatedDatasets: WriDataset[] | null
-    prevRelatedDatasets: WriDataset[] | null
-    layerAsLayerObj: Map<string, string>
-    tempLayerAsLayerobj: Map<string, string>
-    prevLayerGroups: ActiveLayerGroup[]
-    storeDirtyFields: string[]
+    vizIndex: number;
+    dataset: WriDataset | null;
+    relatedDatasets: WriDataset[] | null;
+    prevRelatedDatasets: WriDataset[] | null;
+    layerAsLayerObj: Map<string, string>;
+    tempLayerAsLayerobj: Map<string, string>;
+    prevLayerGroups: ActiveLayerGroup[];
+    storeDirtyFields: string[];
     mapView: {
-        initialrender: boolean
-        isEmbedding: boolean
-        isAddingLayers?: boolean
-        viewState: ViewState
-        basemap: Basemap
-        labels: Labels
-        boundaries: boolean
-        activeLayerGroups: ActiveLayerGroup[]
-        bounds: Bounds
-        isDrawing: boolean | undefined
-        layersParsed: Array<[string, LayerState]>
-    } & Layers
-    activeCharts: View[]
-    selectedChart?: View
+        initialrender: boolean;
+        isEmbedding: boolean;
+        isAddingLayers?: boolean;
+        viewState: ViewState;
+        basemap: Basemap;
+        labels: Labels;
+        boundaries: boolean;
+        activeLayerGroups: ActiveLayerGroup[];
+        bounds: Bounds;
+        isDrawing: boolean | undefined;
+        layersParsed: Array<[string, LayerState]>;
+    } & Layers;
+    activeCharts: View[];
+    selectedChart?: View;
 }
 
 export interface ActiveLayerGroup {
-    datasetId: string
-    layers: string[]
+    datasetId: string;
+    layers: string[];
 }
 
 export type Basemap =
@@ -39,30 +39,30 @@ export type Basemap =
     | 'satellite'
     | 'terrain'
     | 'aqueduct'
-    | 'none'
+    | 'none';
 
 interface DatasetState {
-    id: string
-    layers: LayerState[]
+    id: string;
+    layers: LayerState[];
 }
 
 export interface Layers {
-    layers: Map<string, LayerState>
+    layers: Map<string, LayerState>;
 }
 
 export interface LayerState {
-    visibility?: boolean
-    active?: boolean
-    zIndex?: number
-    opacity?: number
-    threshold?: number
-    layerSource?: 'ckan' | 'rw'
+    visibility?: boolean;
+    active?: boolean;
+    zIndex?: number;
+    opacity?: number;
+    threshold?: number;
+    layerSource?: 'ckan' | 'rw';
 }
 
-export type Labels = 'dark' | 'light' | 'none'
+export type Labels = 'dark' | 'light' | 'none';
 
 export interface Bounds {
-    bbox: number[] | null
-    options?: Record<string, unknown>
-    viewportOptions?: Partial<ViewState>
+    bbox: number[] | null;
+    options?: Record<string, unknown>;
+    viewportOptions?: Partial<ViewState>;
 }

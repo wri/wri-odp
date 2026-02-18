@@ -1,18 +1,18 @@
-import { ArrowUpRightIcon, MinusCircleIcon } from '@heroicons/react/24/outline'
-import { Disclosure } from '@headlessui/react'
-import { Input } from '@/components/_shared/SimpleInput'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { PlusCircleIcon } from '@heroicons/react/20/solid'
-import { MetadataAccordion } from './MetadataAccordion'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { ArrowUpRightIcon, MinusCircleIcon } from '@heroicons/react/24/outline';
+import { Disclosure } from '@headlessui/react';
+import { Input } from '@/components/_shared/SimpleInput';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import { MetadataAccordion } from './MetadataAccordion';
+import { type DatasetFormType } from '@/schema/dataset.schema';
 import {
-    FieldErrors,
-    UseFieldArrayRemove,
-    UseFormRegister,
-    UseFormReturn,
+    type FieldErrors,
+    type UseFieldArrayRemove,
+    type UseFormRegister,
+    type UseFormReturn,
     useFieldArray,
-} from 'react-hook-form'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
+} from 'react-hook-form';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 function OpenIn({
     register,
@@ -20,10 +20,10 @@ function OpenIn({
     remove,
     errors,
 }: {
-    register: UseFormRegister<DatasetFormType>
-    errors: FieldErrors<DatasetFormType>
-    index: number
-    remove: UseFieldArrayRemove
+    register: UseFormRegister<DatasetFormType>;
+    errors: FieldErrors<DatasetFormType>;
+    index: number;
+    remove: UseFieldArrayRemove;
 }) {
     return (
         <div className="flex items-center gap-x-2">
@@ -58,23 +58,23 @@ function OpenIn({
                 />
             </DefaultTooltip>
         </div>
-    )
+    );
 }
 
 export function OpenInForm({
     formObj,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
     const {
         control,
         register,
         formState: { errors },
-    } = formObj
+    } = formObj;
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'open_in',
-    })
+    });
     return (
         <MetadataAccordion
             label={
@@ -115,5 +115,5 @@ export function OpenInForm({
                 </div>
             </Disclosure.Panel>
         </MetadataAccordion>
-    )
+    );
 }

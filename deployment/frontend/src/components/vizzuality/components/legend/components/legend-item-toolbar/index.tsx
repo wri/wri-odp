@@ -9,85 +9,95 @@ import LegendItemButtonInfo from './legend-item-button-info';
 import LegendItemButtonRemove from './legend-item-button-remove';
 
 class LegendItemToolbar extends PureComponent {
-  static propTypes = {
-    // Props
-    children: PropTypes.node,
-    enabledStyle: PropTypes.object,
-    defaultStyle: PropTypes.object,
-    disabledStyle: PropTypes.object,
-    focusStyle: PropTypes.object,
+    static propTypes = {
+        // Props
+        children: PropTypes.node,
+        enabledStyle: PropTypes.object,
+        defaultStyle: PropTypes.object,
+        disabledStyle: PropTypes.object,
+        focusStyle: PropTypes.object,
 
-    // ACTIONS
-    onChangeBBox: PropTypes.func,
-    onChangeLayer: PropTypes.func,
-    onChangeOpacity: PropTypes.func,
-    onChangeVisibility: PropTypes.func,
-    onRemoveLayer: PropTypes.func,
-    onChangeInfo: PropTypes.func
-  }
-
-  static defaultProps = {
-    // Props
-    children: [],
-    defaultStyle: {
-      fill: '#717171'
-    },
-    enabledStyle: {
-      fill: '#2C75B0'
-    },
-    disabledStyle: {
-      fill: '#CACCD0'
-    },
-    focusStyle: {
-      fill: '#393f44'
-    },
-
-    // ACTIONS
-    onChangeBBox: l => console.info(l),
-    onChangeInfo: l => console.info(l),
-    onChangeLayer: l => console.info(l),
-    onChangeVisibility: (l, v) => console.info(l, v),
-    onChangeOpacity: (l, o) => console.info(l, o),
-    onRemoveLayer: l => console.info(l)
-  }
-
-  state = {
-    tooltipOpened: false
-  }
-
-  onTooltipVisibilityChange = (tooltipOpened) => {
-    this.setState({ tooltipOpened });
-  }
-
-  render() {
-    const { children, ...rest } = this.props;
-    const { tooltipOpened } = this.state;
-    const props = {
-      ...rest,
-      tooltipOpened,
-      onTooltipVisibilityChange: this.onTooltipVisibilityChange
+        // ACTIONS
+        onChangeBBox: PropTypes.func,
+        onChangeLayer: PropTypes.func,
+        onChangeOpacity: PropTypes.func,
+        onChangeVisibility: PropTypes.func,
+        onRemoveLayer: PropTypes.func,
+        onChangeInfo: PropTypes.func,
     };
 
-    return (
-      <div className="c-legend-item-toolbar flex items-center shrink mt-[4px] mb-0 mr-0 ml-[20px]">
-        {!!React.Children.count(children) &&
-          React.Children.map(children, child => (React.isValidElement(child) && typeof child.type !== 'string' ?
-            React.cloneElement(child, { ...props })
-            :
-            child
-        ))}
+    static defaultProps = {
+        // Props
+        children: [],
+        defaultStyle: {
+            fill: '#717171',
+        },
+        enabledStyle: {
+            fill: '#2C75B0',
+        },
+        disabledStyle: {
+            fill: '#CACCD0',
+        },
+        focusStyle: {
+            fill: '#393f44',
+        },
 
-        {/* If there is no children defined, let's use the components we had */}
-        {!React.Children.count(children) && <LegendItemButtonBBox {...props} />}
-        {!React.Children.count(children) && <LegendItemButtonLayers {...props} />}
-        {!React.Children.count(children) && <LegendItemButtonOpacity {...props} />}
-        {!React.Children.count(children) && <LegendItemButtonVisibility {...props} />}
-        {!React.Children.count(children) && <LegendItemButtonInfo {...props} />}
-        {!React.Children.count(children) && <LegendItemButtonRemove {...props} /> }
+        // ACTIONS
+        onChangeBBox: (l) => console.info(l),
+        onChangeInfo: (l) => console.info(l),
+        onChangeLayer: (l) => console.info(l),
+        onChangeVisibility: (l, v) => console.info(l, v),
+        onChangeOpacity: (l, o) => console.info(l, o),
+        onRemoveLayer: (l) => console.info(l),
+    };
 
-      </div>
-    );
-  }
+    state = {
+        tooltipOpened: false,
+    };
+
+    onTooltipVisibilityChange = (tooltipOpened) => {
+        this.setState({ tooltipOpened });
+    };
+
+    render() {
+        const { children, ...rest } = this.props;
+        const { tooltipOpened } = this.state;
+        const props = {
+            ...rest,
+            tooltipOpened,
+            onTooltipVisibilityChange: this.onTooltipVisibilityChange,
+        };
+
+        return (
+            <div className="c-legend-item-toolbar flex items-center shrink mt-[4px] mb-0 mr-0 ml-[20px]">
+                {!!React.Children.count(children) &&
+                    React.Children.map(children, (child) =>
+                        React.isValidElement(child) &&
+                        typeof child.type !== 'string'
+                            ? React.cloneElement(child, { ...props })
+                            : child
+                    )}
+
+                {/* If there is no children defined, let's use the components we had */}
+                {!React.Children.count(children) && (
+                    <LegendItemButtonBBox {...props} />
+                )}
+                {!React.Children.count(children) && (
+                    <LegendItemButtonLayers {...props} />
+                )}
+                {!React.Children.count(children) && (
+                    <LegendItemButtonOpacity {...props} />
+                )}
+                {!React.Children.count(children) && (
+                    <LegendItemButtonVisibility {...props} />
+                )}
+                {!React.Children.count(children) && (
+                    <LegendItemButtonInfo {...props} />
+                )}
+                {!React.Children.count(children) && (
+                    <LegendItemButtonRemove {...props} />
+                )}
+            </div>
+        );
+    }
 }
-
-;

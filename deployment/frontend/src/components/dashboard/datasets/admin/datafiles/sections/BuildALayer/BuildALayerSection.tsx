@@ -1,36 +1,39 @@
-import classNames from '@/utils/classnames'
-import { useMachine } from '@xstate/react'
-import layerEditorMachine from './layerEditorMachine'
-import SourceForm from './forms/SourceForm'
-import LegendForm from './forms/LegendsForm'
-import InteractionForm from './forms/InteractionForm'
-import RenderForm from './forms/RenderForm'
-import { useEffect, useState, useRef } from 'react'
-import ReactMapGL, { MapRef } from 'react-map-gl'
-import { FormProvider, UseFormReturn, useForm } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { LayerFormType, layerSchema } from './layer.schema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@/components/_shared/Button'
-import { convertFormToLayerObj, getRawObjFromApiSpec } from './convertObjects'
-import { Legends } from './preview/Legends'
-import { Steps } from './Steps'
-import { getInteractiveLayers } from '@/utils/queryHooks'
-import Tooltip from './preview/Tooltip'
-import { LngLat, MapGeoJSONFeature } from 'react-map-gl/dist/esm/types'
-import { APILayerSpec } from '@/interfaces/layer.interface'
-import LayerManagerPreview from './preview/LayerManagerPreview'
-import { slugify } from '@/utils/slugify'
-import { SafeParseSuccess } from 'zod'
+import classNames from '@/utils/classnames';
+import { useMachine } from '@xstate/react';
+import layerEditorMachine from './layerEditorMachine';
+import SourceForm from './forms/SourceForm';
+import LegendForm from './forms/LegendsForm';
+import InteractionForm from './forms/InteractionForm';
+import RenderForm from './forms/RenderForm';
+import { useEffect, useState, useRef } from 'react';
+import ReactMapGL, { type MapRef } from 'react-map-gl';
+import { FormProvider, type UseFormReturn, useForm } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { type LayerFormType, layerSchema } from './layer.schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/_shared/Button';
+import { convertFormToLayerObj, getRawObjFromApiSpec } from './convertObjects';
+import { Legends } from './preview/Legends';
+import { Steps } from './Steps';
+import { getInteractiveLayers } from '@/utils/queryHooks';
+import Tooltip from './preview/Tooltip';
+import {
+    type LngLat,
+    type MapGeoJSONFeature,
+} from 'react-map-gl/dist/esm/types';
+import { type APILayerSpec } from '@/interfaces/layer.interface';
+import LayerManagerPreview from './preview/LayerManagerPreview';
+import { slugify } from '@/utils/slugify';
+import { type SafeParseSuccess } from 'zod';
 
 export function BuildALayer({
     formObj,
     index,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    index: number
+    formObj: UseFormReturn<DatasetFormType>;
+    index: number;
 }) {
-    const [current, send] = useMachine(layerEditorMachine)
+    const [current, send] = useMachine(layerEditorMachine);
     const [preview, setPreview] = useState<APILayerSpec | null>(
         formObj.getValues(`resources.${index}.layerObj`)
             ? convertFormToLayerObj(
@@ -45,7 +48,7 @@ export function BuildALayer({
                         ).data
               )
             : null
-    )
+    );
     const layerFormObj = useForm<LayerFormType>({
         resolver: zodResolver(layerSchema),
         defaultValues: {
@@ -63,40 +66,40 @@ export function BuildALayer({
             },
             ...formObj.getValues(`resources.${index}.layerObj`),
         },
-    })
+    });
 
     const convertToRaw = () => {
-        formObj.setValue(`resources.${index}.type`, 'layer-raw')
+        formObj.setValue(`resources.${index}.type`, 'layer-raw');
         const layerObjRaw = getRawObjFromApiSpec(
             convertFormToLayerObj(layerFormObj.getValues())
-        )
-        formObj.setValue(`resources.${index}.layerObjRaw`, layerObjRaw)
-        formObj.setValue(`resources.${index}.layerObj`, null)
-    }
+        );
+        formObj.setValue(`resources.${index}.layerObjRaw`, layerObjRaw);
+        formObj.setValue(`resources.${index}.layerObj`, null);
+    };
 
     const syncValues = () => {
-        const values = layerFormObj.getValues()
-        formObj.setValue(`resources.${index}.layerObj`, values)
-    }
+        const values = layerFormObj.getValues();
+        formObj.setValue(`resources.${index}.layerObj`, values);
+    };
 
     useEffect(() => {
         if (formObj.getValues(`resources.${index}.type`) == 'layer') {
-            syncValues()
+            syncValues();
         }
-    }, [layerFormObj.watch()])
+    }, [layerFormObj.watch()]);
 
     const updatePreview = () => {
-        syncValues()
-        setPreview(convertFormToLayerObj(layerFormObj.getValues()))
-    }
+        syncValues();
+        setPreview(convertFormToLayerObj(layerFormObj.getValues()));
+    };
 
     const {
         watch,
         setValue,
         formState: { dirtyFields, touchedFields },
-    } = layerFormObj
+    } = layerFormObj;
     useEffect(() => {
-        if (!dirtyFields['connectorUrl'])
+        if (!dirtyFields.connectorUrl)
             setValue(
                 'connectorUrl',
                 `https://${watch(
@@ -105,28 +108,28 @@ export function BuildALayer({
                     watch('layerConfig.source.provider.layers.0.options.sql') ??
                     ''
                 }`
-            )
+            );
     }, [
         watch('layerConfig.source.provider.account'),
         watch('layerConfig.source.provider.layers.0.options.sql'),
-    ])
+    ]);
 
     useEffect(() => {
-        if (!dirtyFields['slug']) setValue('slug', slugify(watch('name')))
-    }, [watch('name')])
+        if (!dirtyFields.slug) setValue('slug', slugify(watch('name')));
+    }, [watch('name')]);
     useEffect(() => {
-        syncValues()
+        syncValues();
         if (
             Object.keys(dirtyFields).length > 0 ||
             Object.keys(touchedFields).length > 0
         ) {
-            const dirty = Object.keys(dirtyFields)
-            const touched = Object.keys(touchedFields)
-            dirty.push(...touched)
+            const dirty = Object.keys(dirtyFields);
+            const touched = Object.keys(touchedFields);
+            dirty.push(...touched);
             //session storage
-            sessionStorage.setItem('dirtyFields', JSON.stringify(dirty))
+            sessionStorage.setItem('dirtyFields', JSON.stringify(dirty));
         }
-    }, [watch()])
+    }, [watch()]);
 
     return (
         <FormProvider {...layerFormObj}>
@@ -137,12 +140,12 @@ export function BuildALayer({
                         <SourceForm
                             convertToRaw={convertToRaw}
                             onNext={() => {
-                                syncValues()
+                                syncValues();
                                 layerFormObj.watch(
                                     'layerConfig.source.provider.type'
                                 ).value === 'carto'
                                     ? send('GO_TO_RENDER')
-                                    : send('GO_TO_LEGEND')
+                                    : send('GO_TO_LEGEND');
                             }}
                             formObj={formObj}
                             index={index}
@@ -151,40 +154,40 @@ export function BuildALayer({
                     {current.matches('setRenderConfig') && (
                         <RenderForm
                             onPrev={() => {
-                                syncValues()
-                                send('BACK_TO_SOURCE')
+                                syncValues();
+                                send('BACK_TO_SOURCE');
                             }}
                             onNext={() => {
-                                syncValues()
-                                send('GO_TO_LEGEND')
+                                syncValues();
+                                send('GO_TO_LEGEND');
                             }}
                         />
                     )}
                     {current.matches('setLegendConfig') && (
                         <LegendForm
                             onNext={() => {
-                                syncValues()
-                                send('NEXT')
+                                syncValues();
+                                send('NEXT');
                             }}
                             onPrev={() => {
-                                syncValues()
+                                syncValues();
                                 layerFormObj.watch(
                                     'layerConfig.source.provider.type'
                                 ).value === 'carto'
                                     ? send('BACK_TO_RENDER')
-                                    : send('BACK_TO_SOURCE')
+                                    : send('BACK_TO_SOURCE');
                             }}
                         />
                     )}
                     {current.matches('setInteractionConfig') && (
                         <InteractionForm
                             onPrev={() => {
-                                syncValues()
-                                send('PREV')
+                                syncValues();
+                                send('PREV');
                             }}
                             onNext={() => {
-                                syncValues()
-                                send('NEXT')
+                                syncValues();
+                                send('NEXT');
                             }}
                         />
                     )}
@@ -197,59 +200,59 @@ export function BuildALayer({
                 </div>
             </div>
         </FormProvider>
-    )
+    );
 }
 
 export function PreviewMap({
     layerFormObj,
     updatePreview,
 }: {
-    layerFormObj: APILayerSpec | null
-    updatePreview?: () => void
+    layerFormObj: APILayerSpec | null;
+    updatePreview?: () => void;
 }) {
-    const [isReady, setReady] = useState(false)
+    const [isReady, setReady] = useState(false);
     const [viewState, setViewState] = useState({
         longitude: -100,
         latitude: 40,
         zoom: 1,
-    })
+    });
 
-    const mapRef = useRef<MapRef | null>(null)
+    const mapRef = useRef<MapRef | null>(null);
     const interactiveLayerIds = layerFormObj
         ? getInteractiveLayers([layerFormObj])
-        : []
+        : [];
     const [coordinates, setCoordinates] = useState<{
-        longitude: number
-        latitude: number
-    } | null>(null)
-    const [layersInfo, setLayersInfo] = useState<any>([])
+        longitude: number;
+        latitude: number;
+    } | null>(null);
+    const [layersInfo, setLayersInfo] = useState<any>([]);
     const close = () => {
-        setCoordinates(null)
-        setLayersInfo([])
-    }
+        setCoordinates(null);
+        setLayersInfo([]);
+    };
 
-    const layers = layerFormObj ? [layerFormObj] : []
+    const layers = layerFormObj ? [layerFormObj] : [];
 
     const onClickLayer = ({
         features,
         lngLat,
     }: {
-        features?: MapGeoJSONFeature[]
-        lngLat: LngLat
+        features?: MapGeoJSONFeature[];
+        lngLat: LngLat;
     }) => {
-        setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat })
-        const layersInfo = []
-        for (let layer of layers) {
+        setCoordinates({ longitude: lngLat.lng, latitude: lngLat.lat });
+        const layersInfo = [];
+        for (const layer of layers) {
             const feature = features?.find(
                 //  @ts-ignore
                 (f) => (f?.source || f.layer?.source) === layer.id
-            )
-            const { interactionConfig } = layer
+            );
+            const { interactionConfig } = layer;
 
             const layerInfo = {
                 id: layer.id,
                 name: layer.name ?? 'sample-name',
-            }
+            };
 
             if (feature && interactionConfig?.output) {
                 //  TODO: output is supposed to be an array
@@ -261,15 +264,15 @@ export function PreviewMap({
                             //  TODO: c.column is supposed to be a string
                             //  @ts-ignore
                             value: feature.properties[c.column],
-                        }
+                        };
                     }
-                )
+                );
             }
 
-            layersInfo.push(layerInfo)
+            layersInfo.push(layerInfo);
         }
-        setLayersInfo(layersInfo)
-    }
+        setLayersInfo(layersInfo);
+    };
 
     return (
         <div className="relative">
@@ -286,7 +289,7 @@ export function PreviewMap({
                 {...viewState}
                 ref={(_map) => {
                     if (_map)
-                        mapRef.current = _map.getMap() as unknown as MapRef
+                        mapRef.current = _map.getMap() as unknown as MapRef;
                 }}
                 mapStyle="mapbox://styles/mapbox/light-v9"
                 dragRotate={false}
@@ -296,7 +299,7 @@ export function PreviewMap({
                 onClick={onClickLayer}
                 interactiveLayerIds={interactiveLayerIds ?? []}
                 onLoad={() => {
-                    setReady(true)
+                    setReady(true);
                 }}
                 style={{
                     height: '400px',
@@ -315,5 +318,5 @@ export function PreviewMap({
                 )}
             </ReactMapGL>
         </div>
-    )
+    );
 }

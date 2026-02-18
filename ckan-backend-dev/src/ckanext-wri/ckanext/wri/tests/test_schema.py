@@ -76,6 +76,8 @@ def test_package_create(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}]
     }
 
     try:

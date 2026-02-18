@@ -1,20 +1,20 @@
-import { createTRPCRouter } from '@/server/api/trpc'
-import { activityStreamRouter } from '@/server/api/routers/activityStream'
-import { UserRouter } from '@/server/api/routers/User'
-import { DatasetRouter } from './routers/dataset'
-import { OrganizationRouter } from './routers/organization'
-import { TopicRouter } from './routers/topics'
-import { teamRouter } from './routers/teams'
-import { applicationRouter } from './routers/applications'
-import { uploadsRouter } from './routers/uploads'
-import { authRouter } from './routers/auth.router'
-import { tagsRouter } from './routers/tags'
-import { rwRouter } from './routers/rw'
-import { datastoreRouter } from './routers/datastore'
-import { notificationRouter } from './routers/notification'
-import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server'
-import { prefectRouter } from './routers/prefect'
-import { downloadEventRouter } from './routers/download_event'
+import { createTRPCRouter } from '@/server/api/trpc';
+import { activityStreamRouter } from '@/server/api/routers/activityStream';
+import { UserRouter } from '@/server/api/routers/User';
+import { DatasetRouter } from './routers/dataset';
+import { OrganizationRouter } from './routers/organization';
+import { TopicRouter } from './routers/topics';
+import { teamRouter } from './routers/teams';
+import { applicationRouter } from './routers/applications';
+import { uploadsRouter } from './routers/uploads';
+import { authRouter } from './routers/auth.router';
+import { tagsRouter } from './routers/tags';
+import { rwRouter } from './routers/rw';
+import { datastoreRouter } from './routers/datastore';
+import { notificationRouter } from './routers/notification';
+import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
+import { prefectRouter } from './routers/prefect';
+import { downloadEventRouter } from './routers/download_event';
 
 /**
  * This is the primary router for your server.
@@ -37,8 +37,8 @@ export const appRouter = createTRPCRouter({
     datastore: datastoreRouter,
     prefect: prefectRouter,
     downloadEvents: downloadEventRouter,
-})
+});
 
 // export type definition of API
-export type AppRouter = typeof appRouter
-export type RouterOutput = inferRouterOutputs<AppRouter>
+export type AppRouter = typeof appRouter;
+export type RouterOutput = inferRouterOutputs<AppRouter>;

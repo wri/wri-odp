@@ -1,55 +1,55 @@
-import React, { useState } from 'react'
-import SearchHeader from '../_shared/SearchHeader'
-import { DraftRow } from './DatasetRow'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import type { SearchInput } from '@/schema/search.schema'
-import Pagination from '../_shared/Pagination'
-import type { WriDataset } from '@/schema/ckan.schema'
-import notify from '@/utils/notify'
-import dynamic from 'next/dynamic'
+import React, { useState } from 'react';
+import SearchHeader from '../_shared/SearchHeader';
+import { DraftRow } from './DatasetRow';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import type { SearchInput } from '@/schema/search.schema';
+import Pagination from '../_shared/Pagination';
+import type { WriDataset } from '@/schema/ckan.schema';
+import notify from '@/utils/notify';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
+});
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
 
 export default function Drafts({
     setQuery,
     query,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
 }) {
     const { data, isLoading, refetch } =
-        api.dataset.getDraftDataset.useQuery(query)
-    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
-    const [open, setOpen] = useState(false)
+        api.dataset.getDraftDataset.useQuery(query);
+    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null);
+    const [open, setOpen] = useState(false);
     const datasetDelete = api.dataset.deleteDataset.useMutation({
         onSuccess: async (data) => {
-            await refetch()
-            setOpen(false)
+            await refetch();
+            setOpen(false);
             notify(
                 `Successfully deleted the ${
                     selectDataset?.title ?? selectDataset?.name
                 } Dataset`,
                 'error'
-            )
+            );
         },
-    })
+    });
 
     const handleOpenModal = (dataset: WriDataset) => {
-        setSelectDataset(dataset)
-        setOpen(true)
-    }
+        setSelectDataset(dataset);
+        setOpen(true);
+    };
 
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
                 <Spinner className="mx-auto my-2" />
             </div>
-        )
+        );
     }
 
     return (
@@ -85,7 +85,7 @@ export default function Drafts({
                                         : ''
                                 }
                             />
-                        )
+                        );
                     })
                 )}
 
@@ -139,5 +139,5 @@ export default function Drafts({
                 )}
             </div>
         </section>
-    )
+    );
 }

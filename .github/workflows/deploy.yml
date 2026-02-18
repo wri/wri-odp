@@ -1,0 +1,313 @@
+name: Deploy to AWS
+
+on:
+  workflow_call:
+    inputs:
+      branch_name:
+        description: 'Target branch/environment (dev, staging, prod)'
+        required: true
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Target environment to deploy'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  PROJECT_NAME: wri-odp
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-frontend:
+    name: Build Frontend Image for deployment to ${{ inputs.branch_name }}
+    uses: ./.github/workflows/build-frontend-image-deploy.yml
+    with:
+      branch_name: ${{ inputs.branch_name }}
+    secrets: inherit
+
+  deploy:
+    name: Deploy to deployment to ${{ inputs.branch_name }}
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.branch_name }}
+    env:
+      BRANCH_NAME: ${{ inputs.branch_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          mask-password: 'true'
+
+      - name: Promote images from source environment
+        if: inputs.branch_name == 'staging' || inputs.branch_name == 'prod'
+        env:
+          CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ vars.ECR_DATAPUSHER_REPO }}
+          SOLR_REPO: ${{ vars.ECR_SOLR_REPO }}
+          PREFECT_REPO: ${{ vars.ECR_PREFECT_REPO }}
+          POSTGRESQL_REPO: ${{ vars.ECR_POSTGRESQL_REPO }}
+          MIGRATION_REPO: ${{ vars.ECR_MIGRATION_REPO }}
+        run: |
+          # Determine source environment
+          if [ "${{ inputs.branch_name }}" == "staging" ]; then
+            SOURCE_ENV="dev"
+          else
+            SOURCE_ENV="staging"
+          fi
+          TARGET_ENV="${{ inputs.branch_name }}"
+          
+          echo "=============================================="
+          echo "Promoting images from $SOURCE_ENV to $TARGET_ENV"
+          echo "=============================================="
+          
+          # Function to re-tag an image from source to target environment
+          promote_image() {
+            local repo=$1
+            local service_name=$2
+            
+            echo ""
+            echo "--- $service_name ---"
+            
+            # Get the manifest of the source tag
+            MANIFEST=$(aws ecr batch-get-image \
+              --repository-name "$repo" \
+              --image-ids imageTag="$SOURCE_ENV" \
+              --query 'images[0].imageManifest' \
+              --output text 2>/dev/null)
+            
+            if [ -z "$MANIFEST" ] || [ "$MANIFEST" == "None" ]; then
+              echo "::warning::No image found with tag '$SOURCE_ENV' in $repo - skipping"
+              return 0
+            fi
+            
+            # Check if target tag already exists with same manifest
+            EXISTING_MANIFEST=$(aws ecr batch-get-image \
+              --repository-name "$repo" \
+              --image-ids imageTag="$TARGET_ENV" \
+              --query 'images[0].imageManifest' \
+              --output text 2>/dev/null || echo "")
+            
+            if [ "$MANIFEST" == "$EXISTING_MANIFEST" ]; then
+              echo "Image already tagged as $TARGET_ENV (same manifest)"
+              return 0
+            fi
+            
+            # Put the image with the new tag
+            aws ecr put-image \
+              --repository-name "$repo" \
+              --image-tag "$TARGET_ENV" \
+              --image-manifest "$MANIFEST" \
+              --output text > /dev/null 2>&1 || true
+            
+            echo "✓ Promoted $repo:$SOURCE_ENV → $repo:$TARGET_ENV"
+          }
+          
+          # Promote each image (Frontend uses env-specific images, not promoted)
+          promote_image "$CKAN_REPO" "CKAN"
+          promote_image "$DATAPUSHER_REPO" "Datapusher"
+          promote_image "$SOLR_REPO" "Solr"
+          promote_image "$PREFECT_REPO" "Prefect"
+          promote_image "$POSTGRESQL_REPO" "PostgreSQL"
+          promote_image "$MIGRATION_REPO" "Migration"
+          
+          echo ""
+          echo "=============================================="
+          echo "Image promotion complete"
+          echo "=============================================="
+
+      - name: Resolve image tags from ECR latest
+        id: resolve-tags
+        env:
+          CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ vars.ECR_DATAPUSHER_REPO }}
+          SOLR_REPO: ${{ vars.ECR_SOLR_REPO }}
+          MIGRATION_REPO: ${{ vars.ECR_MIGRATION_REPO }}
+        run: |
+          # Function to resolve the SHA tag from a latest tag in ECR
+          # Returns the SHA tag that points to the same image as the latest tag
+          # Note: All log messages go to stderr, only the final tag goes to stdout
+          resolve_sha_from_latest() {
+            local repo=$1
+            local latest_tag=$2
+            local sha_pattern=$3  # regex pattern to match SHA tag
+            local service_name=$4
+            
+            echo "Resolving SHA for $service_name from $repo:$latest_tag..." >&2
+            
+            # Get the digest of the latest tag
+            DIGEST=$(aws ecr describe-images \
+              --repository-name "$repo" \
+              --image-ids imageTag="$latest_tag" \
+              --query 'imageDetails[0].imageDigest' \
+              --output text 2>&1)
+            
+            if [ -z "$DIGEST" ] || [ "$DIGEST" == "None" ] || echo "$DIGEST" | grep -q "ImageNotFoundException"; then
+              echo "::error::Could not find image with tag $latest_tag in $repo" >&2
+              echo "FAILED"
+              return 1
+            fi
+            
+            echo "  Digest: $DIGEST" >&2
+            
+            # Get all tags for this digest
+            TAGS=$(aws ecr describe-images \
+              --repository-name "$repo" \
+              --image-ids imageDigest="$DIGEST" \
+              --query 'imageDetails[0].imageTags[]' \
+              --output text 2>/dev/null || echo "")
+            
+            echo "  All tags: $TAGS" >&2
+            
+            # Find the SHA tag using the provided pattern
+            SHA_TAG=$(echo "$TAGS" | tr '\t' '\n' | grep -E "$sha_pattern" | head -1)
+            
+            if [ -z "$SHA_TAG" ]; then
+              echo "::warning::No SHA tag found matching pattern '$sha_pattern', using latest tag" >&2
+              echo "$latest_tag"
+              return 0
+            fi
+            
+            echo "  Resolved SHA tag: $SHA_TAG" >&2
+            echo "$SHA_TAG"
+          }
+          
+          echo "=============================================="
+          echo "Resolving image tags from ECR latest tags"
+          echo "Branch: $BRANCH_NAME"
+          echo "=============================================="
+          echo ""
+          
+          FAILED=0
+          
+          # Resolve CKAN (pattern: sha only, latest tag is just branch name)
+          echo "--- CKAN ---"
+          CKAN_TAG=$(resolve_sha_from_latest "$CKAN_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "CKAN")
+          [ "$CKAN_TAG" == "FAILED" ] && FAILED=1
+          echo ""
+          
+          # Resolve Frontend (pattern: sha-environment e.g. abc123-dev; latest tag is branch name)
+          echo "--- Frontend ---"
+          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}-" "Frontend")
+          [ "$FRONTEND_TAG" == "FAILED" ] && FAILED=1
+          echo ""
+          
+          # Resolve Datapusher (pattern: sha only, latest tag is just branch name)
+          echo "--- Datapusher ---"
+          DATAPUSHER_TAG=$(resolve_sha_from_latest "$DATAPUSHER_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "Datapusher")
+          [ "$DATAPUSHER_TAG" == "FAILED" ] && FAILED=1
+          echo ""
+          
+          # Resolve Migration (pattern: sha only, latest tag is just branch name)
+          echo "--- Migration ---"
+          MIGRATION_TAG=$(resolve_sha_from_latest "$MIGRATION_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "Migration")
+          [ "$MIGRATION_TAG" == "FAILED" ] && FAILED=1
+          echo ""
+          
+          # Resolve Solr (pattern: sha only, latest tag is just branch name)
+          echo "--- Solr ---"
+          SOLR_TAG=$(resolve_sha_from_latest "$SOLR_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}$" "Solr")
+          [ "$SOLR_TAG" == "FAILED" ] && FAILED=1
+          echo ""
+          
+          if [ $FAILED -eq 1 ]; then
+            echo "::error::One or more images could not be resolved!"
+            exit 1
+          fi
+          
+          echo "=============================================="
+          echo "=== Final Resolved Image Tags ==="
+          echo "CKAN:       $CKAN_TAG"
+          echo "Frontend:   $FRONTEND_TAG"
+          echo "Datapusher: $DATAPUSHER_TAG"
+          echo "Migration:  $MIGRATION_TAG"
+          echo "Solr:       $SOLR_TAG"
+          echo "=============================================="
+          
+          echo "ckan_tag=$CKAN_TAG" >> $GITHUB_OUTPUT
+          echo "frontend_tag=$FRONTEND_TAG" >> $GITHUB_OUTPUT
+          echo "datapusher_tag=$DATAPUSHER_TAG" >> $GITHUB_OUTPUT
+          echo "migration_tag=$MIGRATION_TAG" >> $GITHUB_OUTPUT
+          echo "solr_tag=$SOLR_TAG" >> $GITHUB_OUTPUT
+
+      - name: Run Templater and update values.yaml
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
+          FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
+          DATAPUSHER_REPO: ${{ vars.ECR_DATAPUSHER_REPO }}
+          SOLR_REPO: ${{ vars.ECR_SOLR_REPO }}
+          MIGRATION_REPO: ${{ vars.ECR_MIGRATION_REPO }}
+          CKAN_IMAGE_TAG: ${{ steps.resolve-tags.outputs.ckan_tag }}
+          FRONTEND_IMAGE_TAG: ${{ steps.resolve-tags.outputs.frontend_tag }}
+          DATAPUSHER_IMAGE_TAG: ${{ steps.resolve-tags.outputs.datapusher_tag }}
+          MIGRATION_IMAGE_TAG: ${{ steps.resolve-tags.outputs.migration_tag }}
+          SOLR_IMAGE_TAG: ${{ steps.resolve-tags.outputs.solr_tag }}
+        run: |
+          cd deployment
+          curl -sS https://raw.githubusercontent.com/datopian/devops-tools/master/scripts/templater.sh > /tmp/templater.sh
+          
+          echo "Deploying with image tags:"
+          echo "  CKAN:       $CKAN_IMAGE_TAG"
+          echo "  Frontend:   $FRONTEND_IMAGE_TAG"
+          echo "  Datapusher: $DATAPUSHER_IMAGE_TAG"
+          echo "  Migration:  $MIGRATION_IMAGE_TAG"
+          echo "  Solr:       $SOLR_IMAGE_TAG"
+          
+          bash /tmp/templater.sh helm-templates/values.yaml.$BRANCH_NAME.template > helm-templates/values.yaml
+          
+          echo ""
+          echo "=== Generated image tags in values.yaml ==="
+          grep -E "^\s+tag:" helm-templates/values.yaml | head -10
+
+      - name: Configure Kubeconfig
+        run: |
+          echo "Deploying to: $BRANCH_NAME"
+          mkdir -p /home/runner/.kube
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }}
+          chmod 600 ~/.kube/config
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy using Helm Upgrade
+        run: |
+          set -e
+          helm upgrade -i dx-helm-wri-$BRANCH_NAME-release ./deployment/helm-templates \
+            -f ./deployment/helm-templates/values.yaml \
+            -n $PROJECT_NAME-$BRANCH_NAME \
+            --create-namespace \
+            --wait \
+            --timeout 10m
+
+      - name: Show deployment status
+        if: always()
+        run: |
+          echo "=== Deployment Status ==="
+          helm status dx-helm-wri-$BRANCH_NAME-release -n $PROJECT_NAME-$BRANCH_NAME || true
+          echo ""
+          echo "=== Pod Status ==="
+          kubectl get pods -n $PROJECT_NAME-$BRANCH_NAME -o wide || true

@@ -172,3 +172,15 @@ ckan-backend-dev/src/ckan*
 !ckan-backend-dev/src/ckanext-wri
 
 test_tests.sh
+
+# Load Testing
+load-testing/results/*
+!load-testing/results/.gitkeep
+load-testing/.env
+
+/deployment/helm-templates/values.yaml
+
+# Monitoring - generated values (never commit)
+/deployment/monitoring/values.yaml
+/deployment/monitoring/hidden.sh
+/deployment/monitoring/loki-values-generated.yaml

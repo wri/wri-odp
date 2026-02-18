@@ -1,4 +1,4 @@
-import z from 'zod'
+import z from 'zod';
 
 export const searchSchema = z.object({
     search: z.string().default(''),
@@ -12,7 +12,10 @@ export const searchSchema = z.object({
     appendRawFq: z.string().optional(),
     facetFields: z.array(z.string()).optional(),
     sortBy: z.string().default('score desc').optional(),
-    extGlobalQ: z.enum(['only', 'exclude', 'include']).default('include').optional(),
+    extGlobalQ: z
+        .enum(['only', 'exclude', 'include'])
+        .default('include')
+        .optional(),
     extLocationQ: z.string().optional(),
     extAddressQ: z.string().optional(),
     _isUserSearch: z.boolean().default(false).optional(),
@@ -21,6 +24,6 @@ export const searchSchema = z.object({
     pageEnabled: z.boolean().optional(),
     removeUnecessaryDataInResources: z.boolean().optional(),
     tab: z.string().optional(),
-})
+});
 
-export type SearchInput = z.infer<typeof searchSchema>
+export type SearchInput = z.infer<typeof searchSchema>;

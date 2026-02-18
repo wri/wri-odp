@@ -1,27 +1,27 @@
-import classNames from '@/utils/classnames'
-import { Tab } from '@headlessui/react'
+import classNames from '@/utils/classnames';
+import { Tab } from '@headlessui/react';
 import {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
-} from '@heroicons/react/20/solid'
-import { Fragment } from 'react'
-import { Navigation } from 'swiper/modules'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link'
+} from '@heroicons/react/20/solid';
+import { Fragment } from 'react';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 type TabProps = {
-    name: string
-    title: string
-    id?: string
-}
+    name: string;
+    title: string;
+    id?: string;
+};
 
 export default function DashboardDatasetTabs({ tabs }: { tabs: TabProps[] }) {
-    const prevEl = `.nav-prev-button--tabs`
-    const nextEl = `.nav-next-button--tabs`
+    const prevEl = `.nav-prev-button--tabs`;
+    const nextEl = `.nav-next-button--tabs`;
     return (
         <>
             <Swiper
@@ -98,5 +98,5 @@ export default function DashboardDatasetTabs({ tabs }: { tabs: TabProps[] }) {
                 <ChevronDoubleRightIcon className="h-6 w-6 text-black" />
             </button>
         </>
-    )
+    );
 }

@@ -1,4 +1,4 @@
-import Spinner from './Spinner'
+import Spinner from './Spinner';
 
 export default function Loading() {
     return (
@@ -8,5 +8,5 @@ export default function Loading() {
                 Loading...
             </h2>
         </div>
-    )
+    );
 }

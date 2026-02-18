@@ -1,15 +1,15 @@
-import { useLayersFromRW } from "@/utils/queryHooks";
+import { useLayersFromRW } from '@/utils/queryHooks';
 import {
-    AnyLayer,
-    RasterLayer,
-    FillLayer,
-    LineLayer,
-    SymbolLayer,
-    CircleLayer,
-} from "mapbox-gl";
-import { useMap } from "react-map-gl";
-import IconButton from "./IconButton";
-import {DownloadIcon} from "../../icons/DownloadIcon";
+    type AnyLayer,
+    type RasterLayer,
+    type FillLayer,
+    type LineLayer,
+    type SymbolLayer,
+    type CircleLayer,
+} from 'mapbox-gl';
+import { useMap } from 'react-map-gl';
+import IconButton from './IconButton';
+import { DownloadIcon } from '../../icons/DownloadIcon';
 
 export function Download() {
     const { current: map } = useMap();
@@ -27,16 +27,24 @@ export function Download() {
             .map((feature) => feature.properties);
         alert(JSON.stringify(features));
     }
-    return <IconButton tooltip="Download" onClick={() => getFeatures()}><DownloadIcon /></IconButton>;
+    return (
+        <IconButton tooltip="Download" onClick={() => getFeatures()}>
+            <DownloadIcon />
+        </IconButton>
+    );
 }
 
 function isDataLayer(
     layer: AnyLayer
 ): layer is FillLayer | LineLayer | RasterLayer | SymbolLayer | CircleLayer {
     return (
-        (layer as CircleLayer | FillLayer | LineLayer | RasterLayer | SymbolLayer)
-            .source !== undefined
+        (
+            layer as
+                | CircleLayer
+                | FillLayer
+                | LineLayer
+                | RasterLayer
+                | SymbolLayer
+        ).source !== undefined
     );
 }
-
-

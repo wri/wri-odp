@@ -1,41 +1,41 @@
-import { useState } from 'react'
+import { useState } from 'react';
 import {
     CheckIcon,
     ChevronDownIcon,
     ChevronUpDownIcon,
-} from '@heroicons/react/20/solid'
-import { Combobox } from '@headlessui/react'
-import classNames from '@/utils/classnames'
+} from '@heroicons/react/20/solid';
+import { Combobox } from '@headlessui/react';
+import classNames from '@/utils/classnames';
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
-    UseFormReturn,
+    type FieldValues,
+    type Path,
+    type PathValue,
+    type UseFormReturn,
     useForm,
-} from 'react-hook-form'
+} from 'react-hook-form';
 
 interface Option<V> {
-    label: string
-    value: V
-    default?: boolean
+    label: string;
+    value: V;
+    default?: boolean;
 }
 
-interface ComboboxProps<T extends FieldValues, V extends Object> {
-    options: PathValue<T, Path<T> & Option<V>>[]
-    placeholder: string
-    className?: string
-    maxWidth?: string
-    formObj?: UseFormReturn<T>
-    name: Path<T>
+interface ComboboxProps<T extends FieldValues, V extends object> {
+    options: PathValue<T, Path<T> & Option<V>>[];
+    placeholder: string;
+    className?: string;
+    maxWidth?: string;
+    formObj?: UseFormReturn<T>;
+    name: Path<T>;
 }
 
 export default function SimpleCombobox<
     T extends FieldValues,
-    V extends Object,
+    V extends object,
 >({ options, name, formObj, className = '' }: ComboboxProps<T, V>) {
-    const { control } = formObj ?? useForm()
-    const [query, setQuery] = useState('')
+    const { control } = formObj ?? useForm();
+    const [query, setQuery] = useState('');
 
     const filteredItems =
         query === ''
@@ -43,8 +43,8 @@ export default function SimpleCombobox<
             : options.filter((option) => {
                   return option.label
                       .toLowerCase()
-                      .includes(query.toLowerCase())
-              })
+                      .includes(query.toLowerCase());
+              });
 
     return (
         <Controller
@@ -126,5 +126,5 @@ export default function SimpleCombobox<
                 </Combobox>
             )}
         />
-    )
+    );
 }

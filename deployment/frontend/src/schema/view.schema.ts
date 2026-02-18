@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod';
 
 export const viewFormSchema = z.object({
     title: z.string().min(1),
@@ -9,21 +9,21 @@ export const viewFormSchema = z.object({
         config: z.any(),
         form_state: z.any(),
     }),
-})
+});
 
-type ViewFormSchema = z.infer<typeof viewFormSchema>
+type ViewFormSchema = z.infer<typeof viewFormSchema>;
 
 export const createViewFormSchema = viewFormSchema.and(
     z.object({ resource_id: z.string() })
-)
+);
 
-export type CreateViewFormSchema = z.infer<typeof createViewFormSchema>
+export type CreateViewFormSchema = z.infer<typeof createViewFormSchema>;
 
 export const editViewFormSchema = createViewFormSchema.and(
     z.object({ id: z.string() })
-)
+);
 
-export type EditViewFormSchema = z.infer<typeof editViewFormSchema>
+export type EditViewFormSchema = z.infer<typeof editViewFormSchema>;
 
 export const chartSchema = z.object({
     title: z.string().min(1, 'Please insert a title'),
@@ -147,6 +147,6 @@ export const chartSchema = z.object({
                 .optional(),
         }),
     }),
-})
+});
 
-export type ChartFormType = z.infer<typeof chartSchema>
+export type ChartFormType = z.infer<typeof chartSchema>;

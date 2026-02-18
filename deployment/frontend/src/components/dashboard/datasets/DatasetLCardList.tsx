@@ -1,51 +1,51 @@
-import React, { useState, useEffect } from 'react'
-import DatasetHeader from './DatasetHeader'
-import DatasetRow from './DatasetRow'
-import { api } from '@/utils/api'
-import Spinner from '@/components/_shared/Spinner'
-import type { SearchInput } from '@/schema/search.schema'
-import Pagination from '../_shared/Pagination'
-import type { WriDataset } from '@/schema/ckan.schema'
-import notify from '@/utils/notify'
-import dynamic from 'next/dynamic'
+import React, { useState, useEffect } from 'react';
+import DatasetHeader from './DatasetHeader';
+import DatasetRow from './DatasetRow';
+import { api } from '@/utils/api';
+import Spinner from '@/components/_shared/Spinner';
+import type { SearchInput } from '@/schema/search.schema';
+import Pagination from '../_shared/Pagination';
+import type { WriDataset } from '@/schema/ckan.schema';
+import notify from '@/utils/notify';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { LoaderButton, Button } from '@/components/_shared/Button'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import { useRouter } from 'next/router'
+});
+import { LoaderButton, Button } from '@/components/_shared/Button';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import { useRouter } from 'next/router';
 
 export default function DatasetLCardList({
     setQuery,
     query,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>
-    query: SearchInput
+    setQuery: React.Dispatch<React.SetStateAction<SearchInput>>;
+    query: SearchInput;
 }) {
     const { data, isLoading, refetch } = api.dataset.getAllDataset.useQuery({
         ...query,
         showPendingDataset: true,
-    })
-    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null)
-    const [open, setOpen] = useState(false)
+    });
+    const [selectDataset, setSelectDataset] = useState<WriDataset | null>(null);
+    const [open, setOpen] = useState(false);
     const datasetDelete = api.dataset.deleteDataset.useMutation({
         onSuccess: async (data) => {
-            await refetch()
-            setOpen(false)
+            await refetch();
+            setOpen(false);
             notify(
                 `Successfully deleted the ${
                     selectDataset?.title ?? selectDataset?.name
                 } Dataset`,
                 'error'
-            )
+            );
         },
-    })
+    });
 
     const handleOpenModal = (dataset: WriDataset) => {
-        setSelectDataset(dataset)
-        setOpen(true)
-    }
+        setSelectDataset(dataset);
+        setOpen(true);
+    };
 
     return (
         <section className="w-full max-w-sm sm:max-w-8xl flex  flex-col gap-y-20 sm:gap-y-0">
@@ -84,7 +84,7 @@ export default function DatasetLCardList({
                                         : ''
                                 }
                             />
-                        )
+                        );
                     })
                 )}
 
@@ -139,5 +139,5 @@ export default function DatasetLCardList({
                 )}
             </div>
         </section>
-    )
+    );
 }

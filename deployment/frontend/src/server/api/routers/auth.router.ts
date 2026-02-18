@@ -1,17 +1,17 @@
-import { env } from '@/env.mjs'
-import { User } from '@/interfaces/user.interface'
+import { env } from '@/env.mjs';
+import { type User } from '@/interfaces/user.interface';
 import {
     RequestResetPasswordSchema,
     ResetPasswordSchema,
-} from '@/schema/auth.schema'
-import { CkanResponse } from '@/schema/ckan.schema'
+} from '@/schema/auth.schema';
+import { type CkanResponse } from '@/schema/ckan.schema';
 import {
     createTRPCRouter,
     protectedProcedure,
     publicProcedure,
-} from '@/server/api/trpc'
-import { getTokenList } from '@/utils/apiUtils'
-import { z } from 'zod'
+} from '@/server/api/trpc';
+import { getTokenList } from '@/utils/apiUtils';
+import { z } from 'zod';
 
 export const authRouter = createTRPCRouter({
     requestPasswordReset: publicProcedure
@@ -28,13 +28,13 @@ export const authRouter = createTRPCRouter({
                             email: input.email,
                         }),
                     })
-                ).json()
-                return userUpdate
+                ).json();
+                return userUpdate;
             } catch (e) {
-                console.error(e)
+                console.error(e);
                 throw new Error(
                     'Failed to request password reset. Try again in a few seconds. If the error persists, please contact the system administrator.'
-                )
+                );
             }
         }),
     resetPassword: publicProcedure
@@ -52,10 +52,10 @@ export const authRouter = createTRPCRouter({
                             },
                         }
                     )
-                ).json()
+                ).json();
 
                 if (userShow.error) {
-                    throw userShow.error
+                    throw userShow.error;
                 }
 
                 const userUpdate: CkanResponse<User> = await (
@@ -70,23 +70,23 @@ export const authRouter = createTRPCRouter({
                             reset_key: input.reset_key,
                         }),
                     })
-                ).json()
+                ).json();
 
                 if (userUpdate.error) {
-                    throw userUpdate.error
+                    throw userUpdate.error;
                 }
 
-                return userUpdate
+                return userUpdate;
             } catch (e) {
-                console.error(e)
+                console.error(e);
                 throw new Error(
                     'Failed to reset password. Try again in a few seconds. If the error persists, please contact the system administrator.'
-                )
+                );
             }
         }),
     getApiTokensList: protectedProcedure
         .input(z.object({}))
         .query(async ({ input, ctx }) => {
-            return getTokenList(ctx?.session)
+            return getTokenList(ctx?.session);
         }),
-})
+});

@@ -1,8 +1,8 @@
-import { z } from 'zod'
-const emptyStringToUndefined = z.literal('').transform(() => undefined)
-const emptyStringToStep = z.literal('').transform(() => 'step' as const)
-const emptyStringToStepLabel = z.literal(undefined).transform(() => 'Step')
-const nanToUndefined = z.literal(NaN).transform(() => undefined)
+import { z } from 'zod';
+const emptyStringToUndefined = z.literal('').transform(() => undefined);
+const emptyStringToStep = z.literal('').transform(() => 'step' as const);
+const emptyStringToStepLabel = z.literal(undefined).transform(() => 'Step');
+const nanToUndefined = z.literal(NaN).transform(() => undefined);
 
 const sourceSchema = z
     .object({
@@ -41,15 +41,15 @@ const sourceSchema = z
                     obj.provider.type.value === 'carto' &&
                     obj.provider.account &&
                     obj.provider.account.length > 0
-                )
-            return true
+                );
+            return true;
         },
         {
             path: ['provider.account'],
             message:
                 'Informing an account is required when the provider is setup as cartodb',
         }
-    )
+    );
 
 const numericExpression = z
     .object({
@@ -67,7 +67,7 @@ const numericExpression = z
         coercion: 'to-number',
         operation: 'get',
         column: { value: '', label: '' },
-    })
+    });
 
 const filterExpression = z.object({
     operation: z.object({
@@ -79,7 +79,7 @@ const filterExpression = z.object({
         label: z.string(),
     }),
     value: z.union([z.string(), z.number(), z.literal(NaN)]),
-})
+});
 
 const rampObj = z
     .object({
@@ -115,16 +115,16 @@ const rampObj = z
             return {
                 ...val,
                 interpolationType: null,
-            }
+            };
         }
-        return val
-    })
+        return val;
+    });
 
 const colorPattern = z
     .union([z.string(), rampObj])
     .optional()
     .nullable()
-    .or(emptyStringToUndefined)
+    .or(emptyStringToUndefined);
 
 const renderSchema = z.object({
     layers: z
@@ -144,9 +144,9 @@ const renderSchema = z.object({
                             .nullable()
                             .or(nanToUndefined)
                             .transform((val) => {
-                                if (val && isNaN(val)) return undefined
-                                if (val === 0) return undefined
-                                return val
+                                if (val && isNaN(val)) return undefined;
+                                if (val === 0) return undefined;
+                                return val;
                             }),
                         'line-color': colorPattern,
                         'line-opacity': z.coerce
@@ -155,9 +155,9 @@ const renderSchema = z.object({
                             .nullable()
                             .or(nanToUndefined)
                             .transform((val) => {
-                                if (val && isNaN(val)) return undefined
-                                if (val === 0) return undefined
-                                return val
+                                if (val && isNaN(val)) return undefined;
+                                if (val === 0) return undefined;
+                                return val;
                             }),
                         'line-width': z.coerce
                             .number()
@@ -165,9 +165,9 @@ const renderSchema = z.object({
                             .nullable()
                             .or(nanToUndefined)
                             .transform((val) => {
-                                if (val && isNaN(val)) return undefined
-                                if (val === 0) return undefined
-                                return val
+                                if (val && isNaN(val)) return undefined;
+                                if (val === 0) return undefined;
+                                return val;
                             }),
                         'circle-color': colorPattern,
                         'circle-radius': z.coerce
@@ -176,9 +176,9 @@ const renderSchema = z.object({
                             .nullable()
                             .or(nanToUndefined)
                             .transform((val) => {
-                                if (val && isNaN(val)) return undefined
-                                if (val === 0) return undefined
-                                return val
+                                if (val && isNaN(val)) return undefined;
+                                if (val === 0) return undefined;
+                                return val;
                             }),
                         'circle-opacity': z.coerce
                             .number()
@@ -186,9 +186,9 @@ const renderSchema = z.object({
                             .nullable()
                             .or(nanToUndefined)
                             .transform((val) => {
-                                if (val && isNaN(val)) return undefined
-                                if (val === 0) return undefined
-                                return val
+                                if (val && isNaN(val)) return undefined;
+                                if (val === 0) return undefined;
+                                return val;
                             }),
                     })
                     .optional()
@@ -198,7 +198,7 @@ const renderSchema = z.object({
         )
         .optional()
         .nullable(),
-})
+});
 
 const legendsSchema = z.object({
     type: z.enum(['basic', 'choropleth', 'gradient']),
@@ -208,7 +208,7 @@ const legendsSchema = z.object({
             name: z.string(),
         })
     ),
-})
+});
 
 const interactionConfigSchema = z.object({
     output: z.array(
@@ -222,7 +222,7 @@ const interactionConfigSchema = z.object({
             enabled: z.boolean().default(false),
         })
     ),
-})
+});
 
 const rawLayerSchema = z.object({
     id: z.string().uuid().optional().nullable().or(emptyStringToUndefined),
@@ -230,7 +230,7 @@ const rawLayerSchema = z.object({
     layerConfig: z.any().optional().nullable(),
     interactionConfig: z.any().optional().nullable(),
     legendConfig: z.any().optional().nullable(),
-})
+});
 
 export const layerSchema = z
     .object({
@@ -276,20 +276,20 @@ export const layerSchema = z
                     obj.layerConfig.type.value === 'raster' &&
                     obj.layerConfig.source?.tiles &&
                     obj.layerConfig.source?.tiles.length > 0
-                )
-            return true
+                );
+            return true;
         },
         {
             path: ['tiles'],
             message: 'Tiles are required for raster layers',
         }
-    )
+    );
 
-export type ColorPatternType = z.infer<typeof colorPattern>
-export type RawLayerFormType = z.infer<typeof rawLayerSchema>
-export type LayerFormType = z.infer<typeof layerSchema>
-export type SourceFormType = z.infer<typeof sourceSchema>
-export type RenderFormType = z.infer<typeof renderSchema>
-export type LegendsFormType = z.infer<typeof legendsSchema>
-export type FilterFormType = z.infer<typeof filterExpression>
-export type InteractionFormType = z.infer<typeof interactionConfigSchema>
+export type ColorPatternType = z.infer<typeof colorPattern>;
+export type RawLayerFormType = z.infer<typeof rawLayerSchema>;
+export type LayerFormType = z.infer<typeof layerSchema>;
+export type SourceFormType = z.infer<typeof sourceSchema>;
+export type RenderFormType = z.infer<typeof renderSchema>;
+export type LegendsFormType = z.infer<typeof legendsSchema>;
+export type FilterFormType = z.infer<typeof filterExpression>;
+export type InteractionFormType = z.infer<typeof interactionConfigSchema>;

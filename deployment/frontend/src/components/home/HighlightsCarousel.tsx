@@ -1,21 +1,21 @@
-import { Navigation } from 'swiper/modules'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-import CarouselNavButton from '../_shared/CarouselNavButton'
-import HighlightCard from '../HighlightCard'
-import { AutoCarousel } from '../_shared/AutoCarousel'
-import { WriDataset } from '@/schema/ckan.schema'
-import { api } from '@/utils/api'
-import { ErrorAlert } from '../_shared/Alerts'
-import Spinner from '../_shared/Spinner'
-import Card from '@/components/Card'
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import CarouselNavButton from '../_shared/CarouselNavButton';
+import HighlightCard from '../HighlightCard';
+import { AutoCarousel } from '../_shared/AutoCarousel';
+import { type WriDataset } from '@/schema/ckan.schema';
+import { api } from '@/utils/api';
+import { ErrorAlert } from '../_shared/Alerts';
+import Spinner from '../_shared/Spinner';
+import Card from '@/components/Card';
 
 interface TopicProps {
-    title: string
-    numOfDatasets: number
-    img: string
+    title: string;
+    numOfDatasets: number;
+    img: string;
 }
 
 const highlights = [
@@ -91,7 +91,7 @@ const highlights = [
         tag: 'FORESTS',
         img: '/images/map3.png',
     },
-]
+];
 
 export function HighlightsCarousel() {
     const {
@@ -104,7 +104,7 @@ export function HighlightsCarousel() {
         sortBy: 'metadata_modified desc',
         _isUserSearch: false,
         removeUnecessaryDataInResources: true,
-    })
+    });
     return (
         <div className="relative">
             <div className="peer">
@@ -136,7 +136,7 @@ export function HighlightsCarousel() {
                 </AutoCarousel>
             </div>
         </div>
-    )
+    );
 }
 
 const PrevButton = () => (
@@ -145,7 +145,7 @@ const PrevButton = () => (
     >
         <CarouselNavButton orientation="left" />
     </div>
-)
+);
 
 const NextButton = () => (
     <div
@@ -153,4 +153,4 @@ const NextButton = () => (
     >
         <CarouselNavButton orientation="right" />
     </div>
-)
+);

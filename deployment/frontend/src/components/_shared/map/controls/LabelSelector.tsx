@@ -1,14 +1,14 @@
-import React from 'react'
-import { Labels } from '@/interfaces/state.interface'
-import { useLabels } from '@/utils/storeHooks'
+import React from 'react';
+import { type Labels } from '@/interfaces/state.interface';
+import { useLabels } from '@/utils/storeHooks';
 
 const LabelSelector = () => {
-    const labels = ['light', 'dark', 'none']
-    const { selectedLabels, setLabels } = useLabels()
+    const labels = ['light', 'dark', 'none'];
+    const { selectedLabels, setLabels } = useLabels();
 
     const handleLabelsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setLabels(event.target.value as Labels)
-    }
+        setLabels(event.target.value as Labels);
+    };
 
     return (
         <div>
@@ -28,7 +28,7 @@ const LabelSelector = () => {
                 ))}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default LabelSelector
+export default LabelSelector;

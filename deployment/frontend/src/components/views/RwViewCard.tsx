@@ -1,24 +1,28 @@
-import { Resource, View, ViewState } from '@/interfaces/dataset.interface'
-import ViewCard from './ViewCard'
-import { useState } from 'react'
-import { api } from '@/utils/api'
-import { toast } from 'react-toastify'
-import { WriDataset } from '@/schema/ckan.schema'
+import {
+    Resource,
+    type View,
+    type ViewState,
+} from '@/interfaces/dataset.interface';
+import ViewCard from './ViewCard';
+import { useState } from 'react';
+import { api } from '@/utils/api';
+import { toast } from 'react-toastify';
+import { type WriDataset } from '@/schema/ckan.schema';
 
 export function RwViewCard({
     view: _ogView,
     dataset,
     onCancelOrDelete,
 }: {
-    view: ViewState
-    dataset: WriDataset
-    onCancelOrDelete: (mode: string) => void
+    view: ViewState;
+    dataset: WriDataset;
+    onCancelOrDelete: (mode: string) => void;
 }) {
-    const [mode, setMode] = useState(_ogView._state)
-    const [view, setView] = useState<View>(_ogView)
+    const [mode, setMode] = useState(_ogView._state);
+    const [view, setView] = useState<View>(_ogView);
 
-    const createMutation = api.rw.createDatasetView.useMutation()
-    const updateMutation = api.rw.updateDatasetView.useMutation()
+    const createMutation = api.rw.createDatasetView.useMutation();
+    const updateMutation = api.rw.updateDatasetView.useMutation();
 
     const onSave = (
         mode: string,
@@ -37,16 +41,16 @@ export function RwViewCard({
                 },
                 {
                     onError: (e) => {
-                        toast(e.message, { type: 'error' })
-                        onError()
+                        toast(e.message, { type: 'error' });
+                        onError();
                     },
                     onSuccess: () => {
-                        toast('The new view was successfully created')
-                        setMode('saved')
-                        onSuccess()
+                        toast('The new view was successfully created');
+                        setMode('saved');
+                        onSuccess();
                     },
                 }
-            )
+            );
         } else if (mode == 'edit' && view.id) {
             updateMutation.mutate(
                 {
@@ -59,18 +63,18 @@ export function RwViewCard({
                 },
                 {
                     onError: (e) => {
-                        toast(e.message, { type: 'error' })
-                        onError()
+                        toast(e.message, { type: 'error' });
+                        onError();
                     },
                     onSuccess: () => {
-                        toast('The view was successfully updated')
-                        setMode('saved')
-                        onSuccess()
+                        toast('The view was successfully updated');
+                        setMode('saved');
+                        onSuccess();
                     },
                 }
-            )
+            );
         }
-    }
+    };
 
     return (
         <ViewCard
@@ -82,5 +86,5 @@ export function RwViewCard({
             onSave={onSave}
             dataset={dataset}
         />
-    )
+    );
 }

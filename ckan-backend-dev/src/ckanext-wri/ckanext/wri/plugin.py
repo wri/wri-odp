@@ -33,7 +33,8 @@ from ckanext.wri.logic.action.create import (
     resource_create,
     old_package_create,
     download_event_create,
-    organization_create
+    organization_create,
+    group_create,
 )
 from ckanext.wri.logic.action.update import (
     notification_update,
@@ -45,7 +46,9 @@ from ckanext.wri.logic.action.update import (
     resource_update,
     old_package_patch,
     old_package_update,
-    package_update
+    package_update,
+    group_patch,
+    group_update,
 )
 from ckanext.wri.model.resource_location import ResourceLocation
 from ckanext.wri.logic.action.get import (
@@ -195,6 +198,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "year_validator": wri_validators.year_validator,
             "agents_json_object": wri_validators.agents_json_object,
             "url_or_email_validator": wri_validators.url_or_email_validator,
+            "title_validator": wri_validators.title_validator,
         }
 
     # IFacets
@@ -277,6 +281,10 @@ class WriPlugin(plugins.SingletonPlugin):
             "organization_create": organization_create,
             
             "prefect_send_error_callback": send_error_callback,
+            "group_create": group_create,
+            "group_update": group_update,
+            "group_patch": group_patch,
+            
         }
 
     # IPermissionLabels
@@ -382,23 +390,32 @@ class WriPlugin(plugins.SingletonPlugin):
             log.critical(e)
             pass
 
-    # IPackageController
-
     def after_dataset_create(self, context, pkg_dict):
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)
 
-        if pkg_dict.get("is_approved", False):
-            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_update(self, context, pkg_dict):
+        # We want to ignore changes when its only setting approve to pending
+        if context.get('original_metadata_modified'):
+            model = context['model']
+            original_timestamp = context.get('original_metadata_modified')
+            if original_timestamp:
+                model.Session.query(model.Package).filter_by(
+                    id=pkg_dict['id']
+                ).update({"metadata_modified": original_timestamp})
+                model.Session.commit()
+                # Update the returned dict to reflect the restored timestamp
+                pkg_dict['metadata_modified'] = original_timestamp.isoformat()
         if pkg_dict.get("resources") is not None:
             for resource in pkg_dict.get("resources"):
                 self._submit_to_datapusher(resource)  # TODO: uncomment
 
-        if pkg_dict.get("is_approved", False):
-            ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
+        # if pkg_dict.get("is_approved", False):
+        #     ResourceLocation.index_dataset_resources_by_location(pkg_dict, False)
 
     def after_dataset_show(self, context, pkg_dict):
         authors = pkg_dict.get("authors")
@@ -472,9 +489,6 @@ class WriPlugin(plugins.SingletonPlugin):
         # spatial field is geojson coordinate data, not needed in SOLR either
         pkg_dict.pop("extras_spatial", None)
         pkg_dict.pop("spatial", None)
-
-        print("PACKAGE DICT", flush=True)
-        print(pkg_dict, flush=True)
         return pkg_dict
 
     def before_dataset_search(self, search_params):

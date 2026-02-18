@@ -81,7 +81,7 @@ describe("Dashboard Test", () => {
     });
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
@@ -243,6 +243,12 @@ describe("Dashboard Test", () => {
     }
   );
 
+  it("Should see pending approval tag", () => {
+    cy.visit("/dashboard/datasets");
+    cy.contains(datasetName, { timeout: 30000 });
+    cy.contains("Pending Approval");
+  });
+
   it("Should reject dataset", () => {
     cy.visit("/dashboard/approval-request");
     cy.contains(datasetName, { timeout: 30000 });
@@ -294,6 +300,16 @@ describe("Dashboard Test", () => {
       .type(datasetName + " EDITED");
     cy.get("button").contains("Update Dataset").click({ force: true });
     cy.wait(20000);
+  });
+
+  it("Should not have non-relevant values in the diff dropdown", () => {
+    cy.visit("/dashboard/approval-request");
+    cy.contains(datasetName, { timeout: 30000 });
+    cy.get("button#rowshow").first().click();
+    cy.contains("Title");
+    cy.contains("null").should("not.exist");
+    cy.contains("NULL").should("not.exist");
+    cy.contains("empty").should("not.exist");
   });
 
   it("Should have approve dataset", () => {

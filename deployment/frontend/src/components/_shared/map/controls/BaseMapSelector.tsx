@@ -1,16 +1,16 @@
-import React from 'react'
-import { type Basemap } from '@/interfaces/state.interface'
-import { useBasemap } from '@/utils/storeHooks'
+import React from 'react';
+import { type Basemap } from '@/interfaces/state.interface';
+import { useBasemap } from '@/utils/storeHooks';
 
 const BasemapSelector = () => {
-    const basemaps = ['light', 'dark', 'satellite', 'terrain', 'aqueduct']
-    const { selectedBasemap, setBasemap } = useBasemap()
+    const basemaps = ['light', 'dark', 'satellite', 'terrain', 'aqueduct'];
+    const { selectedBasemap, setBasemap } = useBasemap();
 
     const handleBasemapChange = (
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
-        setBasemap(event.target.value as Basemap)
-    }
+        setBasemap(event.target.value as Basemap);
+    };
 
     return (
         <div>
@@ -30,7 +30,7 @@ const BasemapSelector = () => {
                 ))}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default BasemapSelector
+export default BasemapSelector;

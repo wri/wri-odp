@@ -1,6 +1,6 @@
-import { env } from '@/env.mjs'
-import { useDataset } from '@/utils/storeHooks'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { env } from '@/env.mjs';
+import { useDataset } from '@/utils/storeHooks';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import {
     SnippetEndpoint,
     QueryEndpoint,
@@ -9,30 +9,30 @@ import {
     getRSnippet,
     CkanApiMoreInfo,
     RwMoreInfo,
-} from './APIEndpoint'
-import { useFields } from '@/components/data-explorer/queryHooks'
-import { DatasetTabs } from '@/components/datasets/DatasetTabs'
-import hljs from 'highlight.js/lib/core'
+} from './APIEndpoint';
+import { useFields } from '@/components/data-explorer/queryHooks';
+import { DatasetTabs } from '@/components/datasets/DatasetTabs';
+import hljs from 'highlight.js/lib/core';
 
-import python from 'highlight.js/lib/languages/python'
-import js from 'highlight.js/lib/languages/javascript'
-import r from 'highlight.js/lib/languages/r'
-import { addCopyButton } from '@/utils/highlight'
-import classNames from '@/utils/classnames'
-import { Tab } from '@headlessui/react'
+import python from 'highlight.js/lib/languages/python';
+import js from 'highlight.js/lib/languages/javascript';
+import r from 'highlight.js/lib/languages/r';
+import { addCopyButton } from '@/utils/highlight';
+import classNames from '@/utils/classnames';
+import { Tab } from '@headlessui/react';
 import {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
-} from '@heroicons/react/20/solid'
-import { Navigation } from 'swiper/modules'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
+} from '@heroicons/react/20/solid';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
-hljs.registerLanguage('python', python)
-hljs.registerLanguage('javascript', js)
-hljs.registerLanguage('r', r)
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('javascript', js);
+hljs.registerLanguage('r', r);
 
 export function API({ usecases }: { usecases?: string }) {
     const tabs = [
@@ -56,7 +56,7 @@ export function API({ usecases }: { usecases?: string }) {
             name: 'Advanced API Usage',
             enabled: usecases,
         },
-    ]
+    ];
     return (
         <Tab.Group as="div">
             <Tab.List
@@ -89,28 +89,28 @@ export function API({ usecases }: { usecases?: string }) {
                 </Tab.Panel>
             )}
         </Tab.Group>
-    )
+    );
 }
 
 const QueryInstructions = () => {
-    const { dataset } = useDataset()
+    const { dataset } = useDataset();
     const { data } = useFields({
         id: dataset.rw_id,
         provider: dataset.provider,
-    })
+    });
 
-    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL;
     publicCkanUrl = publicCkanUrl.endsWith('/')
         ? publicCkanUrl.slice(0, -1)
-        : publicCkanUrl
+        : publicCkanUrl;
 
-    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
-    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`;
+    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`;
 
-    const rwBaseUrl = `https://api.resourcewatch.org/v1`
-    const rwDatasetGetUrl = `${rwBaseUrl}/dataset/${dataset.rw_id}`
-    const rwFieldsUrl = `${rwBaseUrl}/fields/${dataset.rw_id}`
-    const rwQueryUrl = `${rwBaseUrl}/query/${dataset.rw_id}?sql=SELECT * FROM ${data?.tableName} LIMIT 10`
+    const rwBaseUrl = `https://api.resourcewatch.org/v1`;
+    const rwDatasetGetUrl = `${rwBaseUrl}/dataset/${dataset.rw_id}`;
+    const rwFieldsUrl = `${rwBaseUrl}/fields/${dataset.rw_id}`;
+    const rwQueryUrl = `${rwBaseUrl}/query/${dataset.rw_id}?sql=SELECT * FROM ${data?.tableName} LIMIT 10`;
 
     return (
         <>
@@ -148,32 +148,32 @@ const QueryInstructions = () => {
                 </>
             )}
         </>
-    )
-}
+    );
+};
 
-hljs.registerLanguage('python', python)
-hljs.registerLanguage('javascript', js)
-hljs.registerLanguage('r', r)
+hljs.registerLanguage('python', python);
+hljs.registerLanguage('javascript', js);
+hljs.registerLanguage('r', r);
 
 const UseCases = ({ usecases }: { usecases: string }) => {
-    const { dataset } = useDataset()
-    const [highlighted, setHighlighted] = useState(false)
-    const divRef = useRef<HTMLDivElement | null>(null)
-    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    const { dataset } = useDataset();
+    const [highlighted, setHighlighted] = useState(false);
+    const divRef = useRef<HTMLDivElement | null>(null);
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL;
     publicCkanUrl = publicCkanUrl.endsWith('/')
         ? publicCkanUrl.slice(0, -1)
-        : publicCkanUrl
+        : publicCkanUrl;
 
-    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
-    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`;
+    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`;
 
     useEffect(() => {
         if (!highlighted && divRef.current) {
-            addCopyButton(`code-block-${dataset.id}`)
-            setHighlighted(true)
-            hljs.highlightAll()
+            addCopyButton(`code-block-${dataset.id}`);
+            setHighlighted(true);
+            hljs.highlightAll();
         }
-    }, [highlighted])
+    }, [highlighted]);
     return (
         <div>
             <div
@@ -188,41 +188,41 @@ const UseCases = ({ usecases }: { usecases: string }) => {
                 }}
             ></div>
         </div>
-    )
-}
+    );
+};
 
 const SnippetInstructions = ({
     language,
     getSnippetFn,
 }: {
-    language: 'javascript' | 'python' | 'r'
-    getSnippetFn: (url: string, method?: string, body?: string) => string
+    language: 'javascript' | 'python' | 'r';
+    getSnippetFn: (url: string, method?: string, body?: string) => string;
 }) => {
-    const { dataset } = useDataset()
+    const { dataset } = useDataset();
     const { data } = useFields({
         id: dataset.rw_id,
         provider: dataset.provider,
-    })
+    });
 
-    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL
+    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL;
     publicCkanUrl = publicCkanUrl.endsWith('/')
         ? publicCkanUrl.slice(0, -1)
-        : publicCkanUrl
-    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`
+        : publicCkanUrl;
+    const ckanBaseUrl = `${publicCkanUrl}/api/3/action`;
 
-    const ckanPackageShowUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`
-    const ckanPackageShowSnippet = getSnippetFn(ckanPackageShowUrl)
+    const ckanPackageShowUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`;
+    const ckanPackageShowSnippet = getSnippetFn(ckanPackageShowUrl);
 
-    const rwBaseUrl = `https://api.resourcewatch.org/v1`
+    const rwBaseUrl = `https://api.resourcewatch.org/v1`;
 
-    const rwDatasetGetUrl = `${rwBaseUrl}/dataset/${dataset.rw_id}`
-    const rwGetDatasetSnippet = getSnippetFn(rwDatasetGetUrl)
+    const rwDatasetGetUrl = `${rwBaseUrl}/dataset/${dataset.rw_id}`;
+    const rwGetDatasetSnippet = getSnippetFn(rwDatasetGetUrl);
 
-    const rwGetFieldsUrl = `${rwBaseUrl}/fields/${dataset.rw_id}`
-    const rwGetFieldsSnippet = getSnippetFn(rwGetFieldsUrl)
+    const rwGetFieldsUrl = `${rwBaseUrl}/fields/${dataset.rw_id}`;
+    const rwGetFieldsSnippet = getSnippetFn(rwGetFieldsUrl);
 
-    const rwQueryUrl = `${rwBaseUrl}/query/${dataset.rw_id}?sql=SELECT * FROM ${data?.tableName} LIMIT 10`
-    const rwQuerySnippet = getSnippetFn(rwQueryUrl)
+    const rwQueryUrl = `${rwBaseUrl}/query/${dataset.rw_id}?sql=SELECT * FROM ${data?.tableName} LIMIT 10`;
+    const rwQuerySnippet = getSnippetFn(rwQueryUrl);
 
     return (
         <>
@@ -264,16 +264,16 @@ const SnippetInstructions = ({
                 </>
             )}
         </>
-    )
-}
+    );
+};
 
 function APITabs({
     tabs,
 }: {
-    tabs: { name: string; count?: number; highlighted?: boolean }[]
+    tabs: { name: string; count?: number; highlighted?: boolean }[];
 }) {
-    const prevEl = `.nav-prev-button--tabs`
-    const nextEl = `.nav-next-button--tabs`
+    const prevEl = `.nav-prev-button--tabs`;
+    const nextEl = `.nav-next-button--tabs`;
     return (
         <>
             <Swiper
@@ -321,5 +321,5 @@ function APITabs({
                 <ChevronDoubleRightIcon className="h-6 w-6 text-black" />
             </button>
         </>
-    )
+    );
 }

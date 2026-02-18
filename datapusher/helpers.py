@@ -105,9 +105,17 @@ class HTTPError(Exception):
 
         """
         super(HTTPError, self).__init__(message)
+        self.message = message
         self.status_code = status_code
         self.request_url = request_url
         self.response = response
+
+    def __reduce__(self):
+        """Make the exception picklable for Prefect's async execution."""
+        return (
+            self.__class__,
+            (self.message, self.status_code, self.request_url, self.response),
+        )
 
     def as_dict(self):
         """Return a JSON-serializable dictionary representation of this error.
@@ -128,9 +136,15 @@ class HTTPError(Exception):
         }
 
     def __str__(self):
+        # Use getattr with fallbacks to handle cases where attributes
+        # may not exist after unpickling in async contexts
+        message = getattr(self, 'message', self.args[0] if self.args else 'HTTPError')
+        status_code = getattr(self, 'status_code', 'unknown')
+        request_url = getattr(self, 'request_url', 'unknown')
+        response = getattr(self, 'response', '')
         return "{} status={} url={} response={}".format(
-            self.message, self.status_code, self.request_url, self.response
-        ).encode("ascii", "replace")
+            message, status_code, request_url, response
+        )
 
 
 def datastore_resource_exists(resource_id, api_key, ckan_url):
@@ -152,7 +166,7 @@ def datastore_resource_exists(resource_id, api_key, ckan_url):
                 "Error getting datastore resource.",
                 response.status_code,
                 search_url,
-                response,
+                response.text,
             )
     except requests.exceptions.RequestException as e:
         raise Exception("Error getting datastore resource ({!s}).".format(e))

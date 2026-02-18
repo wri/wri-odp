@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react';
 
 import {
     Command,
@@ -8,36 +8,36 @@ import {
     CommandGroup,
     CommandInput,
     CommandItem,
-} from '@/components/_shared/Command'
+} from '@/components/_shared/Command';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import classNames from '@/utils/classnames'
+} from '@/components/_shared/Popover';
+import classNames from '@/utils/classnames';
 import {
     CheckIcon,
     ChevronDownIcon,
     XMarkIcon,
-} from '@heroicons/react/24/outline'
-import { match, P } from 'ts-pattern'
-import { Button } from '@/components/_shared/Button'
-import { TopicHierarchy } from '@/interfaces/topic.interface'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { Controller, UseFormReturn } from 'react-hook-form'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { Group } from '@portaljs/ckan'
+} from '@heroicons/react/24/outline';
+import { match, P } from 'ts-pattern';
+import { Button } from '@/components/_shared/Button';
+import { type TopicHierarchy } from '@/interfaces/topic.interface';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { Controller, type UseFormReturn } from 'react-hook-form';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { Group } from '@portaljs/ckan';
 
 export function TopicsSelect({
     userTopics,
     topicHierarchy,
     formObj,
 }: {
-    topicHierarchy: TopicHierarchy[]
-    userTopics: string[] | null
-    formObj: UseFormReturn<DatasetFormType>
+    topicHierarchy: TopicHierarchy[];
+    userTopics: string[] | null;
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { control } = formObj
+    const { control } = formObj;
     return (
         <Controller
             control={control}
@@ -52,7 +52,7 @@ export function TopicsSelect({
                 />
             )}
         />
-    )
+    );
 }
 function TopicsInner({
     topicHierarchy,
@@ -60,28 +60,28 @@ function TopicsInner({
     value,
     userTopics,
 }: {
-    topicHierarchy: TopicHierarchy[]
-    onChange: (value: string[]) => void
-    value: string[]
-    userTopics: string[] | null
+    topicHierarchy: TopicHierarchy[];
+    onChange: (value: string[]) => void;
+    value: string[];
+    userTopics: string[] | null;
 }) {
-    const [open, setOpen] = useState(false)
-    const [query, setQuery] = useState('')
-    const ref = useRef<HTMLButtonElement>(null)
+    const [open, setOpen] = useState(false);
+    const [query, setQuery] = useState('');
+    const ref = useRef<HTMLButtonElement>(null);
     const possiblePaths = useMemo(() => {
-        const possiblePaths = new Map()
+        const possiblePaths = new Map();
         function GetPaths(topic: TopicHierarchy, parent?: TopicHierarchy) {
-            if (!parent) possiblePaths.set(topic.name, [topic.name])
+            if (!parent) possiblePaths.set(topic.name, [topic.name]);
             else
                 possiblePaths.set(topic.name, [
                     ...possiblePaths.get(parent.name),
                     topic.name,
-                ])
-            topic.children.forEach((child) => GetPaths(child, topic))
+                ]);
+            topic.children.forEach((child) => GetPaths(child, topic));
         }
-        topicHierarchy.forEach((topic) => GetPaths(topic))
-        return possiblePaths
-    }, [JSON.stringify(topicHierarchy)])
+        topicHierarchy.forEach((topic) => GetPaths(topic));
+        return possiblePaths;
+    }, [JSON.stringify(topicHierarchy)]);
 
     function FlattenTopic(
         topic: TopicHierarchy
@@ -97,10 +97,10 @@ function TopicsInner({
                 { title: topic.title, name: topic.name },
                 ...topic.children.flatMap(FlattenTopic),
             ])
-            .otherwise(() => [])
+            .otherwise(() => []);
     }
 
-    const flattenedTopicHierarchy = topicHierarchy.flatMap(FlattenTopic)
+    const flattenedTopicHierarchy = topicHierarchy.flatMap(FlattenTopic);
 
     const filteredTopics =
         query.length === 0
@@ -109,13 +109,15 @@ function TopicsInner({
                   .map((item) => {
                       const included = item.title
                           .toLowerCase()
-                          .includes(query.toLowerCase())
-                      return included ? possiblePaths.get(item.name) : []
+                          .includes(query.toLowerCase());
+                      return included ? possiblePaths.get(item.name) : [];
                   })
-                  .flat()
+                  .flat();
 
     function getTopicByName(topicName: string) {
-        return flattenedTopicHierarchy.find((topic) => topic.name === topicName)
+        return flattenedTopicHierarchy.find(
+            (topic) => topic.name === topicName
+        );
     }
 
     function BuildHierarchy(
@@ -126,7 +128,7 @@ function TopicsInner({
             .with(0, () => '')
             .with(1, () => 'pl-6')
             .with(2, () => 'pl-10')
-            .otherwise(() => 'pl-14')
+            .otherwise(() => 'pl-14');
         return (
             <div key={topic.name}>
                 <CommandItem
@@ -143,8 +145,8 @@ function TopicsInner({
                         query.length === 0 ? 'flex' : ''
                     )}
                     onSelect={() => {
-                        onChange([...value, topic.name])
-                        setOpen(false)
+                        onChange([...value, topic.name]);
+                        setOpen(false);
                     }}
                 >
                     <CheckIcon
@@ -185,7 +187,7 @@ function TopicsInner({
                         BuildHierarchy(child, level + 1)
                     )}
             </div>
-        )
+        );
     }
 
     return (
@@ -217,14 +219,14 @@ function TopicsInner({
                                             <DefaultTooltip content="Remove Topic">
                                                 <XMarkIcon
                                                     onClick={(e) => {
-                                                        e.stopPropagation()
+                                                        e.stopPropagation();
                                                         onChange(
                                                             value.filter(
                                                                 (topic) =>
                                                                     topic !==
                                                                     item
                                                             )
-                                                        )
+                                                        );
                                                     }}
                                                     className="mt-0.5 h-3 w-3 cursor-pointer text-red-600"
                                                 />
@@ -304,5 +306,5 @@ function TopicsInner({
                 </Command>
             </PopoverContent>
         </Popover>
-    )
+    );
 }

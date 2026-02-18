@@ -1,13 +1,13 @@
-import { Button } from '@/components/_shared/Button'
-import { TextWithReadMore } from '@/components/_shared/TextWithReadMore'
-import { LinkIcon } from '@heroicons/react/24/outline'
+import { Button } from '@/components/_shared/Button';
+import { TextWithReadMore } from '@/components/_shared/TextWithReadMore';
+import { LinkIcon } from '@heroicons/react/24/outline';
 
 export function Methodology({
     methodology = '',
     technical_notes = '',
 }: {
-    methodology?: string
-    technical_notes?: string
+    methodology?: string;
+    technical_notes?: string;
 }) {
     return (
         <div className="font-acumin text-sm font-light text-stone-900 flex flex-col gap-y-4 py-2">
@@ -39,5 +39,5 @@ export function Methodology({
                 />
             </TextWithReadMore>
         </div>
-    )
+    );
 }

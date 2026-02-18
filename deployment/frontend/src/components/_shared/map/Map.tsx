@@ -3,21 +3,21 @@ import {
     useIsDrawing,
     useIsEmbeddingMap,
     useMapState,
-} from '@/utils/storeHooks'
-import { useEffect, useRef, useState } from 'react'
-import ReactMapGL, { AttributionControl, type MapRef } from 'react-map-gl'
-import { useInteractiveLayers } from '@/utils/queryHooks'
-import Tooltip, { type TooltipRef } from './Tooltip'
-import { type APILayerSpec } from '@/interfaces/layer.interface'
-import { Legends } from './controls/Legends'
-import Controls from './controls/Controls'
-import Basemap from './Basemap'
-import Labels from './Labels'
-import dynamic from 'next/dynamic'
+} from '@/utils/storeHooks';
+import { useEffect, useRef, useState } from 'react';
+import ReactMapGL, { AttributionControl, type MapRef } from 'react-map-gl';
+import { useInteractiveLayers } from '@/utils/queryHooks';
+import Tooltip, { type TooltipRef } from './Tooltip';
+import { type APILayerSpec } from '@/interfaces/layer.interface';
+import { Legends } from './controls/Legends';
+import Controls from './controls/Controls';
+import Basemap from './Basemap';
+import Labels from './Labels';
+import dynamic from 'next/dynamic';
 
 const DynamicLayerManger = dynamic(() => import('./LayerManager'), {
     ssr: false,
-})
+});
 
 export default function Map({
     layers,
@@ -25,40 +25,40 @@ export default function Map({
     showLegends = true,
     mapHeight = 'calc(100vh - 63px)',
 }: {
-    layers: APILayerSpec[]
-    showControls?: boolean
-    showLegends?: boolean
-    mapHeight?: string
+    layers: APILayerSpec[];
+    showControls?: boolean;
+    showLegends?: boolean;
+    mapHeight?: string;
 }) {
-    const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers()
-    const { isEmbedding } = useIsEmbeddingMap()
-    const { setViewState, viewState } = useMapState()
-    const mapRef = useRef<MapRef | null>(null)
-    const mapTooltipRef = useRef<TooltipRef | null>(null)
-    const mapContainerRef = useRef<HTMLDivElement | null>(null)
-    const [ready, setReady] = useState(false)
-    const { data: activeLayersIds } = useInteractiveLayers()
-    const { isDrawing } = useIsDrawing()
+    const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers();
+    const { isEmbedding } = useIsEmbeddingMap();
+    const { setViewState, viewState } = useMapState();
+    const mapRef = useRef<MapRef | null>(null);
+    const mapTooltipRef = useRef<TooltipRef | null>(null);
+    const mapContainerRef = useRef<HTMLDivElement | null>(null);
+    const [ready, setReady] = useState(false);
+    const { data: activeLayersIds } = useInteractiveLayers();
+    const { isDrawing } = useIsDrawing();
 
     useEffect(() => {
         const ro = new ResizeObserver(() => {
             if (mapRef.current) {
-                mapRef.current.resize()
+                mapRef.current.resize();
             }
-        })
-        const map = document.getElementById('map')
+        });
+        const map = document.getElementById('map');
 
-        if (map) ro.observe(map)
+        if (map) ro.observe(map);
 
-        return () => ro.disconnect()
-    }, [])
+        return () => ro.disconnect();
+    }, []);
 
     return (
         <div ref={mapContainerRef} className="h-full" id="map">
             <ReactMapGL
                 ref={(_map) => {
                     if (_map)
-                        mapRef.current = _map.getMap() as unknown as MapRef
+                        mapRef.current = _map.getMap() as unknown as MapRef;
                 }}
                 {...viewState}
                 mapStyle="mapbox://styles/resourcewatch/cjzmw480d00z41cp2x81gm90h"
@@ -73,7 +73,7 @@ export default function Map({
                 onMove={(evt) => setViewState(evt.viewState)}
                 onClick={mapTooltipRef.current?.onClickLayer}
                 onLoad={() => {
-                    setReady(true)
+                    setReady(true);
                 }}
             >
                 {!!mapRef.current && layers && ready && (
@@ -90,7 +90,7 @@ export default function Map({
                                 {!isEmbedding && (
                                     <button
                                         onClick={() => {
-                                            setIsAddingLayers(!isAddingLayers)
+                                            setIsAddingLayers(!isAddingLayers);
                                         }}
                                         className="absolute bg-[#FFD271] hover:bg-opacity-90 transition-all px-6 py-3 text-base font-semibold top-5 z-20 left-1/2 -translate-x-[50%]"
                                     >
@@ -109,5 +109,5 @@ export default function Map({
                 )}
             </ReactMapGL>
         </div>
-    )
+    );
 }

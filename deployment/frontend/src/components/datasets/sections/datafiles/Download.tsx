@@ -1,100 +1,102 @@
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import dynamic from 'next/dynamic'
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import dynamic from 'next/dynamic';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import { Resource } from '@/interfaces/dataset.interface'
-import { api } from '@/utils/api'
-import { convertBytes } from '@/utils/convertBytes'
+} from '@/components/_shared/Popover';
+import { type Resource } from '@/interfaces/dataset.interface';
+import { api } from '@/utils/api';
+import { convertBytes } from '@/utils/convertBytes';
 import {
     ArrowDownTrayIcon,
     ArrowTopRightOnSquareIcon,
     LinkIcon,
     PaperAirplaneIcon,
-} from '@heroicons/react/24/outline'
-import { env } from '@/env.mjs'
-import { useState } from 'react'
-import { toast } from 'react-toastify'
+} from '@heroicons/react/24/outline';
+import { env } from '@/env.mjs';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 import {
     DirectDownloadPopup,
-    DownloadEventForm,
+    type DownloadEventForm,
     DownloadPopup,
-} from '@/components/_shared/DownloadPopup'
-import { WriDataset } from '@/schema/ckan.schema'
+} from '@/components/_shared/DownloadPopup';
+import { type WriDataset } from '@/schema/ckan.schema';
 
 export function DownloadButton({
     datafile,
     dataset,
 }: {
-    datafile: Resource
-    dataset: WriDataset
+    datafile: Resource;
+    dataset: WriDataset;
 }) {
-    const [convertTo, setConvertTo] = useState<'CSV' | 'XLSX' | 'TSV' | 'XML'>()
-    const [open, setOpen] = useState(false)
+    const [convertTo, setConvertTo] = useState<
+        'CSV' | 'XLSX' | 'TSV' | 'XML'
+    >();
+    const [open, setOpen] = useState(false);
     const { data: signedUrl, isLoading } = api.uploads.getPresignedUrl.useQuery(
         {
-            key: datafile.key as string,
+            key: datafile.key!,
         },
         { enabled: !!datafile.key }
-    )
+    );
     const createDownloadEvent = api.downloadEvents.createEvents.useMutation({
         onSuccess: () => {
-            window.open(pendingDownloadUrl, '_target')
-            setShowDownloadForm(false)
+            window.open(pendingDownloadUrl, '_target');
+            setShowDownloadForm(false);
         },
         onError: (err) => {
             toast('Failed to send your information', {
                 type: 'error',
             }),
-                window.open(pendingDownloadUrl, '_target')
-            setShowDownloadForm(false)
+                window.open(pendingDownloadUrl, '_target');
+            setShowDownloadForm(false);
         },
-    })
+    });
 
-    const size = datafile.size
-    const mode = datafile.key ? 'SIGNED_URL' : 'RES_URL'
-    let originalResourceDownloadUrl: string
+    const size = datafile.size;
+    const mode = datafile.key ? 'SIGNED_URL' : 'RES_URL';
+    let originalResourceDownloadUrl: string;
 
     if (mode == 'RES_URL' && datafile.url) {
-        originalResourceDownloadUrl = datafile.url
+        originalResourceDownloadUrl = datafile.url;
         if (originalResourceDownloadUrl.includes('data-api')) {
-            originalResourceDownloadUrl += `&x-api-key=${env.NEXT_PUBLIC_GFW_API_KEY}`
+            originalResourceDownloadUrl += `&x-api-key=${env.NEXT_PUBLIC_GFW_API_KEY}`;
         }
     } else if (mode == 'SIGNED_URL' && signedUrl && !isLoading) {
-        originalResourceDownloadUrl = signedUrl
+        originalResourceDownloadUrl = signedUrl;
     }
 
     const Component =
-        isLoading && mode == 'SIGNED_URL' ? `span` : PopoverTrigger
+        isLoading && mode == 'SIGNED_URL' ? `span` : PopoverTrigger;
 
-    const conversibleTabularFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML']
-    const conversibleSpatialFormats = ['GeoJSON', 'KML', 'SHP']
+    const conversibleTabularFormats = ['CSV', 'XLSX', 'JSON', 'TSV', 'XML'];
+    const conversibleSpatialFormats = ['GeoJSON', 'KML', 'SHP'];
 
-    const format = datafile.format ?? ''
+    const format = datafile.format ?? '';
     const isConversibleTabular =
         datafile.datastore_active &&
-        conversibleTabularFormats.includes(format.toUpperCase())
-    const isConversibleVector = datafile.format == 'Layer'
+        conversibleTabularFormats.includes(format.toUpperCase());
+    const isConversibleVector = datafile.format == 'Layer';
 
     const tabularConversionOptions = conversibleTabularFormats.filter(
         (f) => f != format.toUpperCase()
-    )
+    );
     const requestDatafileConversionMutation =
-        api.dataset.requestDatafileConversion.useMutation()
+        api.dataset.requestDatafileConversion.useMutation();
 
-    const [showDownloadForm, setShowDownloadForm] = useState(false)
-    const [pendingDownloadUrl, setPendingDownloadUrl] = useState<string>('')
+    const [showDownloadForm, setShowDownloadForm] = useState(false);
+    const [pendingDownloadUrl, setPendingDownloadUrl] = useState<string>('');
 
     const download = (url: string, isOriginalFormat = false) => {
         if (isOriginalFormat) {
-            setPendingDownloadUrl(url)
-            setShowDownloadForm(true)
+            setPendingDownloadUrl(url);
+            setShowDownloadForm(true);
         } else {
-            window.open(url, '_target')
+            window.open(url, '_target');
         }
-    }
+    };
 
     const handleFormSubmit = (data: DownloadEventForm) => {
         const _data = {
@@ -104,11 +106,11 @@ export function DownloadButton({
             acceptTerms: true,
             typeOfForm: 'direct-download' as any,
             package_name: `${dataset.name}: ${datafile.title ?? datafile.name}`,
-        }
-        createDownloadEvent.mutate(_data)
-    }
+        };
+        createDownloadEvent.mutate(_data);
+    };
 
-    let sql = `SELECT * FROM "${datafile.id}"`
+    const sql = `SELECT * FROM "${datafile.id}"`;
     const handleFormSubmitConvertion = (data: any) => {
         const _data = {
             ...data,
@@ -116,7 +118,7 @@ export function DownloadButton({
             package_id: datafile.package_id ?? '',
             package_name: datafile.title ?? datafile.name!,
             typeOfForm: 'email-download' as any,
-        }
+        };
         requestDatafileConversionMutation.mutate(
             {
                 email: data.email,
@@ -132,26 +134,26 @@ export function DownloadButton({
                 onSuccess: () => {
                     toast("You'll receive an email when the file is ready", {
                         type: 'success',
-                    })
-                    createDownloadEvent.mutate(_data)
+                    });
+                    createDownloadEvent.mutate(_data);
 
-                    setOpen(false)
+                    setOpen(false);
                 },
                 onError: (err) => {
-                    console.error(err)
+                    console.error(err);
 
                     toast('Failed to request file', {
                         type: 'error',
-                    })
+                    });
                 },
             }
-        )
-    }
+        );
+    };
 
     const handleSkip = () => {
-        window.open(pendingDownloadUrl, '_target')
-        setShowDownloadForm(false)
-    }
+        window.open(pendingDownloadUrl, '_target');
+        setShowDownloadForm(false);
+    };
 
     if (!datafile.datastore_active)
         return (
@@ -217,7 +219,7 @@ export function DownloadButton({
                     )}
                 </button>
             </>
-        )
+        );
 
     return (
         <>
@@ -301,8 +303,8 @@ export function DownloadButton({
                                         className="w-full"
                                         onClick={() => {
                                             // @ts-ignore
-                                            setConvertTo(f)
-                                            setOpen(true)
+                                            setConvertTo(f);
+                                            setOpen(true);
                                         }}
                                     >
                                         {f}
@@ -317,8 +319,8 @@ export function DownloadButton({
                                     className="w-full"
                                     onClick={() => {
                                         // @ts-ignore
-                                        setConvertTo(f)
-                                        setOpen(true)
+                                        setConvertTo(f);
+                                        setOpen(true);
                                     }}
                                 >
                                     {f}
@@ -331,8 +333,8 @@ export function DownloadButton({
                                         className="w-full"
                                         onClick={() => {
                                             // @ts-ignore
-                                            setConvertTo(f)
-                                            setOpen(true)
+                                            setConvertTo(f);
+                                            setOpen(true);
                                         }}
                                     >
                                         {f}
@@ -365,5 +367,5 @@ export function DownloadButton({
                 />
             )}
         </>
-    )
+    );
 }

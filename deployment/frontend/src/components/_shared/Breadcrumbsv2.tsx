@@ -1,7 +1,7 @@
 interface Link {
-    label: string
-    url: string
-    current: boolean
+    label: string;
+    url: string;
+    current: boolean;
 }
 export function Breadcrumbs({ links }: { links: Link[] }) {
     return (
@@ -43,5 +43,5 @@ export function Breadcrumbs({ links }: { links: Link[] }) {
                 ))}
             </ol>
         </nav>
-    )
+    );
 }

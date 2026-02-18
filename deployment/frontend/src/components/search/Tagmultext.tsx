@@ -1,36 +1,42 @@
-import { Fragment, useRef, useState, Dispatch, SetStateAction } from 'react'
-import { Combobox, Listbox, Transition } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import classNames from '@/utils/classnames'
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import {
+    Fragment,
+    useRef,
+    useState,
+    type Dispatch,
+    type SetStateAction,
+} from 'react';
+import { Combobox, Listbox, Transition } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import classNames from '@/utils/classnames';
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/_shared/Popover'
-import { Button } from '@/components/_shared/Button'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { DatasetFormType } from '@/schema/dataset.schema'
-import { Controller, Path, UseFormReturn } from 'react-hook-form'
-import { Filter } from '@/interfaces/search.interface'
-import { set } from 'lodash'
+} from '@/components/_shared/Popover';
+import { Button } from '@/components/_shared/Button';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { type DatasetFormType } from '@/schema/dataset.schema';
+import { Controller, type Path, UseFormReturn } from 'react-hook-form';
+import { type Filter } from '@/interfaces/search.interface';
+import { set } from 'lodash';
 
 interface Option {
-    value: string
-    label: string
+    value: string;
+    label: string;
 }
 
 interface MulTextProps {
-    options?: Option[]
-    name: Path<DatasetFormType>
-    title: string
-    tooltip?: string
-    facetSelectedCount: Record<string, number>
-    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>
-    setFilters: Dispatch<SetStateAction<Filter[]>>
-    filters: Filter[]
-    value: string[]
-    setValue: Dispatch<SetStateAction<string[]>>
+    options?: Option[];
+    name: Path<DatasetFormType>;
+    title: string;
+    tooltip?: string;
+    facetSelectedCount: Record<string, number>;
+    setFacetSelectedCount: Dispatch<SetStateAction<Record<string, number>>>;
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
+    filters: Filter[];
+    value: string[];
+    setValue: Dispatch<SetStateAction<string[]>>;
 }
 
 function defaultSelectedOptions(
@@ -40,9 +46,9 @@ function defaultSelectedOptions(
     // return array of string from .label
     const f = filters
         .filter((f) => f.key === 'tags')
-        .map((f) => options.find((o) => o.value === f.value)?.label)
+        .map((f) => options.find((o) => o.value === f.value)?.label);
 
-    return f as string[]
+    return f as string[];
 }
 
 export default function TagMulText({
@@ -57,43 +63,43 @@ export default function TagMulText({
     value,
     setValue,
 }: MulTextProps) {
-    const [open, setOpen] = useState(false)
-    const ref = useRef<HTMLButtonElement>(null)
-    const [selected, setSelected] = useState<string[]>([])
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLButtonElement>(null);
+    const [selected, setSelected] = useState<string[]>([]);
     // const [value, setValue] = useState<string[]>(
     //     defaultSelectedOptions(options, filters) || []
     // )
-    const [query, setQuery] = useState('')
+    const [query, setQuery] = useState('');
 
     const filteredOptions =
         query === ''
             ? options
             : options.filter((item) => {
-                  return item.label.toLowerCase().includes(query.toLowerCase())
-              })
+                  return item.label.toLowerCase().includes(query.toLowerCase());
+              });
 
     const onChange = (event: string[]) => {
-        setValue((prev) => [...event])
+        setValue((prev) => [...event]);
         setFacetSelectedCount((prev) => {
-            const newFacetSelectedCount = { ...prev }
-            newFacetSelectedCount[name] = event.length
-            return newFacetSelectedCount
-        })
+            const newFacetSelectedCount = { ...prev };
+            newFacetSelectedCount[name] = event.length;
+            return newFacetSelectedCount;
+        });
         setFilters((prev) => {
-            const newFilters = prev.filter((f) => f.key !== 'tags')
+            const newFilters = prev.filter((f) => f.key !== 'tags');
             event.forEach((e) => {
-                let value = options.find((o) => o.label === e)?.value
-                value = value!
+                let value = options.find((o) => o.label === e)?.value;
+                value = value!;
                 newFilters.push({
                     key: 'tags',
                     title: 'Tags',
                     value: value,
                     label: e,
-                })
-            })
-            return newFilters
-        })
-    }
+                });
+            });
+            return newFilters;
+        });
+    };
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -123,13 +129,13 @@ export default function TagMulText({
                                         <DefaultTooltip content={tooltip}>
                                             <XMarkIcon
                                                 onClick={(e) => {
-                                                    e.stopPropagation()
+                                                    e.stopPropagation();
                                                     onChange(
                                                         value.filter(
                                                             (option: string) =>
                                                                 option !== item
                                                         )
-                                                    )
+                                                    );
                                                 }}
                                                 className="mt-0.5 h-3 w-3 cursor-pointer text-red-600"
                                             />
@@ -201,5 +207,5 @@ export default function TagMulText({
                 </Combobox>
             </PopoverContent>
         </Popover>
-    )
+    );
 }

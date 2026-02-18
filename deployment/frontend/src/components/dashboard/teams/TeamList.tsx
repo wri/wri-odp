@@ -1,8 +1,8 @@
-import React from 'react'
-import { Tab } from '@headlessui/react'
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
-import TeamCard from './TeamCard'
-import Link from 'next/link'
+import React from 'react';
+import { Tab } from '@headlessui/react';
+import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import TeamCard from './TeamCard';
+import Link from 'next/link';
 
 const tabs = [
     {
@@ -10,7 +10,7 @@ const tabs = [
         content: <TeamCard />,
         title: 'All Teams',
     },
-]
+];
 
 export default function TeamList() {
     return (
@@ -24,7 +24,6 @@ export default function TeamList() {
                         >
                             {({ selected }) => (
                                 <div
-                                    
                                     className={`font-normal  px-6 py-4 focus:outline-0  w-full  ${
                                         selected
                                             ? ' border-b-wri-dark-green border-b-2 text-wri-green'
@@ -38,7 +37,8 @@ export default function TeamList() {
                     ))}
                     <Link
                         href="/dashboard/teams/new"
-                        className="font-normal  px-6 py-4 focus:outline-0  w-full" role='tab'
+                        className="font-normal  px-6 py-4 focus:outline-0  w-full"
+                        role="tab"
                     >
                         <div className="flex">
                             <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">
@@ -57,5 +57,5 @@ export default function TeamList() {
                 </Tab.Panels>
             </Tab.Group>
         </section>
-    )
+    );
 }

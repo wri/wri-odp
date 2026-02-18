@@ -1,10 +1,10 @@
-import HighlightCard from './HighlightCard'
-import Carousel from './Carousel'
-import { SwiperSlide } from 'swiper/react'
-import CarouselNavButton from './_shared/CarouselNavButton'
-import { api } from '@/utils/api'
-import Spinner from './_shared/Spinner'
-import { ErrorAlert } from './_shared/Alerts'
+import HighlightCard from './HighlightCard';
+import Carousel from './Carousel';
+import { SwiperSlide } from 'swiper/react';
+import CarouselNavButton from './_shared/CarouselNavButton';
+import { api } from '@/utils/api';
+import Spinner from './_shared/Spinner';
+import { ErrorAlert } from './_shared/Alerts';
 
 export default function Highlights() {
     const {
@@ -17,7 +17,7 @@ export default function Highlights() {
         sortBy: 'metadata_modified desc',
         _isUserSearch: false,
         removeUnecessaryDataInResources: true,
-    })
+    });
 
     return (
         <section
@@ -44,7 +44,7 @@ export default function Highlights() {
                                 <SwiperSlide key={index} className="">
                                     <HighlightCard highlight={highlight} />
                                 </SwiperSlide>
-                            )
+                            );
                         })}
                     </Carousel>
                 </div>
@@ -60,5 +60,5 @@ export default function Highlights() {
                 </div>
             </div>
         </section>
-    )
+    );
 }

@@ -1,0 +1,89 @@
+FROM viderum/ckan:v2.11.0
+
+ENV CKAN_INI=/srv/app/production.ini
+ENV APP_DIR=/srv/app
+
+USER root
+
+# 1. Install System Dependencies (Combined Layer)
+RUN apk update && \
+    apk add --no-cache \
+    build-base \
+    libxslt-dev \
+    python3-dev \
+    git=2.40.4-r0 \
+    gcc \
+    libc-dev \
+    geos-dev \
+    geos \
+    proj \
+    proj-dev \
+    proj-util \
+    musl-dev \
+    patch \
+    openssl \
+    sudo && \
+    rm -rf /var/cache/apk/*
+
+# 2. Python Setup & Base Libraries
+RUN pip3 install --upgrade setuptools==70.0.0 && \
+    pip3 install --force-reinstall -v "Pillow==11.0.0" && \
+    pip3 install --disable-pip-version-check Shapely==2.0.1 && \
+    pip3 install pyproj moto ckanapi httpretty mock
+
+# 3. Install CKAN Extensions (Heavy Git Installs)
+# Grouped to cache this heavy layer unless these specific versions change
+RUN pip3 install -e 'git+https://github.com/ckan/ckanext-scheming.git@5ce30cf2856aee97fa7b49de46847f8119dad355#egg=ckanext-scheming' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-scheming/5ce30cf2856aee97fa7b49de46847f8119dad355/test-requirements.txt' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-s3filestore.git@wri/signed-url#egg=ckanext-s3filestore' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/signed-url/requirements.txt' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-s3filestore/wri/signed-url/dev-requirements.txt' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-auth.git@a9e42702b797eaf3ffe967040867519219d32224#egg=ckanext-auth' && \
+    pip3 install -r 'https://raw.githubusercontent.com/datopian/ckanext-auth/okta/requirements.txt' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-hierarchy.git@1547962cc3f86fd008ee7ba45fd41c5afebe8ae9#egg=ckanext-hierarchy' && \
+    pip3 install -e 'git+https://github.com/datopian/ckanext-issues.git@ea2b3cbace924a162de009fd8e5626052ebc99e1#egg=ckanext-issues' && \
+    pip3 install -e 'git+https://github.com/ckan/ckanext-harvest.git@v1.6.0#egg=ckanext-harvest' && \
+    pip3 install -r 'https://raw.githubusercontent.com/ckan/ckanext-harvest/refs/tags/v1.6.0/requirements.txt'
+
+# 4. Apply Patches
+COPY patches ${APP_DIR}/patches
+RUN for d in $APP_DIR/patches/*; do \
+        if [ -d $d ]; then \
+            for f in `ls $d/*.patch | sort -g`; do \
+                cd $SRC_DIR/`basename "$d"` && echo "$0: Applying patch $f to $SRC_DIR/`basename $d`"; patch -p1 < "$f" ; \
+            done ; \
+        fi ; \
+    done
+
+# 5. Additional Configuration & Scripts
+COPY setup/prerun.py.override ${APP_DIR}/prerun.py
+COPY setup/start_ckan.sh.override ${APP_DIR}/start_ckan.sh
+RUN chmod +x ${APP_DIR}/prerun.py ${APP_DIR}/start_ckan.sh && \
+    chmod 777 ${APP_DIR}/src/ckanext-s3filestore
+
+# Configure sudo
+RUN echo "ckan ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ckan && \
+    chmod 0440 /etc/sudoers.d/ckan
+
+# Install main CKAN requirements (if not already covered)
+RUN pip3 install -r /srv/app/src/ckan/requirements.txt
+
+# 6. Setup Supervisor & Cron (Root operations)
+RUN mkdir -p ${APP_DIR}/supervisor/supervisord.d
+COPY setup/supervisord.conf ${APP_DIR}/supervisor/supervisord.conf
+COPY setup/supervisor.worker.conf ${APP_DIR}/supervisor/supervisord.d/worker.conf
+COPY setup/supervisor.harvest.conf ${APP_DIR}/supervisor/supervisord.d/harvest.conf
+COPY setup/crontab ${APP_DIR}/crontab
+
+# Install Supercronic
+ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.29/supercronic-linux-amd64 \
+    SUPERCRONIC=supercronic-linux-amd64 \
+    SUPERCRONIC_SHA1SUM=cd48d45c4b10f3f0bfdd3a57d054cd05ac96812b
+RUN curl -fsSLO "$SUPERCRONIC_URL" \
+ && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
+ && chmod +x "$SUPERCRONIC"
+
+# Fix permissions at the end
+RUN chown -R ckan:ckan ${APP_DIR}/src/ && \
+    chown -R ckan:ckan ${APP_DIR}/supervisor && \
+    chmod -R u+w ${APP_DIR}/supervisor

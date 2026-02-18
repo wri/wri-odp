@@ -1,34 +1,34 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
     MagnifyingGlassIcon,
     ChatBubbleLeftIcon,
     ClockIcon,
-} from '@heroicons/react/24/outline'
-import { Issue } from '@/schema/ckan.schema'
-import { Disclosure, Transition } from '@headlessui/react'
-import { Index } from 'flexsearch'
-import classNames from '@/utils/classnames'
-import { SimpleEditorV2 } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditorv2'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import type { CommentIssueType } from '@/schema/issue.schema'
-import { CommentSchema } from '@/schema/issue.schema'
-import { ErrorDisplay } from '@/components/_shared/InputGroup'
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import { api } from '@/utils/api'
-import notify from '@/utils/notify'
-import dynamic from 'next/dynamic'
+} from '@heroicons/react/24/outline';
+import { type Issue } from '@/schema/ckan.schema';
+import { Disclosure, Transition } from '@headlessui/react';
+import { type Index } from 'flexsearch';
+import classNames from '@/utils/classnames';
+import { SimpleEditorV2 } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditorv2';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { CommentIssueType } from '@/schema/issue.schema';
+import { CommentSchema } from '@/schema/issue.schema';
+import { ErrorDisplay } from '@/components/_shared/InputGroup';
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import { api } from '@/utils/api';
+import notify from '@/utils/notify';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
+});
 import {
     ExclamationTriangleIcon,
     InformationCircleIcon,
-} from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import Image from 'next/image'
+} from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import Image from 'next/image';
 
 export default function Issues({
     issues,
@@ -38,19 +38,19 @@ export default function Issues({
     creator_id,
     authorized,
 }: {
-    issues: Issue[]
-    index: Index
-    datasetName: string
-    owner_org: string | null
-    creator_id: string | null
-    authorized: boolean
+    issues: Issue[];
+    index: Index;
+    datasetName: string;
+    owner_org: string | null;
+    creator_id: string | null;
+    authorized: boolean;
 }) {
-    const [issueState, setIssueState] = useState<'open' | 'closed'>('open')
-    const [q, setQ] = useState('')
+    const [issueState, setIssueState] = useState<'open' | 'closed'>('open');
+    const [q, setQ] = useState('');
     const filteredIssues =
         q !== ''
             ? issues?.filter((issue) => index.search(q).includes(issue.id))
-            : issues
+            : issues;
 
     return (
         <section id="issues">
@@ -84,8 +84,8 @@ export default function Issues({
                                 { value: 'closed', label: 'Closed' },
                             ]}
                             onChange={(data) => {
-                                const state = data as 'closed' | 'open'
-                                setIssueState(state)
+                                const state = data as 'closed' | 'open';
+                                setIssueState(state);
                             }}
                         />
                     </div>
@@ -107,7 +107,7 @@ export default function Issues({
                 </div>
             </div>
         </section>
-    )
+    );
 }
 
 function IssueCard({
@@ -117,22 +117,22 @@ function IssueCard({
     creator_id,
     authorized,
 }: {
-    issue: Issue
-    datasetName: string
-    owner_org: string | null
-    creator_id: string | null
-    authorized: boolean
+    issue: Issue;
+    datasetName: string;
+    owner_org: string | null;
+    creator_id: string | null;
+    authorized: boolean;
 }) {
-    const [isOpenDelete, setOpenDelete] = useState(false)
-    const [isOpenClose, setOpenClose] = useState(false)
-    const [isSubmitting, setIsubmiting] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const created_at = new Date(issue.created ?? '')
+    const [isOpenDelete, setOpenDelete] = useState(false);
+    const [isOpenClose, setOpenClose] = useState(false);
+    const [isSubmitting, setIsubmiting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const created_at = new Date(issue.created ?? '');
     const options = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-    } as const
+    } as const;
     const formObj = useForm<CommentIssueType>({
         resolver: zodResolver(CommentSchema),
         mode: 'onBlur',
@@ -144,42 +144,42 @@ function IssueCard({
             creator_id: creator_id,
             issuetitle: issue.title,
         },
-    })
-    const { errors } = formObj.formState
+    });
+    const { errors } = formObj.formState;
 
-    const utils = api.useUtils()
+    const utils = api.useUtils();
     const commentIssueApi = api.dataset.createIssueComment.useMutation({
         onSuccess: async (data) => {
             await utils.dataset.getDatasetIssues.invalidate({
                 id: datasetName,
-            })
-            notify(`Comment successfully added`, 'success')
-            setIsubmiting(false)
+            });
+            notify(`Comment successfully added`, 'success');
+            setIsubmiting(false);
         },
         onError: (error) => {
-            setIsubmiting(false)
-            setErrorMessage(error.message)
+            setIsubmiting(false);
+            setErrorMessage(error.message);
         },
-    })
+    });
 
     const closeOpenIssueApi = api.dataset.closeOpenIssue.useMutation({
         onSuccess: async (data) => {
             await utils.dataset.getDatasetIssues.invalidate({
                 id: datasetName,
-            })
-            setOpenClose(false)
-            notify(`Issue successfully ${data}`, 'success')
+            });
+            setOpenClose(false);
+            notify(`Issue successfully ${data}`, 'success');
         },
         onError: (error) => setErrorMessage(error.message),
-    })
+    });
 
     const OnSubmit = (data: CommentIssueType) => {
         if (!isOpenClose && !isOpenDelete) {
-            setIsubmiting(true)
-            commentIssueApi.mutate(data)
-            formObj.resetField('comment')
+            setIsubmiting(true);
+            commentIssueApi.mutate(data);
+            formObj.resetField('comment');
         }
-    }
+    };
 
     return (
         <Disclosure
@@ -294,7 +294,7 @@ function IssueCard({
                                 <Button
                                     className=" bg-wri-gray border-2 rounded-md"
                                     onClick={() => {
-                                        setOpenClose(true)
+                                        setOpenClose(true);
                                     }}
                                     id={issue.id.toString()}
                                 >
@@ -381,17 +381,17 @@ function IssueCard({
                                                 issue.status === 'open'
                                                     ? 'closed'
                                                     : 'open',
-                                        }
+                                        };
 
-                                        closeOpenIssueApi.mutate(payload)
+                                        closeOpenIssueApi.mutate(payload);
                                     } else {
                                         // Handle the case when the 'comment' field is empty
                                         formObj.setError('comment', {
                                             type: 'manual',
                                             message:
                                                 'Comment must not be empty',
-                                        })
-                                        setOpenClose(false)
+                                        });
+                                        setOpenClose(false);
                                     }
                                 }}
                                 id={issue.number.toString()}
@@ -411,5 +411,5 @@ function IssueCard({
                 </Disclosure.Panel>
             </Transition>
         </Disclosure>
-    )
+    );
 }

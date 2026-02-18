@@ -1,9 +1,9 @@
-import React from 'react'
-import { Tab } from '@headlessui/react'
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import TopicCard from './TopicCard'
-import { useSession } from 'next-auth/react'
+import React from 'react';
+import { Tab } from '@headlessui/react';
+import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import TopicCard from './TopicCard';
+import { useSession } from 'next-auth/react';
 
 const tabs = [
     {
@@ -11,11 +11,11 @@ const tabs = [
         content: <TopicCard />,
         title: 'All Topics',
     },
-]
+];
 
 export default function TopicList() {
-    const { data: session } = useSession()
-    
+    const { data: session } = useSession();
+
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
             <Tab.Group>
@@ -33,7 +33,7 @@ export default function TopicList() {
                                             : ''
                                     } `}
                                 >
-                                        <span>{tab.title}</span>
+                                    <span>{tab.title}</span>
                                 </div>
                             )}
                         </Tab>
@@ -41,7 +41,8 @@ export default function TopicList() {
                     {session?.user.sysadmin && (
                         <Link
                             href="/dashboard/topics/new"
-                            className="font-normal  px-6 py-4 focus:outline-0  w-full" role='tab'
+                            className="font-normal  px-6 py-4 focus:outline-0  w-full"
+                            role="tab"
                         >
                             <div className="flex">
                                 <div className="flex  items-center justify-center w-4 h-4 rounded-full  bg-wri-gold mr-2 mt-[0.2rem]">
@@ -61,5 +62,5 @@ export default function TopicList() {
                 </Tab.Panels>
             </Tab.Group>
         </section>
-    )
+    );
 }

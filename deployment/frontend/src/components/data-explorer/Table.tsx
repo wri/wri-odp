@@ -1,18 +1,18 @@
 import {
     flexRender,
-    Table as TableType,
+    type Table as TableType,
     type Column,
-    Header,
+    type Header,
     Updater,
     VisibilityState,
-} from '@tanstack/react-table'
+} from '@tanstack/react-table';
 import {
     ChevronLeftIcon,
     ChevronRightIcon,
     FunnelIcon as FunnelIconSolid,
     MapPinIcon as MapPinIconSolid,
-} from '@heroicons/react/24/solid'
-import React, { Fragment, useEffect, useState } from 'react'
+} from '@heroicons/react/24/solid';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
     ArrowDownIcon,
     ArrowsUpDownIcon,
@@ -21,47 +21,53 @@ import {
     FunnelIcon as FunnelIconOutline,
     XCircleIcon,
     MapPinIcon as MapPinIconOutline,
-} from '@heroicons/react/24/outline'
-import { DefaultTooltip } from '../_shared/Tooltip'
-import { match } from 'ts-pattern'
-import { Menu, Popover, Transition } from '@headlessui/react'
-import { DebouncedInput } from '../_shared/SimpleInput'
+} from '@heroicons/react/24/outline';
+import { DefaultTooltip } from '../_shared/Tooltip';
+import { match } from 'ts-pattern';
+import { Menu, Popover, Transition } from '@headlessui/react';
+import { DebouncedInput } from '../_shared/SimpleInput';
 import {
     Controller,
     FormProvider,
     useFieldArray,
     useForm,
     useFormContext,
-} from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { FilterFormType, FilterObjType, filterSchema } from './search.schema'
-import { Button } from '../_shared/Button'
-import SimpleSelect from '../_shared/SimpleSelect'
-import { DataExplorerColumnFilter } from './DataExplorer'
-import { DatePicker } from '../_shared/DatePicker'
+} from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+    type FilterFormType,
+    type FilterObjType,
+    filterSchema,
+} from './search.schema';
+import { Button } from '../_shared/Button';
+import SimpleSelect from '../_shared/SimpleSelect';
+import { type DataExplorerColumnFilter } from './DataExplorer';
+import { DatePicker } from '../_shared/DatePicker';
 
 type TableProps = {
-    table: TableType<any>
-    numOfRows: number
-    isLoading: boolean
-    columnFilters: DataExplorerColumnFilter[]
-}
+    table: TableType<any>;
+    numOfRows: number;
+    isLoading: boolean;
+    columnFilters: DataExplorerColumnFilter[];
+};
 
 export function TopBar({
     table,
     numOfRows,
 }: {
-    table: TableType<any>
-    numOfRows: number
+    table: TableType<any>;
+    numOfRows: number;
 }) {
-    const pageIndex = table.getState().pagination.pageIndex
-    const pageSize = table.getState().pagination.pageSize
-    const numOfColumns = table.getAllColumns().length
+    const pageIndex = table.getState().pagination.pageIndex;
+    const pageSize = table.getState().pagination.pageSize;
+    const numOfColumns = table.getAllColumns().length;
     return (
         <>
             <span className="text-base font-regular leading-5 text-[#3E3E3E] flex items-center">
                 <TableCellsIcon className="w-5 h-5 mr-2 text-blue-800" />
-                {numOfColumns} columns, {numOfRows} rows
+                {
+                    numOfColumns
+                } columns, {numOfRows} rows
             </span>
             <div>
                 <div className="flex items-center gap-x-3">
@@ -71,7 +77,7 @@ export function TopBar({
                         {(pageIndex + 1) * pageSize} of {numOfRows}
                     </span>
                     <button
-                        aria-label='left-icon'
+                        aria-label="left-icon"
                         className={`w-4 h-4 ${
                             !table.getCanPreviousPage()
                                 ? 'opacity-25'
@@ -83,7 +89,7 @@ export function TopBar({
                         <ChevronLeftIcon />
                     </button>
                     <button
-                        aria-label='right-icon'
+                        aria-label="right-icon"
                         className={`w-4 h-4 ${
                             !table.getCanNextPage()
                                 ? 'opacity-25'
@@ -97,24 +103,28 @@ export function TopBar({
                 </div>
             </div>
         </>
-    )
+    );
 }
 
 function ToggleColumns({ table }: { table: TableType<any> }) {
-    const [q, setQ] = useState('')
+    const [q, setQ] = useState('');
 
     const filteredItems =
         q === ''
             ? table.getAllLeafColumns()
             : table.getAllLeafColumns().filter((column) => {
-                  return column.id.toLowerCase().includes(q.toLowerCase()) || typeof column.columnDef.header === 'string' && column.columnDef.header.toLowerCase().includes(q.toLowerCase())
-              })
+                  return (
+                      column.id.toLowerCase().includes(q.toLowerCase()) ||
+                      (typeof column.columnDef.header === 'string' &&
+                          column.columnDef.header
+                              .toLowerCase()
+                              .includes(q.toLowerCase()))
+                  );
+              });
     return (
         <Popover as="div" className="relative inline-block text-left">
             <Popover.Button className=" p-4 flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
-               
-                    Show Columns
-               
+                Show Columns
             </Popover.Button>
             <Transition
                 as={Fragment}
@@ -191,7 +201,9 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
                                     htmlFor={column.id}
                                     className="font-medium text-gray-900 truncate"
                                 >
-                                    {typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id}
+                                    {typeof column.columnDef.header === 'string'
+                                        ? column.columnDef.header
+                                        : column.id}
                                 </label>
                             </div>
                         </div>
@@ -199,11 +211,11 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
                 </Popover.Panel>
             </Transition>
         </Popover>
-    )
+    );
 }
 
 export function Table({ table, isLoading }: TableProps) {
-    const numOfColumns = table.getAllColumns().length
+    const numOfColumns = table.getAllColumns().length;
     return (
         <div className="max-w-full grow flex border-t border-gray-200">
             <table className="block border-r border-gray-200 shadow">
@@ -286,7 +298,7 @@ export function Table({ table, isLoading }: TableProps) {
                                                     ?.default ?? ''}
                                             </div>
                                         </td>
-                                    )
+                                    );
                                 }
                                 return (
                                     <td key={c.id} className="py-2 pl-12">
@@ -297,14 +309,14 @@ export function Table({ table, isLoading }: TableProps) {
                                             )}
                                         </div>
                                     </td>
-                                )
+                                );
                             })}
                         </tr>
                     ))}
                 </tbody>
             </table>
         </div>
-    )
+    );
 }
 
 function Column({ h }: { h: Header<any, unknown> }) {
@@ -315,7 +327,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 .with(false, () => (
                     <DefaultTooltip content="Sort by this column">
                         <button
-                            aria-label='sort'
+                            aria-label="sort"
                             onClick={() => h.column.toggleSorting(false, true)}
                         >
                             <ArrowsUpDownIcon className="w-4 h-4 opacity-75" />
@@ -325,7 +337,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 .with('asc', () => (
                     <DefaultTooltip content="Sorting asc">
                         <button
-                            aria-label='asc sorting'
+                            aria-label="asc sorting"
                             onClick={() => h.column.toggleSorting(true, true)}
                         >
                             <ArrowUpIcon className="w-4 h-4" />
@@ -334,7 +346,10 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 ))
                 .with('desc', () => (
                     <DefaultTooltip content="Sorting desc">
-                        <button aria-label='desc sorting' onClick={() => h.column.clearSorting()}>
+                        <button
+                            aria-label="desc sorting"
+                            onClick={() => h.column.clearSorting()}
+                        >
                             <ArrowDownIcon className="w-4 h-4" />
                         </button>
                     </DefaultTooltip>
@@ -350,7 +365,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                             <button
                                 aria-label="pin to left"
                                 onClick={() => {
-                                    h.column.pin('left')
+                                    h.column.pin('left');
                                 }}
                             >
                                 <MapPinIconOutline className="w-4 h-4" />
@@ -358,10 +373,10 @@ function Column({ h }: { h: Header<any, unknown> }) {
                         </DefaultTooltip>
                     ) : (
                         <DefaultTooltip content="Unpin">
-                                <button
+                            <button
                                 aria-label="unpin"
                                 onClick={() => {
-                                    h.column.pin(false)
+                                    h.column.pin(false);
                                 }}
                             >
                                 <MapPinIconSolid className="w-4 h-4" />
@@ -371,7 +386,7 @@ function Column({ h }: { h: Header<any, unknown> }) {
                 </div>
             )}
         </div>
-    )
+    );
 }
 
 function FilterColumn({ column }: { column: Column<any, unknown> }) {
@@ -380,7 +395,7 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
             {({ open }) => (
                 <>
                     <Popover.Button aria-label="filter">
-                        <DefaultTooltip content="Filter" >
+                        <DefaultTooltip content="Filter">
                             {open || column.getIsFiltered() ? (
                                 <FunnelIconSolid className="w-4 h-4" />
                             ) : (
@@ -404,11 +419,11 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
                 </>
             )}
         </Popover>
-    )
+    );
 }
 
 function FilterForm({ column }: { column: Column<any, unknown> }) {
-    const defaultValues = column.getFilterValue()
+    const defaultValues = column.getFilterValue();
     const formObj = useForm<FilterFormType>({
         resolver: zodResolver(filterSchema),
         defaultValues: {
@@ -423,14 +438,14 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
                 },
             ],
         },
-    })
-    const { watch } = formObj
+    });
+    const { watch } = formObj;
     useEffect(() => {
         const subscription = watch((value, { name, type }) => {
-            column.setFilterValue(value.filters)
-        })
-        return () => subscription.unsubscribe()
-    }, [watch])
+            column.setFilterValue(value.filters);
+        });
+        return () => subscription.unsubscribe();
+    }, [watch]);
 
     return (
         <FormProvider {...formObj}>
@@ -442,36 +457,32 @@ function FilterForm({ column }: { column: Column<any, unknown> }) {
                 </div>
             </div>
         </FormProvider>
-    )
+    );
 }
 
-function Filters({
-    datePicker = false,
-}: {
-    datePicker?: boolean
-}) {
-    const formObj = useFormContext<FilterFormType>()
-    const { register, control, setValue, watch, getValues } = formObj
+function Filters({ datePicker = false }: { datePicker?: boolean }) {
+    const formObj = useFormContext<FilterFormType>();
+    const { register, control, setValue, watch, getValues } = formObj;
     const { append, fields, remove } = useFieldArray({
         control,
         name: 'filters',
-    })
+    });
     const addFilter = (link: 'and' | 'or') => {
-        setValue(`filters.${lastItem}.link`, link)
+        setValue(`filters.${lastItem}.link`, link);
         append({
             operation: { label: 'Equals', value: '=' },
             value: '',
             link: null,
-        })
-    }
+        });
+    };
     const removeFilter = (index: number) => {
-        remove(index)
-        const lastItem = watch(`filters`).length - 1
+        remove(index);
+        const lastItem = watch(`filters`).length - 1;
         if (lastItem >= 0) {
-            setValue(`filters.${lastItem}.link`, null)
+            setValue(`filters.${lastItem}.link`, null);
         }
-    }
-    const lastItem = fields.length - 1
+    };
+    const lastItem = fields.length - 1;
 
     return (
         <>
@@ -509,12 +520,12 @@ function Filters({
                                 value: '<=',
                             },
                         ].filter((o) => {
-                            if (!datePicker) return true
+                            if (!datePicker) return true;
                             return (
                                 datePicker &&
                                 o.value !== '=' &&
                                 o.value !== '!='
-                            )
+                            );
                         })}
                         placeholder="Select a filter"
                     />
@@ -573,22 +584,22 @@ function Filters({
                 </Button>
             </div>
         </>
-    )
+    );
 }
 
 export function ListOfFilters({
     filters,
     setFilters,
 }: {
-    filters: DataExplorerColumnFilter[]
-    setFilters: (filters: DataExplorerColumnFilter[]) => void
+    filters: DataExplorerColumnFilter[];
+    setFilters: (filters: DataExplorerColumnFilter[]) => void;
 }) {
     function removeFilter(index: number) {
         if (index >= 0 && index < filters.length) {
             const newFilters = filters
                 .slice(0, index)
-                .concat(filters.slice(index + 1))
-            setFilters(newFilters)
+                .concat(filters.slice(index + 1));
+            setFilters(newFilters);
         }
     }
 
@@ -620,5 +631,5 @@ export function ListOfFilters({
                 </button>
             ) : null}
         </>
-    )
+    );
 }

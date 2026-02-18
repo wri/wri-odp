@@ -1,4 +1,4 @@
-import { Tab } from '@headlessui/react'
+import { Tab } from '@headlessui/react';
 
 const tabs = [
     {
@@ -9,7 +9,7 @@ const tabs = [
         id: 'apiTokens',
         title: 'API Tokens',
     },
-]
+];
 
 export function SettingsTabs() {
     return (
@@ -36,5 +36,5 @@ export function SettingsTabs() {
                 </Tab>
             ))}
         </>
-    )
+    );
 }

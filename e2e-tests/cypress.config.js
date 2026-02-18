@@ -35,4 +35,4 @@ export default defineConfig({
       return config;
     },
   },
-})
+});

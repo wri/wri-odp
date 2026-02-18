@@ -1,23 +1,23 @@
-import Facet from '@/components/search/Facet'
-import FiltersSelected from '@/components/search/FiltersSelected'
-import LocationSearch from '@/components/search/LocationSearch'
-import MetadataModifiedFacet from '@/components/search/MetadataModifiedFacet'
-import TemporalCoverageFacet from '@/components/search/TemporalCoverageFacet'
-import { Filter } from '@/interfaces/search.interface'
-import { SearchInput } from '@/schema/search.schema'
-import { api } from '@/utils/api'
-import {updateFrequencyLabels, visibilityTypeLabels} from '@/utils/constants'
-import { useSession } from 'next-auth/react'
-import { Dispatch, SetStateAction, useState } from 'react'
+import Facet from '@/components/search/Facet';
+import FiltersSelected from '@/components/search/FiltersSelected';
+import LocationSearch from '@/components/search/LocationSearch';
+import MetadataModifiedFacet from '@/components/search/MetadataModifiedFacet';
+import TemporalCoverageFacet from '@/components/search/TemporalCoverageFacet';
+import { type Filter } from '@/interfaces/search.interface';
+import { type SearchInput } from '@/schema/search.schema';
+import { api } from '@/utils/api';
+import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants';
+import { useSession } from 'next-auth/react';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 
 export default function FiltersPanel({
     filters,
     setFilters,
 }: {
-    filters: Filter[]
-    setFilters: Dispatch<SetStateAction<Filter[]>>
+    filters: Filter[];
+    setFilters: Dispatch<SetStateAction<Filter[]>>;
 }) {
-    const session = useSession()
+    const session = useSession();
 
     /*
      * Query used to fetch all possible facet options
@@ -40,25 +40,25 @@ export default function FiltersPanel({
         { key: 'language', title: 'Language' },
         { key: 'wri_data', title: 'WRI Data' },
         { key: 'metadata_modified', title: 'Last Updated' },
-    ]
+    ];
 
     if (session.status == 'authenticated') {
-        facetFields.push({ key: 'visibility_type', title: 'Visibility' })
+        facetFields.push({ key: 'visibility_type', title: 'Visibility' });
     }
 
     const [facetsQuery] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 5 },
         facetFields: facetFields.map((ff) => ff.key),
-    })
+    });
 
     const { data: facetsData, isLoading: isLoadingFacets } =
-        api.dataset.getAllDataset.useQuery(facetsQuery)
+        api.dataset.getAllDataset.useQuery(facetsQuery);
 
-    const searchFacets = facetsData?.searchFacets
+    const searchFacets = facetsData?.searchFacets;
 
     if (searchFacets) {
-        for (let key in searchFacets) {
+        for (const key in searchFacets) {
             /*
              * Boolean fields look better with Yes and No options
              *
@@ -68,24 +68,24 @@ export default function FiltersPanel({
                     searchFacets[key]?.items.map((i) => ({
                         ...i,
                         display_name: i.name == 'true' ? 'Yes' : 'No',
-                    })) || []
+                    })) || [];
 
                 // @ts-ignore
-                searchFacets[key].items = items
+                searchFacets[key].items = items;
             } else if (key == 'visibility_type') {
                 // @ts-ignore
                 searchFacets[key].items = searchFacets[key].items.map((i) => ({
                     ...i,
                     // @ts-ignore
                     display_name: visibilityTypeLabels[i.name],
-                }))
+                }));
             } else if (key == 'update_frequency') {
                 // @ts-ignore
                 searchFacets[key].items = searchFacets[key].items.map((i) => ({
                     ...i,
                     // @ts-ignore
                     display_name: updateFrequencyLabels[i.name],
-                }))
+                }));
             }
         }
     }
@@ -117,8 +117,7 @@ export default function FiltersPanel({
                                             <Facet
                                                 text={ff.title}
                                                 options={
-                                                    searchFacets &&
-                                                    searchFacets[ff.key]
+                                                    searchFacets?.[ff.key]
                                                         ? searchFacets[
                                                               ff.key
                                                           ]?.items
@@ -145,5 +144,5 @@ export default function FiltersPanel({
                 </nav>
             </div>
         </div>
-    )
+    );
 }

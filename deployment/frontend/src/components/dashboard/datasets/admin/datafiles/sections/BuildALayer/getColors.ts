@@ -1,15 +1,15 @@
-import { P, match } from 'ts-pattern'
-import { LegendsFormType, RenderFormType } from './layer.schema'
+import { P, match } from 'ts-pattern';
+import { type LegendsFormType, type RenderFormType } from './layer.schema';
 
 export function getColors(renderItem?: RenderFormType | null) {
-    if (!renderItem || !renderItem.layers) return []
+    if (!renderItem?.layers) return [];
     const paintObjs = renderItem.layers
         .flatMap((item) => {
             return [
                 item.paint?.['fill-color'],
                 item.paint?.['line-color'],
                 item.paint?.['circle-color'],
-            ]
+            ];
         })
         .filter((item) => item !== undefined)
         .flatMap((item) => {
@@ -24,9 +24,9 @@ export function getColors(renderItem?: RenderFormType | null) {
                             .map((item) => item.color)
                             .filter((item) => item !== undefined)
                 )
-                .otherwise(() => [])
-        })
-    return paintObjs
+                .otherwise(() => []);
+        });
+    return paintObjs;
 }
 
 export function legendsToAdd(
@@ -35,8 +35,8 @@ export function legendsToAdd(
 ) {
     const existingColors = legends
         ? legends.items.map((item) => item.color)
-        : []
-    const colors = getColors(render)
+        : [];
+    const colors = getColors(render);
     const colorsToAdd = colors
         .filter(
             (item) =>
@@ -46,9 +46,9 @@ export function legendsToAdd(
                 )
         )
         .map((item) => {
-            if (item.length === 7) return item
+            if (item.length === 7) return item;
             if (item.length === 4)
-                return `#${item[1]}${item[1]}${item[2]}${item[2]}${item[3]}${item[3]}`
-        })
-    return colorsToAdd
+                return `#${item[1]}${item[1]}${item[2]}${item[2]}${item[3]}${item[3]}`;
+        });
+    return colorsToAdd;
 }

@@ -1,17 +1,17 @@
-import React from 'react'
+import React from 'react';
 import {
     ArrowDownOnSquareIcon,
     BuildingLibraryIcon,
     UsersIcon,
     SquaresPlusIcon,
     Squares2X2Icon,
-} from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import { useSession } from 'next-auth/react'
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 export default function QuickAction({ drag }: { drag: boolean }) {
-    const session = useSession()
-    const loginUser = session.data?.user?.name
+    const session = useSession();
+    const loginUser = session.data?.user?.name;
 
     return (
         <div
@@ -63,5 +63,5 @@ export default function QuickAction({ drag }: { drag: boolean }) {
                 </Link>
             </div>
         </div>
-    )
+    );
 }

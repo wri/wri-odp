@@ -1,5 +1,5 @@
-import { Accordion } from '../Accordion'
-import { Tab } from '@headlessui/react'
+import { Accordion } from '../Accordion';
+import { Tab } from '@headlessui/react';
 import {
     ArrowUpTrayIcon,
     FolderPlusIcon,
@@ -9,27 +9,30 @@ import {
     PaperClipIcon,
     MinusCircleIcon,
     Squares2X2Icon,
-} from '@heroicons/react/24/outline'
-import classNames from '@/utils/classnames'
-import { LinkExternalForm } from './sections/LinkExternalForm'
-import { UploadForm } from './sections/UploadForm'
-import { useMemo, useRef } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-import { DataFileAccordion } from './DatafileAccordion'
-import { match, P } from 'ts-pattern'
-import { BuildALayer } from './sections/BuildALayer/BuildALayerSection'
-import { DatasetFormType, ResourceFormType } from '@/schema/dataset.schema'
-import Uppy, { UppyFile } from '@uppy/core'
-import AwsS3 from '@uppy/aws-s3'
-import { getUploadParameters } from '@/utils/uppyFunctions'
-import { v4 as uuidv4 } from 'uuid'
-import { convertBytes } from '@/utils/convertBytes'
-import { useDataDictionary } from '@/utils/getDataDictionary'
-import { Field } from 'tableschema'
-import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
-import { TileCacheForm } from './sections/TileCacheForm'
-import { GeeAssetForm } from './sections/GeeAssetForm'
+} from '@heroicons/react/24/outline';
+import classNames from '@/utils/classnames';
+import { LinkExternalForm } from './sections/LinkExternalForm';
+import { UploadForm } from './sections/UploadForm';
+import { useMemo, useRef } from 'react';
+import { type UseFormReturn } from 'react-hook-form';
+import { DataFileAccordion } from './DatafileAccordion';
+import { match, P } from 'ts-pattern';
+import { BuildALayer } from './sections/BuildALayer/BuildALayerSection';
+import {
+    type DatasetFormType,
+    type ResourceFormType,
+} from '@/schema/dataset.schema';
+import Uppy, { type UppyFile } from '@uppy/core';
+import AwsS3 from '@uppy/aws-s3';
+import { getUploadParameters } from '@/utils/uppyFunctions';
+import { v4 as uuidv4 } from 'uuid';
+import { convertBytes } from '@/utils/convertBytes';
+import { useDataDictionary } from '@/utils/getDataDictionary';
+import { type Field } from 'tableschema';
+import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { TileCacheForm } from './sections/TileCacheForm';
+import { GeeAssetForm } from './sections/GeeAssetForm';
 
 export function AddDataFile({
     remove,
@@ -37,14 +40,14 @@ export function AddDataFile({
     index,
     formObj,
 }: {
-    remove: () => void
-    index: number
-    field: ResourceFormType
-    formObj: UseFormReturn<DatasetFormType>
+    remove: () => void;
+    index: number;
+    field: ResourceFormType;
+    formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { setValue, watch } = formObj
-    const datafile = watch(`resources.${index}`)
-    const uploadInputRef = useRef<HTMLInputElement>(null)
+    const { setValue, watch } = formObj;
+    const datafile = watch(`resources.${index}`);
+    const uploadInputRef = useRef<HTMLInputElement>(null);
     const { isLoading: dataDictionaryLoading } = useDataDictionary(
         watch(`resources.${index}.fileBlob`),
         watch(`resources.${index}.resourceId`),
@@ -61,7 +64,7 @@ export function AddDataFile({
                     year: 'numeric',
                     yearmonth: 'timestamp',
                     duration: 'numeric',
-                } as const
+                } as const;
                 const dataDictionary = data.map(
                     (item: Field, index: number) => ({
                         _id: index,
@@ -73,12 +76,12 @@ export function AddDataFile({
                             default: '',
                         },
                     })
-                )
-                setValue(`resources.${index}.schema`, dataDictionary)
+                );
+                setValue(`resources.${index}.schema`, dataDictionary);
             }
         },
         watch(`resources.${index}.fileBlob`)?.type === 'text/csv'
-    )
+    );
 
     const uppy = useMemo(() => {
         const uppy = new Uppy({
@@ -97,67 +100,67 @@ export function AddDataFile({
                           }`
                         : `ckan/resources/${datafile.resourceId}`
                 ),
-        })
-        return uppy
-    }, [])
+        });
+        return uppy;
+    }, []);
 
     function upload() {
         uppy.upload().then((result) => {
-            if (result && result.successful[0]) {
-                let paths = new URL(result.successful[0].uploadURL).pathname
+            if (result?.successful[0]) {
+                const paths = new URL(result.successful[0].uploadURL).pathname
                     .substring(1)
-                    .split('/')
-                const url = result.successful[0]?.uploadURL ?? null
-                const name = url ? url.split('/').pop() : ''
-                const format = result.successful[0].extension
-                const size = result.successful[0].size
-                const key = paths.slice(0, paths.length).join('/')
-                uppy.setState({ ...uppy.getState(), files: [] })
-                setValue(`resources.${index}.key`, key)
-                setValue(`resources.${index}.name`, name)
-                setValue(`resources.${index}.size`, size)
-                setValue(`resources.${index}.format`, format)
+                    .split('/');
+                const url = result.successful[0]?.uploadURL ?? null;
+                const name = url ? url.split('/').pop() : '';
+                const format = result.successful[0].extension;
+                const size = result.successful[0].size;
+                const key = paths.slice(0, paths.length).join('/');
+                uppy.setState({ ...uppy.getState(), files: [] });
+                setValue(`resources.${index}.key`, key);
+                setValue(`resources.${index}.name`, name);
+                setValue(`resources.${index}.size`, size);
+                setValue(`resources.${index}.format`, format);
                 if (uploadInputRef && uploadInputRef.current)
-                    uploadInputRef.current.value = ''
+                    uploadInputRef.current.value = '';
             }
 
             if (result.failed.length > 0) {
                 result.failed.forEach((file) => {
-                    console.error(file.error)
-                })
+                    console.error(file.error);
+                });
             }
-        })
+        });
     }
 
     uppy.on('progress', (progress) => {
         if (typeof window !== 'undefined') {
             const progressBar = document.getElementById(
                 `${datafile.resourceId}_upload_progress`
-            )
+            );
             if (progressBar) {
-                progressBar.textContent = progress + '%'
+                progressBar.textContent = progress + '%';
             }
         }
-    })
+    });
 
     uppy.on('upload', (_result) => {
-        setValue(`resources.${index}.type`, 'upload')
-    })
+        setValue(`resources.${index}.type`, 'upload');
+    });
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const files = e.target.files
-        if (!files || !files[0]) return
-        const slice = files[0].slice(0, 1000000)
+        const files = e.target.files;
+        if (!files?.[0]) return;
+        const slice = files[0].slice(0, 1000000);
         const slicedFile = new File([slice], files[0].name, {
             type: files[0].type,
-        })
-        setValue(`resources.${index}.fileBlob`, slicedFile)
+        });
+        setValue(`resources.${index}.fileBlob`, slicedFile);
         uppy.addFile({
             name: files[0].name,
             type: files[0].type,
             data: files[0],
-        })
-        upload()
+        });
+        upload();
     }
 
     return (
@@ -413,5 +416,5 @@ export function AddDataFile({
                 </div>
             </DataFileAccordion>
         </>
-    )
+    );
 }

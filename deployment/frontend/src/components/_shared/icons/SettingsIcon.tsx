@@ -15,5 +15,5 @@ export function SettingsIcon() {
                 strokeLinejoin="round"
             />
         </svg>
-    )
+    );
 }

@@ -1,7 +1,7 @@
-import classNames from '@/utils/classnames'
-import { Tab } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/20/solid'
-import { match } from 'ts-pattern'
+import classNames from '@/utils/classnames';
+import { Tab } from '@headlessui/react';
+import { CheckIcon } from '@heroicons/react/20/solid';
+import { match } from 'ts-pattern';
 
 export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
     const steps = [
@@ -15,8 +15,8 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
             .with(1, () => ({ ...step, status: 'upcoming' }))
             .with(2, () => ({ ...step, status: 'upcoming' }))
             .with(3, () => ({ ...step, status: 'upcoming' }))
-            .otherwise(() => ({ ...step, status: 'complete' }))
-    })
+            .otherwise(() => ({ ...step, status: 'complete' }));
+    });
 
     return (
         <Tab.List
@@ -115,5 +115,5 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
                 </Tab>
             ))}
         </Tab.List>
-    )
+    );
 }

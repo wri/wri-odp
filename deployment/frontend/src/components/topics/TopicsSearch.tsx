@@ -1,7 +1,7 @@
-import React, { useRef } from 'react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import type { SearchInput } from '@/schema/search.schema'
-import Spinner from '@/components/_shared/Spinner'
+import React, { useRef } from 'react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import type { SearchInput } from '@/schema/search.schema';
+import Spinner from '@/components/_shared/Spinner';
 
 export default function TopicsSearch({
     setQuery,
@@ -9,10 +9,10 @@ export default function TopicsSearch({
     isLoading,
     groupType,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<string>>
-    query: string
-    isLoading: boolean
-    groupType: string
+    setQuery: React.Dispatch<React.SetStateAction<string>>;
+    query: string;
+    isLoading: boolean;
+    groupType: string;
 }) {
     return (
         <section
@@ -61,5 +61,5 @@ export default function TopicsSearch({
                 </div>
             </form>
         </section>
-    )
+    );
 }

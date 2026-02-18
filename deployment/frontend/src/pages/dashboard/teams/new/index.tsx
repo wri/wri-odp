@@ -1,6 +1,6 @@
-import Header from '@/components/_shared/Header'
-import CreateTeamForm from '@/components/dashboard/teams/forms/CreateTeamForm'
-import { NextSeo } from 'next-seo'
+import Header from '@/components/_shared/Header';
+import CreateTeamForm from '@/components/dashboard/teams/forms/CreateTeamForm';
+import { NextSeo } from 'next-seo';
 
 export default function NewTeamPage() {
     return (
@@ -9,5 +9,5 @@ export default function NewTeamPage() {
             <Header />
             <CreateTeamForm />
         </>
-    )
+    );
 }

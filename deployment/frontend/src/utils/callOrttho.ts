@@ -1,4 +1,4 @@
-import qs from 'query-string'
+import qs from 'query-string';
 
 export async function callOrttho(data: any) {
     const response = await fetch('https://ortto.wri.org/custom-forms/', {
@@ -7,7 +7,7 @@ export async function callOrttho(data: any) {
         headers: {
             'content-type': 'application/x-www-form-urlencoded',
         },
-    })
-    const json = await response.text()
-    return json
+    });
+    const json = await response.text();
+    return json;
 }

@@ -123,6 +123,8 @@ def test_package_create_public(mail_user):
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
         "groups": [{"id": group_dict["id"]}],
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}]
     }
 
     try:
@@ -304,6 +306,8 @@ def test_package_create_draft(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}]
     }
 
     dataset_draft["draft"] = True
@@ -489,6 +493,8 @@ def test_package_create_internal(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}]
     }
 
     dataset_internal["visibility_type"] = "internal"
@@ -675,6 +681,8 @@ def test_package_create_private(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}]
     }
 
     dataset_private["visibility_type"] = "private"

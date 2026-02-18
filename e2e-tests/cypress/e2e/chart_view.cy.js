@@ -85,7 +85,7 @@ describe("Chart view", () => {
     "should be creatable from the UI",
     {
       retries: {
-        runMode: 10,
+        runMode: 3,
         openMode: 0,
       },
     },
@@ -145,7 +145,7 @@ describe("Chart view", () => {
     "should be editable from the UI",
     {
       retries: {
-        runMode: 10,
+        runMode: 3,
         openMode: 0,
       },
     },
@@ -189,7 +189,7 @@ describe("Chart view", () => {
     "should be accessible through the dataset page",
     {
       retries: {
-        runMode: 10,
+        runMode: 3,
         openMode: 0,
       },
     },

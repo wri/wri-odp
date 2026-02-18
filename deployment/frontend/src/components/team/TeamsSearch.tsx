@@ -1,16 +1,16 @@
-import React, { useRef } from 'react'
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
-import type { SearchInput } from '@/schema/search.schema'
-import Spinner from '@/components/_shared/Spinner'
+import React, { useRef } from 'react';
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
+import type { SearchInput } from '@/schema/search.schema';
+import Spinner from '@/components/_shared/Spinner';
 
 export default function TeamsSearch({
     setQuery,
     query,
     isLoading,
 }: {
-    setQuery: React.Dispatch<React.SetStateAction<string>>
-    query: string
-    isLoading: boolean
+    setQuery: React.Dispatch<React.SetStateAction<string>>;
+    query: string;
+    isLoading: boolean;
 }) {
     return (
         <section
@@ -53,5 +53,5 @@ export default function TeamsSearch({
                 </div>
             </form>
         </section>
-    )
+    );
 }

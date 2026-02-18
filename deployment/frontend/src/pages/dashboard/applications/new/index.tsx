@@ -1,6 +1,6 @@
-import Header from '@/components/_shared/Header'
-import CreateApplicationForm from '@/components/dashboard/applications/forms/CreateApplicationForm'
-import { NextSeo } from 'next-seo'
+import Header from '@/components/_shared/Header';
+import CreateApplicationForm from '@/components/dashboard/applications/forms/CreateApplicationForm';
+import { NextSeo } from 'next-seo';
 
 export default function NewApplicationPage() {
     return (
@@ -9,5 +9,5 @@ export default function NewApplicationPage() {
             <Header />
             <CreateApplicationForm />
         </>
-    )
+    );
 }

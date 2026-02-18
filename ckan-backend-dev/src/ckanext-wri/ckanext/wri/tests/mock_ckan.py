@@ -671,8 +671,8 @@ DATASETS = [
         "author": None,
         "author_email": None,
         "authors": [
-            {"name": "Leah Lazer", "email": None},
-            {"name": "Lydia Freehafer", "email": None},
+            {"name": "Leah Lazer", "email": "email.leah@wri.org"},
+            {"name": "Lydia Freehafer", "email": "email.lydia@wri.org"},
             {"name": "Brian Zepka", "email": "brian.zepka@wri.org"},
         ],
         "cautions": "\u003cp\u003eThis dataset is the result of new data collection by WRI’s Electric School Bus Initiative, and is sourced from hundreds of news articles, school district webpages, and other online sources.\nTo the best of our knowledge, these data are up to date as of the time described in documentation packaged with each version.\nThe data represent a snapshot in time, in a rapidly evolving space.\u003c/p\u003e",
@@ -803,7 +803,7 @@ DATASETS = [
         "authors": [
             {"name": "Elise Mazur", "email": "elise.mazur@wri.org"},
             {"name": "Michelle Sims", "email": "michelle.sims@wri.org"},
-            {"name": "... and others", "email": None},
+            {"name": "... and others", "email": "michelle.sims@wri.org"},
         ],
         "cautions": '\u003cul\u003e\n\u003cli\u003eA conservative approach to mapping natural lands results in overestimation of natural lands in some regions.\u003c/li\u003e\n\u003cli\u003eIt is recommended that this map only be used for purposes that align with the definitions of "natural" used in the map such as setting a corporate "no conversion of natural ecosystems" target associated with SBTN Land.\u003c/li\u003e\n\u003cli\u003eIt is \u003cstrong\u003enot recommended\u003c/strong\u003e to use this map data to quantify the area or proportion of natural or non-natural lands within any spatial region.\u003c/li\u003e\n\u003cli\u003eThis data concerns a single time slice circa 2020 and does not contain time-series data that may be useful for monitoring conversion.\u003c/li\u003e\n\u003cli\u003eThis data incorporates regional data with global data and therefore is not globally consistent. If comparing across geographies, refer to the figures and tables in the technical note identifying where regional data was used. \u003c/li\u003e\n\u003cli\u003eThe definitions of "natural" used in the map does not consider or define attributes such as importance of land for biodiversity or the quality of ecosystems.\u003c/li\u003e\n\u003c/ul\u003e',
         "citation": 'Mazur, E., M. Sims, E. Goldman, M. Schneider, M.D. Pirri, C.R. Beatty, F. Stolle, Stevenson, M. 2024. "SBTN Natural Lands Map v1: Technical Documentation". Science Based Targets for Land Version 1-- Supplementary Material. Science Based Targets Network. https://sciencebasedtargetsnetwork.org/wp-content/uploads/2024/09/Technical-Guidance-2024-Step3-Land-v1-Natural-Lands-Map.pdf',
@@ -943,8 +943,8 @@ DATASETS = [
         "author": None,
         "author_email": None,
         "authors": [
-            {"name": "Jamie Tolan", "email": None},
-            {"name": "... and 15 others", "email": None},
+            {"name": "Jamie Tolan", "email": "michelle.sims@wri.org"},
+            {"name": "... and 15 others", "email": "michelle.sims@wri.org"},
         ],
         "cautions": "\u003cul\u003e\n\u003cli\u003eThis data is based on very high resolution satellite images collected at varying times and atmospheric conditions. As a result the global map does not represent a snapshot in time. Auxiliary files available on AWS include imagery details.\u003c/li\u003e\n\u003cli\u003eThe machine learning model producing this data is trained and validated on a limited geographic range. Continued comparison and validation is needed to assess and contextualize errors and uncertainties in the estimates across all geographies and input imagery conditions.\u003c/li\u003e\n\u003cli\u003eField validation for very tall trees (&gt;25 meters) was not performed during the development of this dataset. This may affect derivatives of the data such as above ground carbon estimates.\u003c/li\u003e\n\u003cli\u003eTerrain slope may influence canopy height estimates by way of modifying the length of a shadow versus totally flat ground. The machine learning model may produce estimates with systematic bias in areas depending on the properties of the surrounding terrain.\u003c/li\u003e\n\u003c/ul\u003e",
         "citation": "Tolan, J., Yang, H., Nosarzewski B., et al. (2024). Very high resolution canopy height maps from RGB imagery using self-supervised vision transformer and convolutional decoder trained on aerial lidar, Remote Sensing of Environment. https://doi.org/10.1016/j.rse.2023.113888",
@@ -1107,7 +1107,7 @@ DATASETS = [
                 "email": "leandro.parente@opengeohub.org",
             },
             {"name": "Lindsey Sloat", "email": "lindsey.sloat@wri.org"},
-            {"name": "... and 18 others", "email": None},
+            {"name": "... and 18 others", "email": "michelle.sims@wri.org"},
         ],
         "cautions": "\u003cul\u003e\n\u003cli\u003eMany areas of the world are predicted to be cultivated grassland but are actually cropland or some other cyclical short vegetation land cover. The peer-reviewed publication should be consulted for known defects and geographic contextualization including regions of under or over-prediction for certain classes.\u003c/li\u003e\n\u003cli\u003eThe primary data products are two grassland class probability maps. The dominant grassland class map is based on balanced probability thresholds for each map which results in maps that likely have a conservative estimate for total grassland worldwide.\u003c/li\u003e\n\u003cli\u003eThe dominant grassland class maps preferentially select for the natural/semi-natural class over the cultivated class when the probability threshold for each is achieved. This is in part because the natural/semi-natural classification model had higher accuracy.\u003c/li\u003e\n\u003c/ul\u003e",
         "citation": "Parente, L., Sloat, L., Mesquita, V., et al. (2024). Annual 30-m maps of global grassland class and extent (2000–2022) based on spatiotemporal Machine Learning, Scientific Data. http://doi.org/10.1038/s41597-024-04139-6",
@@ -1308,9 +1308,9 @@ DATASETS = [
         "author": None,
         "author_email": None,
         "authors": [
-            {"name": "Leandro Parente", "email": None},
-            {"name": "Vinicius Mesquita", "email": None},
-            {"name": "... and 6 others", "email": None},
+            {"name": "Leandro Parente", "email": "michelle.sims@wri.org"},
+            {"name": "Vinicius Mesquita", "email": "michelle.sims@wri.org"},
+            {"name": "... and 6 others", "email": "michelle.sims@wri.org"},
         ],
         "cautions": "\u003cul\u003e\n\u003cli\u003eThis is research data collected and used for the creation of machine learning models to predict certain types of land cover. Using and building upon this data may be beneficial in the future but the fundamental collection and visual interpretation occur within a constrained question framework.\u003c/li\u003e\n\u003c/ul\u003e",
         "citation": "Parente, L., Sloat, L., Mesquita, V., et al. (2024). Annual 30-m maps of global grassland class and extent (2000–2022) based on spatiotemporal Machine Learning, Scientific Data. http://doi.org/10.1038/s41597-024-04139-6",
@@ -1434,11 +1434,11 @@ DATASETS = [
         "author_email": None,
         "authors": [
             {"name": "Logan Byers", "email": "logan.byers@wri.org"},
-            {"name": "Johannes Friedrich", "email": None},
-            {"name": "Roman Hennig", "email": None},
-            {"name": "Aaron Kressig", "email": None},
-            {"name": "Xinyue Li", "email": None},
-            {"name": "Laura Malaguzzi Valeri", "email": None},
+            {"name": "Johannes Friedrich", "email": "michelle.sims@wri.org"},
+            {"name": "Roman Hennig", "email": "michelle.sims@wri.org"},
+            {"name": "Aaron Kressig", "email": "michelle.sims@wri.org"},
+            {"name": "Xinyue Li", "email": "michelle.sims@wri.org"},
+            {"name": "Laura Malaguzzi Valeri", "email": "michelle.sims@wri.org"},
         ],
         "cautions": '\u003cp\u003eThe "Primary Fuel" is the fuel that has been identified to provide the largest portion of generated electricity for the plant or has been identified as the primary fuel by the data source.\u003c/p\u003e\n\u003cp\u003eFor power plants that have data in multiple Other Fuel fields, the ordering of the fuels should not be taken to indicate any priority or preference of the fuel for operating the power plant or generating units.\nThough the "Other Fuel" columns in the database are numbered sequentially from 1, the ordering is insignificant.\nGeneration is provided at the year scale for the years 2013-2017.\nThe generation values may correspond to a calendar year or a fiscal or regulatory year; no distinction is provided in the database.\u003c/p\u003e',
         "citation": "Global Energy Observatory, Google, KTH Royal Institute of Technology in Stockholm, Enipedia, World Resources Institute. 2021. Global Power Plant Database version 1.3.0. Accessed through https://datasets.wri.org/datasets/global-power-plant-database on \u003cdate\u003e",
@@ -1588,18 +1588,18 @@ INVALID_TAGS = [
 ]
 
 ORGS = [
-    {"id": "afe1d718-7853-4a88-9386-cd81459f0519", "name": "climate-economics-finance"},
-    {"id": "ad461dbd-f646-4080-94a9-c10005c42a43", "name": "land-carbon-lab"},
-    {"id": "164c340b-5cf2-49da-98f9-024fdb7e0e42", "name": "electric-school-bus-initiative"}
+    {"id": "afe1d718-7853-4a88-9386-cd81459f0519", "name": "climate-economics-finance", "title": "climate-economics-finance"},
+    {"id": "ad461dbd-f646-4080-94a9-c10005c42a43", "name": "land-carbon-lab", "title": "land-carbon-lab"},
+    {"id": "164c340b-5cf2-49da-98f9-024fdb7e0e42", "name": "electric-school-bus-initiative", "title": "electric-school-bus-initiative"}
 ]
 
 GROUPS = [
-    {"id": "bcf5398c-4880-4678-a934-f741e1b426bc", "name": "economy-industry"},
-    {"id": "a82e7d91-8c0f-429f-b145-ab7f52ea9723", "name": "power-sector"},
-    {"id": "c74fae7a-9b54-4c02-b7b5-e3ca00bff8ef", "name": "forests"},
-    {"id": "80539133-5aaa-4257-9aeb-fe6f56e2837f", "name": "cities"},
-    {"id": "4926571e-a4e5-403d-8278-31a570039cc3", "name": "mobility"},
-    {"id": "c1427a08-9de5-4182-9c05-b6a61fda3127", "name": "land"}
+    {"id": "bcf5398c-4880-4678-a934-f741e1b426bc", "name": "economy-industry", "title": "economy-industry" },
+    {"id": "a82e7d91-8c0f-429f-b145-ab7f52ea9723", "name": "power-sector", "title": "power-sector"},
+    {"id": "c74fae7a-9b54-4c02-b7b5-e3ca00bff8ef", "name": "forests", "title": "forests"},
+    {"id": "80539133-5aaa-4257-9aeb-fe6f56e2837f", "name": "cities", "title": "cities"},
+    {"id": "4926571e-a4e5-403d-8278-31a570039cc3", "name": "mobility", "title": "mobility"},
+    {"id": "c1427a08-9de5-4182-9c05-b6a61fda3127", "name": "land", "title": "land"}
 ]
 
 REVISIONS = [

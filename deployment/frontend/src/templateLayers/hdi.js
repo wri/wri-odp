@@ -11,7 +11,7 @@ export const hdi = {
     thumbnailUrl:
         'https://s3.amazonaws.com/wri-api-backups/resourcewatch/prod/thumbnails/00b9c036-38ea-4ece-a00f-ca315e25e0e0-1643743980009.png',
     layerConfig: {
-        type: "vector",
+        type: 'vector',
         account: 'wri-rw',
         source: {
             type: 'vector',
@@ -120,4 +120,4 @@ export const hdi = {
     staticImageConfig: {},
     createdAt: '2017-09-14T15:23:56.703Z',
     updatedAt: '2021-12-22T17:50:46.360Z',
-}
+};

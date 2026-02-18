@@ -3,11 +3,11 @@ import type {
     LayerSpec,
     Source,
     ProviderMaker,
-} from '@vizzuality/layer-manager'
-import omit from 'lodash/omit'
+} from '@vizzuality/layer-manager';
+import omit from 'lodash/omit';
 
 export class VectorTileProvider implements ProviderMaker {
-    public name = 'vectorlayer'
+    public name = 'vectorlayer';
 
     public handleData = (
         layerModel: LayerModel,
@@ -24,14 +24,14 @@ export class VectorTileProvider implements ProviderMaker {
                     //@ts-ignore
                     tiles: [layer.source.tiles[0]],
                 } as Source,
-            }
+            };
             if (resolve) {
-                resolve(result)
+                resolve(result);
             }
         } catch (error: any) {
             if (reject) {
-                reject(new Error(error.message))
+                reject(new Error(error.message));
             }
         }
-    }
+    };
 }

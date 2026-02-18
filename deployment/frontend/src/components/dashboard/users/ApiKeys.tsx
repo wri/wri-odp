@@ -1,47 +1,50 @@
-import { ErrorAlert, InfoAlert } from '@/components/_shared/Alerts'
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import { ErrorDisplay } from '@/components/_shared/InputGroup'
-import Modal from '@/components/_shared/Modal'
-import { ApiToken } from '@/interfaces/user.interface'
-import { api } from '@/utils/api'
-import classNames from '@/utils/classnames'
-import notify from '@/utils/notify'
-import { Dialog } from '@headlessui/react'
-import { ExclamationTriangleIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { useSession } from 'next-auth/react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { ErrorAlert, InfoAlert } from '@/components/_shared/Alerts';
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import { ErrorDisplay } from '@/components/_shared/InputGroup';
+import Modal from '@/components/_shared/Modal';
+import { type ApiToken } from '@/interfaces/user.interface';
+import { api } from '@/utils/api';
+import classNames from '@/utils/classnames';
+import notify from '@/utils/notify';
+import { Dialog } from '@headlessui/react';
+import {
+    ExclamationTriangleIcon,
+    TrashIcon,
+} from '@heroicons/react/24/outline';
+import { useSession } from 'next-auth/react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 const compareTokens = (tokenA: ApiToken, tokenB: ApiToken) => {
-    const time1 = new Date(tokenB.created_at)
-    const time2 = new Date(tokenA.created_at)
+    const time1 = new Date(tokenB.created_at);
+    const time2 = new Date(tokenA.created_at);
 
     // Compare the timestamps
     if (time1 < time2) {
-        return -1
+        return -1;
     } else if (time1 > time2) {
-        return 1
+        return 1;
     } else {
-        return 0
+        return 0;
     }
-}
+};
 
 function TokenCard({ token }: { token: ApiToken }) {
-    const created_at = new Date(token.created_at ?? '')
-    const last_access = new Date(token.last_access ?? '')
+    const created_at = new Date(token.created_at ?? '');
+    const last_access = new Date(token.last_access ?? '');
     const options = {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-    } as const
-    const utils = api.useUtils()
+    } as const;
+    const utils = api.useUtils();
     const deleteToken = api.user.deleteApiToken.useMutation({
         onSuccess: async (data) => {
-            await utils.user.getUserApiTokens.invalidate()
-            notify(`Successfully deleted the ${token.name} token`, 'error')
+            await utils.user.getUserApiTokens.invalidate();
+            notify(`Successfully deleted the ${token.name} token`, 'error');
         },
-    })
-    const [open, setOpen] = useState(false)
+    });
+    const [open, setOpen] = useState(false);
     return (
         <>
             <div className="flex flex-col">
@@ -117,15 +120,15 @@ function TokenCard({ token }: { token: ApiToken }) {
                 </div>
             </Modal>
         </>
-    )
+    );
 }
 
 export function ApiKeys({ apiTokens }: { apiTokens: ApiToken[] }) {
-    const utils = api.useUtils()
-    const { data: session } = useSession()
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [token, setToken] = useState<string | null>(null)
-    const [open, setOpen] = useState(false)
+    const utils = api.useUtils();
+    const { data: session } = useSession();
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [token, setToken] = useState<string | null>(null);
+    const [open, setOpen] = useState(false);
     const {
         register,
         handleSubmit,
@@ -136,19 +139,22 @@ export function ApiKeys({ apiTokens }: { apiTokens: ApiToken[] }) {
         defaultValues: {
             user: session?.user?.name ?? '',
         },
-    })
+    });
     const createToken = api.user.createApiToken.useMutation({
         onSuccess: async (data) => {
-            reset()
-            setOpen(false)
-            await utils.user.getUserApiTokens.invalidate()
-            setToken(data.token)
-            notify(`Successfully created the ${watch('name')} token`, 'success')
+            reset();
+            setOpen(false);
+            await utils.user.getUserApiTokens.invalidate();
+            setToken(data.token);
+            notify(
+                `Successfully created the ${watch('name')} token`,
+                'success'
+            );
         },
         onError: (error) => {
-            setErrorMessage(error.message)
+            setErrorMessage(error.message);
         },
-    })
+    });
     return (
         <>
             <div className="max-w-8xl mx-auto w-full xl:w-[90%] py-12 rounded-lg shadow-wri flex flex-col">
@@ -198,7 +204,7 @@ export function ApiKeys({ apiTokens }: { apiTokens: ApiToken[] }) {
                         id="token"
                         data-userid={session?.user?.id}
                         onSubmit={handleSubmit((data) => {
-                            createToken.mutate(data)
+                            createToken.mutate(data);
                         })}
                         className="flex flex-col sm:flex-row gap-5 pt-6"
                     >
@@ -225,5 +231,5 @@ export function ApiKeys({ apiTokens }: { apiTokens: ApiToken[] }) {
                 </div>
             </Modal>
         </>
-    )
+    );
 }

@@ -1,23 +1,23 @@
-import { UseFormReturn, useFormContext } from 'react-hook-form'
-import { Button } from '@/components/_shared/Button'
-import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { Input } from '@/components/_shared/SimpleInput'
-import { LayerFormType } from '../layer.schema'
-import { DatasetFormType } from '@/schema/dataset.schema'
+import { type UseFormReturn, useFormContext } from 'react-hook-form';
+import { Button } from '@/components/_shared/Button';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { Input } from '@/components/_shared/SimpleInput';
+import { LayerFormType } from '../layer.schema';
+import { type DatasetFormType } from '@/schema/dataset.schema';
 
 export default function DerivedLayerForm({
     formObj,
     index,
 }: {
-    formObj: UseFormReturn<DatasetFormType>
-    index: number
+    formObj: UseFormReturn<DatasetFormType>;
+    index: number;
 }) {
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = formObj
+    } = formObj;
 
     return (
         <div className="space-y-6">
@@ -56,17 +56,6 @@ export default function DerivedLayerForm({
                     to reference.
                 </p>
             </InputGroup>
-            <InputGroup label="RW Layer URL">
-                <Input
-                    {...register(`resources.${index}.url`)}
-                    placeholder="Enter the existing RW URL ID (e.g., 'https://api.resourcewatch.org/v1/dataset/9085715d-8a32-40b1-ba7b-cd9830333284/layer/ada08d85-6d12-4c2f-9c3c-479de6b9214f')"
-                />
-                <ErrorDisplay name="id" errors={errors} />
-                <p className="mt-1 text-sm text-gray-500">
-                    The URL of the existing layer in the RW API that you want to
-                    reference.
-                </p>
-            </InputGroup>
 
             <InputGroup label="Description">
                 <Input
@@ -76,5 +65,5 @@ export default function DerivedLayerForm({
                 <ErrorDisplay name="description" errors={errors} />
             </InputGroup>
         </div>
-    )
+    );
 }

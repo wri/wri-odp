@@ -1,0 +1,31 @@
+# Run from main.yml via workflow_call. Do not trigger on push/PR directly.
+name: Check Linter
+
+on:
+  workflow_call:
+
+jobs:
+  run-ci:
+    name: Linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'deployment/frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: deployment/frontend
+        run: npm install --legacy-peer-deps
+
+      - name: Check lint
+        working-directory: deployment/frontend
+        run: npm run lint:ci

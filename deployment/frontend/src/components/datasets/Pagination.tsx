@@ -1,44 +1,44 @@
-import { SearchInput } from '@/schema/search.schema'
+import { type SearchInput } from '@/schema/search.schema';
 import {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
-} from '@heroicons/react/20/solid'
+} from '@heroicons/react/20/solid';
 import {
-    Dispatch,
+    type Dispatch,
     Fragment,
-    SetStateAction,
+    type SetStateAction,
     useEffect,
     useRef,
     useState,
-} from 'react'
+} from 'react';
 
 export default function Pagination({
     setQuery,
     query,
     data,
 }: {
-    setQuery: Dispatch<SetStateAction<SearchInput>>
-    query: SearchInput
-    data: any
+    setQuery: Dispatch<SetStateAction<SearchInput>>;
+    query: SearchInput;
+    data: any;
 }) {
     const [currentPage, setCurrentPage] = useState(
         query.page.start / query.page.rows + 1
-    )
+    );
 
     const nPages =
         data?.count && query?.page?.rows
             ? Math.ceil(data?.count / query?.page?.rows)
-            : 1
+            : 1;
 
     const goToNextPage = () => {
-        if (currentPage + 1 <= nPages) setCurrentPage((prev) => prev + 1)
-    }
+        if (currentPage + 1 <= nPages) setCurrentPage((prev) => prev + 1);
+    };
 
     const goToPreviousPage = () => {
-        if (currentPage - 1 >= 1) setCurrentPage((prev) => prev - 1)
-    }
+        if (currentPage - 1 >= 1) setCurrentPage((prev) => prev - 1);
+    };
 
     useEffect(() => {
         /*
@@ -49,32 +49,30 @@ export default function Pagination({
          *
          */
         if (query.page.start / query.page.rows + 1 > nPages) {
-            setCurrentPage(1)
+            setCurrentPage(1);
         } else {
-            setCurrentPage(Math.ceil(query.page.start / query.page.rows) + 1)
+            setCurrentPage(Math.ceil(query.page.start / query.page.rows) + 1);
         }
-        if(window) {
-            window.scrollTo({top: 0, behavior: 'smooth'})
+        if (window) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-    }, [query.page.rows])
+    }, [query.page.rows]);
 
     /*
      * Whenever page or show number changes, update query
      *
      */
     useEffect(() => {
-        const destination = (currentPage - 1) * query.page.rows
+        const destination = (currentPage - 1) * query.page.rows;
         setQuery((prev) => ({
             ...prev,
             page: { ...prev.page, start: destination },
-        }))
+        }));
 
-        if(window) {
-            window.scrollTo({top: 0, behavior: 'smooth'})
+        if (window) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-    }, [currentPage, query.page.rows])
-
-    
+    }, [currentPage, query.page.rows]);
 
     return (
         <div className="flex items-center justify-between bg-white py-3 overflow-x-auto">
@@ -111,13 +109,13 @@ export default function Pagination({
                         {/* Current: "z-10 bg-amber-400 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400", Default: "text-black  ring-inset  hover:bg-gray-50 focus:outline-offset-0" */}
 
                         {[...new Array(3).keys()].map((relativePage) => {
-                            let offset = 0
+                            let offset = 0;
                             if (currentPage > 1) {
-                                offset = -1
+                                offset = -1;
                             }
 
                             const absolutePage =
-                                relativePage + currentPage + offset
+                                relativePage + currentPage + offset;
 
                             const CurrentPageButton = () => (
                                 <button
@@ -126,7 +124,7 @@ export default function Pagination({
                                 >
                                     {absolutePage}
                                 </button>
-                            )
+                            );
 
                             const PageButton = ({ page }: { page: number }) => (
                                 <button
@@ -135,11 +133,11 @@ export default function Pagination({
                                 >
                                     {page}
                                 </button>
-                            )
+                            );
 
                             const Ellipsis = () => (
                                 <span className="py-2 px-4">...</span>
-                            )
+                            );
 
                             return (
                                 <Fragment key={`pagination-${absolutePage}`}>
@@ -166,7 +164,7 @@ export default function Pagination({
                                             </>
                                         )}
                                 </Fragment>
-                            )
+                            );
                         })}
                         <button
                             onClick={() => goToNextPage()}
@@ -196,5 +194,5 @@ export default function Pagination({
                 </div>
             </div>
         </div>
-    )
+    );
 }

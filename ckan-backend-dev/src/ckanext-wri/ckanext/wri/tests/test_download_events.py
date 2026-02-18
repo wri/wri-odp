@@ -11,7 +11,12 @@ def test_download_event_create_basic(mail_user):
     # Setup test data
     user = factories.Sysadmin()
     organization = factories.Organization()
-    dataset = factories.Dataset(owner_org=organization['id'])
+    dataset = factories.Dataset(
+        owner_org=organization['id'], 
+        technical_notes="http://example.com/technical_notes.pdf",
+        authors=[{"name": "Datopian", "email": "datopian@example.com"}],
+        maintainers=[{"name": "Datopian", "email": "datopian@example.com"}]
+    )
     resource1 = factories.Resource(package_id=dataset['id'])
     resource2 = factories.Resource(package_id=dataset['id'])
 
@@ -46,7 +51,12 @@ def test_download_event_create_all_fields(mail_user):
     # Setup test data
     user = factories.Sysadmin()
     organization = factories.Organization()
-    dataset = factories.Dataset(owner_org=organization['id'])
+    dataset = factories.Dataset(
+        owner_org=organization['id'], 
+        technical_notes="http://example.com/technical_notes.pdf",
+        authors=[{"name": "Datopian", "email": "datopian@example.com"}],
+        maintainers=[{"name": "Datopian", "email": "datopian@example.com"}]
+    )
     resource = factories.Resource(package_id=dataset['id'])
 
     context = {
@@ -92,8 +102,18 @@ def test_download_event_list(mail_user):
     org1 = factories.Organization()
     org2 = factories.Organization()
     
-    dataset1 = factories.Dataset(owner_org=org1['id'])
-    dataset2 = factories.Dataset(owner_org=org2['id'])
+    dataset1 = factories.Dataset(
+        owner_org=org1['id'], 
+        technical_notes="http://example.com/notes1.pdf",
+        authors=[{"name": "Datopian", "email": "datopian@example.com"}],
+        maintainers=[{"name": "Datopian", "email": "datopian@example.com"}]
+    )
+    dataset2 = factories.Dataset(
+        owner_org=org2['id'], 
+        technical_notes="http://example.com/notes2.pdf",
+        authors=[{"name": "Datopian", "email": "datopian@example.com"}],
+        maintainers=[{"name": "Datopian", "email": "datopian@example.com"}]
+    )
     
     resource1 = factories.Resource(package_id=dataset1['id'])
     resource2 = factories.Resource(package_id=dataset2['id'])

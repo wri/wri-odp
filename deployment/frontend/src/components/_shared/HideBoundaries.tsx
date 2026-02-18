@@ -1,7 +1,7 @@
-import { useMap } from 'react-map-gl'
+import { useMap } from 'react-map-gl';
 
 export function HideBoundaries() {
-    const { current: map } = useMap()
+    const { current: map } = useMap();
     if (map) {
         map.on('load', () => {
             const layersToHide = [
@@ -9,7 +9,7 @@ export function HideBoundaries() {
                 'admin-2-boundaries-bg',
                 'admin-3-4-boundaries',
                 'admin-3-4-boundaries-bg',
-            ]
+            ];
 
             layersToHide.forEach((layerId) => {
                 // Check if the layer actually exists in the current style before trying to hide it
@@ -18,10 +18,10 @@ export function HideBoundaries() {
                         layerId,
                         'visibility',
                         'none'
-                    )
+                    );
                 }
-            })
-        })
+            });
+        });
     }
-    return null
+    return null;
 }

@@ -1,15 +1,15 @@
-import React from 'react'
-import Image from 'next/image'
-import { DefaultTooltip } from '@/components/_shared/Tooltip'
+import React from 'react';
+import Image from 'next/image';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 export interface IRowProfile {
-    title?: string
-    description?: string
-    image?: string
-    image_display_url?: string
-    name?: string
-    capacity?: string
-    visibility?: string
+    title?: string;
+    description?: string;
+    image?: string;
+    image_display_url?: string;
+    name?: string;
+    capacity?: string;
+    visibility?: string;
 }
 
 export default function RowProfile({
@@ -18,10 +18,10 @@ export default function RowProfile({
     profile,
     defaultImg,
 }: {
-    defaultImg?: string
-    imgStyle?: string
-    isPad?: boolean
-    profile?: IRowProfile
+    defaultImg?: string;
+    imgStyle?: string;
+    isPad?: boolean;
+    profile?: IRowProfile;
 }) {
     return (
         <div className="flex flex-row gap-x-4 hover:bg-slate-100  rounded-md">
@@ -59,7 +59,7 @@ export default function RowProfile({
                 )}
             </div>
         </div>
-    )
+    );
 }
 
 export function RowProfilev2({
@@ -68,10 +68,10 @@ export function RowProfilev2({
     profile,
     defaultImg,
 }: {
-    defaultImg?: string
-    imgStyle?: string
-    isPad?: boolean
-    profile?: IRowProfile
+    defaultImg?: string;
+    imgStyle?: string;
+    isPad?: boolean;
+    profile?: IRowProfile;
 }) {
     return (
         <div className="flex flex-row gap-x-4 hover:bg-slate-100  rounded-md">
@@ -110,5 +110,5 @@ export function RowProfilev2({
                 )}
             </div>
         </div>
-    )
+    );
 }

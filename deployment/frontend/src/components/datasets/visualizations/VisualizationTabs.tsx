@@ -1,13 +1,13 @@
-import classNames from '@/utils/classnames'
-import { Tab } from '@headlessui/react'
-import { Fragment } from 'react'
+import classNames from '@/utils/classnames';
+import { Tab } from '@headlessui/react';
+import { Fragment } from 'react';
 
 export function VisualizationTabs({
     tabs,
 }: {
-    tabs: { name: string; enabled: boolean }[]
+    tabs: { name: string; enabled: boolean }[];
 }) {
-    const singleTab = tabs.filter((tab) => tab.enabled).length === 1
+    const singleTab = tabs.filter((tab) => tab.enabled).length === 1;
     return (
         <>
             {tabs.map((tab, i) => (
@@ -29,5 +29,5 @@ export function VisualizationTabs({
                 </Tab>
             ))}
         </>
-    )
+    );
 }

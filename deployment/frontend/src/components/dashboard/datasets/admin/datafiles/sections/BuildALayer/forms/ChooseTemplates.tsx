@@ -1,39 +1,39 @@
-import React, { useState } from 'react'
-import dynamic from 'next/dynamic'
+import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
-})
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import { democracy_index } from '@/templateLayers/democracy_index'
-import { energy_facilities } from '@/templateLayers/energy_facilities'
-import { roads } from '@/templateLayers/roads'
-import { hdi } from '@/templateLayers/hdi'
-import { marine_ecoregions } from '@/templateLayers/marine_ecoregions'
-import { temperature } from '@/templateLayers/temperature'
-import { useMutation, useQuery } from 'react-query'
-import { Input } from '@/components/_shared/SimpleInput'
-import { useFormContext } from 'react-hook-form'
-import { LayerFormType } from '../layer.schema'
-import { convertLayerObjToForm } from '../convertObjects'
-import { APILayerSpec } from '@/interfaces/layer.interface'
-import Image from 'next/image'
-import { ScrollArea, ScrollBar } from '@/components/_shared/ScrollArea'
+});
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import { democracy_index } from '@/templateLayers/democracy_index';
+import { energy_facilities } from '@/templateLayers/energy_facilities';
+import { roads } from '@/templateLayers/roads';
+import { hdi } from '@/templateLayers/hdi';
+import { marine_ecoregions } from '@/templateLayers/marine_ecoregions';
+import { temperature } from '@/templateLayers/temperature';
+import { useMutation, useQuery } from 'react-query';
+import { Input } from '@/components/_shared/SimpleInput';
+import { useFormContext } from 'react-hook-form';
+import { type LayerFormType } from '../layer.schema';
+import { convertLayerObjToForm } from '../convertObjects';
+import { type APILayerSpec } from '@/interfaces/layer.interface';
+import Image from 'next/image';
+import { ScrollArea, ScrollBar } from '@/components/_shared/ScrollArea';
 
 interface IProps {
-    setOpen: (open: boolean) => void
-    open: boolean
+    setOpen: (open: boolean) => void;
+    open: boolean;
 }
 
 export function ChooseTemplates(props: IProps) {
-    const { open, setOpen } = props
-    const { reset } = useFormContext<LayerFormType>()
-    const [layer, setLayer] = useState('')
+    const { open, setOpen } = props;
+    const { reset } = useFormContext<LayerFormType>();
+    const [layer, setLayer] = useState('');
     const loadLayer = useMutation(['templateLayer', layer], async () => {
         const response = await fetch(
             `https://api.resourcewatch.org/v1/layer/${layer}`
-        )
-        const layerData = await response.json()
-        const { id, attributes } = layerData.data
+        );
+        const layerData = await response.json();
+        const { id, attributes } = layerData.data;
         const templateLayer: APILayerSpec = {
             id: id,
             ...attributes,
@@ -41,21 +41,21 @@ export function ChooseTemplates(props: IProps) {
             protected: false,
             published: false,
             env: 'staging',
-        }
+        };
         if (templateLayer.layerConfig.type === 'vector') {
             const account =
-                layerData.data.attributes.layerConfig.source.provider.account
-            const sql = layerData.data.attributes.layerConfig.source.sql
-            templateLayer.connectorUrl = `https://${account}.carto.com/api/v2/sql?q=${sql}`
+                layerData.data.attributes.layerConfig.source.provider.account;
+            const sql = layerData.data.attributes.layerConfig.source.sql;
+            templateLayer.connectorUrl = `https://${account}.carto.com/api/v2/sql?q=${sql}`;
         }
-        setTemplate(templateLayer)
-    })
+        setTemplate(templateLayer);
+    });
 
     const setTemplate = (layerObj: APILayerSpec) => {
-        const formObj = convertLayerObjToForm(layerObj)
-        reset(formObj)
-        setOpen(false)
-    }
+        const formObj = convertLayerObjToForm(layerObj);
+        reset(formObj);
+        setOpen(false);
+    };
 
     return (
         <Modal open={open} setOpen={setOpen} className="max-w-2xl">
@@ -175,5 +175,5 @@ export function ChooseTemplates(props: IProps) {
                 </div>
             </div>
         </Modal>
-    )
+    );
 }

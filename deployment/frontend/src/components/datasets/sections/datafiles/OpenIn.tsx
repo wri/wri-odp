@@ -1,22 +1,22 @@
-import Modal from '@/components/_shared/Modal'
-import { Tab } from '@headlessui/react'
+import Modal from '@/components/_shared/Modal';
+import { Tab } from '@headlessui/react';
 import {
     ArrowTopRightOnSquareIcon,
     ClipboardIcon,
-} from '@heroicons/react/24/outline'
-import { Fragment, useState } from 'react'
-import { DatasetTabs } from '../../DatasetTabs'
+} from '@heroicons/react/24/outline';
+import { Fragment, useState } from 'react';
+import { DatasetTabs } from '../../DatasetTabs';
 import {
     Tooltip,
     TooltipContent,
     TooltipPortal,
     TooltipProvider,
     TooltipTrigger,
-} from '@/components/_shared/Tooltip'
-import classNames from '@/utils/classnames'
+} from '@/components/_shared/Tooltip';
+import classNames from '@/utils/classnames';
 
 export function OpenInButton() {
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false);
     return (
         <>
             <button
@@ -31,22 +31,22 @@ export function OpenInButton() {
             </button>
             <OpenInModal open={open} setOpen={setOpen} />
         </>
-    )
+    );
 }
 
 function OpenInModal({
     open,
     setOpen,
 }: {
-    open: boolean
-    setOpen: (open: boolean) => void
+    open: boolean;
+    setOpen: (open: boolean) => void;
 }) {
     const tabs = [
         { name: 'Power BI' },
         { name: 'Tableau' },
         { name: 'Google Earth Engine' },
         { name: 'Some other tool' },
-    ]
+    ];
     return (
         <Modal open={open} setOpen={setOpen} className="max-w-[64rem]">
             <div className="flex flex-col gap-y-4 p-5 font-acumin">
@@ -111,5 +111,5 @@ function OpenInModal({
                 </Tab.Group>
             </div>
         </Modal>
-    )
+    );
 }

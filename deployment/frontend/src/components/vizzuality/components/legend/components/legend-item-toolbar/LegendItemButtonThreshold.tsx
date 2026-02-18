@@ -1,37 +1,37 @@
-import { Fragment, useState } from 'react'
-import { Listbox, Transition } from '@headlessui/react'
+import { Fragment, useState } from 'react';
+import { Listbox, Transition } from '@headlessui/react';
 import {
     AdjustmentsVerticalIcon,
     ChevronDownIcon,
-} from '@heroicons/react/20/solid'
-import classNames from '@/utils/classnames'
+} from '@heroicons/react/20/solid';
+import classNames from '@/utils/classnames';
 import {
     Controller,
-    FieldValues,
-    Path,
-    PathValue,
+    type FieldValues,
+    type Path,
+    type PathValue,
     UseFormReturn,
     useForm,
-} from 'react-hook-form'
-import { DefaultTooltip, Tooltip } from '@/components/_shared/Tooltip'
+} from 'react-hook-form';
+import { DefaultTooltip, Tooltip } from '@/components/_shared/Tooltip';
 
 interface Option<V> {
-    label: string
-    value: V
-    default?: boolean
+    label: string;
+    value: V;
+    default?: boolean;
 }
 
 export default function LegendItemButtonThreshold<
     T extends FieldValues,
-    V extends Object,
+    V extends object,
 >(props: any) {
-    const { onChangeThreshold } = props
+    const { onChangeThreshold } = props;
 
-    const { activeLayer } = props
+    const { activeLayer } = props;
 
     const threshold = activeLayer?.layerConfig?.params_config?.find(
         (item: any) => item.key == 'thresh' || item.key === 'threshold'
-    )
+    );
 
     let options = [10, 15, 20, 25, 30, 50, 75].map((item) => ({
         label: `>${item}%`,
@@ -39,7 +39,7 @@ export default function LegendItemButtonThreshold<
         default: activeLayer.threshold
             ? item == activeLayer.threshold
             : item == 20,
-    }))
+    }));
     if (threshold?.options) {
         options = threshold.options.map((item: any) => ({
             label: item.label,
@@ -47,9 +47,9 @@ export default function LegendItemButtonThreshold<
             default: activeLayer.threshold
                 ? item.value == activeLayer.threshold
                 : threshold.default == item.value,
-        }))
+        }));
     }
-    const { control, formState, watch } = useForm()
+    const { control, formState, watch } = useForm();
 
     return threshold ? (
         <Controller
@@ -67,8 +67,8 @@ export default function LegendItemButtonThreshold<
                 <Listbox
                     value={selected}
                     onChange={(e) => {
-                        setSelected(e)
-                        onChangeThreshold(activeLayer, e.value)
+                        setSelected(e);
+                        onChangeThreshold(activeLayer, e.value);
                     }}
                 >
                     {({ open }) => (
@@ -136,7 +136,7 @@ export default function LegendItemButtonThreshold<
                                                                     }
                                                                 </span>
                                                             </>
-                                                        )
+                                                        );
                                                     }}
                                                 </Listbox.Option>
                                             ))}
@@ -149,5 +149,5 @@ export default function LegendItemButtonThreshold<
                 </Listbox>
             )}
         />
-    ) : null
+    ) : null;
 }

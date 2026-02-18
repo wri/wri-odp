@@ -1,34 +1,34 @@
-import { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Fragment, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 import {
     Bars3Icon,
     MagnifyingGlassIcon,
     XMarkIcon,
-} from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-import Login from '../_shared/Login'
-import { useSession } from 'next-auth/react'
-import UserMenu from '../_shared/UserMenu'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import Login from '../_shared/Login';
+import { useSession } from 'next-auth/react';
+import UserMenu from '../_shared/UserMenu';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
 export function Hero() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
-    const session = useSession()
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const session = useSession();
 
-    const { asPath } = useRouter()
-    const searchSchema = z.object({ search: z.string() })
-    type searchFormType = z.infer<typeof searchSchema>
+    const { asPath } = useRouter();
+    const searchSchema = z.object({ search: z.string() });
+    type searchFormType = z.infer<typeof searchSchema>;
 
     const { handleSubmit, register, reset } = useForm<searchFormType>({
         resolver: zodResolver(searchSchema),
         defaultValues: { search: '' },
-    })
-    const router = useRouter()
+    });
+    const router = useRouter();
     const navigation = [
         {
             title: 'Search',
@@ -50,26 +50,19 @@ export function Hero() {
             href: '/applications',
             active: false,
         },
-    ]
+    ];
     navigation.forEach((item) => {
-        item.active = asPath.startsWith(item.href)
-    })
+        item.active = asPath.startsWith(item.href);
+    });
 
     return (
         <div className="bg-gray-900">
             <header className="absolute inset-x-0 top-0 z-50">
                 <div className=" w-full bg-wri-green  py-2 text-center  text-white font-acumin text-lg leading-normal">
-                    This site updates WRI’s Open Data Portal. If you cannot find
-                    what you’re looking for, you can access the former Open Data
-                    Portal{' '}
-                    <a
-                        target="_blank"
-                        href="https://old-datasets.wri.org"
-                        aria-label="https://old-datasets.wri.org"
-                        className="underline font-semibold"
-                    >
-                        here
-                    </a>
+                    This site replaces WRI’s former Open Data Portal. We are still in the process of adding more datasets. 
+                    If you are not able to find the data you&apos;re looking for, please reach out to us at {''}
+                    <a href="mailto:data@wri.org" className="underline font-semibold">data@wri.org</a>.
+                    
                 </div>
                 <nav
                     className="flex items-center justify-between p-6 lg:px-8"
@@ -244,7 +237,7 @@ export function Hero() {
                         <form
                             onSubmit={handleSubmit((data) => {
                                 if (data.search === '') {
-                                    return router.push('/search')
+                                    return router.push('/search');
                                 }
                                 router.push({
                                     pathname: '/search',
@@ -253,7 +246,7 @@ export function Hero() {
                                     )}%22%2C%22value%22%3A%22${encodeURIComponent(
                                         data.search
                                     )}%22%7D%5D`,
-                                })
+                                });
                             })}
                         >
                             <div className="mt-10 flex relative items-start justify-start  w-full max-w-[876px]">
@@ -314,5 +307,5 @@ export function Hero() {
                 </Dialog>
             </Transition>
         </div>
-    )
+    );
 }

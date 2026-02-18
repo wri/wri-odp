@@ -1,41 +1,41 @@
-import React, { useState } from 'react'
-import { Input } from '@/components/_shared/SimpleInput'
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Button, LoaderButton } from '@/components/_shared/Button'
-import Link from 'next/link'
-import { api } from '@/utils/api'
-import { User } from '@portaljs/ckan'
-import { ImageUploader } from '../_shared/ImageUploader'
+import React, { useState } from 'react';
+import { Input } from '@/components/_shared/SimpleInput';
+import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button, LoaderButton } from '@/components/_shared/Button';
+import Link from 'next/link';
+import { api } from '@/utils/api';
+import { User } from '@portaljs/ckan';
+import { ImageUploader } from '../_shared/ImageUploader';
 import {
     GlobeAltIcon,
     CloudArrowUpIcon,
     MinusCircleIcon,
-} from '@heroicons/react/24/outline'
-import { UploadResult } from '@uppy/core'
-import { UserFormInviteSchema } from '@/schema/user.schema'
-import type { UserFormInviteInput } from '@/schema/user.schema'
-import notify from '@/utils/notify'
-import { ErrorAlert } from '@/components/_shared/Alerts'
-import { useRouter } from 'next/router'
+} from '@heroicons/react/24/outline';
+import { UploadResult } from '@uppy/core';
+import { UserFormInviteSchema } from '@/schema/user.schema';
+import type { UserFormInviteInput } from '@/schema/user.schema';
+import notify from '@/utils/notify';
+import { ErrorAlert } from '@/components/_shared/Alerts';
+import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { Dialog } from '@headlessui/react'
-import { WriOrganization } from '@/schema/ckan.schema'
-import SimpleSelect from '@/components/_shared/SimpleSelect'
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@headlessui/react';
+import { type WriOrganization } from '@/schema/ckan.schema';
+import SimpleSelect from '@/components/_shared/SimpleSelect';
 
 export default function AddUserForm({
     orgList,
 }: {
-    orgList: WriOrganization[]
+    orgList: WriOrganization[];
 }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const router = useRouter()
-    const utils = api.useUtils()
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const router = useRouter();
+    const utils = api.useUtils();
     const form = useForm<UserFormInviteInput>({
         defaultValues: {
             email: '',
@@ -52,30 +52,30 @@ export default function AddUserForm({
         },
         resolver: zodResolver(UserFormInviteSchema),
         mode: 'onSubmit',
-    })
-    const { register, handleSubmit, formState, setError, watch } = form
-    const { errors } = formState
+    });
+    const { register, handleSubmit, formState, setError, watch } = form;
+    const { errors } = formState;
     const userCreateApi = api.user.createOtherUser.useMutation({
         onSuccess: async (data) => {
             await utils.user.getAllUsers.invalidate({
                 search: '',
                 page: { start: 0, rows: 100 },
-            })
-            notify(`Successfully created user: ${data.name}`, 'success')
-            router.push(`/dashboard`)
+            });
+            notify(`Successfully created user: ${data.name}`, 'success');
+            router.push(`/dashboard`);
         },
         onError: (error) => setErrorMessage(error.message),
-    })
+    });
 
     const onSubmit = (data: UserFormInviteInput) => {
         const payload: UserFormInviteInput = {
             email: data.email,
             team: data.team,
             role: data.role,
-        }
+        };
 
-        userCreateApi.mutate(payload)
-    }
+        userCreateApi.mutate(payload);
+    };
 
     return (
         <>
@@ -170,5 +170,5 @@ export default function AddUserForm({
                 )}
             </form>
         </>
-    )
+    );
 }

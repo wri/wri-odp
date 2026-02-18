@@ -1,20 +1,20 @@
-import React from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema'
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
 
 interface SubtopicProps {
-    title: string
-    numOfDatasets: number
-    img: string
+    title: string;
+    numOfDatasets: number;
+    img: string;
 }
 
 export default function SubtopicCard({
     topic,
     topicsDetails,
 }: {
-    topic: GroupTree
-    topicsDetails: Record<string, GroupsmDetails>
+    topic: GroupTree;
+    topicsDetails: Record<string, GroupsmDetails>;
 }) {
     return (
         <Link
@@ -38,5 +38,5 @@ export default function SubtopicCard({
                 {topicsDetails[topic.id]?.package_count} Datasets
             </div>
         </Link>
-    )
+    );
 }

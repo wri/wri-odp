@@ -1,18 +1,18 @@
-import LegendItemTypes from '.'
+import LegendItemTypes from '.';
 
 export default function LegendItemTypesList(props: any) {
-    let legendConfigs: any = []
+    let legendConfigs: any = [];
 
-    const legendConfigOg = props?.activeLayer?.legendConfig
+    const legendConfigOg = props?.activeLayer?.legendConfig;
     if (legendConfigOg) {
         if (legendConfigOg.type == 'multiple') {
-            legendConfigs = legendConfigOg.items
+            legendConfigs = legendConfigOg.items;
         } else {
-            legendConfigs = [legendConfigOg]
+            legendConfigs = [legendConfigOg];
         }
     }
 
-    legendConfigs = legendConfigs.filter((lc: any) => lc.type)
+    legendConfigs = legendConfigs.filter((lc: any) => lc.type);
 
     return legendConfigs.map((lc: any, i: number) => (
         <LegendItemTypes
@@ -22,5 +22,5 @@ export default function LegendItemTypesList(props: any) {
                 activeLayer: { ...props?.activeLayer, legendConfig: lc },
             }}
         />
-    ))
+    ));
 }

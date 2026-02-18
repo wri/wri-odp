@@ -1,16 +1,16 @@
-import Editor from '@monaco-editor/react'
+import Editor from '@monaco-editor/react';
 import {
     Controller,
-    FieldValues,
-    Path,
-    UseFormReturn,
+    type FieldValues,
+    type Path,
+    type UseFormReturn,
     useForm,
-} from 'react-hook-form'
+} from 'react-hook-form';
 
 interface CodeEditorProps<T extends FieldValues> {
-    height?: string
-    formObj?: UseFormReturn<T>
-    name: Path<T>
+    height?: string;
+    formObj?: UseFormReturn<T>;
+    name: Path<T>;
 }
 
 export function CodeEditor<T extends FieldValues>({
@@ -18,7 +18,7 @@ export function CodeEditor<T extends FieldValues>({
     formObj,
     name,
 }: CodeEditorProps<T>) {
-    const { control } = formObj ?? useForm()
+    const { control } = formObj ?? useForm();
     return (
         <Controller
             control={control}
@@ -37,5 +37,5 @@ export function CodeEditor<T extends FieldValues>({
                 />
             )}
         />
-    )
+    );
 }
