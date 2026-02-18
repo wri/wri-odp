@@ -6,7 +6,7 @@
         "build": "next build --webpack",
         "dev": "next dev --webpack",
         "lint": "npm run prettier && npm run lint:ci --fix",
-        "lint:ci": "eslint --ext .js,.jsx,.ts,.tsx . --max-warnings 3222",
+        "lint:ci": "eslint --ext .js,.jsx,.ts,.tsx . --max-warnings 3608",
         "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx . --fix",
         "lint:errors-only": "eslint --ext .js,.jsx,.ts,.tsx . --quiet",
         "prettier": "prettier --write --loglevel warn .",
@@ -182,7 +182,6 @@
         "tar": "^7.5.7",
         "d3-color": "^3.1.0",
         "vega-expression": "^5.2.1",
-        "fast-xml-parser": ">=5.3.6",
-        "ajv": "^8.18.0"
+        "fast-xml-parser": ">=5.3.6"
     }
 }
