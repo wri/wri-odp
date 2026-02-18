@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import Uppy, { type UploadResult, type UppyFile } from '@uppy/core';
 
-import '@uppy/core/dist/style.min.css';
+import '@uppy/core/css/style.min.css';
 import AwsS3 from '@uppy/aws-s3';
 import { getUploadParameters } from '@/utils/uppyFunctions';
 import { ArrowUpTrayIcon } from '@heroicons/react/24/outline';

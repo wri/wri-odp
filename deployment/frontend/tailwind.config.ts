@@ -17,8 +17,7 @@ export default {
             },
             boxShadow: {
                 wri: '0px 4px 4px 0px rgba(147, 147, 147, 0.25)',
-                'wri-small':
-                    'box-shadow: 0px 1px 2px 0px rgba(105, 81, 255, 0.05)',
+                'wri-small': 'box-shadow: 0px 1px 2px 0px rgba(105, 81, 255, 0.05)',
                 'wri-dcard': 'box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);',
             },
             animation: {
