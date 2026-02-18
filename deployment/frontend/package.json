@@ -49,7 +49,7 @@
         "@tiptap/extension-code-block": "^2.1.12",
         "@tiptap/extension-code-block-lowlight": "^2.2.4",
         "@tiptap/extension-document": "^2.1.12",
-        "@tiptap/extension-history": "^2.1.12",
+        "@tiptap/extension-history": "^2.10.4",
         "@tiptap/extension-italic": "^2.1.12",
         "@tiptap/extension-link": "^2.1.12",
         "@tiptap/extension-list-item": "^2.2.3",
