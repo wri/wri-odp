@@ -128,9 +128,7 @@
         "use-debounce": "^9.0.4",
         "usehooks-ts": "^2.9.1",
         "uuid": "^9.0.1",
-        "vega": "^6.2.0",
-        "vega-lib": "^4.4.0",
-        "vizzuality-components": "^1.1.1",
+        "vizzuality-components": "^3.0.3",
         "wri-layer-manager": "^1.0.3",
         "xstate": "^4.38.3",
         "zod": "^3.22.4",
@@ -178,10 +176,8 @@
     "packageManager": "npm@9.6.7",
     "overrides": {
         "axios": "^1.7.9",
-        "vega": "^6.2.0",
         "tar": "^7.5.7",
         "d3-color": "^3.1.0",
-        "vega-expression": "^5.2.1",
         "fast-xml-parser": ">=5.3.6"
     }
 }
