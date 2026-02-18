@@ -128,6 +128,8 @@
         "use-debounce": "^9.0.4",
         "usehooks-ts": "^2.9.1",
         "uuid": "^9.0.1",
+        "vega": "^6.2.0",
+        "vega-lib": "^4.4.0",
         "vizzuality-components": "^3.0.3",
         "wri-layer-manager": "^1.0.3",
         "xstate": "^4.38.3",
