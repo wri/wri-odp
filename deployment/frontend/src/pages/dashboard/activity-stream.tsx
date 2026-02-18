@@ -51,10 +51,10 @@ export default function activityStream(
         <>
             <NextSeo
                 title={`Activity Stream - Dashboard`}
-                description={`Activity Stream - Dashboard -- WRI Open Data Catalog`}
+                description={`Activity Stream - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`}
                 openGraph={{
                     title: `Activity Stream - Dashboard`,
-                    description: `Activity Stream - Dashboard -- WRI Open Data Catalog`,
+                    description: `Activity Stream - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/activity-stream`,
                 }}
             />

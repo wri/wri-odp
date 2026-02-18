@@ -44,10 +44,10 @@ export default function Notifications() {
         <>
             <NextSeo
                 title={`Notifications - Dashboard`}
-                description={`Notifications - Dashboard -- WRI Open Data Catalog`}
+                description={`Notifications - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`}
                 openGraph={{
                     title: `Notifications - Dashboard`,
-                    description: `Notifications - Dashboard -- WRI Open Data Catalog`,
+                    description: `Notifications - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/notifications`,
                 }}
             />

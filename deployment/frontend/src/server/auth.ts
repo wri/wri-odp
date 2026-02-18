@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
 import { type GetServerSidePropsContext } from 'next';
 import {
-    getServerSession,
-    type NextAuthOptions,
-    type DefaultSession,
-    type User,
+  getServerSession,
+  type NextAuthOptions,
+  type DefaultSession,
+  type User,
 } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { env } from '@/env.mjs';
@@ -20,26 +20,26 @@ import OktaProvider from 'next-auth/providers/okta';
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  */
 declare module 'next-auth' {
-    interface Session extends DefaultSession {
-        user: DefaultSession['user'] & {
-            id: string;
-            email: string;
-            username: string;
-            apikey: string;
-            sysadmin: boolean;
-            //teams: { name: string; id: string }[]
-            image: string;
-        };
-    }
+  interface Session extends DefaultSession {
+    user: DefaultSession['user'] & {
+      id: string;
+      email: string;
+      username: string;
+      apikey: string;
+      sysadmin: boolean;
+      //teams: { name: string; id: string }[]
+      image: string;
+    };
+  }
 
-    interface User {
-        email: string;
-        username: string;
-        apikey: string;
-        sysadmin: boolean;
-        //teams: { name: string; id: string }[]
-        image: string;
-    }
+  interface User {
+    email: string;
+    username: string;
+    apikey: string;
+    sysadmin: boolean;
+    //teams: { name: string; id: string }[]
+    image: string;
+  }
 }
 
 /**
@@ -48,167 +48,166 @@ declare module 'next-auth' {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authOptions: NextAuthOptions = {
-    pages: {
-        signIn: '/',
-        signOut: '/',
-        error: '/',
-        verifyRequest: '/',
-        newUser: '/',
+  pages: {
+    signIn: '/',
+    signOut: '/',
+    error: '/',
+    verifyRequest: '/',
+    newUser: '/',
+  },
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      return url.startsWith(baseUrl) ? url : baseUrl;
     },
-    callbacks: {
-        async redirect({ url, baseUrl }) {
-            return url.startsWith(baseUrl) ? url : baseUrl;
-        },
-        async jwt({ token, user, account }) {
-            if (user) {
-                token.apikey = user.apikey;
-                // token.teams = user.teams
-                token.sysadmin = user.sysadmin;
+    async jwt({ token, user, account }) {
+      if (user) {
+        token.apikey = user.apikey;
+        // token.teams = user.teams
+        token.sysadmin = user.sysadmin;
+      }
+      const isAzureAd = account?.provider === 'azure-ad';
+      const isOkta = account?.provider === 'okta';
+      if (isAzureAd || isOkta) {
+        const reqBody: any = {
+          email: user?.email,
+          name: user?.name,
+          id_token: account?.id_token,
+        };
+        if (isAzureAd) {
+          reqBody.from_azure = true;
+        }
+        if (isOkta) {
+          reqBody.from_okta = true;
+        }
+        if (account?.access_token) {
+          const userRes = await fetch(
+            `${process.env.CKAN_URL}/api/3/action/user_login`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(reqBody),
             }
-            const isAzureAd = account?.provider === 'azure-ad';
-            const isOkta = account?.provider === 'okta';
-            if (isAzureAd || isOkta) {
-                const reqBody: any = {
-                    email: user?.email,
-                    name: user?.name,
-                    id_token: account?.id_token,
-                };
-                if (isAzureAd) {
-                    reqBody.from_azure = true;
-                }
-                if (isOkta) {
-                    reqBody.from_okta = true;
-                }
-                if (account?.access_token) {
-                    const userRes = await fetch(
-                        `${process.env.CKAN_URL}/api/3/action/user_login`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(reqBody),
-                        }
-                    );
+          );
 
-                    const validUser: CkanResponse<
-                        User & { frontend_token: string }
-                    > = await userRes.json();
+          const validUser: CkanResponse<
+            User & { frontend_token: string }
+          > = await userRes.json();
 
-                    if ((validUser.result as any).errors) {
-                        // TODO: error from the response should be sent to the client, but it's not working
-                        throw new Error(
-                            (validUser.result as any).error_summary.auth
-                        );
-                    }
+          if ((validUser.result as any).errors) {
+            // TODO: error from the response should be sent to the client, but it's not working
+            throw new Error(
+              (validUser.result as any).error_summary.auth
+            );
+          }
 
-                    user = {
-                        ...user,
-                        ...validUser.result,
-                        image:
-                            user?.image ??
-                            (validUser.result as any)?.image ??
-                            '',
-                        apikey: validUser.result.frontend_token,
-                    };
+          user = {
+            ...user,
+            ...validUser.result,
+            image:
+              user?.image ??
+              (validUser.result as any)?.image ??
+              '',
+            apikey: validUser.result.frontend_token,
+          };
 
-                    return { ...token, ...user, sub: validUser.result.id };
-                }
-            }
-            return token;
+          return { ...token, ...user, sub: validUser.result.id };
+        }
+      }
+      return token;
+    },
+    session: ({ session, token }) => {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          name: token.name ? token.name : '',
+          apikey: token.apikey ? token.apikey : '',
+          // teams: token.teams ? token.teams : { name: '', id: '' },
+          sysadmin: token?.sysadmin ? token.sysadmin : false,
+          id: token.sub,
+          image:
+            typeof token.image === 'string'
+              ? token.image
+              : JSON.stringify(token.image || {}),
         },
-        session: ({ session, token }) => {
+      };
+    },
+  },
+  /*pages: {
+  signIn: "/auth/signin",
+},*/
+  providers: [
+    CredentialsProvider({
+      // The name to display on the sign in form (e.g. "Sign in with...")
+      name: 'Credentials',
+      // `credentials` is used to generate a form on the sign in page.
+      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
+      // e.g. domain, username, password, 2FA token, etc.
+      // You can pass any HTML attribute to the <input> tag through the object.
+      credentials: {
+        username: {
+          label: 'Username',
+          type: 'text',
+          placeholder: 'jsmith',
+        },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials, _req) {
+        try {
+          if (!credentials) return null;
+          const userRes = await fetch(
+            `${env.CKAN_URL}/api/3/action/user_login`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                id: credentials.username,
+                password: credentials.password,
+              }),
+            }
+          );
+          const user: CkanResponse<
+            User & { frontend_token: string }
+          > = await userRes.json();
+
+          if ((user.result as any).errors) {
+            // TODO: error from the response should be sent to the client, but it's not working
+            throw new Error(
+              (user.result as any).error_summary.auth
+            );
+          }
+
+          if (user.result.id) {
             return {
-                ...session,
-                user: {
-                    ...session.user,
-                    name: token.name ? token.name : '',
-                    apikey: token.apikey ? token.apikey : '',
-                    // teams: token.teams ? token.teams : { name: '', id: '' },
-                    sysadmin: token?.sysadmin ? token.sysadmin : false,
-                    id: token.sub,
-                    image:
-                        typeof token.image === 'string'
-                            ? token.image
-                            : JSON.stringify(token.image || {}),
-                },
+              ...user.result,
+              image: '',
+              apikey: user.result.frontend_token,
+              sysadmin: user.result?.sysadmin,
             };
-        },
-    },
-    /*pages: {
-    signIn: "/auth/signin",
-  },*/
-    providers: [
-        CredentialsProvider({
-            // The name to display on the sign in form (e.g. "Sign in with...")
-            name: 'Credentials',
-            // `credentials` is used to generate a form on the sign in page.
-            // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-            // e.g. domain, username, password, 2FA token, etc.
-            // You can pass any HTML attribute to the <input> tag through the object.
-            credentials: {
-                username: {
-                    label: 'Username',
-                    type: 'text',
-                    placeholder: 'jsmith',
-                },
-                password: { label: 'Password', type: 'password' },
-            },
-            async authorize(credentials, _req) {
-                try {
-                    if (!credentials) return null;
-                    const userRes = await fetch(
-                        `${env.CKAN_URL}/api/3/action/user_login`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                id: credentials.username,
-                                password: credentials.password,
-                            }),
-                        }
-                    );
-                    const user: CkanResponse<
-                        User & { frontend_token: string }
-                    > = await userRes.json();
-                    console.log('USER', user);
-
-                    if ((user.result as any).errors) {
-                        // TODO: error from the response should be sent to the client, but it's not working
-                        throw new Error(
-                            (user.result as any).error_summary.auth
-                        );
-                    }
-
-                    if (user.result.id) {
-                        return {
-                            ...user.result,
-                            image: '',
-                            apikey: user.result.frontend_token,
-                            sysadmin: user.result?.sysadmin,
-                        };
-                    } else {
-                        throw 'An unexpected error occurred while signing in. Please, try again.';
-                    }
-                } catch (e) {
-                    console.error(e);
-                    throw e;
-                }
-            },
-        }),
-        AzureAdProvider({
-            clientId: env.AZURE_AD_CLIENT_ID ?? '',
-            clientSecret: env.AZURE_AD_CLIENT_SECRET?.toString() ?? '',
-            tenantId: env.AZURE_AD_TENANT_ID ?? '',
-        }),
-        //OktaProvider({
-        //    clientId: env.OKTA_CLIENT_ID ?? '',
-        //    clientSecret: env.OKTA_CLIENT_SECRET?.toString() ?? '',
-        //    issuer: env.OKTA_ISSUER ?? '',
-        //}),
-    ],
+          } else {
+            throw 'An unexpected error occurred while signing in. Please, try again.';
+          }
+        } catch (e) {
+          console.error(e);
+          throw e;
+        }
+      },
+    }),
+    AzureAdProvider({
+      clientId: env.AZURE_AD_CLIENT_ID ?? '',
+      clientSecret: env.AZURE_AD_CLIENT_SECRET?.toString() ?? '',
+      tenantId: env.AZURE_AD_TENANT_ID ?? '',
+    }),
+    //OktaProvider({
+    //    clientId: env.OKTA_CLIENT_ID ?? '',
+    //    clientSecret: env.OKTA_CLIENT_SECRET?.toString() ?? '',
+    //    issuer: env.OKTA_ISSUER ?? '',
+    //}),
+  ],
 };
 
 /**
@@ -217,8 +216,8 @@ export const authOptions: NextAuthOptions = {
  * @see https://next-auth.js.org/configuration/nextjs
  */
 export const getServerAuthSession = (ctx: {
-    req: GetServerSidePropsContext['req'];
-    res: GetServerSidePropsContext['res'];
+  req: GetServerSidePropsContext['req'];
+  res: GetServerSidePropsContext['res'];
 }) => {
-    return getServerSession(ctx.req, ctx.res, authOptions);
+  return getServerSession(ctx.req, ctx.res, authOptions);
 };

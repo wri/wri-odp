@@ -9,14 +9,18 @@ import { api } from '@/utils/api';
 import type { SearchInput } from '@/schema/search.schema';
 import type { WriDataset } from '@/schema/ckan.schema';
 import { formatDate } from '@/utils/general';
+import PendingApprovalTag from '../_shared/PendingApprovalTag';
 
 function Favourite({ dataset }: { dataset: WriDataset }) {
     const created = dataset?.metadata_modified ? dataset.metadata_modified : '';
     return (
         <div className="flex flex-col hover:bg-slate-100 px-3 pb-2 pt-2 mb-2 pb-2 rounded-md">
-            <p className="font-normal text-base">
-                {dataset?.title ?? dataset?.name}
-            </p>
+            <div className="flex items-center gap-x-2">
+                <p className="font-normal text-base">
+                    {dataset?.title ?? dataset?.name}
+                </p>
+                <PendingApprovalTag dataset={dataset} />
+            </div>
             <div className="flex ">
                 <ArrowPathIcon className="w-3 h-3  text-[#3654A5] mt-[2px]" />
                 <div className="ml-1 w-fit h-[12px] text-[12px]">

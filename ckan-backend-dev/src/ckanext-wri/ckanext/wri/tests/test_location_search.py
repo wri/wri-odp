@@ -57,6 +57,8 @@ def test_location_search_1(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}]
     }
 
     try:
@@ -130,6 +132,8 @@ def test_location_search_2(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}]
     }
 
     dataset["name"] = "dataset-w-polygon"
@@ -279,6 +283,8 @@ def test_location_search_3(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}]
     }
 
     dataset["name"] = "dataset-w-address"
@@ -363,6 +369,8 @@ def test_location_search_4(mail_user):
         "learn_more": "https://example.com/learn_more.pdf",
         "cautions": "This data should be used with caution because...",
         "methodology": "A short methodology of the dataset",
+        "authors": [{"name": "Datopian", "email": "datopian@example.com"}],
+        "maintainers": [{"name": "Datopian", "email": "datopian@example.com"}],
         "resources": [
             {
                 "url": "http://example.com/dataset.json",

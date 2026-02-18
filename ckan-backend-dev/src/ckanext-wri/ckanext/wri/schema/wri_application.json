@@ -6,7 +6,7 @@
     {
       "field_name": "title",
       "label": "Title",
-      "validators": "not_empty unicode_safe",
+      "validators": "not_empty unicode_safe title_validator",
       "form_snippet": "large_text.html",
       "form_attrs": { "data-module": "slug-preview-target" },
       "form_placeholder": "My Organization"

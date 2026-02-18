@@ -104,14 +104,26 @@ export default function TeamsPage(
     const filteredTeams = ProcessTeams();
     const links = [{ label: 'Teams', url: '/teams', current: true }];
 
+    useEffect(() => {
+        if (typeof window !== 'undefined' && env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
+            const w = window as unknown as { dataLayer?: Record<string, unknown>[] };
+            w.dataLayer = w.dataLayer ?? [];
+            w.dataLayer.push({
+                event: 'teams_page_view',
+                page_path: '/teams',
+                page_section: 'teams',
+            });
+        }
+    }, []);
+
     return (
         <>
             <NextSeo
                 title="Teams"
-                description="WRI Open Data Catalog Teams"
+                description="WRI Open Data Catalog, WRI Data Explorer Teams"
                 openGraph={{
                     title: 'Teams',
-                    description: 'WRI Open Data Catalog Teams',
+                    description: 'WRI Open Data Catalog, WRI Data Explorer Teams',
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/teams`,
                     type: 'website',
                 }}

@@ -37,7 +37,7 @@ function LeftNode({
     const { data: organization, isLoading: isLoadingOrganization } =
         api.organization.getAllOrganizations.useQuery();
     const { data: dataset, isLoading: isLoadingDataset } =
-        api.dataset.getFavoriteDataset.useQuery();
+        api.dataset.getAllDataset.useQuery(query);
     const { data: group, isLoading: isLoadingGroup } =
         api.topics.getAllTopics.useQuery();
 
@@ -113,7 +113,7 @@ function LeftNode({
             {selectEntity.search === 'dataset' ? (
                 <SelectFilter
                     options={[{ id: 'all', label: 'All Datasets' }].concat(
-                        getKeyValues(dataset?.datasets!, 'title', 'id')
+                        getKeyValues(dataset?.datasets ?? [], 'title', 'id')
                     )}
                     filtername="packageId"
                     setQuery={setServerQuery}

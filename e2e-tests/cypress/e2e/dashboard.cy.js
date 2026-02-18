@@ -81,7 +81,7 @@ describe("Dashboard Test", () => {
     });
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     cy.login(ckanUserName, ckanUserPassword);
   });
 
@@ -242,6 +242,12 @@ describe("Dashboard Test", () => {
       );
     }
   );
+
+  it("Should see pending approval tag", () => {
+    cy.visit("/dashboard/datasets");
+    cy.contains(datasetName, { timeout: 30000 });
+    cy.contains("Pending Approval");
+  });
 
   it("Should reject dataset", () => {
     cy.visit("/dashboard/approval-request");

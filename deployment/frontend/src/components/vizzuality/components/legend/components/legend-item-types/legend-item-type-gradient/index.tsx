@@ -20,7 +20,7 @@ export default function LegendTypeGradient(
     );
     const gradient = items?.map((item) => item.color);
 
-    return !legendConfig || legendConfig.type !== 'gradient' ? null : (
+    return legendConfig?.type !== 'gradient' ? null : (
         <div className="c-legend-type-gradient">
             <div className="flex">
                 {itemTransparent && (

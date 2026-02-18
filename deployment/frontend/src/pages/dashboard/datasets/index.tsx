@@ -56,10 +56,10 @@ export default function DatasetListPage(
         <>
             <NextSeo
                 title={`Datasets - Dashboard`}
-                description={`Datasets - Dashboard -- WRI Open Data Catalog`}
+                description={`Datasets - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`}
                 openGraph={{
                     title: `Datasets - Dashboard`,
-                    description: `Datasets - Dashboard -- WRI Open Data Catalog`,
+                    description: `Datasets - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/datasets`,
                 }}
             />

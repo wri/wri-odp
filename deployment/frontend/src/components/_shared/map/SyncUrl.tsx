@@ -21,8 +21,7 @@ function stripZeroViewProps(obj: any) {
     if (
         obj.pitch === 0 &&
         obj.bearing === 0 &&
-        obj.padding &&
-        obj.padding.top === 0 &&
+        obj.padding?.top === 0 &&
         obj.padding.bottom === 0 &&
         obj.padding.left === 0 &&
         obj.padding.right === 0

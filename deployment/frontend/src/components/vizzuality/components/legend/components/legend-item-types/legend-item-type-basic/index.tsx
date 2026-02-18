@@ -14,7 +14,7 @@ export default function LegendTypeBasic(
 ) {
     const { legendConfig } = activeLayer;
 
-    return !legendConfig || legendConfig.type !== 'basic' ? null : (
+    return legendConfig?.type !== 'basic' ? null : (
         <div className="c-legend-type-basic">
             <ul className={`${mode} m-0 p-0 list-none`}>
                 {legendConfig.items.map((item) => (

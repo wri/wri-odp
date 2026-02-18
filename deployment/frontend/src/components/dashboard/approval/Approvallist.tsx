@@ -108,7 +108,7 @@ export default function Approvallist() {
             <div className="w-full">
                 {isLoading ? (
                     <Spinner className="mx-auto my-2" />
-                ) : data && data.datasets.length === 0 ? (
+                ) : data?.datasets.length === 0 ? (
                     <div className="flex justify-center items-center h-screen">
                         No data
                     </div>

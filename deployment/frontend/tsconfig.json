@@ -10,14 +10,15 @@
         "noEmit": true,
         "esModuleInterop": true,
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
-        "jsx": "preserve",
+        "jsx": "react-jsx",
         "incremental": true,
         "noUncheckedIndexedAccess": true,
         "baseUrl": ".",
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@portaljs/ckan": ["./node_modules/@portaljs/ckan/dist/index.d.ts"]
         },
         "isolatedModules": true
     },

@@ -43,10 +43,10 @@ export default function index(
         <>
             <NextSeo
                 title={`Approval Request - Dashboard`}
-                description={`Approval Request - Dashboard -- WRI Open Data Catalog`}
+                description={`Approval Request - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`}
                 openGraph={{
                     title: `Approval Request - Dashboard`,
-                    description: `Approval Request - Dashboard -- WRI Open Data Catalog`,
+                    description: `Approval Request - Dashboard -- WRI Open Data Catalog, WRI Data Explorer`,
                     url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/dashboard/approval-request`,
                 }}
             />

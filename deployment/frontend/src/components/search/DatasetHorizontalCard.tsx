@@ -28,6 +28,7 @@ import { getFormatColor, formatColors } from '@/utils/formatColors';
 import TabularViewIcon from '../datasets/view-icons/TabularViewIcon';
 import MapViewIcon from '../datasets/view-icons/MapViewIcon';
 import ChartViewIcon from '../datasets/view-icons/ChartViewIcon';
+import PendingApprovalTag from '../_shared/PendingApprovalTag';
 
 export default function DatasetHorizontalCard({
     dataset,
@@ -70,6 +71,7 @@ export default function DatasetHorizontalCard({
                                     }
                                 />
                             )}
+                        <PendingApprovalTag dataset={dataset} />
                         {formats.slice(0, 4).map((format) => (
                             <span
                                 key={`dataset-${dataset.name}-format-${format}`}

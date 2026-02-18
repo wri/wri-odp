@@ -28,9 +28,9 @@ export function DatapusherStatus({ datafile }: { datafile: ResourceFormType }) {
         },
         {
             refetchInterval: (data) =>
-                data && data.type === 'COMPLETED'
+                data?.type === 'COMPLETED'
                     ? false
-                    : data && data.type === 'RUNNING'
+                    : data?.type === 'RUNNING'
                       ? 5000
                       : 1000,
         }
@@ -75,7 +75,7 @@ export function Datapusher({ datafile }: { datafile: ResourceFormType }) {
         },
         {
             refetchInterval: (data) =>
-                data && data.type === 'COMPLETED' ? false : 5000,
+                data?.type === 'COMPLETED' ? false : 5000,
         }
     );
     return (
