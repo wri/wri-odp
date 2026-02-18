@@ -42,6 +42,7 @@
         "@tailwindcss/typography": "^0.5.10",
         "@tanstack/react-query": "^4.32.6",
         "@tanstack/react-table": "^8.10.7",
+        "@tiptap/core": "^2.1.12",
         "@tiptap/extension-bold": "^2.1.12",
         "@tiptap/extension-bullet-list": "^2.2.3",
         "@tiptap/extension-code": "^2.1.12",
@@ -57,7 +58,6 @@
         "@tiptap/extension-strike": "^2.1.12",
         "@tiptap/extension-text": "^2.1.12",
         "@tiptap/extension-underline": "^2.1.12",
-        "@tiptap/core": "^2.1.12",
         "@tiptap/pm": "^2.1.12",
         "@tiptap/react": "^2.1.12",
         "@trpc/client": "^10.37.1",
@@ -181,6 +181,8 @@
         "vega": "^6.2.0",
         "tar": "^7.5.7",
         "d3-color": "^3.1.0",
-        "vega-expression": "^5.2.1"
+        "vega-expression": "^5.2.1",
+        "fast-xml-parser": ">=5.3.6",
+        "ajv": "^8.18.0"
     }
 }
