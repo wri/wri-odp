@@ -135,6 +135,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
           FRONTEND_TAG: ${{ inputs.branch_name || github.ref_name }}-test
+          FRONTEND_SHA_TAG: ${{ github.sha }}-test
         run: |
           docker build \
             --network host \
@@ -151,9 +152,11 @@ jobs:
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
             --build-arg SYS_ADMIN_API_KEY="${{ env.SYS_ADMIN_API_KEY }}" \
             -t $REGISTRY/$FRONTEND_REPO:$FRONTEND_TAG \
+            -t $REGISTRY/$FRONTEND_REPO:$FRONTEND_SHA_TAG \
             deployment/frontend
 
           docker push $REGISTRY/$FRONTEND_REPO:$FRONTEND_TAG
+          docker push $REGISTRY/$FRONTEND_REPO:$FRONTEND_SHA_TAG
 
       - name: Tear down containers
         if: always()
