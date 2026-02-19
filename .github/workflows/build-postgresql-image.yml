@@ -6,13 +6,6 @@ on:
       branch_name:
         required: true
         type: string
-  push:
-    paths:
-      - 'ckan-backend-dev/postgresql/**'
-    branches:
-      - dev
-      - staging
-      - prod
   workflow_dispatch:
     inputs:
       branch_name:
