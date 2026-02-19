@@ -1,6 +1,10 @@
 name: Deploy to AWS
 
 on:
+  push:
+    branches:
+      - staging
+      - prod
   workflow_call:
     inputs:
       branch_name:

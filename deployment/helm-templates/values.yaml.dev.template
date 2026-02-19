@@ -130,6 +130,7 @@ ckan:
       tag: {{FRONTEND_IMAGE_TAG}}
     env:
       SITE_TITLE: WRI ODP
+      NEXT_PUBLIC_DEPLOYMENT_TYPE: development
     targetPort: 3000
   general:
     autoscaling:

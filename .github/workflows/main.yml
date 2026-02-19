@@ -2,8 +2,6 @@ name: Build and Deploy to AWS
 on:
   push:
     branches:
-      - prod
-      - staging
       - dev
   pull_request:
     branches:
@@ -131,7 +129,7 @@ jobs:
   build-ckan:
     name: Build CKAN Image
     needs: setup
-    if: github.event_name == 'pull_request' && needs.setup.outputs.ckan_changed == 'true'
+    if: always() && needs.setup.outputs.ckan_changed == 'true'
     uses: ./.github/workflows/build-ckan-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -139,7 +137,7 @@ jobs:
   build-datapusher:
     name: Build Datapusher Image
     needs: setup
-    if: github.event_name == 'pull_request' && needs.setup.outputs.datapusher_changed == 'true'
+    if: always() && needs.setup.outputs.datapusher_changed == 'true'
     uses: ./.github/workflows/build-datapusher-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -148,7 +146,7 @@ jobs:
   build-migration:
     name: Build Migration Image
     needs: setup
-    if: github.event_name == 'pull_request' && needs.setup.outputs.migration_changed == 'true'
+    if: always() && needs.setup.outputs.migration_changed == 'true'
     uses: ./.github/workflows/build-migration-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -185,7 +183,7 @@ jobs:
   build-prefect:
     name: Build Prefect Image
     needs: setup
-    if: github.event_name == 'pull_request' && needs.setup.outputs.prefect_changed == 'true'
+    if: always() && needs.setup.outputs.prefect_changed == 'true'
     uses: ./.github/workflows/build-prefect-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -194,7 +192,7 @@ jobs:
   build-postgresql:
     name: Build PostgreSQL Image
     needs: setup
-    if: github.event_name == 'pull_request' && needs.setup.outputs.postgresql_changed == 'true'
+    if: always() && needs.setup.outputs.postgresql_changed == 'true'
     uses: ./.github/workflows/build-postgresql-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -203,7 +201,7 @@ jobs:
   build-solr:
     name: Build Solr Image
     needs: setup
-    if: github.event_name == 'pull_request' && needs.setup.outputs.solr_changed == 'true'
+    if: always() && needs.setup.outputs.solr_changed == 'true'
     uses: ./.github/workflows/build-solr-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
