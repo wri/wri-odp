@@ -28,27 +28,36 @@ env:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 jobs:
   build-frontend:
-    name: Build Frontend Image for deployment to ${{ inputs.branch_name }}
+    name: Build Frontend Image for deployment to ${{ inputs.branch_name || github.ref_name }}
     uses: ./.github/workflows/build-frontend-image-deploy.yml
     with:
-      branch_name: ${{ inputs.branch_name }}
+      branch_name: ${{ inputs.branch_name || github.ref_name }}
     secrets: inherit
 
   deploy:
-    name: Deploy to deployment to ${{ inputs.branch_name }}
+    name: Deploy to ${{ inputs.branch_name || github.ref_name }}
     needs: build-frontend
     runs-on: ubuntu-latest
     environment:
-      name: ${{ inputs.branch_name }}
+      name: ${{ inputs.branch_name || github.ref_name }}
     env:
-      BRANCH_NAME: ${{ inputs.branch_name }}
+      # Push events don't have inputs; use ref_name (staging/prod). workflow_call/dispatch provide inputs.branch_name.
+      BRANCH_NAME: ${{ inputs.branch_name || github.ref_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Validate deployment inputs
+        run: |
+          if [ -z "$BRANCH_NAME" ]; then
+            echo "::error::BRANCH_NAME is empty. Deploy must be triggered by push (staging/prod), workflow_dispatch, or workflow_call with branch_name."
+            exit 1
+          fi
+          echo "Deploying to environment: $BRANCH_NAME"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -63,7 +72,7 @@ jobs:
           mask-password: 'true'
 
       - name: Promote images from source environment
-        if: inputs.branch_name == 'staging' || inputs.branch_name == 'prod'
+        if: (inputs.branch_name || github.ref_name) == 'staging' || (inputs.branch_name || github.ref_name) == 'prod'
         env:
           CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
           FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
@@ -74,12 +83,12 @@ jobs:
           MIGRATION_REPO: ${{ vars.ECR_MIGRATION_REPO }}
         run: |
           # Determine source environment
-          if [ "${{ inputs.branch_name }}" == "staging" ]; then
+          if [ "$BRANCH_NAME" == "staging" ]; then
             SOURCE_ENV="dev"
           else
             SOURCE_ENV="staging"
           fi
-          TARGET_ENV="${{ inputs.branch_name }}"
+          TARGET_ENV="$BRANCH_NAME"
           
           echo "=============================================="
           echo "Promoting images from $SOURCE_ENV to $TARGET_ENV"
@@ -211,9 +220,9 @@ jobs:
           [ "$CKAN_TAG" == "FAILED" ] && FAILED=1
           echo ""
           
-          # Resolve Frontend (pattern: sha-environment e.g. abc123-dev; latest tag is branch name)
+          # Resolve Frontend (pattern: sha or sha-branch, e.g. abc123 or abc123-staging; latest tag is branch name)
           echo "--- Frontend ---"
-          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}-" "Frontend")
+          FRONTEND_TAG=$(resolve_sha_from_latest "$FRONTEND_REPO" "${BRANCH_NAME}" "^[a-fA-F0-9]{40}(-[a-zA-Z0-9]+)?$" "Frontend")
           [ "$FRONTEND_TAG" == "FAILED" ] && FAILED=1
           echo ""
           
@@ -315,3 +324,25 @@ jobs:
           echo ""
           echo "=== Pod Status ==="
           kubectl get pods -n $PROJECT_NAME-$BRANCH_NAME -o wide || true
+
+  tag-deploy:
+    name: Tag deployed commit
+    needs: deploy
+    if: (inputs.branch_name || github.ref_name) == 'staging' || (inputs.branch_name || github.ref_name) == 'prod'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create and push deployment tag
+        run: |
+          TAG="v$(date -u +%Y.%m.%d.%H.%M)-${{ inputs.branch_name }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Deploy to ${{ inputs.branch_name }}"
+          git push origin "$TAG"
+          echo "Created and pushed tag: $TAG"

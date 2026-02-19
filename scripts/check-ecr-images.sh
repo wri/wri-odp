@@ -80,8 +80,8 @@ echo "-------------------------------------------"
 # CKAN (pattern: sha only, no branch prefix)
 resolve_sha_tag "$CKAN_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "CKAN"
 
-# Frontend (pattern: sha only, no branch prefix)
-resolve_sha_tag "$FRONTEND_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Frontend"
+# Frontend (pattern: sha or sha-branch, e.g. abc123 or abc123-staging)
+resolve_sha_tag "$FRONTEND_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}(-[a-zA-Z0-9]+)?$" "Frontend"
 
 # Datapusher (pattern: sha only, no branch prefix)
 resolve_sha_tag "$DATAPUSHER_REPO" "${BRANCH}" "^[a-fA-F0-9]{40}$" "Datapusher"

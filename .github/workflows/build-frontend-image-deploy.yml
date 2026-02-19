@@ -48,9 +48,6 @@ jobs:
           else echo "val=DEV" >> $GITHUB_OUTPUT
           fi
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Build and push Frontend image
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -79,6 +76,6 @@ jobs:
             -t $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG \
             -t $REGISTRY/$FRONTEND_REPO:$LATEST_TAG \
             deployment/frontend
-          
+
           docker push $REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
           docker push $REGISTRY/$FRONTEND_REPO:$LATEST_TAG
