@@ -6,14 +6,11 @@ import { TextArea } from '@/components/_shared/SimpleTextArea';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { ImageUploader } from '../../_shared/ImageUploader';
 import { type UploadResult } from '@uppy/core';
-import { env } from '@/env.mjs';
 import { api } from '@/utils/api';
 import { P, match } from 'ts-pattern';
 import Spinner from '@/components/_shared/Spinner';
 import DefaultTooltip from '@/components/_shared/Tooltip';
 import {
-    ArrowsPointingInIcon,
-    ExclamationCircleIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 

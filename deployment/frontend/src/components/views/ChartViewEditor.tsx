@@ -30,7 +30,6 @@ import { queryRw } from '@/utils/rw';
 import { DefaultTooltip } from '../_shared/Tooltip';
 import { type WriDataset } from '@/schema/ckan.schema';
 import { Button, LoaderButton } from '../_shared/Button';
-import { Transform } from 'plotly.js';
 const Chart = dynamic(
     () => import('@/components/datasets/visualizations/Chart'),
     {

@@ -1,6 +1,5 @@
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { Input } from '@/components/_shared/SimpleInput';
-import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { type UseFormReturn } from 'react-hook-form';

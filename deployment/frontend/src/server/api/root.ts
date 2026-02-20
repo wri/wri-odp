@@ -12,7 +12,7 @@ import { tagsRouter } from './routers/tags';
 import { rwRouter } from './routers/rw';
 import { datastoreRouter } from './routers/datastore';
 import { notificationRouter } from './routers/notification';
-import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
+import type { inferRouterOutputs } from '@trpc/server';
 import { prefectRouter } from './routers/prefect';
 import { downloadEventRouter } from './routers/download_event';
 

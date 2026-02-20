@@ -1,10 +1,8 @@
-import { Accordion } from '../Accordion';
 import { Tab } from '@headlessui/react';
 import {
     ArrowUpTrayIcon,
     FolderPlusIcon,
     LinkIcon,
-    Square3Stack3DIcon,
     GlobeAsiaAustraliaIcon,
     PaperClipIcon,
     MinusCircleIcon,
@@ -13,12 +11,11 @@ import {
 import classNames from '@/utils/classnames';
 import { LinkExternalForm } from './sections/LinkExternalForm';
 import { UploadForm } from './sections/UploadForm';
-import { Fragment, useMemo, useRef, useState } from 'react';
+import { Fragment, useMemo, useRef } from 'react';
 import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
 import { DataFileAccordion } from './DatafileAccordion';
-import { P, match } from 'ts-pattern';
-import { BuildALayer } from './sections/BuildALayer/BuildALayerSection';
+import { match } from 'ts-pattern';
 import {
     type DatasetFormType,
     type ResourceFormType,
@@ -30,7 +27,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { convertBytes } from '@/utils/convertBytes';
 import { useDataDictionary } from '@/utils/getDataDictionary';
 import { type Field } from 'tableschema';
-import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection';
 import SortableList, { SortableItem } from 'react-easy-sort';
 import { TileCacheForm } from './sections/TileCacheForm';
 import { GeeAssetForm } from './sections/GeeAssetForm';

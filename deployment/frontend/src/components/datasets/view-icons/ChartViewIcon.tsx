@@ -1,7 +1,5 @@
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
-import { View } from '@/interfaces/dataset.interface';
 import {
-    WriDataset,
     type WriDatasetWithoutDetails,
 } from '@/schema/ckan.schema';
 import { ChartBarIcon } from '@heroicons/react/20/solid';

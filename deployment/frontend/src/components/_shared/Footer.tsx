@@ -1,7 +1,5 @@
 import React from 'react';
-import { EnvelopeIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
-import { Button } from './Button';
 import Link from 'next/link';
 import { SubscribeForm } from './SubscribeForm';
 import { env } from '@/env.mjs';

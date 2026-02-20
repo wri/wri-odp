@@ -6,7 +6,6 @@ import {
     GlobeAsiaAustraliaIcon,
     LinkIcon,
     Squares2X2Icon,
-    XMarkIcon,
 } from '@heroicons/react/24/outline';
 import {
     Table,
@@ -23,7 +22,6 @@ import {
     type DataDictionaryFormType,
     type DatasetFormType,
 } from '@/schema/dataset.schema';
-import { formatDate } from '@/utils/formatDate';
 import { convertBytes } from '@/utils/convertBytes';
 import { PreviewMap } from '../datafiles/sections/BuildALayer/BuildALayerSection';
 import {

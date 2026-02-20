@@ -5,7 +5,6 @@ import Favourites from './Favourites';
 import Notifications from './Notifications';
 import UserActivityStreams from './ActivityStreams';
 import { Cog8ToothIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { api } from '@/utils/api';
 import { DefaultTooltip } from '../_shared/Tooltip';
 
 interface StateItem {

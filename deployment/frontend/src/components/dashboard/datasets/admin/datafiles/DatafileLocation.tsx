@@ -1,7 +1,5 @@
 import {
     ArrowUpTrayIcon,
-    GlobeEuropeAfricaIcon,
-    InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Disclosure, Tab } from '@headlessui/react';
 import { type DatasetFormType } from '@/schema/dataset.schema';

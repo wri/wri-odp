@@ -1,10 +1,8 @@
-import { Navigation } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import CarouselNavButton from '../_shared/CarouselNavButton';
-import HighlightCard from '../HighlightCard';
 import { AutoCarousel } from '../_shared/AutoCarousel';
 import { type WriDataset } from '@/schema/ckan.schema';
 import { api } from '@/utils/api';

@@ -1,8 +1,6 @@
-import Team from '@/interfaces/team.interface';
 import CardsGrid from '../_shared/CardsGrid';
 import Container from '../_shared/Container';
 import TeamCard from './TeamCard';
-import Pagination from '../_shared/Pagination';
 import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
 import { type Organization as CkanOrg } from '@portaljs/ckan';
 

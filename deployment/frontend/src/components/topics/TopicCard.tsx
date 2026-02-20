@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import Topic from '@/interfaces/topic.interface';
 import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
 import { type Group } from '@portaljs/ckan';
 import { api } from '@/utils/api';

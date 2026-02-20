@@ -1,10 +1,9 @@
-import { WriOrganization, type WriUser } from '@/schema/ckan.schema';
+import { type WriUser } from '@/schema/ckan.schema';
 import React from 'react';
 import Link from 'next/link';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
-import { Organization, type Group, User } from '@portaljs/ckan';
+import { type Group } from '@portaljs/ckan';
 import Spinner from '../_shared/Spinner';
-import Topic from '@/interfaces/topic.interface';
 
 export default function EditCard({
     isLoading,

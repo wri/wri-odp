@@ -1,18 +1,15 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import TableHeader from '../_shared/TableHeader';
 import {
     TrashIcon,
-    EllipsisVerticalIcon,
     EnvelopeOpenIcon,
     EnvelopeIcon,
 } from '@heroicons/react/24/outline';
-import { Menu, Transition } from '@headlessui/react';
 import { type NotificationType } from '@/schema/notification.schema';
 import { LoaderButton, Button } from '@/components/_shared/Button';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import notify from '@/utils/notify';
-import Spinner from '@/components/_shared/Spinner';
 import { api } from '@/utils/api';
 
 import dynamic from 'next/dynamic';

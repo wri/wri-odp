@@ -6,12 +6,11 @@ import {
 } from '@/server/api/trpc';
 import { env } from '@/env.mjs';
 import type { Application } from '@/schema/ckan.schema';
-import type { CkanResponse, User } from '@/schema/ckan.schema';
+import type { CkanResponse } from '@/schema/ckan.schema';
 import type { Group } from '@portaljs/ckan';
 
 import { ApplicationSchema } from '@/schema/application.schema';
 import { replaceNames } from '@/utils/replaceNames';
-import { sendMemberNotifications } from '@/utils/apiUtils';
 
 export const applicationRouter = createTRPCRouter({
     getAllApplications: publicProcedure.query(async ({ ctx }) => {

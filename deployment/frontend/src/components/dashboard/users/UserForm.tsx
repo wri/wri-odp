@@ -4,7 +4,6 @@ import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, LoaderButton } from '@/components/_shared/Button';
-import Link from 'next/link';
 import { api } from '@/utils/api';
 import { type User } from '@portaljs/ckan';
 import { ImageUploader } from '../_shared/ImageUploader';
@@ -15,7 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { type UploadResult } from '@uppy/core';
 import { UserFormSchema } from '@/schema/user.schema';
-import type { UserFormInput, UserSchema } from '@/schema/user.schema';
+import type { UserFormInput } from '@/schema/user.schema';
 import notify from '@/utils/notify';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import { useRouter } from 'next/router';

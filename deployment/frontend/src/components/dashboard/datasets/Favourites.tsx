@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import SearchHeader from '../_shared/SearchHeader';
 import { FavouriteRow } from './DatasetRow';
 import { api } from '@/utils/api';

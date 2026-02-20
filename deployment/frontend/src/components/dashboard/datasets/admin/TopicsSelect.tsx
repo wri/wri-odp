@@ -26,7 +26,6 @@ import { type TopicHierarchy } from '@/interfaces/topic.interface';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
-import { Group } from '@portaljs/ckan';
 
 export function TopicsSelect({
     userTopics,

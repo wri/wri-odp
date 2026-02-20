@@ -3,7 +3,6 @@ import Header from '@/components/_shared/Header';
 import Layout from '@/components/dashboard/Layout';
 import UserList from '@/components/dashboard/users/UserList';
 import Footer from '@/components/_shared/Footer';
-import { GroupTree, GroupsmDetails } from '@/schema/ckan.schema';
 import { getServerAuthSession } from '@/server/auth';
 import {
     type GetServerSidePropsContext,

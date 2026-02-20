@@ -9,7 +9,6 @@ import { env } from '@/env.mjs';
 import { getServerAuthSession } from '../../../server/auth';
 import {
     type GetServerSidePropsContext,
-    InferGetServerSidePropsType,
 } from 'next';
 import superjson from 'superjson';
 import { createServerSideHelpers } from '@trpc/react-query/server';

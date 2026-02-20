@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
-import { CKAN } from '@portaljs/ckan';
 import { useQuery } from 'react-query';
 import flatten from 'lodash/flatten';
 import compact from 'lodash/compact';

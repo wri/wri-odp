@@ -1,5 +1,5 @@
 import { Fragment, useRef, useState } from 'react';
-import { Combobox, Listbox, Transition } from '@headlessui/react';
+import { Combobox } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import classNames from '@/utils/classnames';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -10,7 +10,6 @@ import {
 } from '@/components/_shared/Popover';
 import { Button } from '@/components/_shared/Button';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
-import { DatasetFormType } from '@/schema/dataset.schema';
 import {
     Controller,
     type FieldValues,

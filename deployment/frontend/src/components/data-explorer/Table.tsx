@@ -3,8 +3,6 @@ import {
     type Table as TableType,
     type Column,
     type Header,
-    Updater,
-    VisibilityState,
 } from '@tanstack/react-table';
 import {
     ChevronLeftIcon,
@@ -24,7 +22,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { DefaultTooltip } from '../_shared/Tooltip';
 import { match } from 'ts-pattern';
-import { Menu, Popover, Transition } from '@headlessui/react';
+import { Popover, Transition } from '@headlessui/react';
 import { DebouncedInput } from '../_shared/SimpleInput';
 import {
     Controller,

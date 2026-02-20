@@ -1,9 +1,7 @@
 import { match, P } from 'ts-pattern';
 import {
     type ColorPatternType,
-    InteractionFormType,
     type LayerFormType,
-    layerSchema,
     type LegendsFormType,
     type RawLayerFormType,
 } from './layer.schema';

@@ -1,7 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc';
 import { env } from '@/env.mjs';
 import {
-    getGroups,
     searchHierarchy,
     getAllOrganizations,
     getUserOrganizations,

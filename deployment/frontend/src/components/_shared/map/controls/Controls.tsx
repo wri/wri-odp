@@ -3,8 +3,6 @@ import Zoom from './Zoom';
 import type { MutableRefObject } from 'react';
 import Search from './Search';
 import Settings from './Settings';
-import Draw from './Draw';
-import { Download } from './Download';
 import Export from './Export';
 
 export default function Controls({

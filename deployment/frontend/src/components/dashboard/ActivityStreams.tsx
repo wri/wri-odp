@@ -2,7 +2,6 @@ import React from 'react';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import ActivityStreamCard from '../_shared/ActivityStreamCard';
 import type { activity } from '../_shared/ActivityStreamCard';
-import { activity as activitydata } from '../_shared/ActivityStreamList';
 import { Squares2X2Icon } from '@heroicons/react/24/outline';
 import { api } from '@/utils/api';
 import Spinner from '@/components/_shared/Spinner';

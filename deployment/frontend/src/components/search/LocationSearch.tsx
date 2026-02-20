@@ -3,7 +3,6 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { Map } from 'react-map-gl';
 import GeocoderControl from './GeocoderControl';
 import { type Dispatch, type SetStateAction } from 'react';
-import { SearchInput } from '@/schema/search.schema';
 import { type Filter } from '@/interfaces/search.interface';
 import classNames from '@/utils/classnames';
 import { HideBoundaries } from '../_shared/HideBoundaries';

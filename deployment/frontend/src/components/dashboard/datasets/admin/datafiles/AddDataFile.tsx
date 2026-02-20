@@ -1,10 +1,8 @@
-import { Accordion } from '../Accordion';
 import { Tab } from '@headlessui/react';
 import {
     ArrowUpTrayIcon,
     FolderPlusIcon,
     LinkIcon,
-    Square3Stack3DIcon,
     GlobeAsiaAustraliaIcon,
     PaperClipIcon,
     MinusCircleIcon,
@@ -17,7 +15,6 @@ import { useMemo, useRef } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 import { DataFileAccordion } from './DatafileAccordion';
 import { match, P } from 'ts-pattern';
-import { BuildALayer } from './sections/BuildALayer/BuildALayerSection';
 import {
     type DatasetFormType,
     type ResourceFormType,
@@ -29,8 +26,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { convertBytes } from '@/utils/convertBytes';
 import { useDataDictionary } from '@/utils/getDataDictionary';
 import { type Field } from 'tableschema';
-import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection';
-import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { TileCacheForm } from './sections/TileCacheForm';
 import { GeeAssetForm } from './sections/GeeAssetForm';
 

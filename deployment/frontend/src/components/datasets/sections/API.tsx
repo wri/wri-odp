@@ -11,7 +11,6 @@ import {
     RwMoreInfo,
 } from './APIEndpoint';
 import { useFields } from '@/components/data-explorer/queryHooks';
-import { DatasetTabs } from '@/components/datasets/DatasetTabs';
 import hljs from 'highlight.js/lib/core';
 
 import python from 'highlight.js/lib/languages/python';

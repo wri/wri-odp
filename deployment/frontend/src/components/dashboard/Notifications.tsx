@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-    ArrowPathIcon,
     ArrowRightIcon,
     Squares2X2Icon,
 } from '@heroicons/react/24/outline';

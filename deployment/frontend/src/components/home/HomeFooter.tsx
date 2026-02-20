@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import { Button } from '../_shared/Button';
-import { EnvelopeIcon } from '@heroicons/react/20/solid';
 import Link from 'next/link';
 import { SubscribeForm } from '../_shared/SubscribeForm';
 import { env } from '@/env.mjs';

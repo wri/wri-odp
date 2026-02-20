@@ -9,7 +9,7 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
 import { useRouter } from 'next/router';
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { ErrorDisplay } from '@/components/_shared/InputGroup';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, LoaderButton } from '@/components/_shared/Button';

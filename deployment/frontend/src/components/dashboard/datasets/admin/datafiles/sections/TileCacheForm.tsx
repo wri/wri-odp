@@ -4,8 +4,6 @@ import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { type UseFormReturn } from 'react-hook-form';
-import FormatInput from '../FormatInput';
-import { DatafileLocation } from '../DatafileLocation';
 import DefaultTooltip from '@/components/_shared/Tooltip';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { SimpleEditor } from '../../metadata/RTE/SimpleEditor';

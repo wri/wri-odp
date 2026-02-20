@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import Spinner from '@/components/_shared/Spinner';
 import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '@/components/datasets/Pagination';
-import { type GroupTree, GroupsmDetails } from '@/schema/ckan.schema';
+import { type GroupTree } from '@/schema/ckan.schema';
 import { getServerAuthSession } from '@/server/auth';
 import {
     type GetServerSidePropsContext,
@@ -21,7 +21,6 @@ import { Index } from 'flexsearch';
 import { type Organization as CkanOrg } from '@portaljs/ckan';
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2';
 import TopicsSearch from '@/components/topics/TopicsSearch';
-import TeamsSearch from '@/components/team/TeamsSearch';
 
 const TeamsSearchResults = dynamic(
     () => import('@/components/team/TeamsSearchResults')

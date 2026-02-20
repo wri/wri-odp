@@ -11,7 +11,7 @@ import { CartoProvider } from '@/utils/providers/cartoProvider';
 import { TileProvider } from '@/utils/providers/tileProvider';
 import { GeeProvider } from '@/utils/providers/geeProvider';
 import { VectorTileProvider } from '@/utils/providers/vectorProvider';
-import { type APILayerSpec, DeckLayerSpec } from '@/interfaces/layer.interface';
+import { type APILayerSpec } from '@/interfaces/layer.interface';
 import { useLayerStates } from '@/utils/storeHooks';
 import { type LayerState } from '@/interfaces/state.interface';
 import { useMemo } from 'react';

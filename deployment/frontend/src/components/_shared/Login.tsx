@@ -1,21 +1,18 @@
 import React, {
     type Dispatch,
-    FormEvent,
     type SetStateAction,
-    useEffect,
     useState,
 } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
-    ExclamationCircleIcon,
     EnvelopeIcon,
     LockClosedIcon,
     UserIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import Image from 'next/image';
-import { getCsrfToken, signIn } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { EnvelopeIcon } from '@heroicons/react/20/solid';
-import { Button, LoaderButton } from './Button';
+import { LoaderButton } from './Button';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';

@@ -10,7 +10,6 @@ import {
     Fragment,
     type SetStateAction,
     useEffect,
-    useRef,
     useState,
 } from 'react';
 

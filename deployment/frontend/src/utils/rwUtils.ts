@@ -27,7 +27,7 @@ export async function deleteLayerRw(r: ResourceFormType) {
             Authorization: `Bearer ${env.RW_API_KEY}`,
         },
     });
-    const layerRw: RwResponse = await layerRes.json();
+    const layerRw = (await layerRes.json()) as RwResponse;
     if (isRwError(layerRw)) throw new Error(JSON.stringify(layerRw.errors));
     return layerRw;
 }
@@ -55,7 +55,7 @@ export async function createDatasetRw(dataset: DatasetFormType) {
             body,
         }
     );
-    const datasetRw: RwResponse = await datasetRwRes.json();
+    const datasetRw = (await datasetRwRes.json()) as RwResponse;
     if (isRwError(datasetRw)) throw new Error(JSON.stringify(datasetRw.errors));
     return datasetRw;
 }
@@ -78,7 +78,7 @@ export async function createLayerRw(r: ResourceFormType, datasetRwId: string) {
             body,
         }
     );
-    const layerRw: RwResponse = await layerRwRes.json();
+    const layerRw = (await layerRwRes.json()) as RwResponse;
     if (isRwError(layerRw)) throw new Error(JSON.stringify(layerRw.errors));
     if (!isRwLayerResp(layerRw))
         throw new Error('Invalid response from RW API');
@@ -111,7 +111,7 @@ export async function editLayerRw(r: ResourceFormType) {
                 },
                 body,
             });
-            const layerRw: RwResponse = await layerRwRes.json();
+            const layerRw = (await layerRwRes.json()) as RwResponse;
             if (isRwError(layerRw))
                 throw Error(
                     `Error creating resource at the Resource Watch API - (${JSON.stringify(

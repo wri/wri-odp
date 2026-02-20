@@ -10,20 +10,15 @@ import {
   GlobeAmericasIcon,
   MagnifyingGlassIcon,
   MapPinIcon,
-  PaperAirplaneIcon,
   PlusCircleIcon,
 } from '@heroicons/react/24/outline';
 import { DownloadButton } from './datafiles/Download';
-import { OpenInButton } from './datafiles/OpenIn';
 import { type Resource, type View } from '@/interfaces/dataset.interface';
 import { getFormatColor } from '@/utils/formatColors';
 import { type Index } from 'flexsearch';
 import {
   Fragment,
-  useCallback,
-  useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import { type WriDataset } from '@/schema/ckan.schema';
@@ -31,7 +26,7 @@ import { useLayersFromRW } from '@/utils/queryHooks';
 import { useActiveCharts, useActiveLayerGroups } from '@/utils/storeHooks';
 import { type TabularResource } from '../visualizations/Visualizations';
 import { APIButton } from './datafiles/API';
-import { UseFormReturn, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { api } from '@/utils/api';
 import DefaultTooltip from '@/components/_shared/Tooltip';
 import { toast } from 'react-toastify';

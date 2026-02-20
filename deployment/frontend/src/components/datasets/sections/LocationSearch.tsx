@@ -1,4 +1,4 @@
-import { type Resource, View } from '@/interfaces/dataset.interface';
+import { type Resource } from '@/interfaces/dataset.interface';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Layer,
@@ -7,11 +7,10 @@ import {
   type MapRef,
   Marker,
   Source,
-  useMap,
 } from 'react-map-gl';
 import GeocoderControl from '@/components/search/GeocoderControl';
 import { useQuery } from 'react-query';
-import { type UseFormReturn, useForm } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import DrawControl from '@/components/search/Draw';
 import { type LocationSearchFormType } from './DataFiles';
 import { HideBoundaries } from '@/components/_shared/HideBoundaries';

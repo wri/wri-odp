@@ -1,6 +1,5 @@
-import { Collaborator, type WriDataset } from '@/schema/ckan.schema';
+import { type WriDataset } from '@/schema/ckan.schema';
 import {
-    CapacityUnion,
     type DataDictionaryFormType,
     type DatasetFormType,
     DatasetSchema,
@@ -10,7 +9,7 @@ import classNames from '@/utils/classnames';
 import { Tab } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
-import { Fragment, useState, useEffect } from 'react';
+import { Fragment, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { OverviewForm } from './metadata/Overview';
 import { DescriptionForm } from './metadata/DescriptionForm';

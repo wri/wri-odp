@@ -1,4 +1,4 @@
-import { type WriOrganization, type WriUser } from '@/schema/ckan.schema';
+import { type WriOrganization } from '@/schema/ckan.schema';
 import React from 'react';
 import Link from 'next/link';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';

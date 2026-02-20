@@ -1,7 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { type Application } from '@/schema/ckan.schema';
-import { api } from '@/utils/api';
 import Link from 'next/link';
 
 export default function ApplicationCard({

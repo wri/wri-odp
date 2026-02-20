@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import DatasetHeader from './DatasetHeader';
 import DatasetRow from './DatasetRow';
 import { api } from '@/utils/api';
@@ -14,7 +14,6 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 import { LoaderButton, Button } from '@/components/_shared/Button';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
-import { useRouter } from 'next/router';
 
 export default function DatasetLCardList({
     setQuery,

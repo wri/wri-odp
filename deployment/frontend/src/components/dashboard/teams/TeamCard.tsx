@@ -19,7 +19,6 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import type { GroupTree } from '@/schema/ckan.schema';
 import { useQuery } from 'react-query';
-import { DownloadIcon } from '@/components/_shared/icons/DownloadIcon';
 import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/solid';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import { visibilityTypeLabels } from '@/utils/constants';
@@ -497,7 +496,7 @@ export default function TeamCard() {
                 rowMain={
                   <TeamProfile
                     team={team}
-                    org2img={data?.org2Image!}
+                    org2img={data?.org2Image}
                   />
                 }
                 linkButton={{
@@ -555,7 +554,7 @@ export default function TeamCard() {
                   <SubCardProfile
                     teams={team.children}
                     highlighted={team?.highlighted}
-                    org2img={data?.org2Image!}
+                    org2img={data?.org2Image}
                   />
                 }
                 isDropDown

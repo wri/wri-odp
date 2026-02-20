@@ -16,7 +16,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/_shared/Table';
-import { type User, type WriDataset } from '@/schema/ckan.schema';
+import { type WriDataset } from '@/schema/ckan.schema';
 import { formatDate, formatDiff } from '@/utils/general';
 import Spinner from '@/components/_shared/Spinner';
 
@@ -513,7 +513,7 @@ export default function ApprovalRow({
             rowSub={
                 <SubCardProfile
                     isLoading={isLoading}
-                    diff={data!}
+                    diff={data}
                     data={approvalInfo}
                 />
             }

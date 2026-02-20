@@ -1,6 +1,6 @@
 import { type Filter } from '@/interfaces/search.interface';
 import { Disclosure, Transition } from '@headlessui/react';
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 import TagMulText from './Tagmultext';
 

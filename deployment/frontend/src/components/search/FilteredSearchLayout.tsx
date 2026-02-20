@@ -10,14 +10,12 @@ import LocationSearch from './LocationSearch';
 import classNames from '@/utils/classnames';
 import {
   type Filter,
-  Facets as SearchFacet,
 } from '@/interfaces/search.interface';
 import { type SearchInput } from '@/schema/search.schema';
 import { api } from '@/utils/api';
 import { useSession } from 'next-auth/react';
 import TemporalCoverageFacet from './TemporalCoverageFacet';
 import MetadataModifiedFacet from './MetadataModifiedFacet';
-import Spinner from '../_shared/Spinner';
 import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants';
 import Tags from './Tag';
 import React from 'react';

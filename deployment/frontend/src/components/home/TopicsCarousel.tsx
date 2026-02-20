@@ -1,10 +1,8 @@
-import { Navigation } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import CarouselNavButton from '../_shared/CarouselNavButton';
-import SubtopicCard from '../topics/SubtopicCard';
 import Image from 'next/image';
 import { AutoCarousel } from '../_shared/AutoCarousel';
 import Link from 'next/link';

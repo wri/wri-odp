@@ -1,6 +1,5 @@
 import React from 'react';
 import type ReactModal from 'react-modal';
-import * as Icons from './Icons';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,

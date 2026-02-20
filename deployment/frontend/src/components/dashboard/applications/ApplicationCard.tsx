@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import SearchHeader from '../_shared/SearchHeader';
-import RowProfile from '../_shared/RowProfile';
 import Row from '../_shared/Row';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
-import type { IRowProfile } from '../_shared/RowProfile';
 import { api } from '@/utils/api';
 import Spinner from '@/components/_shared/Spinner';
 import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '../_shared/Pagination';
-import type { GroupTree } from '@/schema/ckan.schema';
 import notify from '@/utils/notify';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {

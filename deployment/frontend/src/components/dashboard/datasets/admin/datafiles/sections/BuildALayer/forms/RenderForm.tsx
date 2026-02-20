@@ -4,7 +4,6 @@ import { InputGroup } from '@/components/_shared/InputGroup';
 import { Input } from '@/components/_shared/SimpleInput';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import {
-    ChevronDownIcon,
     InformationCircleIcon,
     PlusCircleIcon,
 } from '@heroicons/react/24/outline';
@@ -15,7 +14,7 @@ import {
     rampTypes,
     renderTypeOptions,
 } from '../../../../formOptions';
-import { Disclosure, Switch, Transition } from '@headlessui/react';
+import { Switch } from '@headlessui/react';
 import { type FilterFormType, type LayerFormType } from '../layer.schema';
 import { useState } from 'react';
 import classNames from '@/utils/classnames';

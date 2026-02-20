@@ -1,5 +1,4 @@
-import { Navigation } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -12,10 +11,7 @@ import { ErrorAlert } from '../_shared/Alerts';
 import Spinner from '../_shared/Spinner';
 import {
     type Application,
-    GroupTree,
-    GroupsmDetails,
 } from '@/schema/ckan.schema';
-import { Group } from '@portaljs/ckan';
 
 export function ApplicationCard({ application }: { application: Application }) {
     const datasetCount = application.package_count;

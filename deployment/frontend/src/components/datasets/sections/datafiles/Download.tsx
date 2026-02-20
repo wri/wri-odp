@@ -1,5 +1,4 @@
 import { Button, LoaderButton } from '@/components/_shared/Button';
-import dynamic from 'next/dynamic';
 import {
     Popover,
     PopoverContent,
@@ -11,7 +10,6 @@ import { convertBytes } from '@/utils/convertBytes';
 import {
     ArrowDownTrayIcon,
     ArrowTopRightOnSquareIcon,
-    LinkIcon,
     PaperAirplaneIcon,
 } from '@heroicons/react/24/outline';
 import { env } from '@/env.mjs';

@@ -1,14 +1,9 @@
 import { type WriDataset } from '@/schema/ckan.schema';
-import {
-    ExclamationCircleIcon,
-    ExclamationTriangleIcon,
-    GlobeAltIcon,
-    TableCellsIcon,
-} from '@heroicons/react/20/solid';
+
+
 import {
     ArrowPathIcon,
     ClockIcon,
-    MapPinIcon,
     UserGroupIcon,
 } from '@heroicons/react/24/outline';
 
@@ -25,9 +20,6 @@ import Chip from '../_shared/Chip';
 import { useSession } from 'next-auth/react';
 import { visibilityTypeLabels } from '@/utils/constants';
 import { getFormatColor, formatColors } from '@/utils/formatColors';
-import TabularViewIcon from '../datasets/view-icons/TabularViewIcon';
-import MapViewIcon from '../datasets/view-icons/MapViewIcon';
-import ChartViewIcon from '../datasets/view-icons/ChartViewIcon';
 import PendingApprovalTag from '../_shared/PendingApprovalTag';
 
 export default function DatasetHorizontalCard({

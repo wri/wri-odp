@@ -3,14 +3,9 @@ import TableHeader from '../_shared/TableHeader';
 import SelectFilter from '../_shared/SelectFilter';
 import { api } from '@/utils/api';
 import type { SearchInput } from '@/schema/search.schema';
-import { getKeyValues2, getKeyValues } from '@/utils/general';
-import type {
-    ActivityDisplay,
-    WriDataset,
-    WriOrganization,
-} from '@/schema/ckan.schema';
-import { type Group } from '@portaljs/ckan';
-import Topic from '@/interfaces/topic.interface';
+import { getKeyValues } from '@/utils/general';
+
+
 
 function LeftNode({
     setQuery,
@@ -125,7 +120,7 @@ function LeftNode({
             {selectEntity.search === 'teams' ? (
                 <SelectFilter
                     options={[{ id: 'all', label: 'All Teams' }].concat(
-                        getKeyValues(organization!, 'title', 'id')
+                        getKeyValues(organization, 'title', 'id')
                     )}
                     filtername="orgId"
                     setQuery={setServerQuery}
@@ -138,7 +133,7 @@ function LeftNode({
             {selectEntity.search === 'topics' ? (
                 <SelectFilter
                     options={[{ id: 'all', label: 'All Topics' }].concat(
-                        getKeyValues(group!, 'title', 'id')
+                        getKeyValues(group, 'title', 'id')
                     )}
                     filtername="groupId"
                     setQuery={setServerQuery}

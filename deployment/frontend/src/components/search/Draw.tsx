@@ -1,5 +1,5 @@
 // @ts-nocheck
-import MapboxDraw, { modes } from '@mapbox/mapbox-gl-draw';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import DrawRectangle from 'mapbox-gl-draw-rectangle-mode';
 import { useEffect, useState } from 'react';
 import { useControl } from 'react-map-gl';

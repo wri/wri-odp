@@ -1,4 +1,3 @@
-import { Option } from '@/components/_shared/SimpleSelect';
 import z from 'zod';
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
 

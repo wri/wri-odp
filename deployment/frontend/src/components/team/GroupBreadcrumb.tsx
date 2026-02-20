@@ -1,4 +1,4 @@
-import { type GroupTree, GroupsmDetails } from '@/schema/ckan.schema';
+import { type GroupTree } from '@/schema/ckan.schema';
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
 import React from 'react';
 import Spinner from '../_shared/Spinner';
