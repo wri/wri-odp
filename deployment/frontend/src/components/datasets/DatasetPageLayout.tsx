@@ -1,7 +1,7 @@
 import classNames from '@/utils/classnames';
 import { Disclosure } from '@headlessui/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 
 export default function DatasetPageLayout({

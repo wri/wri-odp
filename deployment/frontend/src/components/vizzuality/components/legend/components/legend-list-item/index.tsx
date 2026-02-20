@@ -2,7 +2,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import SortableElement from '../../../../react-sortable-hoc/src/SortableElement/index';
 
 // Components
 import LegendItemDrag from '../legend-item-drag';

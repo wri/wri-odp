@@ -12,7 +12,6 @@ import { encodeMapParam } from '@/utils/urlEncoding';
 import { useRef, useEffect } from 'react';
 import { useDebounce } from 'usehooks-ts';
 import { env } from '@/env.mjs';
-import { active } from 'sortablejs';
 
 function stripZeroViewProps(obj: any) {
     // on initial render of the first map , we do have this set of variable set to zero

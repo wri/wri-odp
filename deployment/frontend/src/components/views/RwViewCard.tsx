@@ -1,5 +1,4 @@
 import {
-    Resource,
     type View,
     type ViewState,
 } from '@/interfaces/dataset.interface';

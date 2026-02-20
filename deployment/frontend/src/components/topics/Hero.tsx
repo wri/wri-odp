@@ -9,8 +9,6 @@ import { useSession } from 'next-auth/react';
 import { api } from '@/utils/api';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import EditCard from './EditCard';
-import { type Group } from '@portaljs/ckan';
-import Topic from '@/interfaces/topic.interface';
 
 export function Hero({
     topics,
@@ -78,7 +76,7 @@ export function Hero({
                         {enableQuery ? (
                             <EditCard
                                 userName={session?.user?.name!}
-                                topicDetails={topicdetails.data?.topic!}
+                                topicDetails={topicdetails.data?.topic}
                                 isLoading={topicdetails?.isLoading}
                                 topicName={topic.name}
                             />

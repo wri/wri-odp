@@ -1,12 +1,7 @@
 import { type Filter } from '@/interfaces/search.interface';
-import { SearchInput } from '@/schema/search.schema';
 import { Disclosure, Transition } from '@headlessui/react';
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { set } from 'lodash';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 interface Option {
     value: string;

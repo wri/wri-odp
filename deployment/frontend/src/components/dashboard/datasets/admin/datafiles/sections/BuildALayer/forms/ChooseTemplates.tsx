@@ -3,21 +3,20 @@ import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import { Button, LoaderButton } from '@/components/_shared/Button';
+import { LoaderButton } from '@/components/_shared/Button';
 import { democracy_index } from '@/templateLayers/democracy_index';
 import { energy_facilities } from '@/templateLayers/energy_facilities';
 import { roads } from '@/templateLayers/roads';
 import { hdi } from '@/templateLayers/hdi';
 import { marine_ecoregions } from '@/templateLayers/marine_ecoregions';
 import { temperature } from '@/templateLayers/temperature';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 import { Input } from '@/components/_shared/SimpleInput';
 import { useFormContext } from 'react-hook-form';
 import { type LayerFormType } from '../layer.schema';
 import { convertLayerObjToForm } from '../convertObjects';
 import { type APILayerSpec } from '@/interfaces/layer.interface';
 import Image from 'next/image';
-import { ScrollArea, ScrollBar } from '@/components/_shared/ScrollArea';
 
 interface IProps {
     setOpen: (open: boolean) => void;

@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import Team from '@/interfaces/team.interface';
 import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
 import { api } from '@/utils/api';
 import { type Organization } from '@portaljs/ckan';

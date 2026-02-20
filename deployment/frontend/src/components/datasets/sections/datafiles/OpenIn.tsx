@@ -5,7 +5,6 @@ import {
     ClipboardIcon,
 } from '@heroicons/react/24/outline';
 import { Fragment, useState } from 'react';
-import { DatasetTabs } from '../../DatasetTabs';
 import {
     Tooltip,
     TooltipContent,

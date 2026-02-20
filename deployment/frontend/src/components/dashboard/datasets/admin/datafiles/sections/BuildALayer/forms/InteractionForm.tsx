@@ -1,12 +1,9 @@
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import { MinusCircleIcon } from '@heroicons/react/24/outline';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
     type Control,
     type UseFormRegister,
     useFieldArray,
-    useForm,
     useFormContext,
 } from 'react-hook-form';
 import { type LayerFormType } from '../layer.schema';

@@ -7,14 +7,10 @@ import {
 import { env } from '@/env.mjs';
 import type {
     Activity,
-    ActivityDisplay,
     CkanResponse,
-    User,
 } from '@/schema/ckan.schema';
-import { getUser, activityDetails } from '@/utils/apiUtils';
-import { searchArrayForKeyword } from '@/utils/general';
+import { activityDetails } from '@/utils/apiUtils';
 import { searchSchema } from '@/schema/search.schema';
-import { filterObjects } from '@/utils/general';
 
 export const activityStreamRouter = createTRPCRouter({
     listPackageActivity: publicProcedure

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tab } from '@headlessui/react';
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import { PlusSmallIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import TopicCard from './TopicCard';
 import { useSession } from 'next-auth/react';

@@ -6,12 +6,8 @@ import {
 } from '@/server/api/trpc';
 import { env } from '@/env.mjs';
 import {
-  getGroups,
-  getGroup,
   searchHierarchy,
   getUserGroups,
-  findAllNameInTree,
-  getAllDatasetFq,
   groupList,
   fetchFacets,
 } from '@/utils/apiUtils';
@@ -21,7 +17,6 @@ import type {
   GroupTree,
   GroupsmDetails,
 } from '@/schema/ckan.schema';
-import { searchArrayForKeyword } from '@/utils/general';
 import type { CkanResponse, User } from '@/schema/ckan.schema';
 import type { Group } from '@portaljs/ckan';
 import { type TopicHierarchy } from '@/interfaces/topic.interface';
@@ -29,9 +24,8 @@ import type Topic from '@/interfaces/topic.interface';
 
 import { TopicSchema } from '@/schema/topic.schema';
 import { replaceNames } from '@/utils/replaceNames';
-import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils';
+import { sendMemberNotifications } from '@/utils/apiUtils';
 import { flattenTree } from '@/utils/flattenGroupTree';
-import { group } from 'console';
 
 export const TopicRouter = createTRPCRouter({
   getUsersTopics: protectedProcedure

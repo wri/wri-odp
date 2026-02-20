@@ -4,7 +4,7 @@ import {
     publicProcedure,
 } from '@/server/api/trpc';
 import { env } from '@/env.mjs';
-import { type CkanResponse, Collaborator } from '@/schema/ckan.schema';
+import { type CkanResponse } from '@/schema/ckan.schema';
 import { type Organization } from '@/schema/ckan.schema';
 import { TeamSchema } from '@/schema/team.schema';
 import { z } from 'zod';
@@ -17,15 +17,11 @@ import type {
     WriOrganization,
 } from '@/schema/ckan.schema';
 import {
-    getGroups,
     getAllOrganizations,
     searchHierarchy,
-    findAllNameInTree,
-    getAllDatasetFq,
     fetchFacets,
 } from '@/utils/apiUtils';
-import { findNameInTree, sendMemberNotifications } from '@/utils/apiUtils';
-import { json } from 'stream/consumers';
+import { sendMemberNotifications } from '@/utils/apiUtils';
 import { flattenTree } from '@/utils/flattenGroupTree';
 
 export const teamRouter = createTRPCRouter({

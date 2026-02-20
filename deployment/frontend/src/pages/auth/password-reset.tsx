@@ -10,7 +10,6 @@ import { useForm } from 'react-hook-form';
 import { api } from '@/utils/api';
 import { useState } from 'react';
 import { getServerAuthSession } from '@/server/auth';
-import Spinner from '@/components/_shared/Spinner';
 import { NextSeo } from 'next-seo';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import { LockClosedIcon } from '@heroicons/react/24/outline';

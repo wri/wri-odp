@@ -16,7 +16,6 @@ import {
   createResourceView,
   updateResourceView,
   deleteResourceView,
-  getUser,
   sendGroupNotification,
   getOnePendingDataset,
   getUserOrganizations,
@@ -45,11 +44,8 @@ import type {
   User,
 } from '@/schema/ckan.schema';
 import {
-  DatasetFormType,
   DatasetSchema,
   DatasetSchemaForEdit,
-  ResourceFormType,
-  ResourceSchema,
 } from '@/schema/dataset.schema';
 import type { Dataset, Resource } from '@/interfaces/dataset.interface';
 import type { License } from '@/interfaces/licenses.interface';
@@ -57,29 +53,21 @@ import { isValidUrl } from '@/utils/isValidUrl';
 import { cleanUrl } from '@/utils/cleanUrl';
 import {
   convertFormToLayerObj,
-  convertLayerObjToForm,
   getApiSpecFromRawObj,
-  getRawObjFromApiSpec,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects';
-import { APILayerSpec } from '@/interfaces/layer.interface';
 import {
   type RwLayerResp,
-  RwResponse,
   isRwError,
-  isRwLayerResp,
   type RwErrorResponse,
 } from '@/interfaces/rw.interface';
 import { sendMemberNotifications } from '@/utils/apiUtils';
 import { TRPCError } from '@trpc/server';
 import { CommentSchema, IssueSchema } from '@/schema/issue.schema';
-import { throws } from 'assert';
 import {
   createViewFormSchema,
   editViewFormSchema,
-  viewFormSchema,
 } from '@/schema/view.schema';
 
-import { Organization } from '@portaljs/ckan';
 
 export async function getLayerRw(layerUrl: string) {
   const layerRwRes = await fetch(layerUrl, {

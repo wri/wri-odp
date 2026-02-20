@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ListOfFilters, Table, TopBar } from './Table';
 import {
-    ColumnFilter,
     type ColumnFiltersState,
     type ColumnSort,
     getCoreRowModel,

@@ -1,7 +1,7 @@
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { type View } from '@/interfaces/dataset.interface';
 import { useActiveCharts } from '@/utils/storeHooks';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import ChartViewExport from './ChartViewExport';
 import { useForm } from 'react-hook-form';
 import { InputGroup } from '@/components/_shared/InputGroup';

@@ -4,7 +4,7 @@ import { TextArea } from '../../SimpleTextArea';
 import { DocumentDuplicateIcon } from '@heroicons/react/20/solid';
 import { useDataset } from '@/utils/storeHooks';
 import { Button } from '../../Button';
-import { DefaultTooltip, Tooltip } from '../../Tooltip';
+import { DefaultTooltip } from '../../Tooltip';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,

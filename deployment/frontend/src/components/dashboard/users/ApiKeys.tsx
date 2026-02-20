@@ -1,6 +1,5 @@
 import { ErrorAlert, InfoAlert } from '@/components/_shared/Alerts';
 import { Button, LoaderButton } from '@/components/_shared/Button';
-import { ErrorDisplay } from '@/components/_shared/InputGroup';
 import Modal from '@/components/_shared/Modal';
 import { type ApiToken } from '@/interfaces/user.interface';
 import { api } from '@/utils/api';

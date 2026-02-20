@@ -5,7 +5,7 @@ import {
     type Dispatch,
     type SetStateAction,
 } from 'react';
-import { Combobox, Listbox, Transition } from '@headlessui/react';
+import { Combobox } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import classNames from '@/utils/classnames';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -17,9 +17,8 @@ import {
 import { Button } from '@/components/_shared/Button';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { type DatasetFormType } from '@/schema/dataset.schema';
-import { Controller, type Path, UseFormReturn } from 'react-hook-form';
+import { type Path } from 'react-hook-form';
 import { type Filter } from '@/interfaces/search.interface';
-import { set } from 'lodash';
 
 interface Option {
     value: string;

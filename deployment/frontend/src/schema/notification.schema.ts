@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { type User, type WriDataset, WriOrganization } from './ckan.schema';
+import { type User, type WriDataset } from './ckan.schema';
 import type Team from '@/interfaces/team.interface';
 import type Topic from '@/interfaces/topic.interface';
 

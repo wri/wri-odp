@@ -13,7 +13,6 @@ import Spinner from '@/components/_shared/Spinner';
 import SimpleCombobox from '@/components/dashboard/_shared/SimpleCombobox';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { capacityOptions } from '../../datasets/admin/formOptions';
-import notify from '@/utils/notify';
 import { type TeamFormType } from '@/schema/team.schema';
 import { type RouterOutput } from '@/server/api/root';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';

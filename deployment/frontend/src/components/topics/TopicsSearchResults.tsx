@@ -1,4 +1,3 @@
-import Topic from '@/interfaces/topic.interface';
 import CardsGrid from '../_shared/CardsGrid';
 import Container from '../_shared/Container';
 import TopicCard from './TopicCard';

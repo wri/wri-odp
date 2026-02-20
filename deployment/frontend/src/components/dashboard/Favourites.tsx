@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     ArrowPathIcon,
     ArrowRightIcon,
@@ -6,7 +6,6 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { api } from '@/utils/api';
-import type { SearchInput } from '@/schema/search.schema';
 import type { WriDataset } from '@/schema/ckan.schema';
 import { formatDate } from '@/utils/general';
 import PendingApprovalTag from '../_shared/PendingApprovalTag';

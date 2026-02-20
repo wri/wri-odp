@@ -1,18 +1,12 @@
 import Image from 'next/image';
 import { Button } from '../_shared/Button';
 import { ChevronLeftIcon } from '@heroicons/react/20/solid';
-import { useState } from 'react';
-import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 import {
     type Application,
-    GroupTree,
-    GroupsmDetails,
 } from '@/schema/ckan.schema';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { api } from '@/utils/api';
 import {
-    ArrowTurnLeftUpIcon,
     ArrowUpRightIcon,
 } from '@heroicons/react/24/solid';
 

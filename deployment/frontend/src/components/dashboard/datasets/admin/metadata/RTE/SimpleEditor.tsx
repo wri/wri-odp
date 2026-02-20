@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 // => Tiptap packages
 import Placeholder from '@tiptap/extension-placeholder';
 import {
     useEditor,
     EditorContent,
-    type Editor,
     BubbleMenu,
     ReactNodeViewRenderer,
 } from '@tiptap/react';

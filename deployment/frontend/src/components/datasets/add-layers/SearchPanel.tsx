@@ -1,6 +1,5 @@
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import DatasetCard from '../sections/RelatedDatasets';
-import Select from '@/components/_shared/Select';
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 import { type Filter } from '@/interfaces/search.interface';
 import { useRouter } from 'next/router';
@@ -9,7 +8,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type WriDataset } from '@/schema/ckan.schema';
 import FiltersSelected from '@/components/search/FiltersSelected';
-import { Pagination } from 'swiper/modules';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { type SearchInput } from '@/schema/search.schema';
 

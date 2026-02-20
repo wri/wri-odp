@@ -1,6 +1,4 @@
-import { Button } from '@/components/_shared/Button';
 import { Hero } from '@/components/home/Hero';
-import { HighlightsCarousel } from '@/components/home/HighlightsCarousel';
 import { HomeFooter } from '@/components/home/HomeFooter';
 import { TopicsCarousel } from '@/components/home/TopicsCarousel';
 import Head from 'next/head';
@@ -21,7 +19,6 @@ import dynamic from 'next/dynamic';
 import Spinner from '@/components/_shared/Spinner';
 import { Tab } from '@headlessui/react';
 import { Fragment } from 'react';
-import { ArrowLeftStartOnRectangleIcon } from '@heroicons/react/20/solid';
 import classNames from '@/utils/classnames';
 import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';

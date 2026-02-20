@@ -1,8 +1,7 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import {
     AdjustmentsVerticalIcon,
-    ChevronDownIcon,
 } from '@heroicons/react/20/solid';
 import classNames from '@/utils/classnames';
 import {
@@ -10,10 +9,9 @@ import {
     type FieldValues,
     type Path,
     type PathValue,
-    UseFormReturn,
     useForm,
 } from 'react-hook-form';
-import { DefaultTooltip, Tooltip } from '@/components/_shared/Tooltip';
+import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
 interface Option<V> {
     label: string;

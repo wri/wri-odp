@@ -1,6 +1,5 @@
 import {
     ClockIcon,
-    FolderPlusIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Disclosure } from '@headlessui/react';
@@ -8,7 +7,6 @@ import { MetadataAccordion } from './MetadataAccordion';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { type UseFormReturn } from 'react-hook-form';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
-import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { SimpleEditor } from './RTE/SimpleEditor';
 

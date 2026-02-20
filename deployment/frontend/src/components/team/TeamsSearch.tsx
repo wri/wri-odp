@@ -1,6 +1,5 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
-import type { SearchInput } from '@/schema/search.schema';
 import Spinner from '@/components/_shared/Spinner';
 
 export default function TeamsSearch({

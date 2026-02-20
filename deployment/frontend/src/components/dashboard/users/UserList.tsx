@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tab } from '@headlessui/react';
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import { PlusSmallIcon } from '@heroicons/react/24/outline';
 import UserCard from './UserCard';
 import { useRouter } from 'next/router';
 import AddUserForm from './AddUserForm';
@@ -72,7 +72,7 @@ export default function UserList() {
                             ) : isLoading ? (
                                 <Spinner />
                             ) : (
-                                <AddUserForm orgList={data?.adminOrg!} />
+                                <AddUserForm orgList={data?.adminOrg} />
                             )}
                         </Tab.Panel>
                     ))}

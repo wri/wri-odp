@@ -2,7 +2,6 @@ import {
     ArrowUpRightIcon,
     ChevronLeftIcon,
     ExclamationTriangleIcon,
-    ExclamationCircleIcon,
     InformationCircleIcon,
 } from '@heroicons/react/20/solid';
 import { Button } from '../_shared/Button';
@@ -10,14 +9,13 @@ import {
     ArrowPathIcon,
     ClockIcon,
     FingerPrintIcon,
-    LinkIcon,
     StarIcon,
     TrophyIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { type OpenIn, type WriDataset } from '@/schema/ckan.schema';
 import { Menu, Transition } from '@headlessui/react';
-import { Fragment, useEffect } from 'react';
+import { Fragment } from 'react';
 import classNames from '@/utils/classnames';
 import { getFormatColor } from '@/utils/formatColors';
 import { useSession } from 'next-auth/react';
@@ -45,8 +43,6 @@ import ChartViewIcon from './view-icons/ChartViewIcon';
 import { useQuery } from 'react-query';
 import { type RwDatasetResp, isRwError } from '@/interfaces/rw.interface';
 import { match } from 'ts-pattern';
-import Image from 'next/image';
-import { Popover, PopoverContent, PopoverTrigger } from '../_shared/Popover';
 import { env } from '@/env.mjs';
 import { useRouter } from 'next/router';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';

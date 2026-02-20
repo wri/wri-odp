@@ -1,5 +1,4 @@
 import { Button, LoaderButton } from '@/components/_shared/Button';
-import { ErrorDisplay } from '@/components/_shared/InputGroup';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
@@ -9,17 +8,12 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/_shared/Popover';
-import Spinner from '@/components/_shared/Spinner';
 import { api } from '@/utils/api';
 import {
-    ArrowDownTrayIcon,
     PaperAirplaneIcon,
 } from '@heroicons/react/24/outline';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { z } from 'zod';
 import { type TabularResource } from '../datasets/visualizations/Visualizations';
 import { ArrowDownCircleIcon } from '@heroicons/react/20/solid';
 import { DefaultTooltip } from '../_shared/Tooltip';

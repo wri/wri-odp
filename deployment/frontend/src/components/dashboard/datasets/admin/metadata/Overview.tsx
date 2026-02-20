@@ -1,6 +1,5 @@
 import {
     ArrowsPointingInIcon,
-    ExclamationCircleIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Input } from '@/components/_shared/SimpleInput';
@@ -10,16 +9,13 @@ import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { TopicsSelect } from '../TopicsSelect';
 import { MetadataAccordion } from './MetadataAccordion';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
-import { type UseFormReturn, useForm } from 'react-hook-form';
+import { type UseFormReturn } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
-import { ImageUploader } from '@/components/dashboard/_shared/ImageUploader';
-import { UploadResult } from '@uppy/core';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { api } from '@/utils/api';
 import { P, match } from 'ts-pattern';
 import Spinner from '@/components/_shared/Spinner';
 import classNames from '@/utils/classnames';
-import { env } from '@/env.mjs';
 import MulText from '../MulText';
 import {
     languageOptions,

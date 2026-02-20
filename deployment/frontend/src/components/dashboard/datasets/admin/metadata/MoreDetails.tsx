@@ -1,12 +1,10 @@
 import {
-    ExclamationCircleIcon,
     InformationCircleIcon,
     SquaresPlusIcon,
 } from '@heroicons/react/24/outline';
 import { Disclosure } from '@headlessui/react';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { MetadataAccordion } from './MetadataAccordion';
-import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { type UseFormReturn } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';

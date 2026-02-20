@@ -1,4 +1,4 @@
-import { UseQueryOptions, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 
 export function useColumns(
     type: string,

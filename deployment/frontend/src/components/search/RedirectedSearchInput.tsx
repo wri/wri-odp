@@ -1,14 +1,11 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import classNames from '@/utils/classnames';
-import { SearchInput } from '@/schema/search.schema';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Filter } from '@/interfaces/search.interface';
-import { XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function RedirectedSearchInput() {
     const router = useRouter();

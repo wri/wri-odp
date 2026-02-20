@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import SearchHeader from '../_shared/SearchHeader';
 import SelectFilter from '../_shared/SelectFilter';
 import { api } from '@/utils/api';
 import type { SearchInput } from '@/schema/search.schema';
 import { getKeyValues } from '@/utils/general';
-import type { Group } from '@portaljs/ckan';
-import type { WriOrganization } from '@/schema/ckan.schema';
 
 type IOrg = {
     title: string | undefined;
@@ -57,7 +55,7 @@ function LeftNode({
             <SelectFilter
                 key="teamselect"
                 options={[{ id: 'None', label: 'All Teams' }].concat(
-                    getKeyValues(team!, 'title', 'name')
+                    getKeyValues(team, 'title', 'name')
                 )}
                 filtername="organization"
                 setQuery={setQuery}
@@ -66,7 +64,7 @@ function LeftNode({
             <SelectFilter
                 key="topicselect"
                 options={[{ id: 'None', label: 'All Topics' }].concat(
-                    getKeyValues(topics!, 'name', 'name')
+                    getKeyValues(topics, 'name', 'name')
                 )}
                 setQuery={setQuery}
                 query={query}

@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
 import { useSession } from 'next-auth/react';
 import { api } from '@/utils/api';
-import Spinner from '../_shared/Spinner';
 import EditCard from './EditCard';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 import { useEffect } from 'react';
@@ -130,7 +129,7 @@ export default function TeamHeaderCard({
                         {enableQuery ? (
                             <EditCard
                                 userName={session?.user?.name!}
-                                orgDetails={orgdetails?.data!}
+                                orgDetails={orgdetails?.data}
                                 isLoading={orgdetails?.isLoading}
                                 teamName={team.name}
                             />

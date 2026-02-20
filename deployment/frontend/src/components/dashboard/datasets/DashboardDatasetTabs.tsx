@@ -1,4 +1,3 @@
-import classNames from '@/utils/classnames';
 import { Tab } from '@headlessui/react';
 import {
     ChevronDoubleLeftIcon,
@@ -10,7 +9,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { PlusSmallIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
+import { PlusSmallIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 type TabProps = {

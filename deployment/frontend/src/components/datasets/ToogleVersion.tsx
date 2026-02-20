@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import { Switch } from '@headlessui/react';
-import { DefaultTooltip } from '../_shared/Tooltip';
 import classNames from '@/utils/classnames';
 
 export default function ToggleVersion({

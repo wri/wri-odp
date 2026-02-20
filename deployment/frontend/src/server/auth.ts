@@ -9,9 +9,7 @@ import {
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { env } from '@/env.mjs';
 import type { CkanResponse } from '@/schema/ckan.schema';
-import { Organization } from '@portaljs/ckan';
 import AzureAdProvider from 'next-auth/providers/azure-ad';
-import OktaProvider from 'next-auth/providers/okta';
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`

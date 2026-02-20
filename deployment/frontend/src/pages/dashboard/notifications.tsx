@@ -6,7 +6,6 @@ import Footer from '@/components/_shared/Footer';
 import { NextSeo } from 'next-seo';
 import {
     type GetServerSidePropsContext,
-    InferGetServerSidePropsType,
 } from 'next';
 import { appRouter } from '@/server/api/root';
 import { createServerSideHelpers } from '@trpc/react-query/server';

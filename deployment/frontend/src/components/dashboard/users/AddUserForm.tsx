@@ -3,17 +3,10 @@ import { Input } from '@/components/_shared/SimpleInput';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, LoaderButton } from '@/components/_shared/Button';
-import Link from 'next/link';
+import { LoaderButton } from '@/components/_shared/Button';
 import { api } from '@/utils/api';
-import { User } from '@portaljs/ckan';
-import { ImageUploader } from '../_shared/ImageUploader';
-import {
-    GlobeAltIcon,
-    CloudArrowUpIcon,
-    MinusCircleIcon,
-} from '@heroicons/react/24/outline';
-import { UploadResult } from '@uppy/core';
+
+
 import { UserFormInviteSchema } from '@/schema/user.schema';
 import type { UserFormInviteInput } from '@/schema/user.schema';
 import notify from '@/utils/notify';
@@ -23,8 +16,6 @@ import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 import { type WriOrganization } from '@/schema/ckan.schema';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 

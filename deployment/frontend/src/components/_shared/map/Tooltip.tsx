@@ -3,10 +3,9 @@ import {
     useCallback,
     useEffect,
     useImperativeHandle,
-    useMemo,
     useState,
 } from 'react';
-import { Map, type MapLayerMouseEvent } from 'mapbox-gl';
+import { type MapLayerMouseEvent } from 'mapbox-gl';
 import {
     type LngLat,
     type MapGeoJSONFeature,

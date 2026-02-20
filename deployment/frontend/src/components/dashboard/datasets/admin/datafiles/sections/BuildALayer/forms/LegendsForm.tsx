@@ -4,17 +4,12 @@ import {
     InformationCircleIcon,
     MinusCircleIcon,
 } from '@heroicons/react/24/outline';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
-    Control,
-    UseFieldArrayReturn,
-    UseFormRegister,
     useFieldArray,
-    useForm,
     useFormContext,
 } from 'react-hook-form';
 import { type LayerFormType } from '../layer.schema';
-import { getColors, legendsToAdd } from '../getColors';
+import { legendsToAdd } from '../getColors';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { ScrollArea } from '@/components/_shared/ScrollArea';
 import {

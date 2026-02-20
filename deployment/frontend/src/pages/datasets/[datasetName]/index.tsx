@@ -550,10 +550,10 @@ export default function DatasetPage(
         (d) => d.format === 'Layer' || d.rw_id
       );
       if (LayerResource) {
-        removeLayerFromLayerGroup(LayerResource.rw_id!, dataset.id);
+        removeLayerFromLayerGroup(LayerResource.rw_id, dataset.id);
         setMapDisplayPreview(true);
         addLayerToLayerGroup(
-          LayerResource.rw_id!,
+          LayerResource.rw_id,
           dataset.id,
           undefined,
           true

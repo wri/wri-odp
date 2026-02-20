@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
     CheckIcon,
     ChevronDownIcon,
-    ChevronUpDownIcon,
 } from '@heroicons/react/20/solid';
 import { Combobox } from '@headlessui/react';
 import classNames from '@/utils/classnames';

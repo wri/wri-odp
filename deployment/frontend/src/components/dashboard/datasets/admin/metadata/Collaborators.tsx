@@ -1,6 +1,5 @@
 import {
     type UseFieldArrayRemove,
-    UseFormRegister,
     type UseFormReturn,
     useFieldArray,
 } from 'react-hook-form';

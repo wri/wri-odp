@@ -14,7 +14,6 @@ import { type APILayerSpec } from '@/interfaces/layer.interface';
 import LayerManagerPreview from './preview/LayerManagerPreview';
 import { Accordion } from './Accordion';
 import { CodeEditor } from '@/components/dashboard/_shared/CodeEditor';
-import { v4 as uuidv4 } from 'uuid';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { Input } from '@/components/_shared/SimpleInput';
 import { TextArea } from '@/components/_shared/SimpleTextArea';

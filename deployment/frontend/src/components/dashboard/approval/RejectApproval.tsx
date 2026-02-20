@@ -1,13 +1,12 @@
 import { type WriDataset } from '@/schema/ckan.schema';
 import React, { useState } from 'react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { IssueSchemaType } from '@/schema/issue.schema';
 import { IssueSchema } from '@/schema/issue.schema';
 import { api } from '@/utils/api';
 import notify from '@/utils/notify';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import { SimpleEditor } from '../../dashboard/datasets/admin/metadata/RTE/SimpleEditor';
-import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
+import { ErrorDisplay } from '@/components/_shared/InputGroup';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, LoaderButton } from '@/components/_shared/Button';

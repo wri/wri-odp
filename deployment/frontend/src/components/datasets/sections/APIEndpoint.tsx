@@ -4,7 +4,6 @@ import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { Button } from '@/components/_shared/Button';
 import { DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { useState } from 'react';
 
 export const QueryEndpoint = ({
     description,

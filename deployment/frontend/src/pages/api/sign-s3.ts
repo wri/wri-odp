@@ -5,7 +5,6 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { env } from '@/env.mjs';
 import s3 from '@/server/s3';
-import { v4 as uuidv4 } from 'uuid';
 import { slugify } from '@/utils/slugify';
 
 function makeid(length: number) {

@@ -13,8 +13,6 @@ import { type UploadResult } from '@uppy/core';
 import { api } from '@/utils/api';
 import { P, match } from 'ts-pattern';
 import Spinner from '@/components/_shared/Spinner';
-import { useSession } from 'next-auth/react';
-import { useEffect } from 'react';
 import DefaultTooltip from '@/components/_shared/Tooltip';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 

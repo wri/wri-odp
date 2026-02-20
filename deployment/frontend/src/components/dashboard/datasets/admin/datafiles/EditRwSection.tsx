@@ -2,7 +2,6 @@ import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
 import {
     type DatasetFormType,
-    ResourceFormType,
 } from '@/schema/dataset.schema';
 import { v4 as uuidv4 } from 'uuid';
 import { EditDataFile } from './EditDataFile';
