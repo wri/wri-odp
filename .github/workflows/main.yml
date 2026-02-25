@@ -115,6 +115,9 @@ jobs:
       (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.ckan_changed == 'true')
     name: CodeQL Analysis
     needs: setup
+    concurrency:
+      group: ${{ github.workflow }}-codeql-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/codeql.yml
 
   lint:
@@ -124,12 +127,18 @@ jobs:
       (needs.setup.outputs.frontend_changed == 'true')
     name: Lint Frontend
     needs: setup
+    concurrency:
+      group: ${{ github.workflow }}-lint-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/lint-frontend.yml
 
   build-ckan:
     name: Build CKAN Image
     needs: setup
     if: always() && needs.setup.outputs.ckan_changed == 'true'
+    concurrency:
+      group: ${{ github.workflow }}-build-ckan-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/build-ckan-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -138,6 +147,9 @@ jobs:
     name: Build Datapusher Image
     needs: setup
     if: always() && needs.setup.outputs.datapusher_changed == 'true'
+    concurrency:
+      group: ${{ github.workflow }}-build-datapusher-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/build-datapusher-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -147,6 +159,9 @@ jobs:
     name: Build Migration Image
     needs: setup
     if: always() && needs.setup.outputs.migration_changed == 'true'
+    concurrency:
+      group: ${{ github.workflow }}-build-migration-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/build-migration-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -171,6 +186,9 @@ jobs:
       (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&
       (needs.build-solr.result == 'success' || needs.build-solr.result == 'skipped') &&
       (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.ckan_changed == 'true')
+    concurrency:
+      group: ${{ github.workflow }}-build-frontend-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/build-frontend-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -184,6 +202,9 @@ jobs:
     name: Build Prefect Image
     needs: setup
     if: always() && needs.setup.outputs.prefect_changed == 'true'
+    concurrency:
+      group: ${{ github.workflow }}-build-prefect-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/build-prefect-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -193,6 +214,9 @@ jobs:
     name: Build PostgreSQL Image
     needs: setup
     if: always() && needs.setup.outputs.postgresql_changed == 'true'
+    concurrency:
+      group: ${{ github.workflow }}-build-postgresql-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/build-postgresql-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -202,6 +226,9 @@ jobs:
     name: Build Solr Image
     needs: setup
     if: always() && needs.setup.outputs.solr_changed == 'true'
+    concurrency:
+      group: ${{ github.workflow }}-build-solr-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/build-solr-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
@@ -664,6 +691,9 @@ jobs:
       (needs.test-integration.result == 'success' || needs.test-integration.result == 'skipped') && 
       (needs.test-unit.result == 'success' || needs.test-unit.result == 'skipped') && 
       (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
+    concurrency:
+      group: ${{ github.workflow }}-deploy-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/deploy.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
