@@ -26,15 +26,14 @@ permissions:
   security-events: write
   actions: read
 
-# Cancel in-progress runs when a new commit is pushed to the same branch/PR
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   setup:
     name: Setup Environment
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-setup-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     outputs:
       branch_name: ${{ steps.branch.outputs.name }}
       frontend_ckan_url: ${{ steps.vars.outputs.frontend_ckan_url }}
@@ -237,6 +236,9 @@ jobs:
   test-integration:
     name: Run Integration Tests
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-test-integration-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     needs:
       - setup
       - build-ckan
@@ -346,6 +348,9 @@ jobs:
   test-unit:
     name: Run Unit Tests
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-test-unit-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     needs:
       - setup
       - build-ckan
@@ -441,6 +446,9 @@ jobs:
   test-frontend:
     name: Run Frontend E2E Tests (Group ${{ matrix.group }})
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-test-frontend-${{ matrix.group }}-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     needs:
       - setup
       - build-ckan
@@ -584,6 +592,9 @@ jobs:
   trivy-ckan:
     name: Trivy Security Scan - CKAN
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-trivy-ckan-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     needs:
       - setup
       - build-ckan
@@ -623,6 +634,9 @@ jobs:
   trivy-frontend:
     name: Trivy Security Scan - Frontend
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-trivy-frontend-${{ github.head_ref || github.ref }}
+      cancel-in-progress: true
     needs:
       - setup
       - build-frontend
