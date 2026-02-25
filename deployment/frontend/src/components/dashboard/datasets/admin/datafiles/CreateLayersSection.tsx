@@ -182,7 +182,7 @@ export function AddLayer({
                                 }
                             >
                                 {({ selected }) => (
-                                    <DefaultTooltip content="This option will try to guide you towards building some of the most common map specs; it's more limited but easier overall">
+                                    <DefaultTooltip content="Select this option to build a layer using some of the most common map specs. This option is more limited but easier to use.">
                                         <span
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
@@ -222,7 +222,7 @@ export function AddLayer({
                                 }
                             >
                                 {({ selected }) => (
-                                    <DefaultTooltip content="This requires you to understand the layer config that our maps expect, useful if you want to use less common providers, such as GFW, Document, ArcGIS, etc">
+                                    <DefaultTooltip content="Select this option if you have a baseline understanding of the layer config being used by Data Explorer and want to use less common providers, such as GFW or ArcGIS. ">
                                         <span
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
@@ -262,7 +262,7 @@ export function AddLayer({
                                 }
                             >
                                 {({ selected }) => (
-                                    <DefaultTooltip content="This option allows you to import a layer that already exists in the Resource Watch API to be shown in the data explorer">
+                                    <DefaultTooltip content="This option allows you to import a layer that already exists in the Resource Watch API">
                                         <span
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',

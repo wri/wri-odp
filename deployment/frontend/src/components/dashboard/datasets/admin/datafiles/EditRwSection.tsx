@@ -6,7 +6,6 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { EditDataFile } from './EditDataFile';
 import { MetadataAccordion } from '../metadata/MetadataAccordion';
-import { RWDatasetForm } from '../metadata/RWDataset';
 import { api } from '@/utils/api';
 import ViewsList from '@/components/views/ViewsList';
 import { AddLayer } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection';
@@ -21,7 +20,7 @@ export function EditRwSection({
     dataset: WriDataset;
 }) {
     const { control, watch } = formObj;
-    const { fields, append, prepend, remove, swap, move, insert } =
+    const { fields, append, remove, swap } =
         useFieldArray({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
@@ -31,8 +30,7 @@ export function EditRwSection({
     const provider = watch('provider');
     const {
         data: datasetViews,
-        isLoading: isDatasetViewsLoading,
-        error: datasetViewsError,
+        isLoading: isDatasetViewsLoading
     } = api.rw.getDatasetViews.useQuery(
         { rwDatasetId: rwId ?? '' },
         { enabled: !!rwId }
@@ -58,7 +56,6 @@ export function EditRwSection({
 
     return (
         <>
-            <RWDatasetForm formObj={formObj} editing={true} />
             {rwId && provider && !isDatasetViewsLoading && (
                 <MetadataAccordion label="Dataset views" defaultOpen={false}>
                     <ViewsList
