@@ -10,31 +10,32 @@ DATAPUSHER_REPO="datapusher-ecr"
 MIGRATION_REPO="migration"
 
 # Function to get SHA tag from a "latest" tag (e.g., "dev")
+# SHA tags can be: plain 40 hex (54e732...), or 40hex-branch (64df05...-dev)
 get_sha_tag() {
     local repo=$1
     local latest_tag=$2
-    
-    # Get digest for the latest tag
-    digest=$(aws ecr describe-images \
+
+    all_tags=$(aws ecr describe-images \
         --repository-name "$repo" \
         --image-ids imageTag="$latest_tag" \
         --profile "$PROFILE" \
-        --query 'imageDetails[0].imageDigest' \
+        --query 'imageDetails[0].imageTags[]' \
         --output text 2>/dev/null)
-    
-    if [ -z "$digest" ] || [ "$digest" == "None" ]; then
+
+    if [ -z "$all_tags" ]; then
         echo ""
         return 1
     fi
-    
-    # Get all tags for this digest and find the SHA tag (40 hex chars)
-    sha_tag=$(aws ecr describe-images \
-        --repository-name "$repo" \
-        --image-ids imageDigest="$digest" \
-        --profile "$PROFILE" \
-        --query 'imageDetails[0].imageTags[]' \
-        --output text 2>/dev/null | tr '\t' '\n' | grep -E "^[a-fA-F0-9]{40}$" | head -1)
-    
+
+    # Find SHA tag: plain 40 hex chars, or 40hex-branch (e.g. 64df05...-dev)
+    sha_tag=""
+    for t in $all_tags; do
+        if echo "$t" | grep -qE "^[a-f0-9]{40}$" || echo "$t" | grep -qE "^[a-f0-9]{40}-${latest_tag}$"; then
+            sha_tag="$t"
+            break
+        fi
+    done
+
     echo "$sha_tag"
 }
 
