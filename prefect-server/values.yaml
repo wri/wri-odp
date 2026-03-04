@@ -1,7 +1,7 @@
 ingress:
   enabled: true
   host:
-    hostname: wri.dev.prefect.datopian.com
+    hostname: datasets-prefect.wri.org
     path: /
     pathType: ImplementationSpecific
   annotations:
@@ -11,4 +11,4 @@ ingress:
 server:
   env:
   - name: PREFECT_UI_URL
-    value: "https://wri.dev.prefect.datopian.com"
+    value: "https://datasets-prefect.wri.org"
