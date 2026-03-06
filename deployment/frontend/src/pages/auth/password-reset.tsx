@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-    ResetPasswordSchema,
-    type ResetPasswordFormType,
-} from '@/schema/auth.schema';
+import { ResetPasswordSchema, type ResetPasswordFormType } from '@/schema/auth.schema';
 import type { GetServerSideProps } from 'next';
 import { getCsrfToken, signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -102,17 +99,14 @@ export default function ResetUserPage({
                         resetPassword.mutate(data);
                     })}
                 >
-                    <input
-                        name="csrfToken"
-                        type="hidden"
-                        defaultValue={csrfToken}
-                    />
+                    <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
                     <div className="flex justify-center w-full mb-10">
-                        <div className="relative mx-auto h-12 w-44 sm:h-20 sm:w-56">
+                        <div className="relative mx-auto h-12 w-80 sm:h-20">
                             <Image
                                 src="/images/WRI_logo_4c.png"
                                 alt="Picture of the author"
                                 fill
+                                className="object-contain"
                             />
                         </div>
                     </div>
@@ -146,12 +140,7 @@ export default function ResetUserPage({
                             <LockClosedIcon className="w-4 h-4 text-[#3654A5]" />
                         </div>
                     </div>
-                    {error ? (
-                        <ErrorAlert
-                            text={error}
-                            title="Password reset failed"
-                        />
-                    ) : null}
+                    {error ? <ErrorAlert text={error} title="Password reset failed" /> : null}
                     <button
                         disabled={isResetSuccessful || resetPassword.isLoading}
                         type="submit"

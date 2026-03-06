@@ -73,7 +73,7 @@ export default function Header() {
                 id="header"
                 className="w-full py-10 px-4 sm:px-6 xxl:px-12  mx-auto flex gap-x-1 font-acumin items-baseline"
             >
-                <Link href="/" className=" w-fit sm:w-52 h-fit">
+                <Link href="/" className=" w-fit sm:w-80 h-fit">
                     <Image
                         src="/images/WRI_logo_4c.png"
                         alt="Picture of the author"
