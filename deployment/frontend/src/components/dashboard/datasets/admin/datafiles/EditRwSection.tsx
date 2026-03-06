@@ -43,6 +43,21 @@ export function EditRwSection({
 
     return (
         <>
+            <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
+                <p className="text-sm text-gray-500">
+                    This step is optional and for geospatial data only. If you would like 
+                    to include a map visualization so your users can better “preview” your 
+                    data, click “Add a Layer” and follow steps to build layers, or, to 
+                    reference an existing layer in the Resource Watch API. You can add multiple layers. 
+                    This preview will appear as a half-page flyout on the Dataset Detail 
+                    page and includes basic map settings and limited interactivity (such as a legend).
+                    <br />
+                    <br />
+                    <span className="font-bold">
+                        Note: This step is optional and for geospatial data only.
+                    </span>
+                </p>
+            </div>
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
                     swap(oldIdx, newIdx);
