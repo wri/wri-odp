@@ -186,12 +186,13 @@ export default function Footer({
                 </div>
 
                 <div className="items mx-auto flex w-full flex-col gap-y-8 pt-16 sm:flex-row sm:gap-y-4">
-                    <div className=" relative mx-auto h-16 w-52 sm:ml-0 sm:h-20 sm:w-56">
+                    <div className="relative mx-auto w-80 h-16 sm:ml-0">
                         <Image
                             src="/images/WRI_logo_4c.webp"
                             alt="WRI Logo"
                             fill
                             sizes="(max-width: 638px) 208px, 244px"
+                            className="object-contain"
                         />
                     </div>
                     <div className="mt-auto flex justify-center md:items-end text-base font-normal md:ml-auto">
