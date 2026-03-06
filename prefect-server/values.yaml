@@ -9,6 +9,8 @@ ingress:
     cert-manager.io/cluster-issuer: cert-manager
   tls: true
 server:
+  uiConfig:
+    prefectUiApiUrl: "https://datasets-prefect.wri.org/api"
   env:
   - name: PREFECT_UI_URL
     value: "https://datasets-prefect.wri.org"
