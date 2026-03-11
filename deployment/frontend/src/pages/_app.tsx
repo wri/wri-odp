@@ -204,12 +204,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
                     cardType: 'summary_large_image',
                 }}
                 dangerouslySetAllPagesToNoIndex={
-                    env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
+                    ['production', 'prod'].includes(env.NEXT_PUBLIC_DEPLOYMENT_TYPE)
                         ? false
                         : true
                 }
                 dangerouslySetAllPagesToNoFollow={
-                    env.NEXT_PUBLIC_DEPLOYMENT_TYPE === 'production'
+                    ['production', 'prod'].includes(env.NEXT_PUBLIC_DEPLOYMENT_TYPE)
                         ? false
                         : true
                 }
