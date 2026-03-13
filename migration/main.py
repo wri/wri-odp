@@ -60,7 +60,6 @@ if __name__ == "__main__":
     migration_deployment = trigger_migration.to_deployment(
         name=f"migration_deployment_{DEPLOYMENT_ENV}",
         enforce_parameter_schema=False,
-        is_schedule_active=False,
         tags=[DEPLOYMENT_ENV]
     )
 

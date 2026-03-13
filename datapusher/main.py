@@ -312,7 +312,6 @@ if __name__ == "__main__":
         name=config.get("DEPLOYMENT_NAME"),
         parameters={"resource_id": "test_id", "api_key": "api_key"},
         enforce_parameter_schema=False,
-        is_schedule_active=False,
         tags=[DEPLOYMENT_ENV]
     )
     download_zipped_deployment = download_resources_zipped.to_deployment(
@@ -326,7 +325,6 @@ if __name__ == "__main__":
             "download_filename": "download_filename",
         },
         enforce_parameter_schema=False,
-        is_schedule_active=False,
         tags=[DEPLOYMENT_ENV]
     )
     conversion_deployment = convert_store_to_file.to_deployment(
@@ -344,7 +342,6 @@ if __name__ == "__main__":
             "download_filename": "download_filename",
         },
         enforce_parameter_schema=False,
-        is_schedule_active=False,
         tags=[DEPLOYMENT_ENV]
     )
     download_subset_deployment = download_subset_of_data.to_deployment(
@@ -363,7 +360,6 @@ if __name__ == "__main__":
             "download_filename": "download_filename",
         },
         enforce_parameter_schema=False,
-        is_schedule_active=False,
         tags=[DEPLOYMENT_ENV]
     )
     serve(
