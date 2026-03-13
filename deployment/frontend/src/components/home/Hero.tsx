@@ -68,18 +68,18 @@ export function Hero() {
                     aria-label="Global"
                 >
                     <div className="flex lg:flex-1">
-                        <Link href="/" className=" h-fit w-fit sm:w-52">
+                        <Link href="/" className="h-fit w-fit sm:w-80">
                             <Image
                                 src="/images/wri_logo_transparent.svg"
                                 alt="Picture of the author"
-                                width={400}
+                                width={500}
                                 height={500}
                                 className="hidden sm:block"
                             />
                             <Image
                                 src="/images/wri_logo_transparent.svg"
                                 alt="Picture of the author"
-                                width={120}
+                                width={220}
                                 height={250}
                                 className="block sm:hidden"
                             />
@@ -141,18 +141,18 @@ export function Hero() {
                     <div className="fixed inset-0 z-50" />
                     <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gray-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-white/10">
                         <div className="flex items-center justify-between">
-                            <Link href="/" className=" h-fit w-fit sm:w-52">
+                            <Link href="/" className="h-fit sm:w-80">
                                 <Image
                                     src="/images/wri_logo_transparent.svg"
                                     alt="Picture of the author"
-                                    width={400}
+                                    width={500}
                                     height={500}
                                     className="hidden sm:block"
                                 />
                                 <Image
                                     src="/images/wri_logo_transparent.svg"
                                     alt="Picture of the author"
-                                    width={150}
+                                    width={250}
                                     height={300}
                                     className="block sm:hidden"
                                 />
