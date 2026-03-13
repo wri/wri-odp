@@ -17,7 +17,6 @@ import logging
 
 log = logging.getLogger(__name__)
 
-
 def calculate_md5(input_string):
     md5_hash = hashlib.md5()
     md5_hash.update(input_string.encode("utf-8"))
@@ -90,7 +89,6 @@ def get_admin_emails_for_dataset(dataset_id: str) -> list[str]:
                     if users_obj.get("email", False):
                         admin_email.append(users_obj.get("email"))
     return admin_email
-
 
 def _resolve_s3_key_for_resource(resource_id: str, dataset_id: str, context: Context) -> str | None:
     """Resolve the S3 key or URL for a resource using ckanext-s3filestore path logic."""
