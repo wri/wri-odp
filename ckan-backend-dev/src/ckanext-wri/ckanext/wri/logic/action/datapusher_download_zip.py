@@ -92,6 +92,50 @@ def get_admin_emails_for_dataset(dataset_id: str) -> list[str]:
     return admin_email
 
 
+def _resolve_s3_key_for_resource(resource_id: str, dataset_id: str, context: Context) -> str | None:
+    """Resolve the S3 key or URL for a resource using ckanext-s3filestore path logic."""
+    import os
+    try:
+        resource = p.toolkit.get_action("resource_show")(
+            {"ignore_auth": True}, {"id": resource_id}
+        )
+    except logic.NotFound:
+        return None
+    url_type = resource.get("url_type")
+    url = resource.get("url")
+    if not url:
+        return None
+    if url_type == "upload":
+        filename = url
+        package = p.toolkit.get_action("package_show")(
+            {"ignore_auth": True}, {"id": dataset_id}
+        )
+        storage_path_prefix = config.get("ckanext.s3filestore.aws_storage_path", "") or ""
+        storage_path = os.path.join(storage_path_prefix, "resources") if storage_path_prefix else "resources"
+        filepath = os.path.join(storage_path, resource_id, filename)
+        owner_org = package.get("owner_org")
+        if owner_org:
+            filepath = os.path.join(str(owner_org), filepath)
+        return filepath
+    if url_type == "link" and url.startswith("http"):
+        return url
+    key = resource.get("key")
+    if key:
+        return key
+    return None
+
+
+def _resolve_keys_from_resource_ids(resource_ids: list[str], dataset_id: str, context: Context) -> list[str]:
+    """Resolve S3 keys or URLs from resource IDs."""
+    keys = []
+    for res_id in resource_ids:
+        key = _resolve_s3_key_for_resource(res_id, dataset_id, context)
+        if key:
+            keys.append(key)
+        else:
+            log.warning("Could not resolve S3 key for resource %s", res_id)
+    return keys
+
 
 def zipped_download_request(context: Context, data_dict: dict[str, Any]):
     prefect_url: str = config.get("ckanext.wri.prefect_url")
@@ -99,10 +143,18 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
 
     dataset_id = data_dict.get("dataset_id")
     keys = data_dict.get("keys")
+    resource_ids = data_dict.get("resource_ids")
     email = data_dict.get("email")
 
-    if None in (dataset_id, keys, email):
+    if None in (dataset_id, email):
         raise p.toolkit.ValidationError({"message": "Missing parameters"})
+
+    if resource_ids:
+        resolved_keys = _resolve_keys_from_resource_ids(resource_ids, dataset_id, context)
+        keys = resolved_keys if resolved_keys else keys
+
+    if not keys:
+        raise p.toolkit.ValidationError({"message": "Missing parameters: keys or resource_ids required"})
 
     filename = build_filename(dataset_id, keys)
     download_filename = build_download_filename(dataset_id, context)
@@ -123,10 +175,12 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         "error": "{}", 
     }
 
-    admin_email= get_admin_emails_for_dataset(dataset_id)
-    log.error(f"admin_email: {admin_email}")
+    admin_email = get_admin_emails_for_dataset(dataset_id)
 
-    
+    dataset_rslt = fetch_dataset_entity({"entity_id": dataset_id, "entity_type": "dataset"})
+    dataset_name = dataset_rslt.get("name") or dataset_id
+    dataset_team = (dataset_rslt.get("organization") or {}).get("title") or ""
+
     value = {}
     if admin_email:
         value["admin_emails"] = admin_email
@@ -208,14 +262,27 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
     ).get("token")
 
     try:
-        deployment = requests.get(
+        deployment_resp = requests.get(
             urljoin(
                 prefect_url,
                 f"api/deployments/name/download-resources-zipped/{deployment_name}",
             )
         )
-        deployment = deployment.json()
-        deployment_id = deployment["id"]
+        deployment = deployment_resp.json()
+
+        if not deployment_resp.ok:
+            error_msg = deployment.get("detail") or deployment.get("message") or str(deployment)
+            raise p.toolkit.ValidationError({
+                "message": f"Prefect deployment not found: {error_msg}",
+                "details": f"Ensure the 'download-resources-zipped/{deployment_name}' deployment exists in Prefect.",
+            })
+
+        deployment_id = deployment.get("id")
+        if not deployment_id:
+            raise p.toolkit.ValidationError({
+                "message": "Prefect returned invalid deployment response (missing id).",
+                "details": str(deployment)[:500],
+            })
         r = requests.post(
             urljoin(prefect_url, f"api/deployments/{deployment_id}/create_flow_run"),
             headers={"Content-Type": "application/json"},
@@ -241,9 +308,9 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         }
         task["error"] = json.dumps(error)
         task["state"] = "error"
-        task["last_updated"] = (str(datetime.datetime.utcnow()),)
+        task["last_updated"] = str(datetime.datetime.utcnow())
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email],admin_email, "Zipped data")
+        send_error([email], admin_email, "Zipped data", dataset_team, dataset_name)
         raise p.toolkit.ValidationError(error)
 
     try:
@@ -263,9 +330,9 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
         error = {"message": m, "details": body, "status_code": r.status_code}
         task["error"] = json.dumps(error)
         task["state"] = "error"
-        task["last_updated"] = (str(datetime.datetime.utcnow()),)
+        task["last_updated"] = str(datetime.datetime.utcnow())
         p.toolkit.get_action("task_status_update")(context, task)
-        send_error([email] , admin_email, "Zipped data")
+        send_error([email], admin_email, "Zipped data", dataset_team, dataset_name)
         raise p.toolkit.ValidationError(error)
 
     value = {"job_id": r.json()["id"]}
@@ -280,7 +347,7 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
 
     task["value"] = json.dumps(value)
     task["state"] = "pending"
-    task["last_updated"] = (str(datetime.datetime.utcnow()),)
+    task["last_updated"] = str(datetime.datetime.utcnow())
     p.toolkit.get_action("task_status_update")(context, task)
 
     return True
@@ -302,7 +369,7 @@ def zipped_download_callback(context: Context, data_dict: dict[str, Any]):
 
     task["state"] = state
     task["error"] = json.dumps(error)
-    task["last_updated"] = (str(datetime.datetime.utcnow()),)
+    task["last_updated"] = str(datetime.datetime.utcnow())
     p.toolkit.get_action("task_status_update")(context, task)
 
     value = json.loads(task["value"])
@@ -314,7 +381,13 @@ def zipped_download_callback(context: Context, data_dict: dict[str, Any]):
         url = data_dict.get("url")
         send_email(emails, url, download_filename)
     else:
-        send_error(emails,admin_email, download_filename)
+        dataset_rslt = fetch_dataset_entity({
+            "entity_id": entity_id,
+            "entity_type": "dataset"
+        })
+        dataset_name = dataset_rslt.get("name")
+        dataset_team = (dataset_rslt.get("organization") or {}).get("title") or ""
+        send_error(emails, admin_email, download_filename or "Zipped data", dataset_team, dataset_name)
         log.error(error)
 
 def send_error_callback(context: Context, data_dict: dict[str, Any]):

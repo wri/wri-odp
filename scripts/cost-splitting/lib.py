@@ -6,8 +6,11 @@ from email.mime.text import MIMEText
 def get_org_name(org_id, branch_name):
     # make an http request to the get the org name using organization_show from ckan
     # make a get request
+    domain_suffix = branch_name.replace("dev", "-dev")
+    domain_suffix = branch_name.replace("staging", "-staging")
+    domain_suffix = branch_name.replace("prod", "")
     try:
-        r = requests.get(f'https://wri.{branch_name}.ckan.datopian.com/api/action/organization_show?id={org_id}')
+        r = requests.get(f'https://datasets{domain_suffix}.wri.org/api/action/organization_show?id={org_id}')
         print(r.json())
         org = r.json()['result']
         return org['title']

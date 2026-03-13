@@ -186,15 +186,13 @@ export function DataFiles({
     },
   });
 
-  const keys = datafilesToDownload
-    .map((r) => r.key ?? r.url)
-    .filter(Boolean) as string[];
+  const resourceIds = datafilesToDownload.map((r) => r.id).filter(Boolean);
   const handleFormSubmit = (data: any) => {
     downloadZipped.mutate(
       {
         email: data.email,
         dataset_id: dataset.id,
-        keys,
+        resource_ids: resourceIds,
       },
       {
         onSuccess: () => {

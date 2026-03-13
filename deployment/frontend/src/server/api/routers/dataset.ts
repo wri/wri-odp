@@ -1782,11 +1782,17 @@ export const DatasetRouter = createTRPCRouter({
     }),
   downloadZippedResources: publicProcedure
     .input(
-      z.object({
-        dataset_id: z.string(),
-        keys: z.array(z.string()),
-        email: z.string(),
-      })
+      z
+        .object({
+          dataset_id: z.string(),
+          keys: z.array(z.string()).optional(),
+          resource_ids: z.array(z.string()).optional(),
+          email: z.string(),
+        })
+        .refine(
+          (data) => (data.keys?.length ?? 0) > 0 || (data.resource_ids?.length ?? 0) > 0,
+          { message: 'Either keys or resource_ids is required' }
+        )
     )
     .mutation(async ({ input, ctx }) => {
       const headers: any = {
