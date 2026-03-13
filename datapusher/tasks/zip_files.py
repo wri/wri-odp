@@ -12,7 +12,6 @@ from prefect import task, get_run_logger, variables
 
 s3_config = config.get("S3_CONFIG")
 
-
 # Function to download an object from S3
 def download_from_s3(bucket_name, key, temp_dir):
     # remove first path from key pathname
