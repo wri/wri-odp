@@ -1,4 +1,4 @@
-FROM prefecthq/prefect:2.14.5-python3.11
+FROM python:3.11-slim
 
 WORKDIR /app
 # Copy all jobs to container
