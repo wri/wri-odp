@@ -165,13 +165,28 @@ def datapusher_submit(context: Context, data_dict: dict[str, Any]):
         else api_token
     )
     try:
-        deployment = requests.get(
+        deployment_resp = requests.get(
             urljoin(
                 prefect_url, f"api/deployments/name/push-to-datastore/{deployment_name}"
             )
         )
-        deployment = deployment.json()
-        deployment_id = deployment["id"]
+        deployment = deployment_resp.json()
+
+        if not deployment_resp.ok:
+            error_msg = deployment.get("detail") or deployment.get("message") or str(deployment)
+            log.error("Prefect deployment not found: %s", error_msg)
+            raise p.toolkit.ValidationError({
+                "message": f"Prefect deployment not found: {error_msg}",
+                "details": f"Ensure the 'push-to-datastore/{deployment_name}' deployment exists in Prefect.",
+            })
+
+        deployment_id = deployment.get("id")
+        if not deployment_id:
+            log.error("Prefect returned invalid deployment response (missing id): %s", str(deployment)[:500])
+            raise p.toolkit.ValidationError({
+                "message": "Prefect returned invalid deployment response (missing id).",
+                "details": str(deployment)[:500],
+            })
         r = requests.post(
             urljoin(prefect_url, f"api/deployments/{deployment_id}/create_flow_run"),
             headers={"Content-Type": "application/json"},

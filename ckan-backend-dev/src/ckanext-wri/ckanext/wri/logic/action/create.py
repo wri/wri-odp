@@ -167,13 +167,21 @@ def _trigger_prefect_flow(data_dict: DataDict) -> dict[str, Any]:
         print(migration_flow_name, flush=True)
         print(deployment_name, flush=True)
         print(deployment_env, flush=True)
-        deployment = requests.get(
+        deployment_resp = requests.get(
             urljoin(
                 prefect_url,
                 f"/api/deployments/name/{migration_flow_name}/{deployment_name}_{deployment_env}",
             )
         )
-        deployment = deployment.json()
+        deployment = deployment_resp.json()
+
+        if not deployment_resp.ok or "id" not in deployment:
+            error_msg = deployment.get("detail") or deployment.get("message") or str(deployment)
+            log.error("Prefect deployment '%s/%s_%s' not found: %s", migration_flow_name, deployment_name, deployment_env, error_msg)
+            raise p.toolkit.ValidationError({
+                "message": f"Prefect deployment not found: {error_msg}",
+            })
+
         deployment_id = deployment["id"]
 
         r = requests.post(

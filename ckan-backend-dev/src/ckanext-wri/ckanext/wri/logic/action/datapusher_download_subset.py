@@ -224,13 +224,21 @@ def subset_download_request(context: Context, data_dict: dict[str, Any]):
     ).get("token")
 
     try:
-        deployment = requests.get(
+        deployment_resp = requests.get(
             urljoin(
                 prefect_url,
                 f"api/deployments/name/download-subset-of-data/{deployment_name}",
             )
         )
-        deployment = deployment.json()
+        deployment = deployment_resp.json()
+
+        if not deployment_resp.ok or "id" not in deployment:
+            error_msg = deployment.get("detail") or deployment.get("message") or str(deployment)
+            log.error("Prefect deployment 'download-subset-of-data/%s' not found: %s", deployment_name, error_msg)
+            raise p.toolkit.ValidationError({
+                "message": f"Prefect deployment not found: {error_msg}",
+            })
+
         deployment_id = deployment["id"]
         r = requests.post(
             urljoin(prefect_url, f"api/deployments/{deployment_id}/create_flow_run"),
