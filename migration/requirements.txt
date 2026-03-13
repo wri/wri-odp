@@ -1,3 +1,5 @@
+# pkg_resources required by ckanapi - must be installed first
+setuptools>=78.1.1
 prefect==2.14.15
 pathlib==1.0.1
 semver==3.0.2
@@ -15,6 +17,5 @@ pycountry==22.3.5
 ckanapi==4.8.0
 markdown==3.6.0
 urllib3>=2.6.3 # not directly required, pinned by Snyk to avoid a vulnerability
-setuptools>=78.1.1 # not directly required, pinned by Snyk to avoid a vulnerability
 requests>=2.32.4 # not directly required, pinned by Snyk to avoid a vulnerability
 

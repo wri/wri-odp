@@ -87,14 +87,18 @@ function OpenInButton({
 }) {
     const session = useSession();
 
-    const { data } = useQuery([rw_id], async () => {
-        const datasetRes = await fetch(
-            `https://api.resourcewatch.org/v1/dataset/${rw_id}`
-        );
-        const dataset: RwDatasetResp = await datasetRes.json();
-        if (isRwError(dataset)) throw new Error(dataset.errors[0].detail);
-        return dataset.data.attributes;
-    });
+    const { data } = useQuery(
+        [rw_id],
+        async () => {
+            const datasetRes = await fetch(
+                `https://api.resourcewatch.org/v1/dataset/${rw_id}`
+            );
+            const dataset: RwDatasetResp = await datasetRes.json();
+            if (isRwError(dataset)) throw new Error(dataset.errors[0].detail);
+            return dataset.data.attributes;
+        },
+        { enabled: !!rw_id }
+    );
     if (data) {
         switch (data.provider) {
             case 'cartodb':
