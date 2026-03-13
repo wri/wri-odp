@@ -1,3 +1,3 @@
-FROM prefecthq/prefect:2.11.5-python3.11
+FROM prefecthq/prefect:3-python3.11
 
-CMD ["/opt/prefect/entrypoint.sh", "prefect", "server", "start"]
+CMD ["prefect", "server", "start", "--host", "0.0.0.0"]
