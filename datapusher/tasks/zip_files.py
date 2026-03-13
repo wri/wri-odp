@@ -8,8 +8,6 @@ import string
 import time
 from tqdm import tqdm
 
-from prefect.futures import resolve_futures_to_data
-
 from prefect import task, get_run_logger, variables
 
 s3_config = config.get("S3_CONFIG")
@@ -82,5 +80,5 @@ def download_keys(keys: list[str], filename: str, temp_dir):
         {"key": key, "temp_dir": temp_dir}
         for key in keys
     ]
-    results = request_data.map(possible_inputs)
-    return resolve_futures_to_data(results)
+    futures = request_data.map(possible_inputs)
+    return [f.result() for f in futures]

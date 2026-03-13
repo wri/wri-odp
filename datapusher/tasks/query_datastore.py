@@ -1,7 +1,6 @@
 from typing import Optional
 from urllib.parse import urlsplit, urlunsplit
 from prefect import flow, task, get_run_logger
-from prefect.futures import resolve_futures_to_data
 from helpers import get_url, check_response
 import requests
 import re
@@ -147,8 +146,8 @@ def query_rw(id: str, sql: str, connector_url: str, provider: str, num_of_rows: 
         {"url": url, "sql": sql, "provider": provider, "offset": offset, "limit": limit}
         for offset in offsets
     ]
-    results = request_data.map(possible_inputs)
-    return resolve_futures_to_data(results)
+    futures = request_data.map(possible_inputs)
+    return [f.result() for f in futures]
 
 
 def query_subset_datastore(id: str, sql: str, num_of_rows: int, ckan_url: str):
@@ -159,5 +158,5 @@ def query_subset_datastore(id: str, sql: str, num_of_rows: int, ckan_url: str):
         {"url": url, "sql": sql, "provider": "datastore", "offset": offset, "limit": limit}
         for offset in offsets
     ]
-    results = request_data.map(possible_inputs)
-    return resolve_futures_to_data(results)
+    futures = request_data.map(possible_inputs)
+    return [f.result() for f in futures]
