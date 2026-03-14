@@ -93,18 +93,20 @@ def get_admin_emails_for_dataset(dataset_id: str) -> list[str]:
 def _resolve_s3_key_for_resource(resource_id: str, dataset_id: str, context: Context) -> str | None:
     """Resolve the S3 key or URL for a resource using ckanext-s3filestore path logic."""
     import os
-    try:
-        resource = p.toolkit.get_action("resource_show")(
-            {"ignore_auth": True}, {"id": resource_id}
-        )
-    except logic.NotFound:
+    import ckan.model as model
+
+    resource_obj = model.Resource.get(resource_id)
+    if not resource_obj:
         return None
-    url_type = resource.get("url_type")
-    url = resource.get("url")
-    if not url:
+    url_type = resource_obj.extras.get("url_type") or getattr(resource_obj, "url_type", None)
+    raw_url = resource_obj.url
+    if not raw_url:
         return None
     if url_type == "upload":
-        filename = url
+        filename = raw_url
+        if filename.startswith("http"):
+            parts = filename.split("/download/")
+            filename = parts[1] if len(parts) == 2 else filename.rsplit("/", 1)[-1]
         package = p.toolkit.get_action("package_show")(
             {"ignore_auth": True}, {"id": dataset_id}
         )
@@ -114,12 +116,10 @@ def _resolve_s3_key_for_resource(resource_id: str, dataset_id: str, context: Con
         owner_org = package.get("owner_org")
         if owner_org:
             filepath = os.path.join(str(owner_org), filepath)
+        log.info("Resolved S3 key for resource %s: %s", resource_id, filepath)
         return filepath
-    if url_type == "link" and url.startswith("http"):
-        return url
-    key = resource.get("key")
-    if key:
-        return key
+    if raw_url.startswith("http"):
+        return raw_url
     return None
 
 
