@@ -91,31 +91,44 @@ def get_admin_emails_for_dataset(dataset_id: str) -> list[str]:
     return admin_email
 
 def _resolve_s3_key_for_resource(resource_id: str, dataset_id: str, context: Context) -> str | None:
-    """Resolve the S3 key or URL for a resource using ckanext-s3filestore path logic."""
+    """Resolve the S3 key or URL for a resource using ckanext-s3filestore path logic.
+
+    The WRI fork of ckanext-s3filestore stores resource files at:
+      {owner_org_uuid}/resources/{resource_id}/{filename}
+    mirroring the upload_to_key() logic in that plugin's S3ResourceUploader.
+    """
     import os
     import ckan.model as model
 
-    resource_obj = model.Resource.get(resource_id)
+    # Query directly without state filter so draft/pending resources are found too
+    resource_obj = model.Session.query(model.Resource).filter_by(id=resource_id).first()
     if not resource_obj:
+        log.warning("Resource %s not found in DB", resource_id)
         return None
-    url_type = resource_obj.extras.get("url_type") or getattr(resource_obj, "url_type", None)
+    url_type = getattr(resource_obj, "url_type", None) or (resource_obj.extras or {}).get("url_type")
     raw_url = resource_obj.url
+    log.info("Resource %s: url_type=%r raw_url=%r", resource_id, url_type, raw_url)
     if not raw_url:
         return None
     if url_type == "upload":
         filename = raw_url
         if filename.startswith("http"):
+            # resource_show may have transformed the url — extract just the filename
             parts = filename.split("/download/")
             filename = parts[1] if len(parts) == 2 else filename.rsplit("/", 1)[-1]
-        package = p.toolkit.get_action("package_show")(
-            {"ignore_auth": True}, {"id": dataset_id}
-        )
         storage_path_prefix = config.get("ckanext.s3filestore.aws_storage_path", "") or ""
         storage_path = os.path.join(storage_path_prefix, "resources") if storage_path_prefix else "resources"
         filepath = os.path.join(storage_path, resource_id, filename)
-        owner_org = package.get("owner_org")
-        if owner_org:
-            filepath = os.path.join(str(owner_org), filepath)
+        # The WRI s3filestore fork prepends owner_org UUID when uploading
+        try:
+            package = p.toolkit.get_action("package_show")(
+                {"ignore_auth": True}, {"id": dataset_id}
+            )
+            owner_org = package.get("owner_org")
+            if owner_org:
+                filepath = os.path.join(str(owner_org), filepath)
+        except Exception as e:
+            log.warning("Could not get owner_org for dataset %s: %s", dataset_id, e)
         log.info("Resolved S3 key for resource %s: %s", resource_id, filepath)
         return filepath
     if raw_url.startswith("http"):

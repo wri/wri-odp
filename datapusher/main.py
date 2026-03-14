@@ -263,7 +263,7 @@ async def download_resources_zipped(
         logger = get_run_logger()
         ckan_url = config.get("CKAN_URL")
         with tempfile.TemporaryDirectory() as temp_dir:
-            tasks = await download_keys(keys, filename, temp_dir)
+            tasks = download_keys(keys, filename, temp_dir)
             data = list(tasks)
             zipped_file = f"{filename}.zip"
             zipped_file = os.path.join(temp_dir, zipped_file)
