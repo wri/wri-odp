@@ -14,10 +14,11 @@ s3_config = config.get("S3_CONFIG")
 
 # Function to download an object from S3
 def download_from_s3(bucket_name, key, temp_dir):
-    # remove first path from key pathname
     local_path = os.path.join(temp_dir, os.path.basename(key))
-    _key = key.split("/", 1)[1]
-    _key = _key if s3_config.get("S3_ACCESS_KEY_ID") == "minioadmin" else key
+    # For AWS the key from CKAN already includes the full path within the bucket.
+    # The old code stripped owner_org for Minio, but uploads now include it too.
+    _key = key
+    print(f"[S3 DOWNLOAD] bucket={bucket_name!r} original_key={key!r} resolved_key={_key!r}", flush=True)
     s3 = boto3.client(
         "s3",
         endpoint_url=(

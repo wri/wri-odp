@@ -62,7 +62,8 @@ RUN apk add --virtual .build-deps \
 
 RUN geos-config --cflags
 
-RUN pip install --disable-pip-version-check Shapely==2.0.1
+RUN pip install --disable-pip-version-check "Cython<3" numpy && \
+    pip install --disable-pip-version-check --no-build-isolation Shapely==2.0.1
 
 RUN apk del build-base python3-dev && \
     rm -rf /var/cache/apk/*
