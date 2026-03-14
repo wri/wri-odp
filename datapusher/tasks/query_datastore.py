@@ -6,7 +6,6 @@ import requests
 import re
 import numpy as np
 
-
 # NOTE: this only works for CartoDB layers
 @task(retries=3, retry_delay_seconds=15)
 def query_datastore(
