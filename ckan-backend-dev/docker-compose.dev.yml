@@ -27,37 +27,51 @@ services:
       - ckan_storage:/var/lib/ckan
       - ./src:/srv/app/src_extensions
     restart: unless-stopped
-    image: ${CKAN_IMAGE}
 
-      #  frontend:
-      #    container_name: wri-frontend
-      #    build:
-      #      context: ../deployment/frontend/
-      #      args:
-      #        - NEXT_PUBLIC_CKAN_URL=http://ckan-dev:5000
-      #    environment:
-      #      - NEXTAUTH_SECRET=secret
-      #      - NEXTAUTH_URL=http://localhost:3000
-      #      - CKAN_URL=http://ckan-dev:5000
-      #      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
-      #      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
-      #      - S3_BUCKET_NAME=ckan
-      #      - S3_BUCKET_REGION=us-east-1
-      #      - RW_API_KEY=${RW_API_KEY}
-      #      - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID}
-      #      - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID}
-      #      - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET}
-      #      - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY}
-      #      - SMTP_SERVER=${SMTP_SERVER}
-      #      - SMTP_PORT=${SMTP_PORT}
-      #      - SMTP_USER=${SMTP_USER}
-      #      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      #      - SMTP_FROM=${SMTP_FROM}
-      #      - PREFECT_INTERNAL_URL=http://prefect:4200
-      #    ports:
-      #      - "0.0.0.0:3000:3000"
-      #    healthcheck:
-      #      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
+  # frontend:
+  #   container_name: wri-frontend
+  #   build:
+  #     context: ../deployment/frontend/
+  #     args:
+  #       - NEXT_PUBLIC_CKAN_URL=http://localhost:5000/private-admin
+  #       - NEXTAUTH_URL=http://localhost:3000
+  #       - NEXTAUTH_SECRET=secret
+  #       - NEXT_PUBLIC_NEXTAUTH_URL=http://localhost:3000
+  #       - NEXT_PUBLIC_GTM_ID=GTM-XXXXXX
+  #       - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
+  #       - NEXT_PUBLIC_HOTJAR_ID=0
+  #       - NEXT_PUBLIC_GFW_API_KEY=1111
+  #       - OSANO_URL=YOUR_OSANO_URL/osano.js
+  #       - NEXT_PUBLIC_DEPLOYMENT_TYPE=dev
+  #   environment:
+  #     - NEXTAUTH_SECRET=secret
+  #     - NEXTAUTH_URL=http://localhost:3000
+  #     - NEXT_PUBLIC_CKAN_URL=http://localhost:5000/private-admin
+  #     - CKAN_URL=http://ckan-dev:5000
+  #     - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+  #     - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+  #     - S3_BUCKET_NAME=ckan
+  #     - S3_BUCKET_REGION=us-east-1
+  #     - RW_API_KEY=${RW_API_KEY:-dummy}
+  #     - AZURE_AD_TENANT_ID=${AZURE_AD_TENANT_ID:-ffffffff-ffff-ffff-ffff-ffffffffffff}
+  #     - AZURE_AD_CLIENT_ID=${AZURE_AD_CLIENT_ID:-ffffffff-ffff-ffff-ffff-ffffffffffff}
+  #     - AZURE_AD_CLIENT_SECRET=${AZURE_AD_CLIENT_SECRET:-dummy}
+  #     - SYS_ADMIN_API_KEY=${SYS_ADMIN_API_KEY:-CKAN_API_TOKEN}
+  #     - SMTP_SERVER=${SMTP_SERVER:-smtp}
+  #     - SMTP_PORT=${SMTP_PORT:-1025}
+  #     - SMTP_USER=${SMTP_USER:-testuser}
+  #     - SMTP_PASSWORD=${SMTP_PASSWORD:-testpassword}
+  #     - SMTP_FROM=${SMTP_FROM:-ckan@localhost}
+  #     - PREFECT_INTERNAL_URL=http://prefect:4200
+  #   depends_on:
+  #     ckan-dev:
+  #       condition: service_healthy
+  #     prefect:
+  #       condition: service_healthy
+  #   ports:
+  #     - "0.0.0.0:3000:3000"
+  #   healthcheck:
+  #     test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:3000"]
 
   prefect:
     container_name: prefect-server
@@ -73,42 +87,49 @@ services:
     ports:
       - "0.0.0.0:4200:4200"
     healthcheck:
-      test: ["CMD", "wget", "-qO", "/dev/null", "http://localhost:4200"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4200/api/health')"]
       interval: 40s
       timeout: 30s
       retries: 3
       start_period: 60s
 
-      #my-datapusher:
-      #  container_name: my-datapusher
-      #  build:
-      #    context: ../datapusher
-      #  restart: always
-      #  environment:
-      #    - PREFECT_API_URL=http://prefect:4200/api
-      #    - DEPLOYMENT_NAME=datapusher-dev
-      #    - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
-      #    - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
-      #    - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
-      #    - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
-      #    - S3_BUCKET_NAME=ckan
-      #    - S3_BUCKET_REGION=us-east-1
-      #    - FLOW_DEPLOYMENT_ENV=dev
-      #  depends_on:
-      #    prefect:
-      #      condition: service_healthy
+  my-datapusher:
+    container_name: my-datapusher
+    build:
+      context: ../datapusher
+      dockerfile: Dockerfile.dev
+    restart: always
+    # Mount source so code changes apply without rebuilding
+    volumes:
+      - ../datapusher:/app
+    environment:
+      - PREFECT_API_URL=http://prefect:4200/api
+      - DEPLOYMENT_NAME=datapusher-dev
+      - CKAN_URL=http://ckan-dev:5000
+      - CKAN_DATASTORE_READ_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+      - CKAN_DATASTORE_WRITE_URL=postgresql://ckandbuser:ckandbpassword@db/datastore
+      - S3_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY_ID=${MINIO_ROOT_PASSWORD}
+      - S3_BUCKET_NAME=ckan
+      - S3_BUCKET_REGION=us-east-1
+      - FLOW_DEPLOYMENT_ENV=dev
+    depends_on:
+      prefect:
+        condition: service_healthy
 
-  #my-migration:
-  #  container_name: my-migration
-  #  build:
-  #    context: ../migration
-  #  restart: always
-  #  environment:
-  #    - FLOW_DEPLOYMENT_ENV=dev
-  #    - PREFECT_API_URL=http://prefect:4200/api
-  #  depends_on:
-  #    prefect:
-  #      condition: service_healthy
+  my-migration:
+    container_name: my-migration
+    build:
+      context: ../migration
+    restart: always
+    volumes:
+      - ../migration:/app
+    environment:
+      - FLOW_DEPLOYMENT_ENV=dev
+      - PREFECT_API_URL=http://prefect:4200/api
+    depends_on:
+      prefect:
+        condition: service_healthy
 
   db:
     container_name: ${POSTGRESQL_CONTAINER_NAME}

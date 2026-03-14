@@ -1,0 +1,32 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system deps (geopandas/fiona need GDAL)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    file \
+    uchardet \
+    libuchardet-dev \
+    libgdal-dev \
+    gdal-bin \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python deps from requirements (source code mounted at runtime)
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+
+RUN mkdir -p /app/files
+
+# Stub out qsvdp so push-to-datastore fails gracefully instead of crashing
+RUN printf '#!/bin/sh\necho "qsvdp not available in dev mode" >&2\nexit 1\n' \
+    > /usr/local/bin/qsvdp && chmod +x /usr/local/bin/qsvdp
+
+CMD [ "python", "main.py" ]
+
+kubectl exec -n wri-odp-dev wri-dev-ckan-6796994bd8-gjmk5 bash
+
+wri-dev-datastore-dump.pgdump
+
+kubectl cp wri-odp-dev/wri-dev-ckan-6796994bd8-7gmgh:/wri-dev-datastore-dump.pgdump ./wri-dev-datastore-dump.pgdump
