@@ -247,6 +247,10 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         formState: { dirtyFields },
     } = formObj;
 
+    const isAnyUploading = formObj
+        .watch('resources')
+        ?.some((r) => r.isUploading === true);
+
     const tabs = [
         { name: 'Metadata', enabled: true },
         { name: 'Data Files', enabled: true },
@@ -407,7 +411,13 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 </Link>
                 {/* </Button> */}
                 <LoaderButton
-                    loading={editDataset.isLoading}
+                    loading={editDataset.isLoading || !!isAnyUploading}
+                    disabled={!!isAnyUploading}
+                    title={
+                        isAnyUploading
+                            ? 'Waiting for file upload to complete…'
+                            : undefined
+                    }
                     type="submit"
                     onClick={formObj.handleSubmit(
                         (data) => {

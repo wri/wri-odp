@@ -24,9 +24,3 @@ RUN printf '#!/bin/sh\necho "qsvdp not available in dev mode" >&2\nexit 1\n' \
     > /usr/local/bin/qsvdp && chmod +x /usr/local/bin/qsvdp
 
 CMD [ "python", "main.py" ]
-
-kubectl exec -n wri-odp-dev wri-dev-ckan-6796994bd8-gjmk5 bash
-
-wri-dev-datastore-dump.pgdump
-
-kubectl cp wri-odp-dev/wri-dev-ckan-6796994bd8-7gmgh:/wri-dev-datastore-dump.pgdump ./wri-dev-datastore-dump.pgdump

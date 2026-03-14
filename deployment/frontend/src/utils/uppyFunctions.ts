@@ -1,9 +1,13 @@
 import type { AwsS3UploadParameters } from '@uppy/aws-s3';
-import type { UppyFile } from '@uppy/core';
+import type { Meta, UppyFile } from '@uppy/core';
 import { sha256 } from 'crypto-hash';
 
-export async function getUploadParameters(file: UppyFile, filePath?: string) {
-    const arrayBuffer = await new Response(file.data).arrayBuffer();
+export async function getUploadParameters(
+    file: UppyFile<Meta, Record<string, unknown>>,
+    filePath?: string,
+    onKey?: (key: string) => void
+) {
+    const arrayBuffer = await new Response(file.data as Blob).arrayBuffer();
     const response = await fetch('/api/sign-s3', {
         method: 'POST',
         headers: {
@@ -19,9 +23,12 @@ export async function getUploadParameters(file: UppyFile, filePath?: string) {
     if (!response.ok)
         throw new Error('Unsuccessful request', { cause: response });
 
-    // Parse the JSON response.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const data: { url: string; method: 'PUT' } = await response.json();
+    const data: { url: string; method: 'PUT'; key: string } =
+        await response.json();
+
+    // Let the caller know the exact S3 key before upload starts
+    if (data.key) onKey?.(data.key);
 
     // Return an object in the correct shape.
     const object: AwsS3UploadParameters = {
@@ -30,7 +37,7 @@ export async function getUploadParameters(file: UppyFile, filePath?: string) {
         fields: {}, // For presigned PUT uploads, this should be left empty.
         // Provide content type header required by S3
         headers: {
-            'Content-Type': file.type ? file.type : 'application/octet-stream',
+            'Content-Type': file.type ?? 'application/octet-stream',
         },
     };
     return object;

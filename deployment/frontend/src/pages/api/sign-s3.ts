@@ -50,10 +50,14 @@ export default async function handler(
         }),
         { expiresIn: 3600 }
     );
+    const fullKey = filePath
+        ? `${_filePath}/${key}.${extension}`
+        : `resources/${fileHash}/${key}.${extension}`;
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({
         url: signedUrl,
         method: 'PUT',
+        key: fullKey,
     });
     res.end();
 }
