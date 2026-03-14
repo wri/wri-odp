@@ -107,15 +107,9 @@ def _resolve_s3_key_for_resource(resource_id: str, dataset_id: str, context: Con
         if filename.startswith("http"):
             parts = filename.split("/download/")
             filename = parts[1] if len(parts) == 2 else filename.rsplit("/", 1)[-1]
-        package = p.toolkit.get_action("package_show")(
-            {"ignore_auth": True}, {"id": dataset_id}
-        )
         storage_path_prefix = config.get("ckanext.s3filestore.aws_storage_path", "") or ""
         storage_path = os.path.join(storage_path_prefix, "resources") if storage_path_prefix else "resources"
         filepath = os.path.join(storage_path, resource_id, filename)
-        owner_org = package.get("owner_org")
-        if owner_org:
-            filepath = os.path.join(str(owner_org), filepath)
         log.info("Resolved S3 key for resource %s: %s", resource_id, filepath)
         return filepath
     if raw_url.startswith("http"):
