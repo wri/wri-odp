@@ -91,11 +91,14 @@ def get_admin_emails_for_dataset(dataset_id: str) -> list[str]:
     return admin_email
 
 def _resolve_s3_key_for_resource(resource_id: str, dataset_id: str, context: Context) -> str | None:
-    """Resolve the S3 key or URL for a resource using ckanext-s3filestore path logic.
+    """Resolve the S3 key or URL for a resource.
 
-    The WRI fork of ckanext-s3filestore stores resource files at:
-      {owner_org_uuid}/resources/{resource_id}/{filename}
-    mirroring the upload_to_key() logic in that plugin's S3ResourceUploader.
+    Resolution order:
+    1. Use the 'key' extra set by the frontend during direct-to-S3 upload — this
+       is the exact S3 object path and is the most reliable source.
+    2. Fall back to reconstructing the path from `url` + aws_storage_path config,
+       which mirrors the upload_to_key() logic in ckanext-s3filestore.
+    3. For non-upload resources, return the raw URL directly.
     """
     import os
     import ckan.model as model
@@ -105,12 +108,21 @@ def _resolve_s3_key_for_resource(resource_id: str, dataset_id: str, context: Con
     if not resource_obj:
         log.warning("Resource %s not found in DB", resource_id)
         return None
-    url_type = getattr(resource_obj, "url_type", None) or (resource_obj.extras or {}).get("url_type")
+    extras = resource_obj.extras or {}
+    url_type = getattr(resource_obj, "url_type", None) or extras.get("url_type")
     raw_url = resource_obj.url
-    log.info("Resource %s: url_type=%r raw_url=%r", resource_id, url_type, raw_url)
-    if not raw_url:
-        return None
+    log.info("Resource %s: url_type=%r raw_url=%r extras_key=%r", resource_id, url_type, raw_url, extras.get("key"))
+
     if url_type == "upload":
+        # Prefer the explicit S3 key stored by the frontend upload flow
+        s3_key = extras.get("key")
+        if s3_key:
+            log.info("Using key extra for resource %s: %s", resource_id, s3_key)
+            return s3_key
+
+        # Fall back: reconstruct from url + aws_storage_path config
+        if not raw_url:
+            return None
         filename = raw_url
         if filename.startswith("http"):
             # resource_show may have transformed the url — extract just the filename
@@ -129,9 +141,10 @@ def _resolve_s3_key_for_resource(resource_id: str, dataset_id: str, context: Con
                 filepath = os.path.join(str(owner_org), filepath)
         except Exception as e:
             log.warning("Could not get owner_org for dataset %s: %s", dataset_id, e)
-        log.info("Resolved S3 key for resource %s: %s", resource_id, filepath)
+        log.info("Resolved S3 key (reconstructed) for resource %s: %s", resource_id, filepath)
         return filepath
-    if raw_url.startswith("http"):
+
+    if raw_url and raw_url.startswith("http"):
         return raw_url
     return None
 

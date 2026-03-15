@@ -19,7 +19,7 @@ import {
     type DatasetFormType,
     type ResourceFormType,
 } from '@/schema/dataset.schema';
-import Uppy, { type UppyFile } from '@uppy/core';
+import Uppy, { type UppyFile, type Meta } from '@uppy/core';
 import AwsS3 from '@uppy/aws-s3';
 import { getUploadParameters } from '@/utils/uppyFunctions';
 import { v4 as uuidv4 } from 'uuid';
@@ -43,6 +43,15 @@ export function AddDataFile({
     const { setValue, watch } = formObj;
     const datafile = watch(`resources.${index}`);
     const uploadInputRef = useRef<HTMLInputElement>(null);
+    // Stores the S3 key returned by sign-s3 BEFORE the upload completes.
+    const pendingS3KeyRef = useRef<string | null>(null);
+    // Stable refs so event handlers registered inside useMemo can access
+    // current values without stale closures.
+    const setValueRef = useRef(setValue);
+    setValueRef.current = setValue;
+    const indexRef = useRef(index);
+    indexRef.current = index;
+
     const { isLoading: dataDictionaryLoading } = useDataDictionary(
         watch(`resources.${index}.fileBlob`),
         watch(`resources.${index}.resourceId`),
@@ -86,61 +95,64 @@ export function AddDataFile({
             },
         }).use(AwsS3, {
             id: 'AwsS3',
-            getUploadParameters: (file: UppyFile) =>
+            // Force single-part PUT uploads (presigned URL). Uppy v5 defaults
+            // to multipart and requires createMultipartUpload/listParts/etc
+            // when shouldUseMultipart is true.
+            shouldUseMultipart: false,
+            getUploadParameters: (file: UppyFile<Meta, Record<string, unknown>>) =>
                 getUploadParameters(
                     file,
                     watch('team') && watch('team')?.value !== ''
                         ? `${watch('team')?.id}/ckan/resources/${
                               datafile.resourceId
                           }`
-                        : `ckan/resources/${datafile.resourceId}`
+                        : `ckan/resources/${datafile.resourceId}`,
+                    (key) => {
+                        pendingS3KeyRef.current = key;
+                    }
                 ),
         });
+        // Register all event handlers here so they are only registered once,
+        // not on every render.  Use refs to access current form values.
+        uppy.on('upload', () => {
+            const idx = indexRef.current;
+            const set = setValueRef.current;
+            set(`resources.${idx}.type`, 'upload');
+            set(`resources.${idx}.isUploading`, true);
+        });
+
+        // 'complete' fires once per upload batch (success OR failure) and is
+        // the most reliable signal in Uppy v5 to know the upload is done.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        uppy.on('complete' as any, (result: any) => {
+            const idx = indexRef.current;
+            const set = setValueRef.current;
+            // Always clear the uploading flag, regardless of outcome.
+            set(`resources.${idx}.isUploading`, false);
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            const successFile = result?.successful?.[0];
+            const s3Key = pendingS3KeyRef.current;
+            if (successFile && s3Key) {
+                const name = s3Key.split('/').pop() ?? '';
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                set(`resources.${idx}.size`, successFile.size as number);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                set(`resources.${idx}.format`, successFile.extension as string);
+                set(`resources.${idx}.key`, s3Key);
+                set(`resources.${idx}.name`, name);
+                pendingS3KeyRef.current = null;
+            } else if (!s3Key) {
+                console.error('[complete] S3 key was not captured');
+            } else {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                console.error('[complete] upload failed', result?.failed);
+            }
+            if (uploadInputRef.current) uploadInputRef.current.value = '';
+        });
+
         return uppy;
     }, []);
-
-    function upload() {
-        uppy.upload().then((result) => {
-            if (result?.successful[0]) {
-                const paths = new URL(result.successful[0].uploadURL).pathname
-                    .substring(1)
-                    .split('/');
-                const url = result.successful[0]?.uploadURL ?? null;
-                const name = url ? url.split('/').pop() : '';
-                const format = result.successful[0].extension;
-                const size = result.successful[0].size;
-                const key = paths.slice(0, paths.length).join('/');
-                uppy.setState({ ...uppy.getState(), files: [] });
-                setValue(`resources.${index}.key`, key);
-                setValue(`resources.${index}.name`, name);
-                setValue(`resources.${index}.size`, size);
-                setValue(`resources.${index}.format`, format);
-                if (uploadInputRef && uploadInputRef.current)
-                    uploadInputRef.current.value = '';
-            }
-
-            if (result.failed.length > 0) {
-                result.failed.forEach((file) => {
-                    console.error(file.error);
-                });
-            }
-        });
-    }
-
-    uppy.on('progress', (progress) => {
-        if (typeof window !== 'undefined') {
-            const progressBar = document.getElementById(
-                `${datafile.resourceId}_upload_progress`
-            );
-            if (progressBar) {
-                progressBar.textContent = progress + '%';
-            }
-        }
-    });
-
-    uppy.on('upload', (_result) => {
-        setValue(`resources.${index}.type`, 'upload');
-    });
 
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
         const files = e.target.files;
@@ -155,7 +167,7 @@ export function AddDataFile({
             type: files[0].type,
             data: files[0],
         });
-        upload();
+        // autoProceed: true handles the upload — no need to call uppy.upload()
     }
 
     return (

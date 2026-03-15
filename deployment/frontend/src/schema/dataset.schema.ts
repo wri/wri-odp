@@ -48,6 +48,7 @@ export const ResourceSchema = z
         rw_id: z.string().optional().nullable(),
         asset_id: z.string().optional().nullable(),
         new: z.boolean().optional(),
+        isUploading: z.boolean().optional(),
         package_id: z.string().optional().nullable(),
         url: z.string().optional(),
         cache_type: z
