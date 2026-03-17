@@ -73,7 +73,7 @@ export default function Header() {
                 id="header"
                 className="w-full py-10 px-4 sm:px-6 xxl:px-12  mx-auto flex gap-x-1 font-acumin items-baseline"
             >
-                <Link href="/" className=" w-fit sm:w-80 h-fit">
+                <Link href="/" className=" w-fit sm:w-80 h-fit my-auto">
                     <Image
                         src="/images/WRI_logo_4c.png"
                         alt="Picture of the author"
@@ -89,7 +89,7 @@ export default function Header() {
                         className="block sm:hidden"
                     />
                 </Link>
-                <div className=" ml-auto flex mt-auto gap-x-6 ">
+                <div className=" ml-auto flex pt-2 my-auto gap-x-6 ">
                     <div className=" hidden sm:flex gap-x-6 font-semibold text-wri-black">
                         {navigation.map((item) => {
                             return (
