@@ -176,7 +176,6 @@ export function AddLayer({
                             <Tab className="hidden" id="tabEmpty"></Tab>
                             <Tab
                                 id="tabLayer"
-                                disabled={watch('rw_dataset') === false}
                                 onClick={() =>
                                     setValue(`resources.${index}.type`, 'layer')
                                 }
@@ -200,12 +199,6 @@ export function AddLayer({
                                                 )}
                                             >
                                                 Build a layer (simple, no code)
-                                                {watch('rw_dataset') ===
-                                                    false && (
-                                                    <span>
-                                                        Toggle RW Data to enable
-                                                    </span>
-                                                )}
                                             </div>
                                         </span>
                                     </DefaultTooltip>
@@ -213,7 +206,6 @@ export function AddLayer({
                             </Tab>
                             <Tab
                                 id="tabLayerRaw"
-                                disabled={watch('rw_dataset') === false}
                                 onClick={() =>
                                     setValue(
                                         `resources.${index}.type`,
@@ -240,12 +232,6 @@ export function AddLayer({
                                                 )}
                                             >
                                                 Build a layer (JSON Code)
-                                                {watch('rw_dataset') ===
-                                                    false && (
-                                                    <span>
-                                                        Toggle RW Data to enable
-                                                    </span>
-                                                )}
                                             </div>
                                         </span>
                                     </DefaultTooltip>
@@ -253,7 +239,6 @@ export function AddLayer({
                             </Tab>
                             <Tab
                                 id="tabDerived"
-                                disabled={watch('rw_dataset') === false}
                                 onClick={() =>
                                     setValue(
                                         `resources.${index}.type`,
@@ -281,12 +266,6 @@ export function AddLayer({
                                             >
                                                 Reference an existing RW layer
                                                 (read-only)
-                                                {watch('rw_dataset') ===
-                                                    false && (
-                                                    <span>
-                                                        Toggle RW Data to enable
-                                                    </span>
-                                                )}
                                             </div>
                                         </span>
                                     </DefaultTooltip>

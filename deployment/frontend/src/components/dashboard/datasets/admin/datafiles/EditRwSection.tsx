@@ -4,17 +4,13 @@ import {
     type DatasetFormType,
 } from '@/schema/dataset.schema';
 import { v4 as uuidv4 } from 'uuid';
-import { EditDataFile } from './EditDataFile';
 import { AddLayer } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection';
-import { type WriDataset } from '@/schema/ckan.schema';
 import SortableList, { SortableItem } from 'react-easy-sort';
 
 export function EditRwSection({
     formObj,
-    dataset,
 }: {
     formObj: UseFormReturn<DatasetFormType>;
-    dataset: WriDataset;
 }) {
     const { control, watch } = formObj;
     const { fields, append, remove, swap } =
@@ -71,22 +67,12 @@ export function EditRwSection({
                     return (
                         <SortableItem key={field.id}>
                             <div>
-                                {field.new ? (
-                                    <AddLayer
-                                        index={index}
-                                        field={field}
-                                        remove={() => remove(index)}
-                                        formObj={formObj}
-                                    />
-                                ) : (
-                                    <EditDataFile
-                                        index={index}
-                                        field={field}
-                                        remove={() => remove(index)}
-                                        formObj={formObj}
-                                        dataset={dataset}
-                                    />
-                                )}
+                                <AddLayer
+                                    index={index}
+                                    field={field}
+                                    remove={() => remove(index)}
+                                    formObj={formObj}
+                                />
                             </div>
                         </SortableItem>
                     );

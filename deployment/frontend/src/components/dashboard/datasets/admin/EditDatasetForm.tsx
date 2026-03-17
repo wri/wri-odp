@@ -331,7 +331,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         >
                             <EditRwSection
                                 formObj={formObj}
-                                dataset={dataset}
                             />
                         </Tab.Panel>
                         {canEditCollaborators && (

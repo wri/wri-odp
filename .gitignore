@@ -185,3 +185,4 @@ load-testing/.env
 /deployment/monitoring/hidden.sh
 /deployment/monitoring/loki-values-generated.yaml
 /temp
+.tmp-ckan/

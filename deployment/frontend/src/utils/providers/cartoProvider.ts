@@ -8,10 +8,23 @@ import type {
 } from '@vizzuality/layer-manager';
 
 type CartoData = {
-    cdn_url: {
-        templates: {
-            https: {
-                url: string;
+    cdn_url?: {
+        templates?: {
+            https?: {
+                url?: string;
+            };
+        };
+        https?: string;
+    };
+    metadata?: {
+        tilejson?: {
+            raster?: {
+                tilejson: string;
+                tiles: string[];
+            };
+            vector?: {
+                tilejson: string;
+                tiles: string[];
             };
         };
     };
@@ -87,9 +100,18 @@ export class CartoProvider implements ProviderMaker {
             .then(async (data) => {
                 const cartoData = (await data.json()) as CartoData;
                 const ext = type === 'vector' ? 'mvt' : 'png';
-                const tileUrl = `${cartoData.cdn_url.templates.https.url.replace('{s}', 'a')}/${
-                    cartoProvider.account
-                }/api/v1/map/${cartoData.layergroupid}/{z}/{x}/{y}.${ext}`;
+
+                let tileUrl: string;
+                const cdnBase = cartoData.cdn_url?.templates?.https?.url
+                    ?? cartoData.cdn_url?.https;
+                if (cdnBase) {
+                    tileUrl = `${cdnBase.replace('{s}', 'a')}/${
+                        cartoProvider.account
+                    }/api/v1/map/${cartoData.layergroupid}/{z}/{x}/{y}.${ext}`;
+                } else {
+                    tileUrl = `https://${cartoProvider.account}.carto.com/api/v1/map/${cartoData.layergroupid}/{z}/{x}/{y}.${ext}`;
+                }
+
                 const result = {
                     ...layer,
                     source: {
