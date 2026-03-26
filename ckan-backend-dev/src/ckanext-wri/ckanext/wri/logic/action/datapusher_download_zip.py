@@ -479,13 +479,16 @@ FILE_EMAIL_HTML = """
 def send_email(emails: list[str], url: str, download_filename: str):
     odp_url = config.get("ckanext.wri.odp_url")
     for email in emails:
-        mail_recipient(
-            "",
-            email,
-            "WRI - Your file is ready ({})".format(download_filename),
-            "",
-            FILE_EMAIL_HTML.format(url, download_filename, odp_url, odp_url),
-        )
+        try:
+            mail_recipient(
+                "",
+                email,
+                "WRI - Your file is ready ({})".format(download_filename),
+                "",
+                FILE_EMAIL_HTML.format(url, download_filename, odp_url, odp_url),
+            )
+        except Exception as e:
+            log.warning("Failed to send download email to %s: %s", email, e)
 
 
 ERROR_EMAIL_HTML = """
@@ -520,22 +523,28 @@ def send_error(emails: list[str], admin_emails, resource_title,dataset_team,data
     odp_url = config.get("ckanext.wri.odp_url")
     datasetName = dataset_name if dataset_name else resource_title
     for email in emails:
-        mail_recipient(
-            "",
-            email,
-            "Your WRI data file could not be delivered ({})".format(datasetName),
-            "",
-            ERROR_EMAIL_HTML.format(datasetName,odp_url,datasetName,odp_url, odp_url),
-        )
+        try:
+            mail_recipient(
+                "",
+                email,
+                "Your WRI data file could not be delivered ({})".format(datasetName),
+                "",
+                ERROR_EMAIL_HTML.format(datasetName,odp_url,datasetName,odp_url, odp_url),
+            )
+        except Exception as e:
+            log.warning("Failed to send error email to %s: %s", email, e)
 
     for email in admin_emails:
-        mail_recipient(
-            "",
-            email,
-            "WRI data file could not be delivered to one of your users  ({})".format(dataset_name),
-            "",
-            ERROR_EMAIL_HTML_ADMIN.format(datasetName,odp_url,datasetName,dataset_team),
-        )
+        try:
+            mail_recipient(
+                "",
+                email,
+                "WRI data file could not be delivered to one of your users  ({})".format(dataset_name),
+                "",
+                ERROR_EMAIL_HTML_ADMIN.format(datasetName,odp_url,datasetName,dataset_team),
+            )
+        except Exception as e:
+            log.warning("Failed to send admin error email to %s: %s", email, e)
 
 
 
