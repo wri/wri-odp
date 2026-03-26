@@ -14,6 +14,8 @@ const s3 = new S3Client({
     },
     forcePathStyle: isMinio,
     endpoint: s3Endpoint,
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
 });
 
 export default s3;
