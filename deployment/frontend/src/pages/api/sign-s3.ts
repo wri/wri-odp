@@ -46,7 +46,6 @@ export default async function handler(
                 ? `${_filePath}/${key}.${extension}`
                 : `resources/${fileHash}/${key}.${extension}`,
             ContentType: contentType as string,
-            ACL: 'public-read',
         }),
         { expiresIn: 3600 }
     );
