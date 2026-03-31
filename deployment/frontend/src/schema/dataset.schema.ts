@@ -107,6 +107,10 @@ export const ResourceSchema = z
             .enum(['address', 'geom', 'global'])
             .optional()
             .nullable(),
+        data_api_dataset_id: z.string().optional().nullable(),
+        data_api_version: z.string().optional().nullable(),
+        data_api_asset_id: z.string().optional().nullable(),
+        data_api_tiles: z.array(z.string()).optional().nullable(),
     })
     .refine(
         (obj) => {

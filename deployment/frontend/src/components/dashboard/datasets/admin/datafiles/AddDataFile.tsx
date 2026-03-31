@@ -29,6 +29,7 @@ import { useDataDictionary } from '@/utils/getDataDictionary';
 import { type Field } from 'tableschema';
 import { TileCacheForm } from './sections/TileCacheForm';
 import { GeeAssetForm } from './sections/GeeAssetForm';
+import { DataApiDatasetForm } from './sections/DataApiDatasetForm';
 
 export function AddDataFile({
     remove,
@@ -452,26 +453,10 @@ export function AddDataFile({
                                     />
                                 </Tab.Panel>
                                 <Tab.Panel>
-                                    <div className="py-4">
-                                        <div className="flex items-center gap-x-2">
-                                            <input
-                                                type="text"
-                                                placeholder="Enter dataset ID"
-                                                className="h-10 w-full max-w-md rounded-md border border-gray-300 px-3 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                            />
-                                            <button
-                                                type="button"
-                                                className="h-10 whitespace-nowrap rounded-md bg-blue-800 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-900"
-                                            >
-                                                Get Versions
-                                            </button>
-                                        </div>
-                                        <ul className="mt-4 list-disc pl-5 text-sm text-neutral-700">
-                                            <li>v1.0 — Initial release</li>
-                                            <li>v1.1 — Schema update</li>
-                                            <li>v2.0 — Major revision</li>
-                                        </ul>
-                                    </div>
+                                    <DataApiDatasetForm
+                                        formObj={formObj}
+                                        index={index}
+                                    />
                                 </Tab.Panel>
                             </Tab.Panels>
                         </Tab.Group>
