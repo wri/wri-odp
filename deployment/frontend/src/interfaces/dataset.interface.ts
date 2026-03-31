@@ -81,7 +81,12 @@ export interface Resource {
         | 'layer-raw'
         | 'tile-cache'
         | 'gee-asset'
-        | 'reference-layer';
+        | 'reference-layer'
+        | 'data-api-dataset';
+    data_api_dataset_id?: string;
+    data_api_version?: string;
+    data_api_asset_id?: string;
+    data_api_tiles?: string[];
     _hasChartView?: boolean;
     _views?: View[];
     total_record_count?: number;
@@ -90,22 +95,6 @@ export interface Resource {
     spatial_coordinates?: any;
     spatial_type?: string;
     not_downloadable?: boolean;
-}
-
-interface DatasetListQueryOptions {
-    offset: number;
-    limit: number;
-}
-interface PackageSearchOptions {
-    offset: number;
-    limit: number;
-    groups: Array<string>;
-    orgs: Array<string>;
-    tags: Array<string>;
-    query?: string;
-    resFormat?: Array<string>;
-    sort?: string;
-    include_private?: boolean;
 }
 
 interface Tag {
