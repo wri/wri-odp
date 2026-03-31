@@ -79,6 +79,7 @@ export const ResourceSchema = z
             'empty-layer',
             'layer-raw',
             'reference-layer',
+            'data-api-dataset',
         ]),
         url_type: z
             .enum([
@@ -91,6 +92,7 @@ export const ResourceSchema = z
                 'empty-layer',
                 'layer-raw',
                 'reference-layer',
+                'data-api-dataset',
             ])
             .optional()
             .nullable(),
