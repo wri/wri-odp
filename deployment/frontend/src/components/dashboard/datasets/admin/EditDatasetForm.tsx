@@ -28,7 +28,7 @@ import notify from '@/utils/notify';
 import { LoaderButton } from '@/components/_shared/Button';
 import Link from 'next/link';
 import { ErrorAlert } from '@/components/_shared/Alerts';
-import { EditDataFilesSection } from './datafiles/EditDataFilesSection';
+import { DataFilesSection } from './datafiles/DataFilesSection';
 import { useSession } from 'next-auth/react';
 import { match } from 'ts-pattern';
 import { Collaborators } from './metadata/Collaborators';
@@ -320,7 +320,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
-                            <EditDataFilesSection
+                            <DataFilesSection
                                 formObj={formObj}
                                 dataset={dataset}
                             />

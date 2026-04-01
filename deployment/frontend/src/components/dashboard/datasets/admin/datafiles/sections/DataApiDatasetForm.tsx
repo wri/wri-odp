@@ -1,9 +1,11 @@
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import classNames from '@/utils/classnames';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { Input } from '@/components/_shared/SimpleInput';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Listbox, Transition } from '@headlessui/react';
 import { type UseFormReturn } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { api } from '@/utils/api';
@@ -260,7 +262,6 @@ export function DataApiDatasetForm({
                         type="text"
                         placeholder="e.g. landmark_indigenous_and_community_lands"
                         {...register(`resources.${index}.data_api_dataset_id`)}
-                        maxWidth="max-w-md"
                     />
                     <button
                         type="button"
@@ -268,7 +269,7 @@ export function DataApiDatasetForm({
                         onClick={() => {
                             void fetchDataApiVersions();
                         }}
-                        className="h-10 whitespace-nowrap rounded-md bg-blue-800 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-900 disabled:opacity-50"
+                        className="h-12 whitespace-nowrap rounded-md bg-blue-800 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-900 disabled:opacity-50"
                     >
                         {dataApiFetching ? 'Loading...' : 'Get Versions'}
                     </button>
@@ -278,50 +279,55 @@ export function DataApiDatasetForm({
                 <p className="mt-2 text-sm text-red-600">{dataApiError}</p>
             )}
             {dataApiVersions.length > 0 && (
-                <div className="mt-8 shadow-md">
-                    <span className="font-acumin text-base p-4 font-normal text-black flex items-center gap-x-1">
-                        {dataApiVersions.length} Versions
-                    </span>
-                    <div className="mt-2 flex max-h-72 flex-col gap-y-4 overflow-y-auto">
-                        {dataApiVersions.map((v) => (
-                            <div
-                                key={v}
-                                className={classNames(
-                                    'flex flex-col gap-y-2 border-b-2 border-green-700 p-5 shadow transition hover:bg-slate-100',
-                                    selectedVersion === v ? 'bg-slate-100' : ''
-                                )}
-                            >
-                                <div className="flex flex-row items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <input
-                                            aria-label={`Select version ${v}`}
-                                            type="radio"
-                                            name={`data-api-version-${index}`}
-                                            checked={selectedVersion === v}
-                                            onChange={() => {
-                                                void fetchDataApiAssets(v);
-                                            }}
-                                            className="h-4 w-4 accent-blue-800"
-                                        />
-                                        <span
-                                            className={classNames(
-                                                'hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
-                                                'bg-sky-100'
-                                            )}
-                                        >
-                                            <span className="my-auto">
-                                                Version
-                                            </span>
-                                        </span>
-                                        <h3 className="font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900">
-                                            {v}
-                                        </h3>
-                                    </div>
-                                </div>
+                <InputGroup label="Version" required className="whitespace-nowrap">
+                    <Listbox
+                        value={selectedVersion}
+                        onChange={(v: string) => {
+                            void fetchDataApiAssets(v);
+                        }}
+                    >
+                        {({ open }) => (
+                            <div className="relative w-full max-w-md">
+                                <Listbox.Button className="relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6">
+                                    <span className="block truncate">
+                                        {selectedVersion ?? 'Select a version'}
+                                    </span>
+                                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </span>
+                                </Listbox.Button>
+                                <Transition
+                                    show={open}
+                                    as={Fragment}
+                                    leave="transition ease-in duration-100"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                        {dataApiVersions.map((v) => (
+                                            <Listbox.Option
+                                                key={v}
+                                                value={v}
+                                                className={({ active }) =>
+                                                    classNames(
+                                                        active ? 'bg-blue-800 text-white' : 'text-gray-900',
+                                                        'relative cursor-default select-none py-2 pl-3 pr-9'
+                                                    )
+                                                }
+                                            >
+                                                {({ selected }) => (
+                                                    <span className={classNames(selected ? 'font-semibold' : 'font-normal', 'block truncate')}>
+                                                        {v}
+                                                    </span>
+                                                )}
+                                            </Listbox.Option>
+                                        ))}
+                                    </Listbox.Options>
+                                </Transition>
                             </div>
-                        ))}
-                    </div>
-                </div>
+                        )}
+                    </Listbox>
+                </InputGroup>
             )}
             {assetsError && (
                 <p className="mt-2 text-sm text-red-600">{assetsError}</p>
@@ -332,67 +338,68 @@ export function DataApiDatasetForm({
                 </p>
             )}
             {!assetsFetching && selectedVersion && !assetsError && (
-                <div className="mt-8 shadow-md">
-                    <span className="font-acumin text-base p-4 font-normal text-black flex items-center gap-x-1">
-                        {dataApiAssets.length} Raster tile sets for{' '}
-                        {selectedVersion}
-                    </span>
+                <InputGroup label="Raster Tile Set" required className="whitespace-nowrap">
                     {dataApiAssets.length === 0 ? (
-                        <p className="mt-2 p-4 text-sm text-neutral-500">
+                        <p className="text-sm text-neutral-500">
                             No raster tile sets found for this version.
                         </p>
                     ) : (
-                        <div className="mt-2 flex max-h-72 flex-col gap-y-4 overflow-y-auto">
-                            {dataApiAssets.map((asset) => (
-                                <div
-                                    key={asset.asset_id}
-                                    className={classNames(
-                                        'flex flex-col gap-y-2 border-b-2 border-green-700 p-5 shadow transition hover:bg-slate-100',
-                                        selectedAssetId === asset.asset_id
-                                            ? 'bg-slate-100'
-                                            : ''
-                                    )}
-                                >
-                                    <div className="flex flex-row items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <input
-                                                aria-label={`Select asset ${asset.asset_uri}`}
-                                                type="radio"
-                                                name={`data-api-asset-${index}`}
-                                                checked={
-                                                    selectedAssetId ===
-                                                    asset.asset_id
-                                                }
-                                                onChange={() => {
-                                                    void fetchTilesInfo(
-                                                        asset.asset_id
-                                                    );
-                                                }}
-                                                className="h-4 w-4 accent-blue-800"
-                                            />
-                                            <span
-                                                className={classNames(
-                                                    'hidden h-7 w-fit p-2 items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',
-                                                    'bg-amber-100'
-                                                )}
-                                            >
-                                                {asset.asset_type}
-                                            </span>
-                                            <div>
-                                                <h3 className="font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 break-all">
-                                                    {asset.asset_uri}
-                                                </h3>
-                                                <p className="font-acumin text-xs text-neutral-400">
-                                                    {asset.status}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <Listbox
+                            value={selectedAssetId}
+                            onChange={(assetId: string) => {
+                                void fetchTilesInfo(assetId);
+                            }}
+                        >
+                            {({ open }) => (
+                                <div className="relative w-full">
+                                    <Listbox.Button className="relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6">
+                                        <span className="block truncate">
+                                            {selectedAssetId
+                                                ? (dataApiAssets.find((a) => a.asset_id === selectedAssetId)?.asset_uri ?? selectedAssetId)
+                                                : 'Select a raster tile set'}
+                                        </span>
+                                        <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                            <ChevronDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                        </span>
+                                    </Listbox.Button>
+                                    <Transition
+                                        show={open}
+                                        as={Fragment}
+                                        leave="transition ease-in duration-100"
+                                        leaveFrom="opacity-100"
+                                        leaveTo="opacity-0"
+                                    >
+                                        <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                            {dataApiAssets.map((asset) => (
+                                                <Listbox.Option
+                                                    key={asset.asset_id}
+                                                    value={asset.asset_id}
+                                                    className={({ active }) =>
+                                                        classNames(
+                                                            active ? 'bg-blue-800 text-white' : 'text-gray-900',
+                                                            'relative cursor-default select-none py-2 pl-3 pr-9'
+                                                        )
+                                                    }
+                                                >
+                                                    {({ selected, active }) => (
+                                                        <div>
+                                                            <span className={classNames(selected ? 'font-semibold' : 'font-normal', 'block truncate')}>
+                                                                {asset.asset_uri}
+                                                            </span>
+                                                            <span className={classNames(active ? 'text-blue-200' : 'text-neutral-400', 'block truncate text-xs')}>
+                                                                {asset.status}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </Listbox.Option>
+                                            ))}
+                                        </Listbox.Options>
+                                    </Transition>
                                 </div>
-                            ))}
-                        </div>
+                            )}
+                        </Listbox>
                     )}
-                </div>
+                </InputGroup>
             )}
             {tilesError && (
                 <p className="mt-2 text-sm text-red-600">{tilesError}</p>

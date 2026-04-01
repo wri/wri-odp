@@ -1,7 +1,7 @@
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import { Button, LoaderButton } from '@/components/_shared/Button';
 import { CreateDatasetTabs } from '@/components/dashboard/datasets/admin/CreateDatasetTabs';
-import { CreateDataFilesSection } from '@/components/dashboard/datasets/admin/datafiles/CreateDatafilesSection';
+import { DataFilesSection } from '@/components/dashboard/datasets/admin/datafiles/DataFilesSection';
 import { CreateLayersSection } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection';
 import { CustomFieldsForm } from '@/components/dashboard/datasets/admin/metadata/CustomFields';
 import { DescriptionForm } from '@/components/dashboard/datasets/admin/metadata/DescriptionForm';
@@ -144,7 +144,7 @@ export default function CreateDatasetForm() {
                         </form>
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
-                        <CreateDataFilesSection formObj={formObj} />
+                        <DataFilesSection formObj={formObj} />
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
                         <CreateLayersSection formObj={formObj} />
