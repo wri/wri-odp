@@ -175,7 +175,8 @@ def zipped_download_request(context: Context, data_dict: dict[str, Any]):
 
     if resource_ids:
         resolved_keys = _resolve_keys_from_resource_ids(resource_ids, dataset_id, context)
-        keys = resolved_keys if resolved_keys else keys
+        if resolved_keys:
+            keys = (keys or []) + resolved_keys
 
     if not keys:
         raise p.toolkit.ValidationError({"message": "Missing parameters: keys or resource_ids required"})

@@ -7,6 +7,7 @@ import {
     PaperClipIcon,
     MinusCircleIcon,
     Squares2X2Icon,
+    RectangleGroupIcon,
 } from '@heroicons/react/24/outline';
 import classNames from '@/utils/classnames';
 import { LinkExternalForm } from './sections/LinkExternalForm';
@@ -28,6 +29,7 @@ import { useDataDictionary } from '@/utils/getDataDictionary';
 import { type Field } from 'tableschema';
 import { TileCacheForm } from './sections/TileCacheForm';
 import { GeeAssetForm } from './sections/GeeAssetForm';
+import { DataApiDatasetForm } from './sections/DataApiDatasetForm';
 
 export function AddDataFile({
     remove,
@@ -250,12 +252,13 @@ export function AddDataFile({
                                 .with('link', () => 2)
                                 .with('tile-cache', () => 3)
                                 .with('gee-asset', () => 4)
+                                .with('data-api-dataset', () => 5)
                                 .otherwise(() => 0)}
                         >
                             <Tab.List
                                 as="div"
                                 className={classNames(
-                                    'grid max-w-[50rem] grid-cols-2 lg:grid-cols-4 gap-3 py-4',
+                                    'grid max-w-[50rem] grid-cols-2 lg:grid-cols-5 gap-3 py-4',
                                     datafile.type === 'upload' ? 'hidden' : ''
                                 )}
                             >
@@ -377,6 +380,38 @@ export function AddDataFile({
                                         </span>
                                     )}
                                 </Tab>
+                                <Tab
+                                    id="tabDataApiDataset"
+                                    onClick={() =>
+                                        setValue(
+                                            `resources.${index}.type`,
+                                            'data-api-dataset'
+                                        )
+                                    }
+                                >
+                                    {({ selected }) => (
+                                        <span
+                                            className={classNames(
+                                                'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
+                                                selected ? 'bg-amber-400' : '',
+                                                datafile.type === 'upload'
+                                                    ? 'hidden'
+                                                    : ''
+                                            )}
+                                            id="data-api-dataset-button"
+                                        >
+                                            <RectangleGroupIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
+                                            <div
+                                                className={classNames(
+                                                    'font-acumin text-xs font-normal text-black group-hover:font-bold sm:text-sm',
+                                                    selected ? 'font-bold' : ''
+                                                )}
+                                            >
+                                                Data API Dataset
+                                            </div>
+                                        </span>
+                                    )}
+                                </Tab>
                             </Tab.List>
                             <Tab.Panels as="div" className="mt-2">
                                 <Tab.Panel className="hidden"></Tab.Panel>
@@ -413,6 +448,12 @@ export function AddDataFile({
                                 </Tab.Panel>
                                 <Tab.Panel>
                                     <GeeAssetForm
+                                        formObj={formObj}
+                                        index={index}
+                                    />
+                                </Tab.Panel>
+                                <Tab.Panel>
+                                    <DataApiDatasetForm
                                         formObj={formObj}
                                         index={index}
                                     />

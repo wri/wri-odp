@@ -35,6 +35,8 @@ import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm';
 import { LinkExternalForm } from './sections/LinkExternalForm';
 import { TileCacheForm } from './sections/TileCacheForm';
 import { GeeAssetForm } from './sections/GeeAssetForm';
+import { DataApiDatasetForm } from './sections/DataApiDatasetForm';
+import { RectangleGroupIcon } from '@heroicons/react/24/outline';
 
 export function EditDataFile({
     remove,
@@ -62,7 +64,8 @@ export function EditDataFile({
             datafile.type === 'link' ||
             datafile.type === 'empty-file' ||
             datafile.type === 'tile-cache' ||
-            datafile.type === 'gee-asset'
+            datafile.type === 'gee-asset' ||
+            datafile.type === 'data-api-dataset'
     );
     const notLayersCount = notLayers.length ?? 0;
 
@@ -73,7 +76,8 @@ export function EditDataFile({
         datafile.type !== 'link' &&
         datafile.type !== 'empty-file' &&
         datafile.type !== 'tile-cache' &&
-        datafile.type !== 'gee-asset';
+        datafile.type !== 'gee-asset' &&
+        datafile.type !== 'data-api-dataset';
 
     const heading = isLayer
         ? `Layer ${index + 1 - notLayersCount}`
@@ -163,6 +167,23 @@ export function EditDataFile({
                                     </button>
                                 </>
                             ))
+                            .with('data-api-dataset', () => (
+                                <>
+                                    <div className="flex items-center gap-x-2">
+                                        <RectangleGroupIcon className="h-6 w-6 text-blue-800" />
+                                        <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
+                                            {field.title}
+                                        </span>
+                                    </div>
+                                    <button
+                                        aria-label="remove"
+                                        type="button"
+                                        onClick={() => remove()}
+                                    >
+                                        <MinusCircleIcon className="h-6 w-6 text-red-500" />
+                                    </button>
+                                </>
+                            ))
                             .with(
                                 P.union(
                                     'layer',
@@ -217,6 +238,9 @@ export function EditDataFile({
                             .with('gee-asset', () => (
                                 <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
                             ))
+                            .with('data-api-dataset', () => (
+                                <RectangleGroupIcon className="h-6 w-6 text-blue-800" />
+                            ))
                             .with('layer', () => (
                                 <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
                             ))
@@ -256,6 +280,11 @@ export function EditDataFile({
                         <LinkExternalForm formObj={formObj} index={index} />
                     ) : datafile.type === 'gee-asset' ? (
                         <GeeAssetForm formObj={formObj} index={index} />
+                    ) : datafile.type === 'data-api-dataset' ? (
+                        <DataApiDatasetForm
+                            formObj={formObj}
+                            index={index}
+                        />
                     ) : datafile.type === 'tile-cache' ? (
                         <TileCacheForm formObj={formObj} index={index} />
                     ) : (

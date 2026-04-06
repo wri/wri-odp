@@ -6,34 +6,22 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { AddDataFile } from './AddDataFile';
 import { EditDataFile } from './EditDataFile';
-import { api } from '@/utils/api';
 import { type WriDataset } from '@/schema/ckan.schema';
 import SortableList, { SortableItem } from 'react-easy-sort';
 
-export function EditDataFilesSection({
+export function DataFilesSection({
     formObj,
     dataset,
 }: {
     formObj: UseFormReturn<DatasetFormType>;
-    dataset: WriDataset;
+    dataset?: WriDataset;
 }) {
     const { control, watch } = formObj;
-    const { fields, append, prepend, remove, swap, move, insert } =
+    const { fields, remove, swap, insert } =
         useFieldArray({
-            control, // control props comes from useForm (optional: if you are using FormContext)
+            control,
             name: 'resources',
         });
-
-    const rwId = watch('rw_id');
-    const provider = watch('provider');
-    const {
-        data: datasetViews,
-        isLoading: isDatasetViewsLoading,
-        error: datasetViewsError,
-    } = api.rw.getDatasetViews.useQuery(
-        { rwDatasetId: rwId ?? '' },
-        { enabled: !!rwId }
-    );
 
     const datafiles = fields.filter(
         (r) =>
@@ -41,6 +29,8 @@ export function EditDataFilesSection({
             r.type !== 'layer-raw' &&
             r.type !== 'empty-layer'
     );
+
+    const isEditMode = !!dataset;
 
     return (
         <>
@@ -53,10 +43,11 @@ export function EditDataFilesSection({
                 draggedItemClassName="dragged"
             >
                 {datafiles.map((field, index) => {
+                    const isNew = !isEditMode || field.new;
                     return (
                         <SortableItem key={field.id}>
                             <div>
-                                {field.new ? (
+                                {isNew ? (
                                     <AddDataFile
                                         key={index}
                                         index={index}
@@ -84,11 +75,12 @@ export function EditDataFilesSection({
                     onClick={() =>
                         insert(datafiles.length, {
                             resourceId: uuidv4(),
-                            package_id: watch('id'),
+                            ...(isEditMode
+                                ? { package_id: watch('id'), new: true }
+                                : { layerObj: null }),
                             title: '',
                             type: 'empty-file',
                             format: '',
-                            new: true,
                             not_downloadable: false,
                             schema: [],
                         })
@@ -104,3 +96,4 @@ export function EditDataFilesSection({
         </>
     );
 }
+
