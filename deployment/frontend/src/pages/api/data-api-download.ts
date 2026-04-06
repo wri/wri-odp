@@ -19,9 +19,7 @@ export default async function handler(
         });
     }
 
-    const apiKey: string | undefined = env.GFW_DATA_API_KEY as
-        | string
-        | undefined;
+    const apiKey: string | undefined = env.GFW_DATA_API_KEY;
 
     if (!apiKey) {
         return res.status(400).json({
