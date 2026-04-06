@@ -22,6 +22,7 @@ import {
   DirectDownloadPopup,
   type DownloadEventForm,
 } from '@/components/_shared/DownloadPopup';
+import DefaultTooltip from '@/components/_shared/Tooltip';
 
 function tileToDownloadUrl(
   tilePath: string,
@@ -58,12 +59,18 @@ export function DataApiDatasetCard({
   diffFields,
   isCurrentVersion,
   index,
+  selected,
+  addDatafileToDownload,
+  removeDatafileToDownload,
 }: {
   datafile: Resource;
   dataset: WriDataset;
   isCurrentVersion?: boolean;
   diffFields: Array<Record<string, { old_value: string; new_value: string }>>;
   index: number;
+  selected: boolean;
+  addDatafileToDownload: (datafile: Resource) => void;
+  removeDatafileToDownload: (datafile: Resource) => void;
 }) {
   const created_at = new Date(datafile?.created ?? '');
   const last_updated = new Date(datafile?.metadata_modified ?? '');
@@ -187,6 +194,23 @@ export function DataApiDatasetCard({
             )}
           >
             <div className="flex items-center gap-3">
+              {tiles.length > 0 && (
+                <DefaultTooltip content="Select to download">
+                  <input
+                    aria-label={`Select ${datafile.title ?? datafile.name}`}
+                    type="checkbox"
+                    className="h-4 w-4 rounded bg-white"
+                    checked={selected}
+                    onChange={() => {
+                      if (selected) {
+                        removeDatafileToDownload(datafile);
+                      } else {
+                        addDatafileToDownload(datafile);
+                      }
+                    }}
+                  />
+                </DefaultTooltip>
+              )}
               <span
                 className={classNames(
                   'hidden h-7 w-fit items-center justify-center rounded-sm px-3 text-center text-xs font-normal text-black md:flex',

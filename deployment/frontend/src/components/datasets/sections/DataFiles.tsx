@@ -30,6 +30,26 @@ const LocationSearch = dynamic(() => import('./LocationSearch'), {
   ssr: false,
 });
 
+function tileToGfwDownloadUrl(
+  tilePath: string,
+  datasetId: string,
+  version: string
+): string | null {
+  const parts = tilePath.split('/');
+  if (parts.length < 12) return null;
+
+  const filename = parts[parts.length - 1];
+  const format = parts[parts.length - 2];
+  const pixelMeaning = parts[parts.length - 3];
+  const grid2 = parts[parts.length - 4];
+  const grid1 = parts[parts.length - 5];
+
+  const tileId = filename?.replace(/\.[^.]+$/, '');
+  if (!tileId || !format || !pixelMeaning || !grid1 || !grid2) return null;
+
+  return `https://data-api.globalforestwatch.org/dataset/${encodeURIComponent(datasetId)}/${encodeURIComponent(version)}/download/${encodeURIComponent(format)}?grid=${grid1}/${grid2}&tile_id=${tileId}&pixel_meaning=${pixelMeaning}`;
+}
+
 export interface LocationSearchFormType {
   bbox: Array<Array<number>> | null;
   point: Array<number> | null;
@@ -149,7 +169,10 @@ export function DataFiles({
   };
 
   const uploadedDatafiles = datafiles.filter(
-    (r) => r.url_type === 'upload' || r.url_type === 'link'
+    (r) =>
+      r.url_type === 'upload' ||
+      r.url_type === 'link' ||
+      (r.type === 'data-api-dataset' && (r.data_api_tiles?.length ?? 0) > 0)
   );
 
   const downloadZipped = api.dataset.downloadZippedResources.useMutation();
@@ -162,10 +185,24 @@ export function DataFiles({
     },
   });
 
-  const resourceIds = datafilesToDownload.map((r) => r.id).filter(Boolean);
-  const keys = datafilesToDownload
-    .map((r) => r.key ?? r.url)
-    .filter(Boolean) as string[];
+  const resourceIds = datafilesToDownload
+    .filter((r) => r.type !== 'data-api-dataset')
+    .map((r) => r.id)
+    .filter(Boolean);
+
+  const keys = datafilesToDownload.flatMap((r) => {
+    if (r.type === 'data-api-dataset') {
+      const tiles = r.data_api_tiles ?? [];
+      const dsId = r.data_api_dataset_id;
+      const ver = r.data_api_version;
+      if (!dsId || !ver) return [];
+      return tiles
+        .map((t) => tileToGfwDownloadUrl(t, dsId, ver))
+        .filter(Boolean) as string[];
+    }
+    return [r.key ?? r.url].filter(Boolean) as string[];
+  });
+
   const handleFormSubmit = (data: any) => {
     downloadZipped.mutate(
       {
@@ -299,7 +336,10 @@ export function DataFiles({
             </button>
           )}
           {datafiles.some(
-            (r) => r.url_type === 'upload' || r.url_type === 'link'
+            (r) =>
+              r.url_type === 'upload' ||
+              r.url_type === 'link' ||
+              (r.type === 'data-api-dataset' && (r.data_api_tiles?.length ?? 0) > 0)
           ) && (
               <>
                 {' '}
@@ -429,6 +469,11 @@ export function DataFiles({
                     diffFields={diffFields}
                     isCurrentVersion={isCurrentVersion}
                     index={index}
+                    selected={datafilesToDownload.some(
+                      (r) => r.id === datafile.id
+                    )}
+                    addDatafileToDownload={addDatafileToDownload}
+                    removeDatafileToDownload={removeDatafileToDownload}
                   />
                 );
               }
