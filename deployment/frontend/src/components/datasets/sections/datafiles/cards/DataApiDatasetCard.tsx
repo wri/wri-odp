@@ -23,15 +23,33 @@ import {
   type DownloadEventForm,
 } from '@/components/_shared/DownloadPopup';
 
-function tileToS3Url(tilePath: string): string | null {
-  const prefix = '/vsis3/';
-  if (!tilePath.startsWith(prefix)) return null;
-  const rest = tilePath.slice(prefix.length);
-  const slashIdx = rest.indexOf('/');
-  if (slashIdx === -1) return null;
-  const bucket = rest.slice(0, slashIdx);
-  const key = rest.slice(slashIdx + 1);
-  return `https://${bucket}.s3.amazonaws.com/${key}`;
+function tileToDownloadUrl(
+  tilePath: string,
+  datasetId: string,
+  version: string
+): string | null {
+  const parts = tilePath.split('/');
+  if (parts.length < 12) return null;
+
+  const filename = parts[parts.length - 1];
+  const format = parts[parts.length - 2];
+  const pixelMeaning = parts[parts.length - 3];
+  const grid2 = parts[parts.length - 4];
+  const grid1 = parts[parts.length - 5];
+
+  const tileId = filename?.replace(/\.[^.]+$/, '');
+  if (!tileId || !format || !pixelMeaning || !grid1 || !grid2) return null;
+
+  const params = new URLSearchParams({
+    dataset: datasetId,
+    version,
+    format,
+    grid: `${grid1}/${grid2}`,
+    tile_id: tileId,
+    pixel_meaning: pixelMeaning,
+  });
+
+  return `/api/data-api-download?${params.toString()}`;
 }
 
 export function DataApiDatasetCard({
@@ -293,7 +311,11 @@ export function DataApiDatasetCard({
                     <div className="mt-2 flex max-h-72 flex-col gap-y-2 overflow-y-auto">
                       {filteredTiles.map((tile) => {
                         const shortName = tile.split('/').pop() ?? tile;
-                        const downloadUrl = tileToS3Url(tile);
+                        const downloadUrl = tileToDownloadUrl(
+                          tile,
+                          datafile.data_api_dataset_id ?? '',
+                          datafile.data_api_version ?? ''
+                        );
                         return (
                           <div
                             key={tile}
