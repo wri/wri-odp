@@ -19,7 +19,13 @@ export default async function handler(
         });
     }
 
-    const apiKey = env.NEXT_PUBLIC_GFW_API_KEY;
+    const apiKey: string | undefined = env.GFW_DATA_API_KEY;
+
+    if (!apiKey) {
+        return res.status(400).json({
+            error: 'GFW_DATA_API_KEY is not set',
+        });
+    }
 
     const params = new URLSearchParams({
         grid: String(grid),
