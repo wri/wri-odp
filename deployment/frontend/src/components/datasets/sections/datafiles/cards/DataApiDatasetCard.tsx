@@ -23,6 +23,15 @@ import {
   type DownloadEventForm,
 } from '@/components/_shared/DownloadPopup';
 import DefaultTooltip from '@/components/_shared/Tooltip';
+import dynamic from 'next/dynamic';
+
+const TileMapPreview = dynamic(
+  () =>
+    import('@/components/_shared/TileMapPreview').then(
+      (m) => m.TileMapPreview
+    ),
+  { ssr: false }
+);
 
 function tileToDownloadUrl(
   tilePath: string,
@@ -80,7 +89,10 @@ export function DataApiDatasetCard({
     day: 'numeric',
   } as const;
 
-  const tiles = useMemo(() => datafile.data_api_tiles ?? [], [datafile.data_api_tiles]);
+  const tiles = useMemo(
+    () => [...(datafile.data_api_tiles ?? [])].sort((a, b) => a.localeCompare(b)),
+    [datafile.data_api_tiles]
+  );
 
   const higlighted = (field: string, value: string) => {
     if (diffFields && !isCurrentVersion) {
@@ -217,7 +229,7 @@ export function DataApiDatasetCard({
                   'bg-violet-100'
                 )}
               >
-                <span className="my-auto">Data API</span>
+                <span className="my-auto">Raster Tile Set</span>
               </span>
               <Disclosure.Button>
                 <h3
@@ -312,6 +324,9 @@ export function DataApiDatasetCard({
                       <span className="font-acumin text-base font-normal text-black">
                         {tiles.length} Selected TIFFs
                       </span>
+                    </div>
+                    <div className="mt-3 mb-4">
+                      <TileMapPreview tileNames={tiles} />
                     </div>
                     <div className="mt-2 flex justify-between">
                       <input

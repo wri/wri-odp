@@ -1,14 +1,23 @@
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import {
+    GlobeAmericasIcon,
+    MagnifyingGlassIcon,
+} from '@heroicons/react/24/outline';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import classNames from '@/utils/classnames';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { Input } from '@/components/_shared/SimpleInput';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
+import { Disclosure, Listbox, Transition } from '@headlessui/react';
 import { type UseFormReturn } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { api } from '@/utils/api';
+import { Button } from '@/components/_shared/Button';
+import dynamic from 'next/dynamic';
+
+const TileLocationSelect = dynamic(() => import('./TileLocationSelect'), {
+    ssr: false,
+});
 
 export function DataApiDatasetForm({
     formObj,
@@ -59,7 +68,7 @@ export function DataApiDatasetForm({
             const q = tileSearchQuery.trim().toLowerCase();
             tiles = tiles.filter((t) => t.toLowerCase().includes(q));
         }
-        return tiles;
+        return [...tiles].sort((a, b) => a.localeCompare(b));
     }, [tileNames, selectedTiles, showOnlySelectedTiles, tileSearchQuery]);
 
     function toggleTile(name: string) {
@@ -79,6 +88,13 @@ export function DataApiDatasetForm({
             tiles,
             { shouldDirty: true }
         );
+    }
+
+    function addTilesToSelection(names: string[]) {
+        if (names.length === 0) return;
+        const next = new Set(selectedTiles);
+        for (const n of names) next.add(n);
+        setAllTiles(Array.from(next));
     }
 
     useEffect(() => {
@@ -434,6 +450,39 @@ export function DataApiDatasetForm({
                                         <MagnifyingGlassIcon className="w-5 h-5 text-black" />
                                     </button>
                                 </div>
+                                <Disclosure defaultOpen>
+                                    {({ open }) => (
+                                        <>
+                                            <Disclosure.Button as={Fragment}>
+                                                <Button
+                                                    type="button"
+                                                    className="my-2 ml-auto group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3"
+                                                >
+                                                    {open
+                                                        ? 'Collapse map'
+                                                        : 'Select tiles by location'}
+                                                    <GlobeAmericasIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
+                                                </Button>
+                                            </Disclosure.Button>
+                                            <Disclosure.Panel
+                                                unmount={false}
+                                                className="pb-3 w-full"
+                                            >
+                                                <TileLocationSelect
+                                                    open={open}
+                                                    tileNames={tileNames}
+                                                    selectedTiles={
+                                                        selectedTiles
+                                                    }
+                                                    onToggleTile={toggleTile}
+                                                    onSelectTilesInArea={
+                                                        addTilesToSelection
+                                                    }
+                                                />
+                                            </Disclosure.Panel>
+                                        </>
+                                    )}
+                                </Disclosure>
                             </div>
                             <span className="font-acumin text-base font-normal text-black flex items-center gap-x-1">
                                 {filteredTiles.length} TIFFs{' '}
