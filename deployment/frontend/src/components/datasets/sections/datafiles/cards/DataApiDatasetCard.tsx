@@ -220,7 +220,7 @@ export function DataApiDatasetCard({
                   'bg-violet-100'
                 )}
               >
-                <span className="my-auto">Data API</span>
+                <span className="my-auto">Raster Tileset</span>
               </span>
               <Disclosure.Button>
                 <h3
