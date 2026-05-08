@@ -4,8 +4,11 @@ import {
     Map,
     type MapLayerMouseEvent,
     type MapRef,
+    Popup,
     Source,
 } from 'react-map-gl';
+
+type HoverInfo = { longitude: number; latitude: number; tileId: string };
 import GeocoderControl from '@/components/search/GeocoderControl';
 import DrawControl from '@/components/search/Draw';
 import { HideBoundaries } from '@/components/_shared/HideBoundaries';
@@ -103,7 +106,23 @@ export default function TileLocationSelect({
 }: TileLocationSelectProps) {
     const mapRef = useRef<MapRef | null>(null);
     const [cursor, setCursor] = useState('grab');
+    const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
     const initialFitDone = useRef(false);
+
+    const onMouseMove = useCallback((e: MapLayerMouseEvent) => {
+        const feature = e.features?.[0];
+        if (feature) {
+            setHoverInfo({
+                longitude: e.lngLat.lng,
+                latitude: e.lngLat.lat,
+                tileId: feature.properties?.name as string,
+            });
+        } else {
+            setHoverInfo(null);
+        }
+    }, []);
+
+    const onMouseLeave = useCallback(() => setHoverInfo(null), []);
 
     const parsedTiles = useMemo(() => {
         const result: ParsedTile[] = [];
@@ -257,9 +276,25 @@ export default function TileLocationSelect({
                 mapStyle="mapbox://styles/mapbox/streets-v9"
                 onClick={handleMapClick}
                 interactiveLayerIds={TILE_FILL_LAYERS}
+                onMouseMove={onMouseMove}
+                onMouseLeave={onMouseLeave}
                 cursor={cursor}
             >
                 <HideBoundaries />
+                {hoverInfo && (
+                    <Popup
+                        longitude={hoverInfo.longitude}
+                        latitude={hoverInfo.latitude}
+                        closeButton={false}
+                        closeOnClick={false}
+                        anchor="bottom"
+                        offset={6}
+                    >
+                        <span className="text-xs font-semibold text-stone-900">
+                            {hoverInfo.tileId.split('/').pop() ?? hoverInfo.tileId}
+                        </span>
+                    </Popup>
+                )}
                 <GeocoderControl
                     mapboxAccessToken={MAPBOX_TOKEN}
                     position="bottom-right"
