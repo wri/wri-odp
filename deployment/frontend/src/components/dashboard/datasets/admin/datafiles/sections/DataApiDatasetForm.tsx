@@ -59,7 +59,7 @@ export function DataApiDatasetForm({
             const q = tileSearchQuery.trim().toLowerCase();
             tiles = tiles.filter((t) => t.toLowerCase().includes(q));
         }
-        return tiles;
+        return [...tiles].sort((a, b) => a.localeCompare(b));
     }, [tileNames, selectedTiles, showOnlySelectedTiles, tileSearchQuery]);
 
     function toggleTile(name: string) {

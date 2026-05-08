@@ -80,7 +80,10 @@ export function DataApiDatasetCard({
     day: 'numeric',
   } as const;
 
-  const tiles = useMemo(() => datafile.data_api_tiles ?? [], [datafile.data_api_tiles]);
+  const tiles = useMemo(
+    () => [...(datafile.data_api_tiles ?? [])].sort((a, b) => a.localeCompare(b)),
+    [datafile.data_api_tiles]
+  );
 
   const higlighted = (field: string, value: string) => {
     if (diffFields && !isCurrentVersion) {

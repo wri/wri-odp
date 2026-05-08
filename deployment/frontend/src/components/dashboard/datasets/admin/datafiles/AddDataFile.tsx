@@ -407,7 +407,7 @@ export function AddDataFile({
                                                     selected ? 'font-bold' : ''
                                                 )}
                                             >
-                                                Data API Dataset
+                                                Link to Data API Raster Tile Set
                                             </div>
                                         </span>
                                     )}
