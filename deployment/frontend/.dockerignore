@@ -1,8 +1,40 @@
 .env
+.env.*
+!.env.example
 Dockerfile
 .dockerignore
+
+# Build outputs / caches
 node_modules
-npm-debug.log
-README.md
 .next
+.turbo
+coverage
+.eslintcache
+*.tsbuildinfo
+
+# VCS / CI
 .git
+.github
+.gitignore
+
+# Tests (not needed at runtime)
+tests
+**/__tests__
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+vitest.config.ts
+
+# Editor / OS
+.vscode
+.idea
+.DS_Store
+
+# Misc
+README.md
+README*.md
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+bun.lockb
