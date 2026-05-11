@@ -15,7 +15,7 @@ const DrawControl = dynamic(() => import('@/components/search/Draw'), {
 });
 
 const MAPBOX_TOKEN =
-    'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA';
+    process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? '';
 
 const TILE_ID_RE = /^(\d+)([NSns])_(\d+)([EWew])$/;
 

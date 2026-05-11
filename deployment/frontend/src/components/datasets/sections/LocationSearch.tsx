@@ -31,7 +31,7 @@ export default function LocationSearch({
 
   const mapRef = useRef<MapRef | null>(null);
   const accessToken =
-    'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA';
+    process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? '';
   const { data: markers } = useQuery(
     ['markers', geojsons.length],
     async () => {
@@ -131,7 +131,7 @@ export default function LocationSearch({
       ref={(_map) => {
         if (_map) mapRef.current = _map.getMap() as unknown as MapRef;
       }}
-      mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+      mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       style={{ height: 300 }}
       dragRotate={false}
       initialViewState={{
@@ -146,7 +146,7 @@ export default function LocationSearch({
     >
       <HideBoundaries />
       <GeocoderControl
-        mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         position="bottom-right"
         placeholder="Search Data Files by location"
         initialValue={formObj.getValues('location')}
