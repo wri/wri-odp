@@ -9,7 +9,7 @@ import {
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import { type Resource } from '@/interfaces/dataset.interface';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { type WriDataset } from '@/schema/ckan.schema';
 import { api } from '@/utils/api';
 import { toast } from 'react-toastify';
@@ -93,6 +93,59 @@ export function DataApiDatasetCard({
     () => [...(datafile.data_api_tiles ?? [])].sort((a, b) => a.localeCompare(b)),
     [datafile.data_api_tiles]
   );
+
+  const [selectedTilesForDownload, setSelectedTilesForDownload] = useState<Set<string>>(
+    () => new Set(datafile.data_api_tiles ?? [])
+  );
+
+  // Keeps the download queue entry in sync with tile selection.
+  // Removes any stale entry then adds a fresh one with the new tile list.
+  const syncQueue = useCallback(
+    (next: Set<string>) => {
+      if (!selected) return;
+      removeDatafileToDownload(datafile);
+      if (next.size > 0) {
+        addDatafileToDownload({ ...datafile, data_api_tiles: Array.from(next) });
+      }
+    },
+    [selected, datafile, addDatafileToDownload, removeDatafileToDownload]
+  );
+
+  const toggleTileForDownload = useCallback(
+    (name: string) => {
+      setSelectedTilesForDownload((prev) => {
+        const next = new Set(prev);
+        if (next.has(name)) next.delete(name);
+        else next.add(name);
+        syncQueue(next);
+        return next;
+      });
+    },
+    [syncQueue]
+  );
+
+  const addTilesInAreaForDownload = useCallback(
+    (names: string[]) => {
+      setSelectedTilesForDownload((prev) => {
+        const next = new Set(prev);
+        for (const n of names) next.add(n);
+        syncQueue(next);
+        return next;
+      });
+    },
+    [syncQueue]
+  );
+
+  const handleResourceCheckbox = () => {
+    if (selected) {
+      removeDatafileToDownload(datafile);
+    } else {
+      const toDownload = selectedTilesForDownload.size > 0
+        ? Array.from(selectedTilesForDownload)
+        : tiles;
+      addDatafileToDownload({ ...datafile, data_api_tiles: toDownload });
+    }
+  };
 
   const higlighted = (field: string, value: string) => {
     if (diffFields && !isCurrentVersion) {
@@ -207,19 +260,13 @@ export function DataApiDatasetCard({
           >
             <div className="flex items-center gap-3">
               {tiles.length > 0 && (
-                <DefaultTooltip content="Select to download">
+                <DefaultTooltip content={selected ? 'Remove from download' : 'Add to download'}>
                   <input
                     aria-label={`Select ${datafile.title ?? datafile.name}`}
                     type="checkbox"
                     className="h-4 w-4 rounded bg-white"
                     checked={selected}
-                    onChange={() => {
-                      if (selected) {
-                        removeDatafileToDownload(datafile);
-                      } else {
-                        addDatafileToDownload(datafile);
-                      }
-                    }}
+                    onChange={handleResourceCheckbox}
                   />
                 </DefaultTooltip>
               )}
@@ -320,13 +367,51 @@ export function DataApiDatasetCard({
                 </div>
                 {tiles.length > 0 && (
                   <div className="mt-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
                       <span className="font-acumin text-base font-normal text-black">
-                        {tiles.length} Selected TIFFs
+                        {tiles.length} TIFFs
+                        {selectedTilesForDownload.size > 0 && selectedTilesForDownload.size < tiles.length && (
+                          <span className="ml-1 text-sm text-neutral-500">
+                            ({selectedTilesForDownload.size} selected for download)
+                          </span>
+                        )}
                       </span>
+                      <div className="flex gap-x-3 text-sm">
+                        {selectedTilesForDownload.size < tiles.length && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = new Set(tiles);
+                              setSelectedTilesForDownload(next);
+                              syncQueue(next);
+                            }}
+                            className="underline text-black"
+                          >
+                            Select all
+                          </button>
+                        )}
+                        {selectedTilesForDownload.size > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = new Set<string>();
+                              setSelectedTilesForDownload(next);
+                              syncQueue(next);
+                            }}
+                            className="underline text-black"
+                          >
+                            Deselect all
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div className="mt-3 mb-4">
-                      <TileMapPreview tileNames={tiles} />
+                      <TileMapPreview
+                        tileNames={tiles}
+                        selectedTiles={selectedTilesForDownload}
+                        onToggleTile={toggleTileForDownload}
+                        onSelectTilesInArea={addTilesInAreaForDownload}
+                      />
                     </div>
                     <div className="mt-2 flex justify-between">
                       <input
@@ -347,9 +432,10 @@ export function DataApiDatasetCard({
                         Showing {filteredTiles.length} of {tiles.length}
                       </p>
                     )}
-                    <div className="mt-2 flex max-h-72 flex-col gap-y-2 overflow-y-auto">
+                    <div className="mt-2 flex max-h-72 flex-col gap-y-2 p-2 overflow-y-auto">
                       {filteredTiles.map((tile) => {
                         const shortName = tile.split('/').pop() ?? tile;
+                        const isChecked = selectedTilesForDownload.has(tile);
                         const downloadUrl = tileToDownloadUrl(
                           tile,
                           datafile.data_api_dataset_id ?? '',
@@ -358,9 +444,21 @@ export function DataApiDatasetCard({
                         return (
                           <div
                             key={tile}
-                            className="flex items-center justify-between gap-3 rounded-md bg-white p-3 shadow ring-1 ring-gray-200"
+                            className={classNames(
+                              'flex items-center justify-between gap-3 rounded-md bg-white p-3 shadow ring-1',
+                              isChecked ? 'ring-green-700' : 'ring-gray-200'
+                            )}
                           >
                             <div className="flex items-center gap-3 min-w-0">
+                              <DefaultTooltip content={isChecked ? 'Remove from download' : 'Add to download'}>
+                                <input
+                                  type="checkbox"
+                                  aria-label={`Select ${shortName}`}
+                                  className="h-4 w-4 shrink-0 rounded bg-white"
+                                  checked={isChecked}
+                                  onChange={() => toggleTileForDownload(tile)}
+                                />
+                              </DefaultTooltip>
                               <span
                                 className={classNames(
                                   'hidden h-6 w-fit shrink-0 items-center justify-center rounded-sm px-2 text-center text-xs font-normal text-black md:flex',

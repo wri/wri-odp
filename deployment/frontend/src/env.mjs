@@ -53,6 +53,7 @@ export const env = createEnv({
      * `NEXT_PUBLIC_`.
      */
     client: {
+        NEXT_PUBLIC_MAPBOX_TOKEN: z.string(),
         NEXT_PUBLIC_CKAN_URL: z.string(),
         NEXT_PUBLIC_NEXTAUTH_URL: z.string(),
         NEXT_PUBLIC_GTM_ID: z.string(),
@@ -74,6 +75,7 @@ export const env = createEnv({
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,
         CKAN_URL: process.env.CKAN_URL,
         PREFECT_INTERNAL_URL: process.env.PREFECT_INTERNAL_URL,
+        NEXT_PUBLIC_MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN,
         NEXT_PUBLIC_CKAN_URL: process.env.NEXT_PUBLIC_CKAN_URL,
         S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
         S3_SECRET_KEY_ID: process.env.S3_SECRET_KEY_ID,

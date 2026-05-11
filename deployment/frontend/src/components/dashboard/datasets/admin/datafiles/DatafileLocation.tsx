@@ -211,7 +211,7 @@ export function DatafileLocation({
                         <Tab.Panel>
                             {watch(`resources.${index}.spatial_geom`) && (
                                 <Map
-                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+                                    mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
                                     style={{ height: 300 }}
                                     mapStyle="mapbox://styles/mapbox/streets-v9"
                                     dragRotate={false}
@@ -250,7 +250,7 @@ export function DatafileLocation({
                         </Tab.Panel>
                         <Tab.Panel id={`choose-address-${index}`}>
                             <Map
-                                mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+                                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
                                 style={{ height: 300 }}
                                 mapStyle="mapbox://styles/mapbox/streets-v9"
                                 dragRotate={false}
@@ -258,7 +258,7 @@ export function DatafileLocation({
                             >
                                 <HideBoundaries />
                                 <GeocoderControl
-                                    mapboxAccessToken="pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA"
+                                    mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
                                     position="bottom-right"
                                     onResult={(e) => {
                                         setValue(

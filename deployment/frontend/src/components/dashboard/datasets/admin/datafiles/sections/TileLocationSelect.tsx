@@ -14,7 +14,7 @@ import DrawControl from '@/components/search/Draw';
 import { HideBoundaries } from '@/components/_shared/HideBoundaries';
 
 const MAPBOX_TOKEN =
-    'pk.eyJ1IjoicmVzb3VyY2V3YXRjaCIsImEiOiJjbHNueG5idGIwOXMzMmp0ZzE1NWVjZDV1In0.050LmRm-9m60lrzhpsKqNA';
+    process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? '';
 
 const TILE_FILL_LAYERS = [
     'tiles-unselected-fill',
