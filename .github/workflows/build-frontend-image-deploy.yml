@@ -56,6 +56,7 @@ jobs:
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}
           NEXT_PUBLIC_GTM_ID: ${{ vars[format('{0}_NEXT_PUBLIC_GTM_ID', steps.prefix.outputs.val)] }}
           NEXT_PUBLIC_HOTJAR_ID: ${{ vars[format('{0}_NEXT_PUBLIC_HOTJAR_ID', steps.prefix.outputs.val)] }}
+          NEXT_PUBLIC_MAPBOX_TOKEN: ${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}
           FRONTEND_NEXTAUTH_URL: ${{ vars[format('{0}_FRONTEND_NEXTAUTH_URL', steps.prefix.outputs.val)] }}
           FRONTEND_CKAN_URL: ${{ vars[format('{0}_FRONTEND_CKAN_URL', steps.prefix.outputs.val)] }}
         run: |
@@ -70,6 +71,7 @@ jobs:
             --build-arg NEXT_PUBLIC_DISABLE_HOTJAR="enabled" \
             --build-arg NEXT_PUBLIC_HOTJAR_ID="${NEXT_PUBLIC_HOTJAR_ID:-dummy-hotjar-id}" \
             --build-arg NEXT_PUBLIC_GFW_API_KEY="dummy-api-key" \
+            --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="${NEXT_PUBLIC_MAPBOX_TOKEN:-pk.dummy_mapbox_token}" \
             --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js" \
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
             --build-arg SYS_ADMIN_API_KEY=${{ env.SYS_ADMIN_API_KEY }} \
