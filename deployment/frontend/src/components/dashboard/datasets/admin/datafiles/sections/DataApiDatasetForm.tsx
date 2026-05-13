@@ -235,7 +235,7 @@ export function DataApiDatasetForm({
             setTileSearchQuery('');
             setShowOnlySelectedTiles(false);
             setValue(`resources.${index}.data_api_asset_id`, assetId, { shouldDirty: true });
-            setValue(`resources.${index}.data_api_tiles`, null, { shouldDirty: true });
+            setValue(`resources.${index}.data_api_tiles`, names, { shouldDirty: true });
         } catch (err) {
             const message =
                 err instanceof Error ? err.message : 'Unknown error';
