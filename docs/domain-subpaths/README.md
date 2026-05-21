@@ -133,7 +133,6 @@ When the pipeline is running in GitHub Actions, a different method is used to se
           - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
           - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
           - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
-          - NEXT_PUBLIC_GFW_API_KEY="1111"
           - OSANO_URL="YOUR_OSANO_URL/osano.js"
           - NEXT_PUBLIC_DEPLOYMENT_TYPE="dev"
       environment:

@@ -59,7 +59,6 @@ export const env = createEnv({
         NEXT_PUBLIC_GTM_ID: z.string(),
         NEXT_PUBLIC_DISABLE_HOTJAR: z.string(),
         NEXT_PUBLIC_HOTJAR_ID: z.string(),
-        NEXT_PUBLIC_GFW_API_KEY: z.string(),
         NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL: z.string(),
         NEXT_PUBLIC_DEPLOYMENT_TYPE: z.string(),
     },
@@ -98,7 +97,6 @@ export const env = createEnv({
         NEXT_PUBLIC_DISABLE_HOTJAR:
             process.env.NEXT_PUBLIC_DISABLE_HOTJAR || 'enabled',
         NEXT_PUBLIC_HOTJAR_ID: process.env.NEXT_PUBLIC_HOTJAR_ID,
-        NEXT_PUBLIC_GFW_API_KEY: process.env.NEXT_PUBLIC_GFW_API_KEY,
         OSANO_URL: process.env.OSANO_URL,
         GFW_DATA_API_KEY: process.env.GFW_DATA_API_KEY,
         NEXT_PUBLIC_WRI_PRIVACY_POLICY_URL:

@@ -40,7 +40,6 @@ services:
   #       - NEXT_PUBLIC_GTM_ID=GTM-XXXXXX
   #       - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
   #       - NEXT_PUBLIC_HOTJAR_ID=0
-  #       - NEXT_PUBLIC_GFW_API_KEY=1111
   #       - OSANO_URL=YOUR_OSANO_URL/osano.js
   #       - NEXT_PUBLIC_DEPLOYMENT_TYPE=dev
   #   environment:
