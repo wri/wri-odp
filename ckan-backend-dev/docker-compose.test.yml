@@ -44,7 +44,6 @@ services:
         - NEXT_PUBLIC_GTM_ID=AAAAAAAAA
         - NEXT_PUBLIC_DISABLE_HOTJAR=disabled
         - NEXT_PUBLIC_HOTJAR_ID=AAAAAAAAA
-        - NEXT_PUBLIC_GFW_API_KEY="1111"
         - NEXT_PUBLIC_MAPBOX_TOKEN=pk.dummy_token_for_local_testing
         - OSANO_URL="YOUR_OSANO_URL/osano.js"
         - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
@@ -70,7 +69,7 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM=${SMTP_FROM}
       - PREFECT_INTERNAL_URL=http://prefect:4200
-      - NEXT_PUBLIC_GFW_API_KEY="1111"
+      - GFW_DATA_API_KEY=
       - NEXT_PUBLIC_MAPBOX_TOKEN=pk.dummy_token_for_local_testing
       - OSANO_URL="YOUR_OSANO_URL/osano.js"
       - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff

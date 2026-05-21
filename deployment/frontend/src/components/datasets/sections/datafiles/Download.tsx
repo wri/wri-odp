@@ -12,7 +12,6 @@ import {
     ArrowTopRightOnSquareIcon,
     PaperAirplaneIcon,
 } from '@heroicons/react/24/outline';
-import { env } from '@/env.mjs';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -59,8 +58,35 @@ export function DownloadButton({
 
     if (mode == 'RES_URL' && datafile.url) {
         originalResourceDownloadUrl = datafile.url;
+        // GFW data-api downloads require an api key. Route through our
+        // server-side proxy (/api/data-api-download) so the key stays on the
+        // server and is read from process.env at runtime instead of being
+        // baked into the client bundle via NEXT_PUBLIC_*.
         if (originalResourceDownloadUrl.includes('data-api')) {
-            originalResourceDownloadUrl += `&x-api-key=${env.NEXT_PUBLIC_GFW_API_KEY}`;
+            try {
+                const u = new URL(originalResourceDownloadUrl);
+                const m = u.pathname.match(
+                    /^\/dataset\/([^/]+)\/([^/]+)\/download\/([^/]+)\/?$/
+                );
+                const grid = u.searchParams.get('grid');
+                const tileId = u.searchParams.get('tile_id');
+                const pixelMeaning = u.searchParams.get('pixel_meaning');
+                if (m && grid && tileId && pixelMeaning) {
+                    const [, datasetParam, version, format] = m;
+                    const params = new URLSearchParams({
+                        dataset: datasetParam!,
+                        version: version!,
+                        format: format!,
+                        grid,
+                        tile_id: tileId,
+                        pixel_meaning: pixelMeaning,
+                    });
+                    originalResourceDownloadUrl = `/api/data-api-download?${params.toString()}`;
+                }
+            } catch {
+                // Leave the URL untouched if it can't be parsed — the user
+                // will hit GFW directly without a key and see a clear 401.
+            }
         }
     } else if (mode == 'SIGNED_URL' && signedUrl && !isLoading) {
         originalResourceDownloadUrl = signedUrl;

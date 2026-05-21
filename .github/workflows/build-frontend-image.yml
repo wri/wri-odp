@@ -147,7 +147,6 @@ jobs:
             --build-arg NEXT_PUBLIC_GTM_ID="dummy-gtm-id" \
             --build-arg NEXT_PUBLIC_DISABLE_HOTJAR="disabled" \
             --build-arg NEXT_PUBLIC_HOTJAR_ID="dummy-hotjar-id" \
-            --build-arg NEXT_PUBLIC_GFW_API_KEY="dummy-api-key" \
             --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="pk.dummy_mapbox_token_for_ci" \
             --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js" \
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
