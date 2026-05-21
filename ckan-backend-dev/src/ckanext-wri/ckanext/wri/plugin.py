@@ -99,6 +99,35 @@ import json
 log = logging.getLogger(__name__)
 
 
+# CKAN core calls ``smtplib.SMTP("host:port")`` in ``ckan.lib.mailer``. CPython's
+# ``smtplib.SMTP.__init__`` assigns the *raw* ``host`` argument to ``self._host``
+# before ``connect()`` strips the ``:port`` suffix, so ``self._host`` retains the
+# port. ``starttls()`` later passes ``server_hostname=self._host`` as the TLS SNI
+# value, which AWS SES rejects with ``SSLV3_ALERT_ILLEGAL_PARAMETER`` because the
+# SNI must be a valid DNS name. Strip a trailing ``:<port>`` after construction
+# so SNI is well-formed. Safe for any SMTP server, not just SES.
+def _install_smtplib_sni_fix() -> None:
+    import smtplib
+
+    if getattr(smtplib.SMTP.__init__, "_wri_sni_patch", False):
+        return
+
+    _orig_smtp_init = smtplib.SMTP.__init__
+
+    def _smtp_init(self, host="", *args, **kwargs):
+        _orig_smtp_init(self, host, *args, **kwargs)
+        h = getattr(self, "_host", "") or ""
+        if h.count(":") == 1:
+            self._host = h.split(":", 1)[0]
+
+    _smtp_init._wri_sni_patch = True
+    smtplib.SMTP.__init__ = _smtp_init
+    smtplib.SMTP_SSL.__init__ = _smtp_init
+
+
+_install_smtplib_sni_fix()
+
+
 class WriPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IConfigurable)
