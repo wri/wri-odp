@@ -65,8 +65,8 @@ export function DownloadButton({
         if (originalResourceDownloadUrl.includes('data-api')) {
             try {
                 const u = new URL(originalResourceDownloadUrl);
-                const m = u.pathname.match(
-                    /^\/dataset\/([^/]+)\/([^/]+)\/download\/([^/]+)\/?$/
+                const m = /^\/dataset\/([^/]+)\/([^/]+)\/download\/([^/]+)\/?$/.exec(
+                    u.pathname
                 );
                 const grid = u.searchParams.get('grid');
                 const tileId = u.searchParams.get('tile_id');
