@@ -77,6 +77,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 EXPOSE 3000
 ENV PORT 3000
+# Next.js standalone uses HOSTNAME as the bind address. Kubernetes sets
+# HOSTNAME to the pod name, making the server listen only on the pod IP and
+# refuse loopback connections (breaks kubectl port-forward). Bind everywhere.
+ENV HOSTNAME 0.0.0.0
 ENV NODE_OPTIONS='-r /app/bypassApiTrackingFetch.js --experimental-fetch'
 
 CMD ["node", "server.js"]
