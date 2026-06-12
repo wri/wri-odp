@@ -39,13 +39,9 @@ grafana:
         hosts:
           - {{GRAFANA_DOMAIN}}
   
-  # Additional data sources (Loki)
-  additionalDataSources:
-    - name: Loki
-      type: loki
-      url: http://loki:3100
-      access: proxy
-      isDefault: false
+  # Loki datasource is provisioned by the loki-stack release (see loki-stack.loki.isDefault),
+  # so it is intentionally NOT redefined here to avoid a duplicate datasource and a
+  # "only one datasource can be marked as default" provisioning failure.
   
   # Default dashboards
   defaultDashboardsEnabled: true
@@ -73,6 +69,7 @@ prometheus:
       volumeClaimTemplate:
         spec:
           accessModes: ["ReadWriteOnce"]
+          storageClassName: "{{STORAGE_CLASS}}"
           resources:
             requests:
               storage: {{PROMETHEUS_STORAGE_SIZE}}
@@ -104,6 +101,7 @@ alertmanager:
       volumeClaimTemplate:
         spec:
           accessModes: ["ReadWriteOnce"]
+          storageClassName: "{{STORAGE_CLASS}}"
           resources:
             requests:
               storage: {{ALERTMANAGER_STORAGE_SIZE}}
@@ -226,6 +224,9 @@ additionalPrometheusRulesMap:
 loki-stack:
   loki:
     enabled: true
+    # Prometheus (from kube-prometheus-stack) is the single default datasource.
+    # Keep this false so Grafana does not see two defaults and fail provisioning.
+    isDefault: false
     
     persistence:
       enabled: true

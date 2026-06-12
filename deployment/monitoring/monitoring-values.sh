@@ -14,7 +14,9 @@
 #   SLACK_WEBHOOK_URL       - Slack webhook for alerts (default: empty)
 #   SLACK_CHANNEL           - Slack channel for alerts (default: #wri-alerts)
 #   ALERT_RECEIVER          - Alert receiver name (default: slack, use 'null' to disable)
-#   STORAGE_CLASS           - Kubernetes storage class (default: empty = cluster default)
+#   STORAGE_CLASS           - Kubernetes storage class (default: gp2). Must be a real
+#                             provisioning class; an empty value disables dynamic provisioning
+#                             and leaves Prometheus/Alertmanager PVCs stuck in Pending.
 #   CERT_MANAGER_ISSUER     - Cert-manager issuer name (default: cert-manager)
 #   GRAFANA_INGRESS_ENABLED - Enable Grafana ingress (default: true)
 #   GRAFANA_STORAGE_SIZE    - Grafana PVC size (default: 10Gi)
@@ -83,7 +85,7 @@ export GRAFANA_ADMIN_PASSWORD
 export GRAFANA_DOMAIN
 
 # Set and export defaults for optional variables
-export STORAGE_CLASS="${STORAGE_CLASS:-}"
+export STORAGE_CLASS="${STORAGE_CLASS:-gp2}"
 export CERT_MANAGER_ISSUER="${CERT_MANAGER_ISSUER:-cert-manager}"
 export GRAFANA_INGRESS_ENABLED="${GRAFANA_INGRESS_ENABLED:-true}"
 export GRAFANA_STORAGE_SIZE="${GRAFANA_STORAGE_SIZE:-10Gi}"

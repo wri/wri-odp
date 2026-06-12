@@ -36,7 +36,7 @@ The monitoring stack is deployed in a dedicated `monitoring` namespace and colle
 | `SLACK_WEBHOOK_URL` | (empty) | Slack webhook for alerts |
 | `SLACK_CHANNEL` | `#wri-alerts` | Slack channel for alerts |
 | `ALERT_RECEIVER` | `slack` | Alert receiver (`slack` or `null`) |
-| `STORAGE_CLASS` | (cluster default) | Kubernetes storage class |
+| `STORAGE_CLASS` | `gp2` | Kubernetes storage class (must be a real provisioner; empty disables provisioning) |
 | `CERT_MANAGER_ISSUER` | `cert-manager` | Cert-manager issuer name |
 | `GRAFANA_INGRESS_ENABLED` | `true` | Enable Grafana ingress |
 | `GRAFANA_STORAGE_SIZE` | `10Gi` | Grafana PVC size |
