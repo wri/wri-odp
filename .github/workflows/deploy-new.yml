@@ -303,7 +303,7 @@ jobs:
         run: |
           echo "Deploying environment '$BRANCH_NAME' to cluster '$TARGET_CLUSTER'"
           mkdir -p /home/runner/.kube
-          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name "$TARGET_CLUSTER" --role-arn ${{ secrets.KUBEROLE }}
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name "$TARGET_CLUSTER"
           chmod 600 ~/.kube/config
 
       - name: Verify target cluster before deploy
@@ -319,6 +319,13 @@ jobs:
             echo "::error::This workflow must not deploy to the old cluster (ckan-dev). Use deploy.yml instead."
             exit 1
           fi
+          # Authenticated API call so auth problems fail fast and loudly here,
+          # instead of surfacing as "cluster unreachable" inside helm
+          if ! kubectl get --raw /version >/dev/null; then
+            echo "::error::Authenticated call to $TARGET_CLUSTER failed (401?). Check that the CI role has an EKS Access Entry on this cluster: aws eks list-access-entries --cluster-name $TARGET_CLUSTER"
+            exit 1
+          fi
+          echo "Cluster API auth OK"
           # The *-envvars secrets are managed out-of-band (wri-odp-secrets repo)
           # and must exist before the helm release can start pods
           NS="$PROJECT_NAME-$BRANCH_NAME"
