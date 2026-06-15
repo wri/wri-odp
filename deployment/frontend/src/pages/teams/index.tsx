@@ -8,10 +8,7 @@ import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '@/components/datasets/Pagination';
 import { type GroupTree } from '@/schema/ckan.schema';
 import { getServerAuthSession } from '@/server/auth';
-import {
-    type GetServerSidePropsContext,
-    type InferGetServerSidePropsType,
-} from 'next';
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next';
 import { appRouter } from '@/server/api/root';
 import { createServerSideHelpers } from '@trpc/react-query/server';
 import superjson from 'superjson';
@@ -22,9 +19,7 @@ import { type Organization as CkanOrg } from '@portaljs/ckan';
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2';
 import TopicsSearch from '@/components/topics/TopicsSearch';
 
-const TeamsSearchResults = dynamic(
-    () => import('@/components/team/TeamsSearchResults')
-);
+const TeamsSearchResults = dynamic(() => import('@/components/team/TeamsSearchResults'));
 
 type Organization = CkanOrg & { numSubTeams: number };
 
@@ -48,9 +43,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
 }
 
-export default function TeamsPage(
-    props: InferGetServerSidePropsType<typeof getServerSideProps>
-) {
+export default function TeamsPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [pagination, setPagination] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
@@ -85,12 +78,10 @@ export default function TeamsPage(
                 ? (data?.allTeams
                       ?.filter((t) => indexTeams.search(query).includes(t.id))
                       .filter(
-                          (obj, index, self) =>
-                              index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+                          (obj, index, self) => index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
                       ) ?? [])
                 : data.teams.filter(
-                      (obj, index, self) =>
-                          index === self.findIndex((t) => t.id === obj.id)
+                      (obj, index, self) => index === self.findIndex((t) => t.id === obj.id)
                   ); // Compare based on 'id' property
         const teams = filteredTeams.slice(
             pagination.page.start,
@@ -140,15 +131,10 @@ export default function TeamsPage(
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        This page lets you explore all the data associated with
-                        a specific WRI project or team.
-                        <br />
-                        If you have questions about a project&apos;s data reach
-                        out to the point of contact in the Dataset or to{' '}
-                        <a
-                            href="mailto:data@wri.org"
-                            className="text-blue-700 underline"
-                        >
+                        Browse datasets by WRI project or team to find data associated with specific
+                        programs and initiatives. If you have questions about a dataset, contact the
+                        listed point of contact or{' '}
+                        <a href="mailto:data@wri.org" className="text-blue-700 underline">
                             {' '}
                             data@wri.org
                         </a>
@@ -163,11 +149,7 @@ export default function TeamsPage(
             ) : (
                 <>
                     <TeamsSearchResults
-                        filtered={
-                            query !== '' &&
-                            query !== null &&
-                            typeof query !== 'undefined'
-                        }
+                        filtered={query !== '' && query !== null && typeof query !== 'undefined'}
                         count={filteredTeams.count}
                         teams={filteredTeams?.teams}
                         teamsDetails={filteredTeams?.teamsDetails}
