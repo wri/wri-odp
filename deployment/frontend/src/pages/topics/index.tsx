@@ -9,10 +9,7 @@ import type { SearchInput } from '@/schema/search.schema';
 import { type GroupTree } from '@/schema/ckan.schema';
 import Pagination from '@/components/datasets/Pagination';
 import { getServerAuthSession } from '@/server/auth';
-import {
-    type GetServerSidePropsContext,
-    type InferGetServerSidePropsType,
-} from 'next';
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next';
 import { appRouter } from '@/server/api/root';
 import { createServerSideHelpers } from '@trpc/react-query/server';
 import superjson from 'superjson';
@@ -23,9 +20,7 @@ import { type Group as CkanGroup } from '@portaljs/ckan';
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2';
 type Group = CkanGroup & { numSubtopics: number };
 
-const TopicsSearchResults = dynamic(
-    () => import('@/components/topics/TopicsSearchResults')
-);
+const TopicsSearchResults = dynamic(() => import('@/components/topics/TopicsSearchResults'));
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context);
@@ -47,9 +42,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
 }
 
-export default function TopicsPage(
-    props: InferGetServerSidePropsType<typeof getServerSideProps>
-) {
+export default function TopicsPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [pagination, setPagination] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
@@ -82,21 +75,15 @@ export default function TopicsPage(
                 ? (data?.allTopics
                       ?.filter((t) => indexTopics.search(query).includes(t.id))
                       .filter(
-                          (obj, index, self) =>
-                              index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+                          (obj, index, self) => index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
                       ) ?? [])
                 : data.topics.filter(
-                      (obj, index, self) =>
-                          index === self.findIndex((t) => t.id === obj.id)
+                      (obj, index, self) => index === self.findIndex((t) => t.id === obj.id)
                   ); // Compare based on 'id' property
         const topics = filteredTopics
-            ?.slice(
-                pagination.page.start,
-                pagination.page.start + pagination.page.rows
-            )
+            ?.slice(pagination.page.start, pagination.page.start + pagination.page.rows)
             .filter(
-                (obj, index, self) =>
-                    index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
+                (obj, index, self) => index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
             ) as GroupTree[] | Group[];
         const topicDetails = data.topicDetails;
         return { topics, topicDetails, count: filteredTopics?.length };
@@ -125,12 +112,16 @@ export default function TopicsPage(
                 query={query}
                 groupType="Topics"
             />
+            <section className="max-w-8xl mx-auto px-8 xxl:px-0 pt-1">
+                <p className="ml-2 text-sm text-neutral-500">
+                    Banner image by Chris Barbalis / Unsplash
+                </p>
+            </section>
             <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-acumin text-xl font-light leading-loose text-neutral-700 ">
-                        Explore reliable Datasets filtered by the topic of your
-                        interest.
+                        Browse datasets by topic to find data relevant to your work.
                     </h3>
                 </div>
             </section>
@@ -141,11 +132,7 @@ export default function TopicsPage(
             ) : (
                 <>
                     <TopicsSearchResults
-                        filtered={
-                            query !== '' &&
-                            query !== null &&
-                            typeof query !== 'undefined'
-                        }
+                        filtered={query !== '' && query !== null && typeof query !== 'undefined'}
                         count={filteredTopics?.count ?? 0}
                         topics={filteredTopics.topics}
                         topicDetails={filteredTopics.topicDetails}
