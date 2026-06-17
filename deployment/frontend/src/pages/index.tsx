@@ -123,6 +123,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                 href="https://www.wri.org/data/open-data-commitment"
                                 className=" text-blue-600 underline"
                                 target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 Open Data Commitment
                             </a>
