@@ -52,10 +52,7 @@ describe("Home page", () => {
         [...new Array(2).keys()].map((k, i) => {
           const name = getRandomDatasetName();
           cy.createDatasetAPI(i < 7 ? orgs[0] : orgs[1], name, true, {
-            groups: [
-              { name: topic1 },
-              { name: topic2 },
-            ],
+            groups: [{ name: topic1 }, { name: topic2 }],
             featured_dataset: true,
             tags: i < 7 ? [{ name: "tags 1" }] : [{ name: "tags 2" }],
             temporal_coverage_start: i < 7 ? 2005 : 2010,
@@ -74,7 +71,7 @@ describe("Home page", () => {
 
   it("display home page", () => {
     cy.visit("/");
-    cy.contains("Data Explorer - Beta");
+    cy.contains("Find and Use Open Data on Climate, Nature and Development");
     cy.contains("Highlights");
   });
 
