@@ -16,10 +16,7 @@ import { useMemo, useRef } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 import { DataFileAccordion } from './DatafileAccordion';
 import { match, P } from 'ts-pattern';
-import {
-    type DatasetFormType,
-    type ResourceFormType,
-} from '@/schema/dataset.schema';
+import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema';
 import Uppy, { type UppyFile, type Meta } from '@uppy/core';
 import AwsS3 from '@uppy/aws-s3';
 import { getUploadParameters } from '@/utils/uppyFunctions';
@@ -44,6 +41,7 @@ export function AddDataFile({
 }) {
     const { setValue, watch } = formObj;
     const datafile = watch(`resources.${index}`);
+    const canRemove = !datafile?.isUploading;
     const uploadInputRef = useRef<HTMLInputElement>(null);
     // Stores the S3 key returned by sign-s3 BEFORE the upload completes.
     const pendingS3KeyRef = useRef<string | null>(null);
@@ -71,18 +69,15 @@ export function AddDataFile({
                     yearmonth: 'timestamp',
                     duration: 'numeric',
                 } as const;
-                const dataDictionary = data.map(
-                    (item: Field, index: number) => ({
-                        _id: index,
-                        id: item.name,
-                        info: {
-                            label: item.name,
-                            type_override:
-                                types[item.type as keyof typeof types],
-                            default: '',
-                        },
-                    })
-                );
+                const dataDictionary = data.map((item: Field, index: number) => ({
+                    _id: index,
+                    id: item.name,
+                    info: {
+                        label: item.name,
+                        type_override: types[item.type as keyof typeof types],
+                        default: '',
+                    },
+                }));
                 setValue(`resources.${index}.schema`, dataDictionary);
             }
         },
@@ -105,9 +100,7 @@ export function AddDataFile({
                 getUploadParameters(
                     file,
                     watch('team') && watch('team')?.value !== ''
-                        ? `${watch('team')?.id}/ckan/resources/${
-                              datafile.resourceId
-                          }`
+                        ? `${watch('team')?.id}/ckan/resources/${datafile.resourceId}`
                         : `ckan/resources/${datafile.resourceId}`,
                     (key) => {
                         pendingS3KeyRef.current = key;
@@ -156,19 +149,56 @@ export function AddDataFile({
         return uppy;
     }, []);
 
+    function clearUppyFiles() {
+        uppy.cancelAll();
+        uppy.getFiles().forEach((file) => {
+            uppy.removeFile(file.id);
+        });
+        pendingS3KeyRef.current = null;
+        if (uploadInputRef.current) uploadInputRef.current.value = '';
+    }
+
+    function handleRemove() {
+        clearUppyFiles();
+        remove();
+    }
+
+    function handleResetUploadResource() {
+        clearUppyFiles();
+        setValue(`resources.${index}.isUploading`, false);
+        setValue(`resources.${index}`, {
+            resourceId: uuidv4(),
+            title: '',
+            type: 'empty-file',
+            not_downloadable: false,
+            schema: [],
+            layerObj: null,
+        });
+    }
+
     function onInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const files = e.target.files;
-        if (!files?.[0]) return;
-        const slice = files[0].slice(0, 1000000);
-        const slicedFile = new File([slice], files[0].name, {
-            type: files[0].type,
+        const selectedFile = e.target.files?.[0];
+        if (!selectedFile) return;
+
+        // This component keeps a stable Uppy instance; when re-uploading
+        // after removing/resetting, clear previous file references first.
+        clearUppyFiles();
+
+        const slice = selectedFile.slice(0, 1000000);
+        const slicedFile = new File([slice], selectedFile.name, {
+            type: selectedFile.type,
         });
         setValue(`resources.${index}.fileBlob`, slicedFile);
-        uppy.addFile({
-            name: files[0].name,
-            type: files[0].type,
-            data: files[0],
-        });
+        try {
+            uppy.addFile({
+                name: selectedFile.name,
+                type: selectedFile.type,
+                data: selectedFile,
+            });
+        } catch (error) {
+            console.error('[addFile-error]', error);
+            setValue(`resources.${index}.isUploading`, false);
+        }
         // autoProceed: true handles the upload — no need to call uppy.upload()
     }
 
@@ -181,7 +211,7 @@ export function AddDataFile({
                 className="hidden"
             />
             <DataFileAccordion
-                remove={remove}
+                remove={canRemove ? handleRemove : () => undefined}
                 icon={<FolderPlusIcon className="h-7 w-7" />}
                 title={`Data File ${index + 1}`}
                 id={`datafile-accordion-${datafile.id}`}
@@ -196,12 +226,10 @@ export function AddDataFile({
                                             {datafile.name}
                                         </span>
                                         <span className="font-['Acumin Pro SemiCondensed'] mt-0.5 text-right text-xs font-normal leading-tight text-neutral-500">
-                                            {datafile.size
-                                                ? convertBytes(datafile.size)
-                                                : 'N/A'}
+                                            {datafile.size ? convertBytes(datafile.size) : 'N/A'}
                                         </span>
                                     </div>
-                                    <button onClick={() => remove()}>
+                                    <button onClick={() => handleRemove()} disabled={!canRemove}>
                                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                                     </button>
                                 </>
@@ -214,7 +242,7 @@ export function AddDataFile({
                                             {field.title}
                                         </span>
                                     </div>
-                                    <button onClick={() => remove()}>
+                                    <button onClick={() => handleRemove()} disabled={!canRemove}>
                                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                                     </button>
                                 </>
@@ -227,7 +255,7 @@ export function AddDataFile({
                                             {field.title}
                                         </span>
                                     </div>
-                                    <button onClick={() => remove()}>
+                                    <button onClick={() => handleRemove()} disabled={!canRemove}>
                                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                                     </button>
                                 </>
@@ -235,7 +263,7 @@ export function AddDataFile({
                             .otherwise(() => (
                                 <>
                                     <div className="flex items-center gap-x-2"></div>
-                                    <button onClick={() => remove()}>
+                                    <button onClick={() => handleRemove()} disabled={!canRemove}>
                                         <MinusCircleIcon className="h-6 w-6 text-red-500" />
                                     </button>
                                 </>
@@ -264,15 +292,11 @@ export function AddDataFile({
                             >
                                 <Tab className="hidden" id="tabEmpty"></Tab>
                                 <Tab
-                                    onClick={() =>
-                                        uploadInputRef.current?.click()
-                                    }
+                                    onClick={() => uploadInputRef.current?.click()}
                                     id="tabUpload"
                                     className={classNames(
                                         'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
-                                        datafile.type === 'upload'
-                                            ? 'hidden'
-                                            : ''
+                                        datafile.type === 'upload' ? 'hidden' : ''
                                     )}
                                 >
                                     <ArrowUpTrayIcon className="h-5 w-5 text-blue-800 sm:h-9 sm:w-9" />
@@ -286,21 +310,14 @@ export function AddDataFile({
                                 </Tab>
                                 <Tab
                                     id="tabLink"
-                                    onClick={() =>
-                                        setValue(
-                                            `resources.${index}.type`,
-                                            'link'
-                                        )
-                                    }
+                                    onClick={() => setValue(`resources.${index}.type`, 'link')}
                                 >
                                     {({ selected }) => (
                                         <span
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
                                                 selected ? 'bg-amber-400' : '',
-                                                datafile.type === 'upload'
-                                                    ? 'hidden'
-                                                    : ''
+                                                datafile.type === 'upload' ? 'hidden' : ''
                                             )}
                                             id="link-button"
                                         >
@@ -319,10 +336,7 @@ export function AddDataFile({
                                 <Tab
                                     id="tabLink"
                                     onClick={() =>
-                                        setValue(
-                                            `resources.${index}.type`,
-                                            'tile-cache'
-                                        )
+                                        setValue(`resources.${index}.type`, 'tile-cache')
                                     }
                                 >
                                     {({ selected }) => (
@@ -330,9 +344,7 @@ export function AddDataFile({
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
                                                 selected ? 'bg-amber-400' : '',
-                                                datafile.type === 'upload'
-                                                    ? 'hidden'
-                                                    : ''
+                                                datafile.type === 'upload' ? 'hidden' : ''
                                             )}
                                             id="tile-cache-link-button"
                                         >
@@ -350,21 +362,14 @@ export function AddDataFile({
                                 </Tab>
                                 <Tab
                                     id="tabLink"
-                                    onClick={() =>
-                                        setValue(
-                                            `resources.${index}.type`,
-                                            'gee-asset'
-                                        )
-                                    }
+                                    onClick={() => setValue(`resources.${index}.type`, 'gee-asset')}
                                 >
                                     {({ selected }) => (
                                         <span
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
                                                 selected ? 'bg-amber-400' : '',
-                                                datafile.type === 'upload'
-                                                    ? 'hidden'
-                                                    : ''
+                                                datafile.type === 'upload' ? 'hidden' : ''
                                             )}
                                             id="gee-asset-button"
                                         >
@@ -383,10 +388,7 @@ export function AddDataFile({
                                 <Tab
                                     id="tabDataApiDataset"
                                     onClick={() =>
-                                        setValue(
-                                            `resources.${index}.type`,
-                                            'data-api-dataset'
-                                        )
+                                        setValue(`resources.${index}.type`, 'data-api-dataset')
                                     }
                                 >
                                     {({ selected }) => (
@@ -394,9 +396,7 @@ export function AddDataFile({
                                             className={classNames(
                                                 'group flex aspect-square w-full flex-col items-center justify-center rounded-sm border-b-2 border-amber-400 bg-neutral-100 shadow transition hover:bg-amber-400 md:gap-y-2',
                                                 selected ? 'bg-amber-400' : '',
-                                                datafile.type === 'upload'
-                                                    ? 'hidden'
-                                                    : ''
+                                                datafile.type === 'upload' ? 'hidden' : ''
                                             )}
                                             id="data-api-dataset-button"
                                         >
@@ -419,44 +419,21 @@ export function AddDataFile({
                                     <UploadForm
                                         formObj={formObj}
                                         index={index}
-                                        dataDictionaryLoading={
-                                            dataDictionaryLoading
-                                        }
-                                        removeFile={() =>
-                                            setValue(`resources.${index}`, {
-                                                resourceId: uuidv4(),
-                                                title: '',
-                                                type: 'empty-file',
-                                                not_downloadable: false,
-                                                schema: [],
-                                                layerObj: null,
-                                            })
-                                        }
+                                        dataDictionaryLoading={dataDictionaryLoading}
+                                        removeFile={handleResetUploadResource}
                                     />
                                 </Tab.Panel>
                                 <Tab.Panel>
-                                    <LinkExternalForm
-                                        formObj={formObj}
-                                        index={index}
-                                    />
+                                    <LinkExternalForm formObj={formObj} index={index} />
                                 </Tab.Panel>
                                 <Tab.Panel>
-                                    <TileCacheForm
-                                        formObj={formObj}
-                                        index={index}
-                                    />
+                                    <TileCacheForm formObj={formObj} index={index} />
                                 </Tab.Panel>
                                 <Tab.Panel>
-                                    <GeeAssetForm
-                                        formObj={formObj}
-                                        index={index}
-                                    />
+                                    <GeeAssetForm formObj={formObj} index={index} />
                                 </Tab.Panel>
                                 <Tab.Panel>
-                                    <DataApiDatasetForm
-                                        formObj={formObj}
-                                        index={index}
-                                    />
+                                    <DataApiDatasetForm formObj={formObj} index={index} />
                                 </Tab.Panel>
                             </Tab.Panels>
                         </Tab.Group>
