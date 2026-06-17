@@ -1,9 +1,6 @@
 import { Fragment, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import {
-    Bars3Icon,
-    XMarkIcon,
-} from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -58,15 +55,15 @@ export function Hero() {
         <div className="bg-gray-900">
             <header className="absolute inset-x-0 top-0 z-50">
                 <div className=" w-full bg-wri-green  py-2 text-center  text-white font-acumin text-lg leading-normal">
-                    This site replaces WRI’s former Open Data Portal. We are still in the process of adding more datasets. 
-                    If you are not able to find the data you&apos;re looking for, please reach out to us at {''}
-                    <a href="mailto:data@wri.org" className="underline font-semibold">data@wri.org</a>.
-                    
+                    This site replaces WRI’s former Open Data Portal. We are still in the process of
+                    adding more datasets. If you are not able to find the data you&apos;re looking
+                    for, please reach out to us at {''}
+                    <a href="mailto:data@wri.org" className="underline font-semibold">
+                        data@wri.org
+                    </a>
+                    .
                 </div>
-                <nav
-                    className="flex items-center justify-between p-6 lg:px-8"
-                    aria-label="Global"
-                >
+                <nav className="flex items-center justify-between p-6 lg:px-8" aria-label="Global">
                     <div className="flex lg:flex-1">
                         <Link href="/" className="h-fit w-fit sm:w-80">
                             <Image
@@ -163,10 +160,7 @@ export function Hero() {
                                 onClick={() => setMobileMenuOpen(false)}
                             >
                                 <span className="sr-only">Close menu</span>
-                                <XMarkIcon
-                                    className="h-6 w-6"
-                                    aria-hidden="true"
-                                />
+                                <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                             </button>
                         </div>
                         <div className="mt-6 flow-root">
@@ -210,28 +204,20 @@ export function Hero() {
                 <div className="default-home-container mx-auto py-32 sm:py-48 lg:py-56">
                     <div className="text-start">
                         <h1 className="max-w-[592px] pr-5 font-acumin text-4xl font-semibold text-white">
-                            Data Explorer - Beta
+                            Find and Use Open Data on Climate, Nature and Development
                         </h1>
                         <p className="font-acumin max-w-[705px] font-light text-[#DFDFDF] leading-[30px] text-[23px]">
-                            WRI produces and curates hundreds of Datasets as
-                            part of our commitment to turn information into
-                            action. These products are based on our research and
-                            are held to{' '}
-                            <a
-                                href="https://www.wri.org/research/excellence"
-                                className=" text-blue-500 underline"
-                                target="_blank"
-                            >
-                                {' '}
-                                traditional academic standards of excellence
-                            </a>
-                            {', '}
-                            including objectivity and rigor.
+                            World Resources Institute produces and curates hundreds of datasets
+                            grounded in rigorous analysis to support research, policy and
+                            decision-making. We make this data freely available for you to explore
+                            and download for use in your own analysis, research or tools.
                         </p>
                         <br />
+                        <h3 className="font-acumin text-2xl font-semibold text-white">
+                            Search and explore
+                        </h3>
                         <p className="font-acumin max-w-[705px] leading-[30px] text-[23px] font-light text-[#DFDFDF]">
-                            Explore using the search bar or use more advanced
-                            filters.
+                            Find datasets by topic, team or application.
                         </p>
                         <form
                             onSubmit={handleSubmit((data) => {
@@ -250,7 +236,7 @@ export function Hero() {
                         >
                             <div className="mt-10 flex relative items-start justify-start  w-full max-w-[876px]">
                                 <input
-                                    placeholder="Search Datasets - try “energy”, “Global Forest Watch”, or “food”"
+                                    placeholder="Try: “energy”, “forests”, “food”, or “Global Forest Watch”"
                                     aria-label="search"
                                     className="placeholder:text-[#5f5e5e]  flex-shrink flex-grow  placeholder:italic placeholder:font-light placeholder:leading-tight placeholder:sm:font-normal placeholder:sm:leading-normal text-[#4f4e4e]  text-xs md:text-xl font-normal font-acumin w-full px-6 h-[66px] bg-white rounded-tl-[3px] rounded-bl-[3px] border-y-0 border-r-0"
                                     {...register('search')}
@@ -269,11 +255,7 @@ export function Hero() {
             </div>
 
             <Transition appear show={isOpen} as={Fragment}>
-                <Dialog
-                    as="div"
-                    className="relative z-50"
-                    onClose={() => setIsOpen(false)}
-                >
+                <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
                     <Transition.Child
                         as={Fragment}
                         enter="ease-out duration-300"
