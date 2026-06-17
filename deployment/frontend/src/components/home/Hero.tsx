@@ -57,7 +57,7 @@ export function Hero() {
                 <div className=" w-full bg-wri-green  py-2 text-center  text-white font-acumin text-lg leading-normal">
                     This site replaces WRI’s former Open Data Portal. We are still in the process of
                     adding more datasets. If you are not able to find the data you&apos;re looking
-                    for, please reach out to us at {''}
+                    for, please reach out to us at{' '}
                     <a href="mailto:data@wri.org" className="underline font-semibold">
                         data@wri.org
                     </a>
