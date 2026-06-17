@@ -129,11 +129,11 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                             {'. '}
                             You can search and download datasets across climate, energy, food and
                             land use—and apply them in your own analysis, research or tools.
-                            <br />
+                            <br /><br />
                             We are continuing to add new datasets. Check back regularly for updates,
                             or sign up to receive email notifications when new datasets are
                             published.
-                            <br />
+                            <br /><br />
                             This page is managed by the
                             <a
                                 href="https://www.wri.org/data/data-lab"
