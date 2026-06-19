@@ -7,10 +7,7 @@ import { NextSeo } from 'next-seo';
 import Link from 'next/link';
 import { api } from '@/utils/api';
 import { useState } from 'react';
-import {
-    type GetServerSidePropsContext,
-    type InferGetServerSidePropsType,
-} from 'next';
+import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next';
 import superjson from 'superjson';
 import { createServerSideHelpers } from '@trpc/react-query/server';
 import { appRouter } from '@/server/api/root';
@@ -25,10 +22,7 @@ import { ArrowRightIcon } from '@heroicons/react/24/solid';
 import { type WriDataset } from '@/schema/ckan.schema';
 
 const ErrorAlert = dynamic<{ text: string; title?: string }>(
-    () =>
-        import('@/components/_shared/Alerts').then(
-            (module) => module.ErrorAlert
-        ),
+    () => import('@/components/_shared/Alerts').then((module) => module.ErrorAlert),
     {
         ssr: false,
     }
@@ -61,9 +55,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
 }
 
-export default function Home(
-    props: InferGetServerSidePropsType<typeof getServerSideProps>
-) {
+export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [readmore, setReadmore] = useState(false);
     const {
         data: recentlyAdded,
@@ -93,11 +85,7 @@ export default function Home(
     } = api.dataset.getFeaturedDatasets.useQuery({
         removeUnecessaryDataInResources: true,
     });
-    const {
-        data: application,
-        isLoading,
-        error,
-    } = api.applications.getAllApplications.useQuery();
+    const { data: application, isLoading, error } = api.applications.getAllApplications.useQuery();
     return (
         <>
             <Head>
@@ -120,7 +108,7 @@ export default function Home(
                 <div className="col-span-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />
                     <h3 className="pt-1 font-acumin text-2xl font-bold leading-loose text-stone-900">
-                        About Data Explorer
+                        About WRI Data Explorer
                     </h3>
                 </div>
                 <div className="col-span-3 flex flex-col gap-y-4">
@@ -128,36 +116,37 @@ export default function Home(
                         className={`w-full font-acumin text-[23px] font-light leading-[30px] text-[#3F3F3F]  md:overflow-hidden md:max-h-[100vh] transition duration-300 ease-in-out h-auto`}
                     >
                         <p>
-                            WRI believes that good data is the foundation of
-                            good decision-making. Data Explorer is the central
-                            repository for WRI data, making it freely available
-                            in line with{' '}
+                            WRI believes that good data is the foundation of good decision-making.
+                            WRI Data Explorer is the central repository for data from World
+                            Resources Institute, making it freely available as part of our{' '}
                             <a
                                 href="https://www.wri.org/data/open-data-commitment"
                                 className=" text-blue-600 underline"
                                 target="_blank"
+                                rel="noopener noreferrer"
                             >
-                                our Open Data Commitment
+                                Open Data Commitment
                             </a>
                             {'. '}
-                            We are still in the process of adding more Datasets
-                            — check back regularly for updates. This page is
-                            managed by the{' '}
+                            You can search and download datasets across climate, energy, food and
+                            land use—and apply them in your own analysis, research or tools.
+                            <br /><br />
+                            We are continuing to add new datasets. Check back regularly for updates,
+                            or sign up to receive email notifications when new datasets are
+                            published.
+                            <br /><br />
+                            This page is managed by the
                             <a
                                 href="https://www.wri.org/data/data-lab"
                                 className="text-blue-600 underline"
                             >
                                 {' '}
-                                Data Lab
+                                WRI Data Lab
                             </a>
                             {'. '}
-                            If you are not able to find the data you're looking
-                            for or have other feedback to share, please reach
-                            out to{' '}
-                            <a
-                                href="mailto:data@wri.org"
-                                className="text-blue-600 underline"
-                            >
+                            If you cannot find the data you're looking for or have feedback to
+                            share, contact{' '}
+                            <a href="mailto:data@wri.org" className="text-blue-600 underline">
                                 {' '}
                                 data@wri.org
                             </a>
@@ -207,8 +196,7 @@ export default function Home(
                                 href="/topics"
                                 className="flex justify-end pr-5 text-lg font-semibold pb-3 items-center gap-x-2"
                             >
-                                See all{' '}
-                                <ArrowRightIcon className="h-4 w-4 inline-block" />
+                                See all <ArrowRightIcon className="h-4 w-4 inline-block" />
                             </Link>
                             <TopicsCarousel />
                         </Tab.Panel>
@@ -217,8 +205,7 @@ export default function Home(
                                 href="/applications"
                                 className="flex justify-end pr-5 text-lg font-semibold pb-3 items-center gap-x-2"
                             >
-                                See all{' '}
-                                <ArrowRightIcon className="h-4 w-4 inline-block" />
+                                See all <ArrowRightIcon className="h-4 w-4 inline-block" />
                             </Link>
                             <ApplicationsCarousel />
                         </Tab.Panel>
@@ -286,9 +273,7 @@ export default function Home(
                                     className="max-w-[90.5vw] mx-auto flex flex-col font-acumin gap-y-6"
                                 >
                                     <Recent
-                                        datasets={
-                                            featuredDatasets.datasets as WriDataset[]
-                                        }
+                                        datasets={featuredDatasets.datasets as WriDataset[]}
                                         title="Featured Datasets"
                                     />
                                 </div>
