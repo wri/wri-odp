@@ -125,3 +125,8 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
  && chmod +x "$SUPERCRONIC"
 
 COPY setup/crontab ${APP_DIR}/crontab
+
+COPY docker-entrypoint.d/ /docker-entrypoint.d/
+USER root
+RUN chmod +x /docker-entrypoint.d/*.sh
+USER ckan
