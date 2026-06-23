@@ -11,6 +11,7 @@
 #   GRAFANA_DOMAIN          - Domain for Grafana ingress (e.g., grafana.wri.org)
 #
 # Optional environment variables:
+#   CLUSTER_NAME            - Cluster identifier on alerts (e.g. ckan-dev, ckan-prod)
 #   SLACK_WEBHOOK_URL       - Slack webhook for alerts (default: empty)
 #   SLACK_CHANNEL           - Slack channel for alerts (default: #wri-alerts)
 #   ALERT_RECEIVER          - Alert receiver name (default: slack, use 'null' to disable)
@@ -99,6 +100,7 @@ export ALERTMANAGER_STORAGE_SIZE="${ALERTMANAGER_STORAGE_SIZE:-10Gi}"
 export NODE_EXPORTER_ENABLED="${NODE_EXPORTER_ENABLED:-true}"
 export LOKI_STORAGE_SIZE="${LOKI_STORAGE_SIZE:-50Gi}"
 export LOKI_RETENTION="${LOKI_RETENTION:-168h}"
+export CLUSTER_NAME="${CLUSTER_NAME:-unknown}"
 export SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 export SLACK_CHANNEL="${SLACK_CHANNEL:-#wri-odp}"
 export ALERT_RECEIVER="${ALERT_RECEIVER:-slack}"
@@ -109,7 +111,12 @@ if [ -z "$SLACK_WEBHOOK_URL" ]; then
     echo -e "${YELLOW}Warning: SLACK_WEBHOOK_URL not set, alerts will use 'null' receiver${NC}"
 fi
 
+if [ "$CLUSTER_NAME" = "unknown" ]; then
+    echo -e "${YELLOW}Warning: CLUSTER_NAME not set, alerts will show cluster=unknown${NC}"
+fi
+
 echo "Configuration:"
+echo "  Cluster Name:       $CLUSTER_NAME"
 echo "  Grafana Domain:     $GRAFANA_DOMAIN"
 echo "  Grafana Ingress:    $GRAFANA_INGRESS_ENABLED"
 echo "  Storage Class:      ${STORAGE_CLASS:-<cluster default>}"
@@ -132,7 +139,7 @@ for var in GRAFANA_ADMIN_PASSWORD GRAFANA_DOMAIN STORAGE_CLASS CERT_MANAGER_ISSU
            PROMETHEUS_RETENTION_SIZE PROMETHEUS_STORAGE_SIZE PROMETHEUS_CPU_REQUEST \
            PROMETHEUS_MEMORY_REQUEST PROMETHEUS_CPU_LIMIT PROMETHEUS_MEMORY_LIMIT \
            ALERTMANAGER_ENABLED ALERTMANAGER_STORAGE_SIZE NODE_EXPORTER_ENABLED \
-           LOKI_STORAGE_SIZE LOKI_RETENTION \
+           LOKI_STORAGE_SIZE LOKI_RETENTION CLUSTER_NAME \
            SLACK_WEBHOOK_URL SLACK_CHANNEL ALERT_RECEIVER; do
     value="${!var}"
     # Escape special characters for sed
