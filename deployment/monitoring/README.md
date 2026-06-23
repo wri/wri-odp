@@ -35,6 +35,7 @@ The monitoring stack is deployed in a dedicated `monitoring` namespace and colle
 |----------|---------|-------------|
 | `SLACK_WEBHOOK_URL` | (empty) | Slack webhook for alerts |
 | `SLACK_CHANNEL` | `#wri-alerts` | Slack channel for alerts |
+| `CLUSTER_NAME` | `unknown` | Cluster label on metrics/alerts (e.g. `ckan-dev`, `ckan-prod`) |
 | `ALERT_RECEIVER` | `slack` | Alert receiver (`slack` or `null`) |
 | `STORAGE_CLASS` | (cluster default) | Kubernetes storage class |
 | `CERT_MANAGER_ISSUER` | `cert-manager` | Cert-manager issuer name |
@@ -72,6 +73,7 @@ helm repo update
 ```bash
 export GRAFANA_ADMIN_PASSWORD='your-secure-password'
 export GRAFANA_DOMAIN='grafana.wri.org'
+export CLUSTER_NAME='ckan-prod'   # or ckan-dev — appears on all Slack alerts
 ./monitoring-values.sh
 ```
 
@@ -163,27 +165,46 @@ Alertmanager is included in the stack. Alerts are pre-configured in the template
 - High memory usage (>85% of limit)
 - Pod crash looping
 - High error rate (>5% 5xx responses)
-- Pod not ready for >10 minutes
+- Pod not ready for >10 minutes (excludes completed Job/CronJob pods in `Succeeded` phase)
+
+Slack notifications include a **cluster** label (from `CLUSTER_NAME`) so alerts from `ckan-dev` and `ckan-prod` are distinguishable.
 
 To configure Slack notifications, set `SLACK_WEBHOOK_URL` before running the script.
 
+Apply to each cluster separately with the matching `CLUSTER_NAME`, then run `helm upgrade` on that cluster's monitoring stack.
+
 ## Upgrading
 
+When upgrading the chart across major operator versions (e.g. v0.88 → v0.91), apply CRDs **before** `helm upgrade`:
+
 ```bash
-# Regenerate values if needed
+helm show crds prometheus-community/kube-prometheus-stack | kubectl apply --server-side --force-conflicts -f -
+```
+
+If Helm fails with a ConfigMap conflict (`conflict with "kubectl-patch"`), delete the affected ConfigMap and retry — Helm recreates it:
+
+```bash
+# Prometheus stack
+kubectl -n monitoring delete configmap prometheus-grafana-datasource
+
+# Loki stack
+kubectl -n monitoring delete configmap loki-loki-stack
+```
+
+Regenerate values if needed, then upgrade both stacks:
+
+```bash
 ./monitoring-values.sh
 
-# Update Prometheus stack
 helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
   -n monitoring \
-  -f /Users/carlos/wri/wri-odp/deployment/monitoring/values.yaml \
+  -f values.yaml \
   --create-namespace \
   --wait --timeout 10m
 
-# Update Loki stack
 helm upgrade --install loki grafana/loki-stack \
   -n monitoring \
-  -f /Users/carlos/wri/wri-odp/deployment/monitoring/loki-values-generated.yaml \
+  -f loki-values-generated.yaml \
   --create-namespace \
   --wait --timeout 5m
 ```
