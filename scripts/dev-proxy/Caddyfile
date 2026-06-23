@@ -1,0 +1,13 @@
+# Local proxy for testing the new cluster via kubectl port-forward.
+# Usage: see start.sh
+#
+# Browser: https://datasets-dev.wri.org/
+# Requires /etc/hosts: 127.0.0.1 datasets-dev.wri.org
+# Requires: kubectl port-forward svc/wri-dev-frontend-svc 3000:80
+
+datasets-dev.wri.org {
+	# Use 127.0.0.1, not localhost — macOS resolves localhost to [::1] but
+	# kubectl port-forward only binds on IPv4.
+	reverse_proxy 127.0.0.1:3000
+	tls internal
+}
