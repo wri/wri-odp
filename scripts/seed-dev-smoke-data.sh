@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-# Seed minimal CKAN data on wri-odp-dev for smoke testing (empty DB).
-# Requires: kubectl access to ckan-prod / wri-odp-dev, ckan_admin user on the cluster.
+# Seed minimal CKAN data on a cluster namespace for smoke testing (empty/fresh DB).
+# Requires: kubectl access, ckan_admin user on the target CKAN pod.
+#
+# Dev (default):
+#   ./scripts/seed-dev-smoke-data.sh
+#
+# Staging:
+#   KUBE_NAMESPACE=wri-odp-staging CKAN_POD=deploy/wri-staging-ckan ./scripts/seed-dev-smoke-data.sh
 set -euo pipefail
 
 CTX="${KUBE_CONTEXT:-arn:aws:eks:us-east-1:245948672511:cluster/ckan-prod}"
