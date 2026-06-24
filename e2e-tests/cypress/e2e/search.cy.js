@@ -139,8 +139,14 @@ describe("Search page", () => {
         .toISOString()
         .split("T")[0];
 
-      cy.get("#since-date", {force: true}).type(sinceDateFormatted, { force: true, timeout: 10000 });
-      cy.get("#before-date").type(beforeDateFormatted, { force: true, timeout: 10000 });
+      cy.get("#since-date", { timeout: 15000, force: true })
+        .should("be.visible")
+        .clear({ force: true })
+        .type(sinceDateFormatted, { force: true, timeout: 10000 });
+      cy.get("#before-date", { timeout: 15000, force: true })
+        .should("be.visible")
+        .clear({ force: true })
+        .type(beforeDateFormatted, { force: true, timeout: 10000 });
 
       if (combination.results === true) {
         cy.contains("results", { timeout: 10000 });

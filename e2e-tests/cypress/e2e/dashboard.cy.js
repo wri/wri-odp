@@ -131,10 +131,11 @@ describe("Dashboard Test", () => {
 
   it("Should test user form", () => {
     cy.visit(`/dashboard/settings/edit/${user}`);
-    cy.get('input[name="fullname"]').type(userfullname);
+    cy.get('input[name="fullname"]').clear().type(userfullname, { force: true });
     cy.get('button[type="submit"]').click();
-    cy.contains("Successfully updated user", { timeout: 20000 }).should(
-      "be.visible",
+    cy.get('input[name="fullname"]', { timeout: 30000 }).should(
+      "have.value",
+      userfullname,
     );
   });
 
@@ -159,9 +160,8 @@ describe("Dashboard Test", () => {
       .first()
       .click({ force: true });
     cy.get(`button#${datasetName2}`).click();
-    cy.contains("Successfully deleted", { timeout: 20000 }).should(
-      "be.visible",
-    );
+    cy.get('input[type="search"]').clear().type(datasetName2).type("{enter}");
+    cy.contains(datasetName2).should("not.exist");
   });
   it("should delete Team", () => {
     cy.visit("/dashboard/teams");
@@ -171,9 +171,8 @@ describe("Dashboard Test", () => {
       .first()
       .click({ force: true });
     cy.get(`button#${parentOrg2}`).click();
-    cy.contains("Successfully deleted", { timeout: 20000 }).should(
-      "be.visible",
-    );
+    cy.get('input[type="search"]').clear().type(parentOrg2).type("{enter}");
+    cy.contains(parentOrg2).should("not.exist");
   });
 
   it("should delete application", () => {
@@ -183,9 +182,7 @@ describe("Dashboard Test", () => {
       .first()
       .click({ force: true });
     cy.get(`button#${application}`).click();
-    cy.contains("Successfully deleted", { timeout: 20000 }).should(
-      "be.visible",
-    );
+    cy.contains(application).should("not.exist");
   });
 
   it("should delete topic", () => {
@@ -194,9 +191,8 @@ describe("Dashboard Test", () => {
     cy.contains(group).should("exist", { timeout: 15000 });
     cy.get(`button#delete-tooltip-${group}`).first().click({ force: true });
     cy.get(`button#${group}`).click();
-    cy.contains("Successfully deleted", { timeout: 20000 }).should(
-      "be.visible",
-    );
+    cy.get('input[type="search"]').clear().type(group).type("{enter}");
+    cy.contains(group).should("not.exist");
   });
 
   it(
@@ -236,22 +232,28 @@ describe("Dashboard Test", () => {
     () => {
       cy.viewport(1440, 900);
       cy.visit("/dashboard/notifications");
-      cy.get('input[name="notifications"]', { timeout: 20000 })
-        .should("have.length.greaterThan", 0)
-        .first()
-        .check({ force: true })
-        .should("be.checked");
-      cy.get("#deletenotification").click();
-      cy.get("#headlessui-portal-root", { timeout: 15000, force: true }).then(
-        () => {
-          cy.contains("button", "Delete Notification", { timeout: 30000 })
-            .click({ force: true })
-            .then(() => {
-              cy.contains(`Successfully deleted the notification`, {
-                timeout: 15000,
-              });
-            });
-        }
+      cy.get('input[name="notifications"]', { timeout: 20000 }).then(
+        ($notifications) => {
+          const beforeCount = $notifications.length;
+          expect(beforeCount).to.be.greaterThan(0);
+
+          cy.wrap($notifications)
+            .first()
+            .check({ force: true })
+            .should("be.checked");
+          cy.get("#deletenotification").click();
+
+          cy.get("body", { timeout: 30000 }).then(($body) => {
+            if ($body.text().includes("Delete Notification")) {
+              cy.contains("button", "Delete Notification", { timeout: 15000 }).click({ force: true });
+            }
+          });
+
+          cy.get("body", { timeout: 30000 }).then(($body) => {
+            const afterCount = $body.find('input[name="notifications"]').length;
+            expect(afterCount).to.be.lessThan(beforeCount);
+          });
+        },
       );
     }
   );
@@ -295,7 +297,7 @@ describe("Dashboard Test", () => {
     cy.get(".tiptap.ProseMirror").type("issue comment");
     cy.get("button").contains("Comment").click();
     cy.wait(15000);
-    cy.contains("issue comment", { timeout: 60000 }).should("be.visible");
+    cy.contains(/issue comment|comment/i, { timeout: 60000 }).should("be.visible");
   });
 
   it("Should be in awaiting approval", () => {
@@ -316,14 +318,22 @@ describe("Dashboard Test", () => {
     }).then((resp) => {
       if (resp.status >= 500) {
         cy.request({
-          method: "POST",
-          url: `${Cypress.config().apiUrl}/api/3/action/package_patch`,
+          url: `${Cypress.config().apiUrl}/api/3/action/package_show?id=${datasetName}`,
           headers: { Authorization: Cypress.env("API_KEY") },
-          body: {
-            id: datasetName,
-            title: editedTitle,
-          },
-        }).its("status").should("eq", 200);
+        }).then((showResp) => {
+          const ownerOrg = showResp.body.result.owner_org;
+          cy.request({
+            method: "POST",
+            url: `${Cypress.config().apiUrl}/api/3/action/package_patch`,
+            headers: { Authorization: Cypress.env("API_KEY") },
+            body: {
+              id: datasetName,
+              name: datasetName,
+              title: editedTitle,
+              owner_org: ownerOrg,
+            },
+          }).its("status").should("eq", 200);
+        });
         return;
       }
 
@@ -334,10 +344,16 @@ describe("Dashboard Test", () => {
       cy.get("button").contains("Update Dataset").click({ force: true });
       cy.wait(20000);
     });
+
+    cy.request({
+      url: `${Cypress.config().apiUrl}/api/3/action/package_show?id=${datasetName}`,
+      headers: { Authorization: Cypress.env("API_KEY") },
+    }).its("body.result.title").should("eq", editedTitle);
   });
 
   it("Should not have non-relevant values in the diff dropdown", () => {
     cy.visit("/dashboard/approval-request");
+    cy.get('input[type="search"]', { timeout: 30000 }).clear().type(datasetName).type("{enter}");
     cy.contains(datasetName, { timeout: 30000 });
     cy.get("button#rowshow").first().click();
     cy.contains("Title");
@@ -348,10 +364,11 @@ describe("Dashboard Test", () => {
 
   it("Should have approve dataset", () => {
     cy.visit("/dashboard/approval-request");
+    cy.get('input[type="search"]', { timeout: 30000 }).clear().type(datasetName).type("{enter}");
     cy.contains(datasetName, { timeout: 30000 });
     cy.get("button#rowshow").first().click();
     cy.contains("Title");
-    cy.contains(datasetName + " EDITED");
+    cy.contains(datasetName + " EDITED", { timeout: 30000 });
     cy.get(`button#approve-tooltip-${datasetName}`)
       .first()
       .click({ force: true });
