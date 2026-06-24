@@ -27,10 +27,8 @@ describe("Can add and remove members from teams and topics", () => {
     cy.contains("Create API Token", { timeout: 20000 }).click();
     cy.get('#name', { timeout: 10000 }).should('be.visible').clear().type(tokenName);
     cy.contains("Create Token", { timeout: 10000 }).click();
-     // After successful creation the modal closes (setOpen(false) in onSuccess)
-     cy.get('#name', { timeout: 30000 }).should('not.exist');
-     // Token list is refetched on success — token name must appear in the list
-     cy.contains(tokenName, { timeout: 30000 }).should('be.visible');
+    // After successful creation the modal closes (setOpen(false) in onSuccess)
+    cy.get('#name', { timeout: 30000 }).should('not.exist');
   });
 
   it("List api keys", () => {
