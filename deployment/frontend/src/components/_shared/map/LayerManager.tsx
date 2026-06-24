@@ -14,7 +14,7 @@ import { VectorTileProvider } from '@/utils/providers/vectorProvider';
 import { type APILayerSpec } from '@/interfaces/layer.interface';
 import { useLayerStates } from '@/utils/storeHooks';
 import { type LayerState } from '@/interfaces/state.interface';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createDeckLayer } from '@/utils/decodeFunctions';
 
 const parseLayers = (
@@ -72,14 +72,45 @@ const providers: Record<string, any['handleData']> = {
 const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
     const { current: map } = useMap();
     const { currentLayers } = useLayerStates();
+    const [mapInstance, setMapInstance] = useState<any | null>(null);
+    const [isStyleReady, setIsStyleReady] = useState(false);
+
+    useEffect(() => {
+        if (!mapInstance && map?.getMap) {
+            const instance = map.getMap();
+            if (instance) {
+                setMapInstance(instance);
+            }
+        }
+    }, [map, mapInstance]);
+
+    useEffect(() => {
+        if (!mapInstance) return;
+
+        const onStyleReady = () => setIsStyleReady(true);
+
+        if (mapInstance.isStyleLoaded?.()) {
+            setIsStyleReady(true);
+            return;
+        }
+
+        mapInstance.once?.('load', onStyleReady);
+        mapInstance.once?.('style.load', onStyleReady);
+
+        return () => {
+            mapInstance.off?.('load', onStyleReady);
+            mapInstance.off?.('style.load', onStyleReady);
+        };
+    }, [mapInstance]);
+
     const parsedLayers = useMemo(() => {
         const parsedLayers = parseLayers(layers, currentLayers);
         return parsedLayers;
     }, [layers, currentLayers]);
 
-    return map && map.getMap() ? (
+    return mapInstance && isStyleReady ? (
         <VizzLayerManager
-            map={map.getMap()}
+            map={mapInstance}
             plugin={PluginMapboxGl}
             providers={providers}
         >

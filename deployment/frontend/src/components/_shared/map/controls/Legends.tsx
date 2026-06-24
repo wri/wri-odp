@@ -56,6 +56,7 @@ export function Legends() {
             <Icons />
             <Legend
                 maxHeight={300}
+                sortable={false}
                 onChangeOrder={(datasetIds: string[]) =>
                     reorderLayerGroups(datasetIds)
                 }

@@ -59,6 +59,7 @@ function customDataLayer(data: { event: string; resource_name: string }) {
 const LazyViz = dynamic(
   () => import('@/components/datasets/visualizations/Visualizations'),
   {
+    ssr: false,
     loading: () => (
       <div className="min-h-[90vh] bg-lima-700 opacity-75 flex-col items-center justify-center">
         <Spinner className="text-wri-green w-12 h-12" />
@@ -270,6 +271,7 @@ export default function DatasetPage(
   if (typeof prevdataset == 'string') prevdataset = JSON.parse(prevdataset);
 
   const [isCurrentVersion, setIsCurrentVersion] = useState<boolean>(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { addLayerToLayerGroup, removeLayerFromLayerGroup } =
     useActiveLayerGroups();
@@ -392,6 +394,10 @@ export default function DatasetPage(
   } else {
     generalAuthorized = true;
   }
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     if (query.tab === 'issues' && issues.data) {
@@ -685,163 +691,169 @@ export default function DatasetPage(
                 is_approved={is_approved}
               />
               <div className="px-4 sm:px-6">
-                <Tab.Group
-                  as="div"
-                  selectedIndex={selectedIndex}
-                  onChange={setSelectedIndex}
-                >
-                  <Tab.List
-                    as="nav"
-                    className="flex w-full gap-x-2 border-b border-zinc-300"
+                {hasMounted ? (
+                  <Tab.Group
+                    as="div"
+                    selectedIndex={selectedIndex}
+                    onChange={setSelectedIndex}
                   >
-                    <DatasetTabs
-                      tabs={tabs.filter(
-                        (tab) => tab.enabled
-                      )}
-                    />
-                  </Tab.List>
-                  <div className="mb-4 mr-9" />
-                  <div>
-                    <Tab.Panels as="div">
-                      <Tab.Panel as="div">
-                        <DataFiles
-                          //@ts-ignore
-                          dataset={
-                            isCurrentVersion
-                              ? prevDatasetData
-                              : datasetData
-                          }
-                          index={index}
-                          tabularResource={
-                            tabularResource
-                          }
-                          setTabularResource={
-                            setTabularResource
-                          }
-                          setDisplayNoPreview={
-                            setDisplayNoPreview
-                          }
-                          setMapDisplayPreview={
-                            setMapDisplayPreview
-                          }
-                          mapDisplayPreview={
-                            mapDisplayPreview
-                          }
-                          isCurrentVersion={
-                            isCurrentVersion
-                          }
-                          diffFields={
-                            resourceDiffValues
-                          }
-                        />
-                      </Tab.Panel>
-                      <Tab.Panel as="div">
-                        <About
-                          //@ts-ignore
-                          dataset={
-                            isCurrentVersion
-                              ? prevDatasetData
-                              : datasetData
-                          }
-                          isCurrentVersion={
-                            isCurrentVersion
-                          }
-                          diffFields={diffFields}
-                        />
-                      </Tab.Panel>
-                      <Tab.Panel as="div">
-                        <API
-                          usecases={
-                            isCurrentVersion
-                              ? prevDatasetData.usecases
-                              : datasetData.usecases
-                          }
-                        />
-                      </Tab.Panel>
-                      {datasetData.methodology && (
+                    <Tab.List
+                      as="nav"
+                      className="flex w-full gap-x-2 border-b border-zinc-300"
+                    >
+                      <DatasetTabs
+                        tabs={tabs.filter(
+                          (tab) => tab.enabled
+                        )}
+                      />
+                    </Tab.List>
+                    <div className="mb-4 mr-9" />
+                    <div>
+                      <Tab.Panels as="div">
                         <Tab.Panel as="div">
-                          <Methodology
-                            methodology={
+                          <DataFiles
+                            //@ts-ignore
+                            dataset={
                               isCurrentVersion
-                                ? prevDatasetData.methodology
-                                : datasetData.methodology
+                                ? prevDatasetData
+                                : datasetData
                             }
-                            technical_notes={
+                            index={index}
+                            tabularResource={
+                              tabularResource
+                            }
+                            setTabularResource={
+                              setTabularResource
+                            }
+                            setDisplayNoPreview={
+                              setDisplayNoPreview
+                            }
+                            setMapDisplayPreview={
+                              setMapDisplayPreview
+                            }
+                            mapDisplayPreview={
+                              mapDisplayPreview
+                            }
+                            isCurrentVersion={
                               isCurrentVersion
-                                ? prevDatasetData.technical_notes
-                                : datasetData.technical_notes
+                            }
+                            diffFields={
+                              resourceDiffValues
                             }
                           />
                         </Tab.Panel>
-                      )}
-                      <Tab.Panel as="div">
-                        <Contact
-                          //@ts-ignore
-                          dataset={
-                            isCurrentVersion
-                              ? prevDatasetData
-                              : datasetData
-                          }
-                          isCurrentVersion={
-                            isCurrentVersion
-                          }
-                          diffFields={diffFields}
-                        />
-                      </Tab.Panel>
-                      <Tab.Panel as="div">
-                        <RelatedDatasets />
-                      </Tab.Panel>
-                      {collaborators.data && (
                         <Tab.Panel as="div">
-                          <Members
-                            members={
-                              collaborators.data
+                          <About
+                            //@ts-ignore
+                            dataset={
+                              isCurrentVersion
+                                ? prevDatasetData
+                                : datasetData
+                            }
+                            isCurrentVersion={
+                              isCurrentVersion
+                            }
+                            diffFields={diffFields}
+                          />
+                        </Tab.Panel>
+                        <Tab.Panel as="div">
+                          <API
+                            usecases={
+                              isCurrentVersion
+                                ? prevDatasetData.usecases
+                                : datasetData.usecases
                             }
                           />
                         </Tab.Panel>
-                      )}
-                      {issues.data &&
-                        !isCurrentVersion &&
-                        issues.data.length > 0 && (
+                        {datasetData.methodology && (
                           <Tab.Panel as="div">
-                            <Issues
-                              issues={issues.data}
-                              index={indexIssues}
-                              datasetName={
-                                datasetData.name
+                            <Methodology
+                              methodology={
+                                isCurrentVersion
+                                  ? prevDatasetData.methodology
+                                  : datasetData.methodology
                               }
-                              owner_org={
-                                datasetData?.owner_org ||
-                                null
-                              }
-                              creator_id={
-                                datasetData?.creator_user_id ||
-                                null
-                              }
-                              authorized={
-                                teamAuthorized ||
-                                generalAuthorized
+                              technical_notes={
+                                isCurrentVersion
+                                  ? prevDatasetData.technical_notes
+                                  : datasetData.technical_notes
                               }
                             />
                           </Tab.Panel>
                         )}
-                      <Tab.Panel as="div">
-                        <Versioning
-                          //@ts-ignore
-                          dataset={
-                            isCurrentVersion
-                              ? prevDatasetData
-                              : datasetData
-                          }
-                          isCurrentVersion={
-                            isCurrentVersion
-                          }
-                          diffFields={diffFields}
-                        />
-                      </Tab.Panel>
-                    </Tab.Panels>
+                        <Tab.Panel as="div">
+                          <Contact
+                            //@ts-ignore
+                            dataset={
+                              isCurrentVersion
+                                ? prevDatasetData
+                                : datasetData
+                            }
+                            isCurrentVersion={
+                              isCurrentVersion
+                            }
+                            diffFields={diffFields}
+                          />
+                        </Tab.Panel>
+                        <Tab.Panel as="div">
+                          <RelatedDatasets />
+                        </Tab.Panel>
+                        {collaborators.data && (
+                          <Tab.Panel as="div">
+                            <Members
+                              members={
+                                collaborators.data
+                              }
+                            />
+                          </Tab.Panel>
+                        )}
+                        {issues.data &&
+                          !isCurrentVersion &&
+                          issues.data.length > 0 && (
+                            <Tab.Panel as="div">
+                              <Issues
+                                issues={issues.data}
+                                index={indexIssues}
+                                datasetName={
+                                  datasetData.name
+                                }
+                                owner_org={
+                                  datasetData?.owner_org ||
+                                  null
+                                }
+                                creator_id={
+                                  datasetData?.creator_user_id ||
+                                  null
+                                }
+                                authorized={
+                                  teamAuthorized ||
+                                  generalAuthorized
+                                }
+                              />
+                            </Tab.Panel>
+                          )}
+                        <Tab.Panel as="div">
+                          <Versioning
+                            //@ts-ignore
+                            dataset={
+                              isCurrentVersion
+                                ? prevDatasetData
+                                : datasetData
+                            }
+                            isCurrentVersion={
+                              isCurrentVersion
+                            }
+                            diffFields={diffFields}
+                          />
+                        </Tab.Panel>
+                      </Tab.Panels>
+                    </div>
+                  </Tab.Group>
+                ) : (
+                  <div className="flex w-full items-center justify-center py-10">
+                    <Spinner />
                   </div>
-                </Tab.Group>
+                )}
               </div>
             </>
           )

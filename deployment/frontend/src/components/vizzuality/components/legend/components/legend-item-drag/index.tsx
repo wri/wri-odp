@@ -1,5 +1,4 @@
 import React from 'react';
-import { SortableHandle } from '../../../../react-sortable-hoc/src';
 
 const LegendItemDrag = () => (
     <span className="absolute cursor-move top-[19px] left-[8px]">
@@ -21,4 +20,4 @@ const LegendItemDrag = () => (
     </span>
 );
 
-export default SortableHandle(LegendItemDrag);
+export default LegendItemDrag;

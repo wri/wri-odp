@@ -6,7 +6,7 @@ import { env } from '@/env.mjs';
 import { NextSeo } from 'next-seo';
 import Link from 'next/link';
 import { api } from '@/utils/api';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next';
 import superjson from 'superjson';
 import { createServerSideHelpers } from '@trpc/react-query/server';
@@ -15,7 +15,6 @@ import { getServerAuthSession } from '@/server/auth';
 import dynamic from 'next/dynamic';
 import Spinner from '@/components/_shared/Spinner';
 import { Tab } from '@headlessui/react';
-import { Fragment } from 'react';
 import classNames from '@/utils/classnames';
 import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';
@@ -55,8 +54,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
 }
 
-export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    const [readmore, setReadmore] = useState(false);
+export default function Home(_props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const [hasMounted, setHasMounted] = useState(false);
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
     const {
         data: recentlyAdded,
         isLoading: isLoadingRecentlyAdded,
@@ -85,7 +89,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
     } = api.dataset.getFeaturedDatasets.useQuery({
         removeUnecessaryDataInResources: true,
     });
-    const { data: application, isLoading, error } = api.applications.getAllApplications.useQuery();
+    const { data: application } = api.applications.getAllApplications.useQuery();
     return (
         <>
             <Head>
@@ -144,7 +148,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                 WRI Data Lab
                             </a>
                             {'. '}
-                            If you cannot find the data you're looking for or have feedback to
+                            If you cannot find the data you&apos;re looking for or have feedback to
                             share, contact{' '}
                             <a href="mailto:data@wri.org" className="text-blue-600 underline">
                                 {' '}
@@ -157,38 +161,30 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             </main>
 
             <main className="flex min-h-screen flex-col bg-neutral-50 py-20">
-                <Tab.Group>
+                {hasMounted ? (
+                    <>
+                        <Tab.Group>
                     <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full">
-                        <Tab as={Fragment}>
-                            {({ selected }) => (
-                                <div
-                                    className={classNames(
-                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
-                                        selected
-                                            ? 'text-[#32864b] underline underline-offset-8'
-                                            : ''
-                                    )}
-                                >
-                                    Explore by Topic
-                                </div>
-                            )}
+                        <Tab
+                            className={({ selected }) =>
+                                classNames(
+                                    'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                    selected ? 'text-[#32864b] underline underline-offset-8' : ''
+                                )
+                            }
+                        >
+                            Explore by Topic
                         </Tab>
-                        {application && application.length > 0 && (
-                            <Tab as={Fragment}>
-                                {({ selected }) => (
-                                    <div
-                                        className={classNames(
-                                            'text-black text-2xl font-medium font-acumin cursor-pointer',
-                                            selected
-                                                ? 'text-[#32864b] underline underline-offset-8'
-                                                : ''
-                                        )}
-                                    >
-                                        Explore by Application
-                                    </div>
-                                )}
-                            </Tab>
-                        )}
+                        <Tab
+                            className={({ selected }) =>
+                                classNames(
+                                    'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                    selected ? 'text-[#32864b] underline underline-offset-8' : ''
+                                )
+                            }
+                        >
+                            Explore by Application
+                        </Tab>
                     </Tab.List>
                     <Tab.Panels>
                         <Tab.Panel className="topics-carousel relative !ml-auto w-full max-w-[94.5vw]">
@@ -207,53 +203,47 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                             >
                                 See all <ArrowRightIcon className="h-4 w-4 inline-block" />
                             </Link>
-                            <ApplicationsCarousel />
+                            {application && application.length > 0 ? (
+                                <ApplicationsCarousel />
+                            ) : (
+                                <div className="w-full px-5 py-10 text-right font-acumin text-lg text-stone-500">
+                                    No applications available.
+                                </div>
+                            )}
                         </Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
                 <Tab.Group>
                     <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full pt-20 pb-8">
-                        <Tab as={Fragment}>
-                            {({ selected }) => (
-                                <div
-                                    className={classNames(
-                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
-                                        selected
-                                            ? 'text-[#32864b] underline underline-offset-8'
-                                            : ''
-                                    )}
-                                >
-                                    Dataset Highlights
-                                </div>
-                            )}
+                        <Tab
+                            className={({ selected }) =>
+                                classNames(
+                                    'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                    selected ? 'text-[#32864b] underline underline-offset-8' : ''
+                                )
+                            }
+                        >
+                            Dataset Highlights
                         </Tab>
-                        <Tab as={Fragment}>
-                            {({ selected }) => (
-                                <div
-                                    className={classNames(
-                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
-                                        selected
-                                            ? 'text-[#32864b] underline underline-offset-8'
-                                            : ''
-                                    )}
-                                >
-                                    Recently added
-                                </div>
-                            )}
+                        <Tab
+                            className={({ selected }) =>
+                                classNames(
+                                    'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                    selected ? 'text-[#32864b] underline underline-offset-8' : ''
+                                )
+                            }
+                        >
+                            Recently added
                         </Tab>
-                        <Tab as={Fragment}>
-                            {({ selected }) => (
-                                <div
-                                    className={classNames(
-                                        'text-black text-2xl font-medium font-acumin cursor-pointer',
-                                        selected
-                                            ? 'text-[#32864b] underline underline-offset-8'
-                                            : ''
-                                    )}
-                                >
-                                    Recently updated
-                                </div>
-                            )}
+                        <Tab
+                            className={({ selected }) =>
+                                classNames(
+                                    'text-black text-2xl font-medium font-acumin cursor-pointer',
+                                    selected ? 'text-[#32864b] underline underline-offset-8' : ''
+                                )
+                            }
+                        >
+                            Recently updated
                         </Tab>
                     </Tab.List>
                     <Tab.Panels>
@@ -325,6 +315,12 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                         </Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
+                    </>
+                ) : (
+                    <div className="mx-auto w-full max-w-[94.5vw] px-5 py-10 text-right font-acumin text-lg text-stone-500">
+                        Loading sections...
+                    </div>
+                )}
             </main>
             <HomeFooter />
         </>
