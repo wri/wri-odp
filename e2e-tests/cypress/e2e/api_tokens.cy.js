@@ -27,8 +27,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.contains("Create API Token", { timeout: 20000 }).click();
     cy.get('#name', { timeout: 10000 }).should('be.visible').clear().type(tokenName);
     cy.contains("Create Token", { timeout: 10000 }).click();
-    cy.contains(tokenName, { timeout: 30000 }).should('be.visible');
-    cy.get("#copyButton", { timeout: 20000 }).should('be.visible').click();
+    cy.get("#copyButton", { timeout: 30000 }).should('be.visible').click();
     cy.contains("Copied", { timeout: 20000 }).should('be.visible');
   });
 

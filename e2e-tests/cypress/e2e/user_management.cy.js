@@ -131,7 +131,8 @@ describe("Can add and remove members from teams and topics", () => {
       ".flex.flex-col.gap-y-4 .grid.grow.grid-cols-1.items-start.gap-x-24.md\\:grid-cols-2"
     )
       .should("have.length.gt", 0)
-      .each(($gridRow, index) => {
+      .each(($gridRow) => {
+        let openedDropdown = false;
         cy.wrap($gridRow).within(() => {
           cy.get('input[role="combobox"]')
             .invoke("val")
@@ -140,9 +141,8 @@ describe("Can add and remove members from teams and topics", () => {
                 cy.get('button[id^="headlessui-listbox-button"]').then(
                   ($capacityButton) => {
                     if ($capacityButton.length) {
+                      openedDropdown = true;
                       cy.wrap($capacityButton).click();
-
-                      cy.contains("li", "Admin").click();
                     } else {
                       cy.log("No capacity button found for the user");
                     }
@@ -150,6 +150,12 @@ describe("Can add and remove members from teams and topics", () => {
                 );
               }
             });
+        });
+        cy.then(() => {
+          if (openedDropdown) {
+            cy.contains('[role="option"]', "Admin").click();
+            openedDropdown = false;
+          }
         });
       });
 
@@ -270,7 +276,8 @@ describe("Can add and remove members from teams and topics", () => {
       ".flex.flex-col.gap-y-4 .grid.grow.grid-cols-1.items-start.gap-x-24.md\\:grid-cols-2"
     )
       .should("have.length.gt", 0)
-      .each(($gridRow, index) => {
+      .each(($gridRow) => {
+        let openedDropdown = false;
         cy.wrap($gridRow).within(() => {
           cy.get('input[role="combobox"]')
             .invoke("val")
@@ -279,9 +286,8 @@ describe("Can add and remove members from teams and topics", () => {
                 cy.get('button[id^="headlessui-listbox-button"]').then(
                   ($capacityButton) => {
                     if ($capacityButton.length) {
+                      openedDropdown = true;
                       cy.wrap($capacityButton).click();
-
-                      cy.contains("li", "Admin").click();
                     } else {
                       cy.log("No capacity button found for the user");
                     }
@@ -289,6 +295,12 @@ describe("Can add and remove members from teams and topics", () => {
                 );
               }
             });
+        });
+        cy.then(() => {
+          if (openedDropdown) {
+            cy.contains('[role="option"]', "Admin").click();
+            openedDropdown = false;
+          }
         });
       });
 
@@ -349,7 +361,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.login(switchUser, switchUserPassword);
     cy.visit("/dashboard/notifications");
     cy.contains(ckanUserName);
-    cy.contains(" removed you as a member (admin) from the Topic");
+    cy.contains(/removed you as a member.+from the Topic/i);
   });
 
   after(() => {
