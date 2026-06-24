@@ -27,6 +27,7 @@ const config = {
     typescript: {
         ignoreBuildErrors: true,
     },
+    transpilePackages: ['@worldresources/wri-design-systems'],
 
     /**
      * If you are using `appDir` then you must comment the below `i18n` config out.
