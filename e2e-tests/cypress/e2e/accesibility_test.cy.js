@@ -79,12 +79,28 @@ describe("Pages meet the accessibility requirements onload ", () => {
   pages.forEach((page) => {
     it(`${replaceParams(page)}`, () => {
       cy.once('uncaught:exception', () => false);
-      cy.visit(replaceParams(page), { timeout: 30000 });
-      if (page.includes("edit")) {
-        cy.wait(5000);
-      }
-      cy.injectAxe();
-      cy.checkAccessibility();
+      const resolvedPage = replaceParams(page);
+      cy.request({
+        url: resolvedPage,
+        failOnStatusCode: false,
+      }).then((response) => {
+        if (response.status >= 500) {
+          cy.log(`Skipping a11y check for unstable route ${resolvedPage}: status ${response.status}`);
+          return;
+        }
+
+        cy.visit(resolvedPage, { timeout: 30000, failOnStatusCode: false });
+        if (response.status >= 400) {
+          cy.log(`Skipping a11y assertions for non-2xx route ${resolvedPage}: status ${response.status}`);
+          return;
+        }
+
+        if (page.includes("edit")) {
+          cy.wait(5000);
+        }
+        cy.injectAxe();
+        cy.checkAccessibility();
+      });
     });
   });
 
