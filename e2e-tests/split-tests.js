@@ -26,9 +26,10 @@ const groupFiles = testFiles.slice(startIndex, endIndex);
 // Build the spec pattern
 const specPattern = groupFiles.map(file => `cypress/e2e/${file}`).join(',');
 
-console.log(`Running group ${groupIndex} of ${totalGroups}`);
-console.log(`Tests in this group (${groupFiles.length}): ${groupFiles.join(', ')}`);
-console.log(`\nSpec pattern: ${specPattern}`);
+// Keep diagnostics in stderr so command substitution only returns the spec list.
+console.error(`Running group ${groupIndex} of ${totalGroups}`);
+console.error(`Tests in this group (${groupFiles.length}): ${groupFiles.join(', ')}`);
+console.error(`Spec pattern: ${specPattern}`);
 
 // Output the spec pattern for Cypress to use
 process.stdout.write(specPattern);

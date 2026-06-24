@@ -72,15 +72,23 @@ Cypress.Commands.add("login", (username, password) => {
         cy.contains('button', 'Save').click({ force: true });
       }
     });
-    cy.get("#nav-login-button").click();
-    cy.get("#login-modal").as("login-modal");
+    cy.get("#nav-login-button", { timeout: 20000 }).should('be.visible').click();
+    cy.get("#login-modal", { timeout: 20000 }).should('be.visible').as("login-modal");
 
     cy.get("@login-modal").get('input[name="username"]').type(username);
     cy.get("@login-modal").get('input[name="password"]').type(password);
 
     cy.get("button#login-button").click({ force: true });
-    cy.wait(9000);
-    cy.get("#nav-user-menu").should("be.visible");
+
+    // Wait for the authenticated UI state instead of a fixed delay.
+    cy.location('pathname', { timeout: 30000 }).should('include', '/dashboard');
+    cy.get("#nav-user-menu", { timeout: 30000 }).should("be.visible");
+  }, {
+    cacheAcrossSpecs: true,
+    validate: () => {
+      cy.visit('/dashboard', { failOnStatusCode: false });
+      cy.get('#nav-user-menu', { timeout: 20000 }).should('be.visible');
+    },
   });
 });
 

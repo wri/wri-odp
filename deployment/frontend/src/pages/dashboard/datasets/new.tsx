@@ -1,8 +1,13 @@
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
 import Header from '@/components/_shared/Header';
-import CreateDatasetForm from '@/components/dashboard/datasets/admin/CreateDatasetForm';
 import { NextSeo } from 'next-seo';
 import type { GetServerSideProps } from 'next';
+import dynamic from 'next/dynamic';
+
+const CreateDatasetForm = dynamic(
+    () => import('@/components/dashboard/datasets/admin/CreateDatasetForm'),
+    { ssr: false }
+);
 
 const links = [
     { label: 'Dashboard', url: '/dashboard', current: false },
