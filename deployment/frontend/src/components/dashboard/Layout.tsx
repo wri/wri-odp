@@ -125,7 +125,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         onClose={setSidebarOpen}
                     >
                         <Transition.Child
-                            as={Fragment}
+                            as="div"
                             enter="transition-opacity ease-linear duration-300"
                             enterFrom="opacity-0"
                             enterTo="opacity-100"
@@ -138,7 +138,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
                         <div className="fixed z-[60] inset-0 flex">
                             <Transition.Child
-                                as={Fragment}
+                                as="div"
                                 enter="transition ease-in-out duration-300 transform"
                                 enterFrom="-translate-x-full"
                                 enterTo="translate-x-0"
@@ -148,7 +148,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             >
                                 <Dialog.Panel className="relative mr-16 flex w-full flex-1 md:max-w-sm">
                                     <Transition.Child
-                                        as={Fragment}
+                                        as="div"
                                         enter="ease-in-out duration-300"
                                         enterFrom="opacity-0"
                                         enterTo="opacity-100"
