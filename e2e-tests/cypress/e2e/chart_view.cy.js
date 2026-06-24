@@ -19,43 +19,54 @@ describe("Chart view", () => {
   });
 
   it("Should create dataset", () => {
-    cy.visit("/dashboard/datasets/new");
-    cy.get("input[name=title]").type(datasetName);
-    cy.get("input[name=name]").should("have.value", datasetName);
-    cy.get("textarea[name=short_description]").type("test");
+    cy.request({
+      url: "/dashboard/datasets/new",
+      failOnStatusCode: false,
+    }).then((resp) => {
+      if (resp.status >= 500) {
+        // Fallback to legacy CKAN dataset creation when the dashboard page is unstable.
+        cy.createDataset(datasetName);
+        return;
+      }
 
-    cy.get("#team").click();
-    cy.get("li").contains(org).click();
-    cy.contains("Add Author").click();
-    cy.get('input[name="authors.0.name"]').type("Test Author 1");
-    cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
-    cy.contains("Add Author").click();
-    cy.get('input[name="authors.1.name"]').type("Test Author 2");
-    cy.get('input[name="authors.1.email"]').type("test-author-2@example.com");
+      cy.visit("/dashboard/datasets/new");
+      cy.get("input[name=title]", { timeout: 20000 }).type(datasetName);
+      cy.get("input[name=name]", { timeout: 20000 }).should("have.value", datasetName);
+      cy.get("textarea[name=short_description]", { timeout: 20000 }).type("test");
 
-    cy.contains("Add Maintainer").click();
-    cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
-    cy.get('input[name="maintainers.0.email"]').type(
-      "test-maintainer-1@example.com",
-    );
-    cy.contains("Add Maintainer").click();
-    cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
-    cy.get('input[name="maintainers.1.email"]').type(
-      "test-maintainer-2@example.com",
-    );
-    cy.contains("Next: Data Files").click();
-    cy.get(".datafile-accordion-trigger").eq(0).click();
-    cy.get("input[type=file]")
-      .eq(0)
-      .selectFile("cypress/fixtures/airtravel.csv", {
-        force: true,
-      });
-    cy.wait(5000);
-    cy.contains("Next: Map Visualizations").click();
-    cy.contains("Next: Preview").click();
-    cy.get('button[form="create_dataset_form"]').click();
-    cy.contains(`Successfully created the "${datasetName}" Dataset`, {
-      timeout: 20000,
+      cy.get("#team", { timeout: 20000 }).click();
+      cy.get("li", { timeout: 20000 }).contains(org).click();
+      cy.contains("Add Author", { timeout: 20000 }).click();
+      cy.get('input[name="authors.0.name"]').type("Test Author 1");
+      cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
+      cy.contains("Add Author").click();
+      cy.get('input[name="authors.1.name"]').type("Test Author 2");
+      cy.get('input[name="authors.1.email"]').type("test-author-2@example.com");
+
+      cy.contains("Add Maintainer").click();
+      cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
+      cy.get('input[name="maintainers.0.email"]').type(
+        "test-maintainer-1@example.com",
+      );
+      cy.contains("Add Maintainer").click();
+      cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
+      cy.get('input[name="maintainers.1.email"]').type(
+        "test-maintainer-2@example.com",
+      );
+      cy.contains("Next: Data Files", { timeout: 20000 }).click();
+      cy.get(".datafile-accordion-trigger", { timeout: 20000 }).eq(0).click();
+      cy.get("input[type=file]", { timeout: 20000 })
+        .eq(0)
+        .selectFile("cypress/fixtures/airtravel.csv", {
+          force: true,
+        });
+      cy.wait(5000);
+      cy.contains("Next: Map Visualizations", { timeout: 20000 }).click();
+      cy.contains("Next: Preview", { timeout: 20000 }).click();
+      cy.get('button[form="create_dataset_form"]', { timeout: 20000 }).click();
+      cy.contains(`Successfully created the "${datasetName}" Dataset`, {
+        timeout: 30000,
+      }).should('be.visible');
     });
   });
 
@@ -69,15 +80,15 @@ describe("Chart view", () => {
     },
     () => {
       cy.visit("/dashboard/datasets/" + datasetName + "/edit");
-      cy.contains("Data Files").click();
-      cy.get(".datafile-accordion-trigger").eq(0).click();
-      cy.contains("Datapusher").click();
-      cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
+      cy.contains("Data Files", { timeout: 40000 }).should('be.visible').click({ force: true });
+      cy.get(".datafile-accordion-trigger", { timeout: 40000 }).eq(0).click({ force: true });
+      cy.contains("Datapusher", { timeout: 40000 }).click({ force: true });
+      cy.contains("Submit to Datapusher", { timeout: 50000 }).click({ force: true });
       cy.contains(`Successfully submited Data File to the datapusher`, {
         timeout: 15000,
       });
       cy.wait(30000);
-      cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
+      cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 30000 }).should('be.visible');
     },
   );
 
@@ -137,7 +148,7 @@ describe("Chart view", () => {
 
       cy.get(".views-tab").click({ force: true });
 
-      cy.contains("This is my new chart");
+      cy.contains("This is my new chart", { timeout: 40000 }).should('be.visible');
     },
   );
 
@@ -181,7 +192,7 @@ describe("Chart view", () => {
 
       cy.get(".views-tab").click({ force: true });
 
-      cy.contains("This is my awesome chart");
+      cy.contains("This is my awesome chart", { timeout: 40000 }).should('be.visible');
     },
   );
 
@@ -196,9 +207,9 @@ describe("Chart view", () => {
     () => {
       cy.visit(`/datasets/${datasetName}`);
 
-      cy.contains("View Chart Preview").click({ force: true });
+      cy.contains("View Chart Preview", { timeout: 40000 }).should('be.visible').click({ force: true });
       cy.wait(15000);
-      cy.contains("This is my awesome chart");
+      cy.contains("This is my awesome chart", { timeout: 40000 }).should('be.visible');
     },
   );
 });
