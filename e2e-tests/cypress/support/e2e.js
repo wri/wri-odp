@@ -439,13 +439,17 @@ Cypress.Commands.add("updateResourceRecord", (resource) => {
 });
 
 Cypress.Commands.add("deleteDatasetAPI", (name) => {
-  const request = cy.request({
+  cy.request({
     method: "POST",
     url: apiUrl("package_delete"),
     headers: headers,
+    failOnStatusCode: false,
     body: {
       id: name,
     },
+  }).then((response) => {
+    // Cleanup must be idempotent across retries/parallel jobs.
+    expect([200, 404]).to.include(response.status);
   });
 });
 
