@@ -359,10 +359,32 @@ describe("Dashboard Test", () => {
       cy.wait(20000);
     });
 
-    cy.request({
-      url: `${Cypress.config().apiUrl}/api/3/action/package_show?id=${datasetName}`,
-      headers: { Authorization: Cypress.env("API_KEY") },
-    }).its("body.result.title").should("eq", editedTitle);
+    const assertPendingOrPackageTitle = (attempt = 0) => {
+      cy.request({
+        url: `${Cypress.config().apiUrl}/api/3/action/pending_dataset_show?package_id=${datasetName}`,
+        headers: { Authorization: Cypress.env("API_KEY") },
+        failOnStatusCode: false,
+      }).then((pendingResp) => {
+        const pendingTitle = pendingResp.body?.result?.package_data?.title;
+
+        if (pendingResp.status === 200 && pendingTitle === editedTitle) {
+          expect(pendingTitle).to.eq(editedTitle);
+          return;
+        }
+
+        if (attempt < 8) {
+          cy.wait(2000);
+          return assertPendingOrPackageTitle(attempt + 1);
+        }
+
+        cy.request({
+          url: `${Cypress.config().apiUrl}/api/3/action/package_show?id=${datasetName}`,
+          headers: { Authorization: Cypress.env("API_KEY") },
+        }).its("body.result.title").should("eq", editedTitle);
+      });
+    };
+
+    assertPendingOrPackageTitle();
   });
 
   it("Should not have non-relevant values in the diff dropdown", () => {
