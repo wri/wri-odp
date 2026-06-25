@@ -116,12 +116,7 @@ describe("Search page", () => {
     cy.viewport(1440, 900);
     cy.wait(2000);
 
-    // Scope to #facets-list to avoid matching "Last Updated" text in dataset cards (which use <p>, not <button>)
-    cy.get("#facets-list")
-      .contains("button", "Last Updated", { timeout: 15000 })
-      .scrollIntoView()
-      .should("be.visible")
-      .click({ force: true });
+    cy.get("@facets-list").contains("Last Updated").click({ force: true });
 
     cy.get("#since-date", { timeout: 15000 }).should("exist");
     cy.get("#before-date", { timeout: 15000 }).should("exist");
