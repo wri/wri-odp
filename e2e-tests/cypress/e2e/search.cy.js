@@ -116,39 +116,30 @@ describe("Search page", () => {
     cy.viewport(1440, 900);
 
     const ensureLastUpdatedFacetOpen = () => {
-      cy.contains("p", "Last Updated", { timeout: 20000 })
-        .should("be.visible")
-        .parents('[role="listitem"]')
-        .first()
-        .then(($facet) => {
-          const visibleDateInputs = $facet.find('input[type="date"]:visible').length;
-          if (visibleDateInputs < 2) {
-            cy.wrap($facet).find("button").first().click({ force: true });
-          }
-        });
+      cy.get('input[type="date"]:visible').then(($inputs) => {
+        if ($inputs.length < 2) {
+          cy.contains("button", "Last Updated", { timeout: 20000 })
+            .first()
+            .click({ force: true });
+        }
+      });
 
-      cy.contains("p", "Last Updated", { timeout: 20000 })
-        .parents('[role="listitem"]')
-        .first()
-        .find('input[type="date"]:visible', { timeout: 30000 })
-        .should("have.length.at.least", 2);
+      cy.get('input[type="date"]:visible', { timeout: 30000 }).should(
+        "have.length.at.least",
+        2,
+      );
     };
 
     const setDateRange = (sinceDateFormatted, beforeDateFormatted) => {
       ensureLastUpdatedFacetOpen();
-      cy.contains("p", "Last Updated", { timeout: 20000 })
-        .parents('[role="listitem"]')
-        .first()
-        .within(() => {
-          cy.get('input[type="date"]:visible')
-            .eq(0)
-            .clear({ force: true })
-            .type(sinceDateFormatted, { force: true, timeout: 10000 });
-          cy.get('input[type="date"]:visible')
-            .eq(1)
-            .clear({ force: true })
-            .type(beforeDateFormatted, { force: true, timeout: 10000 });
-        });
+      cy.get('input[type="date"]:visible')
+        .eq(0)
+        .clear({ force: true })
+        .type(sinceDateFormatted, { force: true, timeout: 10000 });
+      cy.get('input[type="date"]:visible')
+        .eq(1)
+        .clear({ force: true })
+        .type(beforeDateFormatted, { force: true, timeout: 10000 });
     };
 
     const today = new Date();
