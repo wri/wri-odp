@@ -138,21 +138,13 @@ describe("Search page", () => {
       { since: yesterday, before: yesterday, results: false },
     ];
 
-    // Typing into a date input fires onChange per character → setFilters →
-    // React re-render → HeadlessUI outer Disclosure may close, removing
-    // #facets-list from the DOM entirely. Re-open outer then inner if needed.
+    // After typing, setFilters → router.push may trigger a full re-render,
+    // temporarily removing both the outer sidebar and inner panel from the DOM.
+    // After re-mount, outer Disclosure reopens (defaultOpen), but the inner
+    // MetadataModifiedFacet Disclosure resets to closed. Wait for #facets-list
+    // to reappear and then reopen "Last Updated" if needed.
     const ensureLastUpdatedOpen = () => {
-      // Step 1: if the outer sidebar collapsed, re-open it via its toggle button
-      // (Disclosure.Button is always in the DOM, unlike Disclosure.Panel)
-      cy.get("body").then(($body) => {
-        if ($body.find("#facets-list").length === 0) {
-          cy.get('[aria-label="collapse sidebar"]', { timeout: 5000 }).click({
-            force: true,
-          });
-        }
-      });
-      // Step 2: once #facets-list exists, re-open Last Updated panel if closed
-      cy.get("#facets-list", { timeout: 10000 }).then(($facetsList) => {
+      cy.get("#facets-list", { timeout: 15000 }).then(($facetsList) => {
         if ($facetsList.find("#since-date").length === 0) {
           cy.wrap($facetsList)
             .contains("button", "Last Updated")
