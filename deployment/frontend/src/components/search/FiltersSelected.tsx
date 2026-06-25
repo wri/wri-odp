@@ -19,7 +19,7 @@ export default function FiltersSelected({
                 {filters
                     .filter((f) => f.value !== '')
                     .map((f) => (
-                        <div className="flex h-8 w-fit items-center gap-x-2 rounded-sm bg-neutral-100 hover:bg-neutral-200 transition px-3 py-1 shadow">
+                        <div key={`${f.key}-${f.value}`} className="flex h-8 w-fit items-center gap-x-2 rounded-sm bg-neutral-100 hover:bg-neutral-200 transition px-3 py-1 shadow">
                             <div className="font-['Acumin Pro SemiCondensed'] text-xs font-semibold leading-none text-black">
                                 {f.title}: {f.label}
                             </div>

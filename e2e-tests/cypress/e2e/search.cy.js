@@ -143,10 +143,28 @@ describe("Search page", () => {
         .toISOString()
         .split("T")[0];
 
+      // Typing into a date input fires onChange for each character, which can
+      // trigger a re-render that collapses the HeadlessUI Disclosure. Re-open it
+      // before each input if needed.
+      const ensureLastUpdatedOpen = () => {
+        cy.get("body").then(($body) => {
+          if ($body.find("#since-date").length === 0) {
+            cy.get("@facets-list")
+              .contains("button", "Last Updated", { timeout: 10000 })
+              .click({ force: true });
+            cy.get("#since-date", { timeout: 10000 }).should("exist");
+          }
+        });
+      };
+
+      ensureLastUpdatedOpen();
       cy.get("#since-date", { timeout: 15000 }).clear().type(sinceDateFormatted, {
         force: true,
         timeout: 10000,
       });
+
+      // Re-open the panel if the Disclosure closed after typing since-date
+      ensureLastUpdatedOpen();
       cy.get("#before-date", { timeout: 15000 }).clear().type(beforeDateFormatted, {
         force: true,
         timeout: 10000,
