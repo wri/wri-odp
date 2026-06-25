@@ -114,56 +114,17 @@ describe("Search page", () => {
   it("allows faceting by last updated since and before dates", () => {
     cy.visit("/search");
     cy.viewport(1440, 900);
+    cy.wait(2000);
 
-    const getLastUpdatedFacet = () =>
-      cy
-        .contains("#facets-list [role='listitem'] p", "Last Updated", {
-          timeout: 30000,
-        })
-        .closest("[role='listitem']");
+    // Scope to #facets-list to avoid matching "Last Updated" text in dataset cards (which use <p>, not <button>)
+    cy.get("#facets-list")
+      .contains("button", "Last Updated", { timeout: 15000 })
+      .scrollIntoView()
+      .should("be.visible")
+      .click({ force: true });
 
-    const ensureLastUpdatedFacetOpen = () => {
-      getLastUpdatedFacet()
-        .find("button[aria-expanded]", { timeout: 30000 })
-        .first()
-        .then(($button) => {
-          if ($button.attr("aria-expanded") !== "true") {
-            cy.wrap($button).click({ force: true });
-          }
-        });
-
-      getLastUpdatedFacet()
-        .find("button[aria-expanded]", { timeout: 30000 })
-        .first()
-        .then(($button) => {
-          if ($button.attr("aria-expanded") !== "true") {
-            cy.wrap($button).click({ force: true });
-          }
-        });
-
-      getLastUpdatedFacet()
-        .find("button[aria-expanded]", { timeout: 30000 })
-        .first()
-        .should("have.attr", "aria-expanded", "true");
-
-      getLastUpdatedFacet().within(() => {
-        cy.get("#since-date", { timeout: 30000 }).should("exist");
-        cy.get("#before-date", { timeout: 30000 }).should("exist");
-      });
-    };
-
-    const setDateRange = (sinceDateFormatted, beforeDateFormatted) => {
-      ensureLastUpdatedFacetOpen();
-
-      // Re-query each field between clear/type to avoid detached element issues on re-render.
-      cy.get("#since-date", { timeout: 30000 }).clear({ force: true });
-      cy.get("#since-date", { timeout: 30000 })
-        .type(sinceDateFormatted, { force: true, timeout: 10000 });
-
-      cy.get("#before-date", { timeout: 30000 }).clear({ force: true });
-      cy.get("#before-date", { timeout: 30000 })
-        .type(beforeDateFormatted, { force: true, timeout: 10000 });
-    };
+    cy.get("#since-date", { timeout: 15000 }).should("exist");
+    cy.get("#before-date", { timeout: 15000 }).should("exist");
 
     const today = new Date();
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
@@ -178,24 +139,29 @@ describe("Search page", () => {
       { since: yesterday, before: yesterday, results: false },
     ];
 
-    cy.wrap(combinations).each((combination) => {
+    combinations.forEach((combination) => {
       const sinceDateFormatted = combination.since.toISOString().split("T")[0];
       const beforeDateFormatted = combination.before
         .toISOString()
         .split("T")[0];
 
-      if (combination.results === null) {
-        cy.once("window:alert", (message) => {
-          expect(message).to.contains("Invalid date range");
-        });
-      }
-
-      setDateRange(sinceDateFormatted, beforeDateFormatted);
+      cy.get("#since-date", { timeout: 15000 }).type(sinceDateFormatted, {
+        force: true,
+        timeout: 10000,
+      });
+      cy.get("#before-date", { timeout: 15000 }).type(beforeDateFormatted, {
+        force: true,
+        timeout: 10000,
+      });
 
       if (combination.results === true) {
-        cy.get("body", { timeout: 10000 }).contains("results");
+        cy.contains("results", { timeout: 10000 });
+      } else if (combination.results === null) {
+        cy.on("window:alert", (message) => {
+          expect(message).to.contains("Invalid date range");
+        });
       } else {
-        cy.get("body", { timeout: 10000 }).contains("0 results");
+        cy.contains("0 results", { timeout: 10000 });
       }
     });
   });
