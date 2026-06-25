@@ -136,13 +136,18 @@ describe("Search page", () => {
 
     const setDateRange = (sinceDateFormatted, beforeDateFormatted) => {
       ensureLastUpdatedFacetOpen();
-      cy.get('input[type="date"]')
+
+      // Re-query each field between clear/type to avoid detached element issues on re-render.
+      cy.get('input[type="date"]', { timeout: 30000 }).eq(0).as("sinceDate");
+      cy.get("@sinceDate").clear({ force: true });
+      cy.get('input[type="date"]', { timeout: 30000 })
         .eq(0)
-        .clear({ force: true })
         .type(sinceDateFormatted, { force: true, timeout: 10000 });
-      cy.get('input[type="date"]')
+
+      cy.get('input[type="date"]', { timeout: 30000 }).eq(1).as("beforeDate");
+      cy.get("@beforeDate").clear({ force: true });
+      cy.get('input[type="date"]', { timeout: 30000 })
         .eq(1)
-        .clear({ force: true })
         .type(beforeDateFormatted, { force: true, timeout: 10000 });
     };
 
@@ -159,7 +164,7 @@ describe("Search page", () => {
       { since: yesterday, before: yesterday, results: false },
     ];
 
-    combinations.forEach((combination) => {
+    cy.wrap(combinations).each((combination) => {
       const sinceDateFormatted = combination.since.toISOString().split("T")[0];
       const beforeDateFormatted = combination.before
         .toISOString()
