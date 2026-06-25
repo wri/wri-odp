@@ -35,8 +35,10 @@ describe("Create public Team", () => {
 
       cy.get('#visibility').contains("Public").should("exist");
 
-      cy.get("button#visibility").click();
-      cy.get("li").contains("Private").click();
+      cy.get("button#visibility_type").click({ force: true });
+      cy.get('[id^="headlessui-listbox-options-"]')
+        .contains("Private")
+        .click({ force: true });
       cy.get("button[type=submit]").click();
       cy.contains(`Successfully edited the ${parentOrg} Team`);
     });
@@ -46,8 +48,10 @@ describe("Create public Team", () => {
 
       cy.get('#visibility').contains("Private").should("exist");
 
-      cy.get("button#visibility").click();
-      cy.get("li").contains("Public").click();
+      cy.get("button#visibility_type").click({ force: true });
+      cy.get('[id^="headlessui-listbox-options-"]')
+        .contains("Public")
+        .click({ force: true });
       cy.get("button[type=submit]").click();
       cy.contains(`Successfully edited the ${parentOrg} Team`);
     });
@@ -61,8 +65,10 @@ describe("Create public Team", () => {
 
     cy.get('#visibility').contains("Public").should("exist");
 
-    cy.get("button#visibility").click();
-    cy.get("li").contains("Private").click();
+    cy.get("button#visibility_type").click({ force: true });
+    cy.get('[id^="headlessui-listbox-options-"]')
+      .contains("Private")
+      .click({ force: true });
     cy.get("button[type=submit]").click();
     cy.contains("User does not have admin access to edit this Team").should(
       "exist"
@@ -77,8 +83,10 @@ describe("Create public Team", () => {
 
     cy.get('#visibility').contains("Public").should("exist");
 
-    cy.get("button#visibility").click();
-    cy.get("li").contains("Private").click();
+    cy.get("button#visibility_type").click({ force: true });
+    cy.get('[id^="headlessui-listbox-options-"]')
+      .contains("Private")
+      .click({ force: true });
     cy.get("button[type=submit]").click();
     cy.contains(`Successfully edited the ${parentOrg} Team`);
 
@@ -86,8 +94,10 @@ describe("Create public Team", () => {
 
     cy.get('#visibility').contains("Private").should("exist");
 
-    cy.get("button#visibility").click();
-    cy.get("li").contains("Public").click();
+    cy.get("button#visibility_type").click({ force: true });
+    cy.get('[id^="headlessui-listbox-options-"]')
+      .contains("Public")
+      .click({ force: true });
     cy.get("button[type=submit]").click();
     cy.contains(
       "User is unauthorized to change visibility from private to public. Please contact a SysAdmin."

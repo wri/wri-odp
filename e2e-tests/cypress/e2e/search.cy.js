@@ -116,7 +116,11 @@ describe("Search page", () => {
     cy.viewport(1440, 900);
 
     const ensureLastUpdatedFacetOpen = () => {
-      cy.get('input[type="date"]:visible').then(($inputs) => {
+      cy.contains("button", "Last Updated", { timeout: 20000 })
+        .first()
+        .click({ force: true });
+
+      cy.get('input[type="date"]', { timeout: 30000 }).then(($inputs) => {
         if ($inputs.length < 2) {
           cy.contains("button", "Last Updated", { timeout: 20000 })
             .first()
@@ -124,7 +128,7 @@ describe("Search page", () => {
         }
       });
 
-      cy.get('input[type="date"]:visible', { timeout: 30000 }).should(
+      cy.get('input[type="date"]', { timeout: 30000 }).should(
         "have.length.at.least",
         2,
       );
@@ -132,11 +136,11 @@ describe("Search page", () => {
 
     const setDateRange = (sinceDateFormatted, beforeDateFormatted) => {
       ensureLastUpdatedFacetOpen();
-      cy.get('input[type="date"]:visible')
+      cy.get('input[type="date"]')
         .eq(0)
         .clear({ force: true })
         .type(sinceDateFormatted, { force: true, timeout: 10000 });
-      cy.get('input[type="date"]:visible')
+      cy.get('input[type="date"]')
         .eq(1)
         .clear({ force: true })
         .type(beforeDateFormatted, { force: true, timeout: 10000 });
