@@ -116,38 +116,54 @@ describe("Search page", () => {
     cy.viewport(1440, 900);
 
     const ensureLastUpdatedFacetOpen = () => {
-      cy.contains("button", "Last Updated", { timeout: 20000 })
+      cy.get("#facets-list", { timeout: 30000 })
+        .contains('[role="listitem"] p', "Last Updated", { timeout: 30000 })
+        .parents('[role="listitem"]')
         .first()
-        .click({ force: true });
+        .as("lastUpdatedFacet");
 
-      cy.get('input[type="date"]', { timeout: 30000 }).then(($inputs) => {
-        if ($inputs.length < 2) {
-          cy.contains("button", "Last Updated", { timeout: 20000 })
-            .first()
-            .click({ force: true });
-        }
+      cy.get("@lastUpdatedFacet")
+        .find("button[aria-expanded]", { timeout: 30000 })
+        .first()
+        .then(($button) => {
+          if ($button.attr("aria-expanded") !== "true") {
+            cy.wrap($button).click({ force: true });
+          }
+        });
+
+      cy.get("@lastUpdatedFacet")
+        .find("button[aria-expanded]", { timeout: 30000 })
+        .first()
+        .then(($button) => {
+          if ($button.attr("aria-expanded") !== "true") {
+            cy.wrap($button).click({ force: true });
+          }
+        });
+
+      cy.get("@lastUpdatedFacet")
+        .find("button[aria-expanded]", { timeout: 30000 })
+        .first()
+        .should("have.attr", "aria-expanded", "true");
+
+      cy.get("@lastUpdatedFacet").within(() => {
+        cy.get("#since-date", { timeout: 30000 }).should("exist");
+        cy.get("#before-date", { timeout: 30000 }).should("exist");
       });
-
-      cy.get('input[type="date"]', { timeout: 30000 }).should(
-        "have.length.at.least",
-        2,
-      );
     };
 
     const setDateRange = (sinceDateFormatted, beforeDateFormatted) => {
       ensureLastUpdatedFacetOpen();
 
-      // Re-query each field between clear/type to avoid detached element issues on re-render.
-      cy.get('input[type="date"]', { timeout: 30000 }).eq(0).as("sinceDate");
+      cy.get("@lastUpdatedFacet").find("#since-date", { timeout: 30000 }).as("sinceDate");
       cy.get("@sinceDate").clear({ force: true });
-      cy.get('input[type="date"]', { timeout: 30000 })
-        .eq(0)
+      cy.get("@lastUpdatedFacet")
+        .find("#since-date", { timeout: 30000 })
         .type(sinceDateFormatted, { force: true, timeout: 10000 });
 
-      cy.get('input[type="date"]', { timeout: 30000 }).eq(1).as("beforeDate");
+      cy.get("@lastUpdatedFacet").find("#before-date", { timeout: 30000 }).as("beforeDate");
       cy.get("@beforeDate").clear({ force: true });
-      cy.get('input[type="date"]', { timeout: 30000 })
-        .eq(1)
+      cy.get("@lastUpdatedFacet")
+        .find("#before-date", { timeout: 30000 })
         .type(beforeDateFormatted, { force: true, timeout: 10000 });
     };
 
