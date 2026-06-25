@@ -112,13 +112,14 @@ describe("Search page", () => {
   });
 
   it("allows faceting by last updated since and before dates", () => {
-    cy.visit("/search");
+    // Set viewport BEFORE visit so the page renders at lg breakpoint from the start
     cy.viewport(1440, 900);
+    cy.visit("/search");
     cy.wait(2000);
     cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
 
-    cy.get("@facets-list")
-      .contains("button", "Last Updated", { timeout: 15000 })
+    cy.get("#facets-list", { timeout: 15000 })
+      .contains("button", "Last Updated")
       .click({ force: true });
 
     cy.get("#since-date", { timeout: 15000 }).should("exist");
@@ -137,25 +138,24 @@ describe("Search page", () => {
       { since: yesterday, before: yesterday, results: false },
     ];
 
+    // Typing into a date input fires onChange per character → setFilters →
+    // React re-render → HeadlessUI Disclosure may close. Re-open if needed.
+    const ensureLastUpdatedOpen = () => {
+      cy.get("body").then(($body) => {
+        if ($body.find("#since-date").length === 0) {
+          cy.get("@facets-list")
+            .contains("button", "Last Updated")
+            .click({ force: true });
+          cy.get("#since-date", { timeout: 10000 }).should("exist");
+        }
+      });
+    };
+
     combinations.forEach((combination) => {
       const sinceDateFormatted = combination.since.toISOString().split("T")[0];
       const beforeDateFormatted = combination.before
         .toISOString()
         .split("T")[0];
-
-      // Typing into a date input fires onChange for each character, which can
-      // trigger a re-render that collapses the HeadlessUI Disclosure. Re-open it
-      // before each input if needed.
-      const ensureLastUpdatedOpen = () => {
-        cy.get("body").then(($body) => {
-          if ($body.find("#since-date").length === 0) {
-            cy.get("@facets-list")
-              .contains("button", "Last Updated", { timeout: 10000 })
-              .click({ force: true });
-            cy.get("#since-date", { timeout: 10000 }).should("exist");
-          }
-        });
-      };
 
       ensureLastUpdatedOpen();
       cy.get("#since-date", { timeout: 15000 }).clear().type(sinceDateFormatted, {
