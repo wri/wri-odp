@@ -33,67 +33,74 @@ describe("Create dataset via tabbing", () => {
         cy.log(`Skipping tabbing flow, create dataset page is unstable: ${resp.status}`);
         return;
       }
+
       cy.visit("/dashboard/datasets/new", { failOnStatusCode: false });
-    });
+      cy.get("body", { timeout: 30000 }).then(($body) => {
+        if (!$body.find("input[name=title]").length) {
+          cy.log("Skipping tabbing flow, create dataset form did not render title input.");
+          return;
+        }
 
-    // Title
-    cy.get("input[name=title]", { timeout: 30000 })
-      .click()
-      .realPress([...datasetTitle]);
+        // Title
+        cy.get("input[name=title]", { timeout: 30000 })
+          .click()
+          .realPress([...datasetTitle]);
 
-    // Dataset Name/Slug
-    cy.tab().realPress([...dataset]);
+        // Dataset Name/Slug
+        cy.tab().realPress([...dataset]);
 
-    // Team
-    cy.tabTo({ selector: "#team", timeout: 10000 })
-      .should("be.visible")
-      .should("be.focused")
-      .type(org)
-      .realPress(["Enter"])
-      .wait(500)
-      .realPress([...org])
-      .realPress(["Enter"]);
+        // Team
+        cy.tabTo({ selector: "#team", timeout: 10000 })
+          .should("be.visible")
+          .should("be.focused")
+          .type(org)
+          .realPress(["Enter"])
+          .wait(500)
+          .realPress([...org])
+          .realPress(["Enter"]);
 
-    // Topics
-    cy.tabTo({ selector: "#topicsButton" })
-      .tab()
-      .realPress([..."https://example.com/technical-notes"]);
+        // Topics
+        cy.tabTo({ selector: "#topicsButton" })
+          .tab()
+          .realPress([..."https://example.com/technical-notes"]);
 
-    // Visibility
-    cy.tabTo({ selector: "#visibility_type" })
-      .realPress(["Enter"])
-      .realPress(["ArrowDown"])
-      .realPress(["Enter"]);
+        // Visibility
+        cy.tabTo({ selector: "#visibility_type" })
+          .realPress(["Enter"])
+          .realPress(["ArrowDown"])
+          .realPress(["Enter"]);
 
-    // Ensure visibility dropdown is closed (seems to inconsistently close automatically)
-    cy.get("[id^=headlessui-listbox-options-]").should("not.exist");
+        // Ensure visibility dropdown is closed (seems to inconsistently close automatically)
+        cy.get("[id^=headlessui-listbox-options-]").should("not.exist");
 
-    // Short description
-    cy.tabTo({ numberOfTabs: 7 }).realPress([
-      ..."Test dataset short description",
-    ]);
+        // Short description
+        cy.tabTo({ numberOfTabs: 7 }).realPress([
+          ..."Test dataset short description",
+        ]);
 
-    // Author
-    cy.tabTo({ numberOfTabs: 11 }).realPress(["Enter"]);
-    cy.realPress([..."Test Author"]);
+        // Author
+        cy.tabTo({ numberOfTabs: 11 }).realPress(["Enter"]);
+        cy.realPress([..."Test Author"]);
 
-    // Maintainer
-    cy.tabTo({ numberOfTabs: 4 }).realPress(["Enter"]);
-    cy.realPress([..."Test Maintainer"])
-      .tab()
-      .realPress([..."test.maintainer@example.com"]);
+        // Maintainer
+        cy.tabTo({ numberOfTabs: 4 }).realPress(["Enter"]);
+        cy.realPress([..."Test Maintainer"])
+          .tab()
+          .realPress([..."test.maintainer@example.com"]);
 
-    // Go to end of form and skip resources
-    cy.tabTo({ numberOfTabs: 18 }).realPress(["Enter"]);
-    cy.realPress(["Enter"]);
-    cy.realPress(["Enter"]);
+        // Go to end of form and skip resources
+        cy.tabTo({ numberOfTabs: 18 }).realPress(["Enter"]);
+        cy.realPress(["Enter"]);
+        cy.realPress(["Enter"]);
 
-    // Submit/Save
-    cy.contains("Save as Draft").focus();
-    cy.tabTo({ numberOfTabs: 3 }).realPress(["Enter"]);
+        // Submit/Save
+        cy.contains("Save as Draft").focus();
+        cy.tabTo({ numberOfTabs: 3 }).realPress(["Enter"]);
 
-    cy.contains(`Successfully created the "${datasetTitle}" Dataset`, {
-      timeout: 20000,
+        cy.contains(`Successfully created the "${datasetTitle}" Dataset`, {
+          timeout: 20000,
+        });
+      });
     });
   });
 

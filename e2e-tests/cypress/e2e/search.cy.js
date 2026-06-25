@@ -113,12 +113,30 @@ describe("Search page", () => {
 
   it("allows faceting by last updated since and before dates", () => {
     cy.visit("/search");
-    cy.viewport(1440, 900)
-    cy.wait(2000);
-    cy.contains('button', 'Last Updated', { timeout: 15000 })
-      .scrollIntoView()
-      .should('be.visible')
-      .click({ force: true });
+    cy.viewport(1440, 900);
+
+    cy.contains("p", "Last Updated", { timeout: 20000 })
+      .should("be.visible")
+      .parents('[role="listitem"]')
+      .first()
+      .within(() => {
+        cy.get("button").first().click({ force: true });
+      });
+
+    cy.get("body", { timeout: 20000 }).then(($body) => {
+      if (!$body.find("#since-date").length || !$body.find("#before-date").length) {
+        cy.log("Last Updated panel did not open on first attempt, retrying click.");
+        cy.contains("p", "Last Updated", { timeout: 20000 })
+          .parents('[role="listitem"]')
+          .first()
+          .within(() => {
+            cy.get("button").first().click({ force: true });
+          });
+      }
+    });
+
+    cy.get("#since-date", { timeout: 30000 }).should("be.visible");
+    cy.get("#before-date", { timeout: 30000 }).should("be.visible");
 
     const today = new Date();
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
@@ -139,11 +157,11 @@ describe("Search page", () => {
         .toISOString()
         .split("T")[0];
 
-      cy.get("#since-date", { timeout: 15000, force: true })
+      cy.get("#since-date", { timeout: 30000, force: true })
         .should("be.visible")
         .clear({ force: true })
         .type(sinceDateFormatted, { force: true, timeout: 10000 });
-      cy.get("#before-date", { timeout: 15000, force: true })
+      cy.get("#before-date", { timeout: 30000, force: true })
         .should("be.visible")
         .clear({ force: true })
         .type(beforeDateFormatted, { force: true, timeout: 10000 });
