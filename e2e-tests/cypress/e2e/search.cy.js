@@ -115,28 +115,41 @@ describe("Search page", () => {
     cy.visit("/search");
     cy.viewport(1440, 900);
 
-    cy.contains("p", "Last Updated", { timeout: 20000 })
-      .should("be.visible")
-      .parents('[role="listitem"]')
-      .first()
-      .within(() => {
-        cy.get("button").first().click({ force: true });
-      });
+    const ensureLastUpdatedFacetOpen = () => {
+      cy.contains("p", "Last Updated", { timeout: 20000 })
+        .should("be.visible")
+        .parents('[role="listitem"]')
+        .first()
+        .then(($facet) => {
+          const visibleDateInputs = $facet.find('input[type="date"]:visible').length;
+          if (visibleDateInputs < 2) {
+            cy.wrap($facet).find("button").first().click({ force: true });
+          }
+        });
 
-    cy.get("body", { timeout: 20000 }).then(($body) => {
-      if (!$body.find("#since-date").length || !$body.find("#before-date").length) {
-        cy.log("Last Updated panel did not open on first attempt, retrying click.");
-        cy.contains("p", "Last Updated", { timeout: 20000 })
-          .parents('[role="listitem"]')
-          .first()
-          .within(() => {
-            cy.get("button").first().click({ force: true });
-          });
-      }
-    });
+      cy.contains("p", "Last Updated", { timeout: 20000 })
+        .parents('[role="listitem"]')
+        .first()
+        .find('input[type="date"]:visible', { timeout: 30000 })
+        .should("have.length.at.least", 2);
+    };
 
-    cy.get("#since-date", { timeout: 30000 }).should("be.visible");
-    cy.get("#before-date", { timeout: 30000 }).should("be.visible");
+    const setDateRange = (sinceDateFormatted, beforeDateFormatted) => {
+      ensureLastUpdatedFacetOpen();
+      cy.contains("p", "Last Updated", { timeout: 20000 })
+        .parents('[role="listitem"]')
+        .first()
+        .within(() => {
+          cy.get('input[type="date"]:visible')
+            .eq(0)
+            .clear({ force: true })
+            .type(sinceDateFormatted, { force: true, timeout: 10000 });
+          cy.get('input[type="date"]:visible')
+            .eq(1)
+            .clear({ force: true })
+            .type(beforeDateFormatted, { force: true, timeout: 10000 });
+        });
+    };
 
     const today = new Date();
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
@@ -157,14 +170,7 @@ describe("Search page", () => {
         .toISOString()
         .split("T")[0];
 
-      cy.get("#since-date", { timeout: 30000, force: true })
-        .should("be.visible")
-        .clear({ force: true })
-        .type(sinceDateFormatted, { force: true, timeout: 10000 });
-      cy.get("#before-date", { timeout: 30000, force: true })
-        .should("be.visible")
-        .clear({ force: true })
-        .type(beforeDateFormatted, { force: true, timeout: 10000 });
+      setDateRange(sinceDateFormatted, beforeDateFormatted);
 
       if (combination.results === true) {
         cy.contains("results", { timeout: 10000 });
