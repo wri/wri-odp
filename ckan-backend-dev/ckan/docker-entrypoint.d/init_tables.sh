@@ -1,40 +1,36 @@
 #!/bin/bash
-# Create WRI extension tables and other plugin tables not covered by `ckan db init`.
-# Idempotent: each command no-ops when the table already exists.
 
-set -euo pipefail
+echo "Initializing custom tables..."
 
-CKAN_INI="${CKAN_INI:-production.ini}"
+ckan -c production.ini notificationdb
 
-run_ckan_cmd() {
-    local cmd=$1
-    local required=${2:-required}
+EXIT_CODE=$?
 
-    echo "[init_custom_tables] Running: ckan -c ${CKAN_INI} ${cmd}"
-    if ckan -c "${CKAN_INI}" ${cmd}; then
-        echo "[init_custom_tables] OK: ${cmd}"
-        return 0
-    fi
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "Failed to initialize the notification table"
+fi
 
-    local exit_code=$?
-    if [ "${required}" = "required" ]; then
-        echo "[init_custom_tables] FAILED (required): ${cmd} (exit ${exit_code})"
-        exit "${exit_code}"
-    fi
+ckan -c production.ini pendingdatasetsdb
 
-    echo "[init_custom_tables] WARN (optional): ${cmd} failed (exit ${exit_code}), continuing"
-    return 0
-}
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "Failed to initialize the pending datasets table"
+    exit $EXIT_CODE
+fi
 
-echo "[init_custom_tables] Initializing custom tables..."
+ckan -c production.ini resourcelocationdb
 
-run_ckan_cmd "notificationdb"
-run_ckan_cmd "pendingdatasetsdb"
-run_ckan_cmd "downloadeventdb"
-run_ckan_cmd "downloadeventdbupdate" optional
-run_ckan_cmd "resourcelocationdb" optional
-run_ckan_cmd "issuesdb"
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "Failed to initialize the data file location table"
+    exit $EXIT_CODE
+fi
 
-run_ckan_cmd "db upgrade -p harvest" optional
+echo "Custom tables initialized successfully"
 
-echo "[init_custom_tables] Custom tables initialized"
+ckan -c production.ini issuesdb
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "Failed to initialize the issues table"
+    exit $EXIT_CODE
+fi
+
+echo "Issues table initialized successfully"
