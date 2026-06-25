@@ -115,8 +115,11 @@ describe("Search page", () => {
     cy.visit("/search");
     cy.viewport(1440, 900);
     cy.wait(2000);
+    cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
 
-    cy.get("@facets-list").contains("Last Updated").click({ force: true });
+    cy.get("@facets-list")
+      .contains("button", "Last Updated", { timeout: 15000 })
+      .click({ force: true });
 
     cy.get("#since-date", { timeout: 15000 }).should("exist");
     cy.get("#before-date", { timeout: 15000 }).should("exist");
@@ -140,11 +143,11 @@ describe("Search page", () => {
         .toISOString()
         .split("T")[0];
 
-      cy.get("#since-date", { timeout: 15000 }).type(sinceDateFormatted, {
+      cy.get("#since-date", { timeout: 15000 }).clear().type(sinceDateFormatted, {
         force: true,
         timeout: 10000,
       });
-      cy.get("#before-date", { timeout: 15000 }).type(beforeDateFormatted, {
+      cy.get("#before-date", { timeout: 15000 }).clear().type(beforeDateFormatted, {
         force: true,
         timeout: 10000,
       });

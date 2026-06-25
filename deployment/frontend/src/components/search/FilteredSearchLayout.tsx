@@ -545,6 +545,9 @@ export default function FilteredSearchLayout({
                               ff.key ===
                                 'temporal_coverage' ? (
                                 <TemporalCoverageFacet
+                                  key={
+                                    ff.key
+                                  }
                                   filters={
                                     filters
                                   }
@@ -555,6 +558,9 @@ export default function FilteredSearchLayout({
                               ) : ff.key ===
                                 'metadata_modified' ? (
                                 <MetadataModifiedFacet
+                                  key={
+                                    ff.key
+                                  }
                                   filters={
                                     filters
                                   }
@@ -565,6 +571,9 @@ export default function FilteredSearchLayout({
                               ) : ff.key ===
                                 'tags' ? (
                                 <Tags
+                                  key={
+                                    ff.key
+                                  }
                                   value={
                                     value
                                   }
@@ -617,7 +626,11 @@ export default function FilteredSearchLayout({
                                 />
                               ) : ff.key ===
                                 'groups' ? (
-                                <>
+                                <React.Fragment
+                                  key={
+                                    ff.key
+                                  }
+                                >
                                   <Facet
                                     text={
                                       'Topics'
@@ -741,11 +754,14 @@ export default function FilteredSearchLayout({
                                       filters
                                     }
                                   />
-                                </>
+                                </React.Fragment>
                               ) : (
                                 <Facet
                                   text={
                                     ff.title
+                                  }
+                                  key={
+                                    ff.key
                                   }
                                   facetSelectedCount={
                                     facetSelectedCount
