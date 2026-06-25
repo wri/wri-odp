@@ -139,11 +139,22 @@ describe("Search page", () => {
     ];
 
     // Typing into a date input fires onChange per character → setFilters →
-    // React re-render → HeadlessUI Disclosure may close. Re-open if needed.
+    // React re-render → HeadlessUI outer Disclosure may close, removing
+    // #facets-list from the DOM entirely. Re-open outer then inner if needed.
     const ensureLastUpdatedOpen = () => {
+      // Step 1: if the outer sidebar collapsed, re-open it via its toggle button
+      // (Disclosure.Button is always in the DOM, unlike Disclosure.Panel)
       cy.get("body").then(($body) => {
-        if ($body.find("#since-date").length === 0) {
-          cy.get("@facets-list")
+        if ($body.find("#facets-list").length === 0) {
+          cy.get('[aria-label="collapse sidebar"]', { timeout: 5000 }).click({
+            force: true,
+          });
+        }
+      });
+      // Step 2: once #facets-list exists, re-open Last Updated panel if closed
+      cy.get("#facets-list", { timeout: 10000 }).then(($facetsList) => {
+        if ($facetsList.find("#since-date").length === 0) {
+          cy.wrap($facetsList)
             .contains("button", "Last Updated")
             .click({ force: true });
           cy.get("#since-date", { timeout: 10000 }).should("exist");
