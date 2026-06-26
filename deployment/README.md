@@ -89,3 +89,5 @@ Once the collection is created, update the CKAN_SOLR_URL secret in CKAN to use t
 CKAN_SOLR_URL: http://solr-url/solr/ckan
 ```
 Where `ckan` is name of newly created collection
+
+run tests
