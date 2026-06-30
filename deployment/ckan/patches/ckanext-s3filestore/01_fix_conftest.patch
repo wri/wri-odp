@@ -1,0 +1,12 @@
+diff --git a/conftest.py b/conftest.py
+index 1111111..2222222 100644
+--- a/conftest.py
++++ b/conftest.py
+@@ -1,7 +1,5 @@
+ # -*- coding: utf-8 -*-
+ 
+ pytest_plugins = [
+     u'ckanext.s3filestore.tests.fixtures',
+-    u'ckan.tests.pytest_ckan.ckan_setup',
+-    u'ckan.tests.pytest_ckan.fixtures',
+ ]
