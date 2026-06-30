@@ -265,3 +265,5 @@ The script creates:
 - Two CSV resources uploaded to local Minio
 
 You can then visit `http://localhost:3000` and use the `test-bulk-download` dataset to test the bulk download flow end-to-end.
+
+running the tests
