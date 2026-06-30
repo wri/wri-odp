@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-CKAN_INI="${CKAN_INI:-production.ini}"
+CKAN_INI="${CKAN_INI:-/srv/app/production.ini}"
 
 run_ckan_cmd() {
     local cmd=$1
@@ -35,6 +35,7 @@ run_ckan_cmd "downloadeventdbupdate" optional
 run_ckan_cmd "resourcelocationdb" optional
 run_ckan_cmd "issuesdb"
 
+# Alembic migrations for extensions not handled by `db init`.
 run_ckan_cmd "db upgrade -p harvest" optional
 
 echo "[init_custom_tables] Custom tables initialized"

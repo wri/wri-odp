@@ -94,6 +94,10 @@ prometheus:
     # Additional scrape configs for custom targets
     additionalScrapeConfigs: []
 
+    # Attached to all metrics and alerts — set per cluster at deploy time (e.g. ckan-dev, ckan-prod)
+    externalLabels:
+      cluster: "{{CLUSTER_NAME}}"
+
 # Alertmanager configuration
 alertmanager:
   enabled: {{ALERTMANAGER_ENABLED}}
@@ -122,7 +126,7 @@ alertmanager:
       resolve_timeout: 5m
       slack_api_url: "{{SLACK_WEBHOOK_URL}}"
     route:
-      group_by: ['alertname', 'namespace']
+      group_by: ['alertname', 'namespace', 'cluster']
       group_wait: 30s
       group_interval: 5m
       repeat_interval: 4h
@@ -137,9 +141,10 @@ alertmanager:
         slack_configs:
           - channel: '{{SLACK_CHANNEL}}'
             send_resolved: true
-            title: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}'
+            title: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }} ({{ .CommonLabels.cluster }})'
             text: >-
               {{ range .Alerts }}
+              *Cluster:* {{ .Labels.cluster }}
               *Alert:* {{ .Annotations.summary }}
               *Description:* {{ .Annotations.description }}
               *Namespace:* {{ .Labels.namespace }}
@@ -206,15 +211,16 @@ additionalPrometheusRulesMap:
               summary: "High error rate detected"
               description: "Error rate is above 5% for the last 5 minutes"
           
-          # Pod not ready
+          # Pod not ready (excludes Succeeded pods, e.g. completed CronJob/Job runs)
           - alert: PodNotReady
             expr: |
               kube_pod_status_ready{condition="true", namespace=~"wri-odp-.*"} == 0
+              unless on (namespace, pod) kube_pod_status_phase{phase="Succeeded", namespace=~"wri-odp-.*"} == 1
             for: 10m
             labels:
               severity: warning
             annotations:
-              summary: "Pod not ready in {{ $labels.namespace }}"
+              summary: "Pod not ready in {{ $labels.namespace }} ({{ $labels.cluster }})"
               description: "Pod {{ $labels.pod }} has been not ready for more than 10 minutes"
 
 # ============================================================================

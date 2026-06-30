@@ -41,6 +41,7 @@ jobs:
       next_public_gtm_id: ${{ steps.vars.outputs.next_public_gtm_id }}
       next_public_hotjar_id: ${{ steps.vars.outputs.next_public_hotjar_id }}
       ckan_changed: ${{ steps.check_changes.outputs.ckan_changed }}
+      ckan_base_changed: ${{ steps.check_changes.outputs.ckan_base_changed }}
       datapusher_changed: ${{ steps.check_changes.outputs.datapusher_changed }}
       frontend_changed: ${{ steps.check_changes.outputs.frontend_changed }}
       migration_changed: ${{ steps.check_changes.outputs.migration_changed }}
@@ -84,6 +85,7 @@ jobs:
 
           # Check each component for changes
           check_changed "ckan"       "ckan-backend-dev/" "deployment/ckan/"
+          check_changed "ckan_base"    "deployment/ckan/Dockerfile.base" "deployment/ckan/patches/" "deployment/ckan/setup/" "deployment/ckan/docker-entrypoint.d/"
           check_changed "datapusher" "datapusher/"
           check_changed "frontend"   "deployment/frontend/"
           check_changed "migration"  "migration/"
@@ -141,6 +143,7 @@ jobs:
     uses: ./.github/workflows/build-ckan-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
+      ckan_base_changed: ${{ needs.setup.outputs.ckan_base_changed }}
     secrets: inherit
   build-datapusher:
     name: Build Datapusher Image
