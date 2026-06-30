@@ -3,7 +3,7 @@ import { SessionProvider } from 'next-auth/react';
 import { type AppProps, type AppType } from 'next/app';
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query';
 import { ChakraProvider } from '@chakra-ui/react';
-import { system } from '../lib/theme';
+import { system } from '../theme';
 import { Provider, useCreateStore } from '@/utils/store';
 import { useState, useEffect } from 'react';
 
