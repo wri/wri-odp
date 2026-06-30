@@ -10,6 +10,10 @@ ENV UWSGI_HARAKIRI=50
 ENV CKAN_INI=${APP_DIR}/production.ini
 ENV SRC_EXTENSIONS_DIR=${APP_DIR}/src_extensions
 
+# v2.11.4 ships ckan.ini instead of production.ini; keep the old path working
+USER root
+RUN ln -sf /srv/app/ckan.ini /srv/app/production.ini
+
 # Install any extensions needed by your CKAN instance
 # - Make sure to add the plugins to CKAN__PLUGINS in the .env file
 # - Also make sure all extra configuration options are added to the CKAN config file (production.ini)
