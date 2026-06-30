@@ -22,7 +22,7 @@ const cspHeader = `
 
 /** @type {import("next").NextConfig} */
 const config = {
-    reactStrictMode: false,
+    reactStrictMode: true,
     output: 'standalone',
     typescript: {
         ignoreBuildErrors: true,
