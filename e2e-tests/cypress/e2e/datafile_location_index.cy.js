@@ -28,12 +28,28 @@ describe("Data File location", () => {
     },
     () => {
       cy.visit("/dashboard/datasets/new");
-      cy.get("input[name=title]").type(datasetName);
-      cy.get("input[name=name]").should("have.value", datasetName);
-      cy.get("textarea[name=short_description]").type("test");
+      cy.contains("h1", "Add a Dataset", { timeout: 20000 }).should("be.visible");
+
+      cy.get('input[name="title"], input[placeholder="My Dataset"]', {
+        timeout: 20000,
+      })
+        .first()
+        .type(datasetName);
+
+      cy.get('input[name="name"], input[placeholder="name-of-dataset"]', {
+        timeout: 10000,
+      })
+        .first()
+        .should("have.value", datasetName);
+
+      cy.get('textarea[name="short_description"], textarea[aria-label="Short Description"]', {
+        timeout: 10000,
+      })
+        .first()
+        .type("test");
 
       cy.get("#team").click();
-      cy.get("li").contains(org).click();
+      cy.contains("li", org, { timeout: 20000 }).click();
       cy.contains("Add Author").click();
       cy.get('input[name="authors.0.name"]').type("Test Author 1");
       cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
@@ -58,9 +74,17 @@ describe("Data File location", () => {
         force: true,
       });
       cy.contains("Choose location").click({ force: true });
-      cy.get(".mapboxgl-ctrl-geocoder--input").type("Brazil");
-      cy.get(".mapboxgl-ctrl-geocoder--suggestion-title").first().click();
-      cy.wait(5000);
+      cy.get(".mapboxgl-ctrl-geocoder--input", { timeout: 20000 })
+        .should("be.visible")
+        .type("Brazil");
+      cy.get(".mapboxgl-ctrl-geocoder--suggestion-title", { timeout: 20000 })
+        .contains("Brazil")
+        .first()
+        .click();
+      cy.get(".mapboxgl-ctrl-geocoder--input", { timeout: 20000 }).should(
+        "contain.value",
+        "Brazil"
+      );
       cy.contains("Next: Map Visualizations").click();
       cy.contains("Next: Preview").click();
       cy.get('button[type="submit"]').click();

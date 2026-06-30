@@ -9,7 +9,7 @@ class LegendList extends PureComponent {
     };
 
     static defaultProps = {
-        sortable: true,
+        sortable: false,
         children: [],
     };
 

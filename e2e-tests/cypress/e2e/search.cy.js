@@ -112,18 +112,13 @@ describe("Search page", () => {
   });
 
   it("allows faceting by last updated since and before dates", () => {
-    // Set viewport BEFORE visit so the page renders at lg breakpoint from the start
-    cy.viewport(1440, 900);
     cy.visit("/search");
+    cy.viewport(1440, 900)
     cy.wait(2000);
-    cy.get("#facets-list", { timeout: 20000 }).as("facets-list");
-
-    cy.get("#facets-list", { timeout: 15000 })
-      .contains("button", "Last Updated")
+    cy.contains('button', 'Last Updated', { timeout: 15000 })
+      .scrollIntoView()
+      .should('be.visible')
       .click({ force: true });
-
-    cy.get("#since-date", { timeout: 15000 }).should("exist");
-    cy.get("#before-date", { timeout: 15000 }).should("exist");
 
     const today = new Date();
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
@@ -138,40 +133,14 @@ describe("Search page", () => {
       { since: yesterday, before: yesterday, results: false },
     ];
 
-    // After typing, setFilters → router.push may trigger a full re-render,
-    // temporarily removing both the outer sidebar and inner panel from the DOM.
-    // After re-mount, outer Disclosure reopens (defaultOpen), but the inner
-    // MetadataModifiedFacet Disclosure resets to closed. Wait for #facets-list
-    // to reappear and then reopen "Last Updated" if needed.
-    const ensureLastUpdatedOpen = () => {
-      cy.get("#facets-list", { timeout: 15000 }).then(($facetsList) => {
-        if ($facetsList.find("#since-date").length === 0) {
-          cy.wrap($facetsList)
-            .contains("button", "Last Updated")
-            .click({ force: true });
-          cy.get("#since-date", { timeout: 10000 }).should("exist");
-        }
-      });
-    };
-
     combinations.forEach((combination) => {
       const sinceDateFormatted = combination.since.toISOString().split("T")[0];
       const beforeDateFormatted = combination.before
         .toISOString()
         .split("T")[0];
 
-      ensureLastUpdatedOpen();
-      cy.get("#since-date", { timeout: 15000 }).clear().type(sinceDateFormatted, {
-        force: true,
-        timeout: 10000,
-      });
-
-      // Re-open the panel if the Disclosure closed after typing since-date
-      ensureLastUpdatedOpen();
-      cy.get("#before-date", { timeout: 15000 }).clear().type(beforeDateFormatted, {
-        force: true,
-        timeout: 10000,
-      });
+      cy.get("#since-date", {force: true}).type(sinceDateFormatted, { force: true, timeout: 10000 });
+      cy.get("#before-date").type(beforeDateFormatted, { force: true, timeout: 10000 });
 
       if (combination.results === true) {
         cy.contains("results", { timeout: 10000 });

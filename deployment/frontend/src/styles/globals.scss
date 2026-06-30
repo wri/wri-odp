@@ -377,7 +377,7 @@ li.osano-cm-drawer-item:nth-child(5) {
     }
 }
 
-@theme {
+:root {
     --font-sans:
         var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
         'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
