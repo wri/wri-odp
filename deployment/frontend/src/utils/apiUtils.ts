@@ -2761,7 +2761,7 @@ export function advance_search_query(filters: Filter[]) {
 
 export async function getTokenList(session: Session) {
     const response = await fetch(
-        `${env.CKAN_URL}/api/3/action/api_token_list`,
+        `${env.NEXT_PUBLIC_CKAN_URL}/api/3/action/api_token_list`,
         {
             method: 'POST',
             body: JSON.stringify({ user_id: session.user.id }),

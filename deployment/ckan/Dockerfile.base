@@ -58,9 +58,7 @@ RUN for d in $APP_DIR/patches/*; do \
 # 5. Additional Configuration & Scripts
 COPY setup/prerun.py.override ${APP_DIR}/prerun.py
 COPY setup/start_ckan.sh.override ${APP_DIR}/start_ckan.sh
-COPY docker-entrypoint.d/ /docker-entrypoint.d/
 RUN chmod +x ${APP_DIR}/prerun.py ${APP_DIR}/start_ckan.sh && \
-    chmod +x /docker-entrypoint.d/*.sh && \
     chmod 777 ${APP_DIR}/src/ckanext-s3filestore
 
 # Configure sudo
