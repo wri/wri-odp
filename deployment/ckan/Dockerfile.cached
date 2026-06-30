@@ -22,7 +22,7 @@ RUN cd ${APP_DIR}/src/ckanext-wri && pip3 install -e .
 # 3. Final User & Config
 USER ckan
 
-ENV CKAN__PLUGINS=text_view image_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest hierarchy_display wri wri_harvester auth issues envvars
+ENV CKAN__PLUGINS="text_view image_view webpage_view resource_proxy datatables_view datastore datapusher activity s3filestore scheming_datasets scheming_organizations scheming_groups harvest hierarchy_display wri wri_harvester auth issues envvars"
 
 # Combine config tool commands
 RUN ckan config-tool ${CKAN_INI} \
