@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - 'deployment/ckan/Dockerfile.base'
+      - 'deployment/ckan/patches/**'
+      - 'deployment/ckan/setup/**'
+      - 'deployment/ckan/docker-entrypoint.d/**'
     branches:
       - dev
   workflow_dispatch:

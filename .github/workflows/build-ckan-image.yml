@@ -6,6 +6,10 @@ on:
       branch_name:
         required: true
         type: string
+      ckan_base_changed:
+        required: false
+        type: string
+        default: 'false'
   workflow_dispatch:
     inputs:
       branch_name:
@@ -42,19 +46,42 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           CKAN_REPO: ${{ vars.ECR_CKAN_REPO }}
+          BASE_REPO: ${{ vars.ECR_CKAN_BASE_REPO }}
           IMAGE_TAG: ${{ github.sha }}
           LATEST_TAG: ${{ inputs.branch_name || github.ref_name }}
+          CKAN_BASE_CHANGED: ${{ inputs.ckan_base_changed || 'false' }}
         run: |
           # Move ckanext-wri extension to deployment directory
           mv ckan-backend-dev/src/ckanext-wri deployment/ckan/
-          
-          # Build the CKAN image from the cached Dockerfile.Base image
+
+          BASE_IMAGE_TAG=latest
+
+          if [ "$CKAN_BASE_CHANGED" = "true" ]; then
+            echo "Base image inputs changed; building from Dockerfile.base"
+            docker build -f deployment/ckan/Dockerfile.base \
+              -t $REGISTRY/$BASE_REPO:$IMAGE_TAG \
+              deployment/ckan
+            BASE_IMAGE_TAG=$IMAGE_TAG
+
+            if [ "${{ github.event_name }}" != "pull_request" ]; then
+              docker tag $REGISTRY/$BASE_REPO:$IMAGE_TAG $REGISTRY/$BASE_REPO:latest
+              docker push $REGISTRY/$BASE_REPO:$IMAGE_TAG
+              docker push $REGISTRY/$BASE_REPO:latest
+              echo "Successfully pushed base image $IMAGE_TAG and latest"
+            else
+              echo "Using locally built base image $IMAGE_TAG for PR (not pushed)"
+            fi
+          else
+            echo "Using published base image tag: latest"
+          fi
+
           docker build -f deployment/ckan/Dockerfile.cached \
             --build-arg REGISTRY=$REGISTRY \
+            --build-arg BASE_IMAGE_TAG=$BASE_IMAGE_TAG \
             -t $REGISTRY/$CKAN_REPO:$IMAGE_TAG \
             deployment/ckan
           docker push $REGISTRY/$CKAN_REPO:$IMAGE_TAG
-          
+
           # Only push 'latest' tag if this is NOT a Pull Request
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             docker tag $REGISTRY/$CKAN_REPO:$IMAGE_TAG $REGISTRY/$CKAN_REPO:$LATEST_TAG
@@ -63,5 +90,5 @@ jobs:
           else
             echo "Skipping 'latest' tag push for Pull Request"
           fi
-          
+
           echo "Successfully pushed $IMAGE_TAG"
