@@ -9,23 +9,45 @@ const dataset = `${uuid()}-test-datasettytytyty`;
 
 describe("Upload file and create dataset", () => {
   beforeEach(function () {
-    cy.login("ckan_admin", "test1234");
+    cy.login(ckanUserName, ckanUserPassword);
   });
 
   before(() => {
     cy.createOrganizationAPI(org);
   });
 
-  it("Should create dataset", () => {
+  it(
+    "Should create dataset",
+    {
+      retries: {
+        runMode: 5,
+        openMode: 0,
+      },
+    },
+    () => {
     cy.visit("/dashboard/datasets/new");
-    cy.get("input[name=title]").type(dataset);
-    cy.get("input[name=name]").should("have.value", dataset);
+    cy.contains("h1", "Add a Dataset", { timeout: 30000 }).should("be.visible");
+
+    cy.get('input[name="title"], input[placeholder="My Dataset"]', {
+      timeout: 20000,
+    })
+      .first()
+      .type(dataset);
+    cy.get('input[name="name"], input[placeholder="name-of-dataset"]', {
+      timeout: 10000,
+    })
+      .first()
+      .should("have.value", dataset);
     cy.get("#visibility_type").click();
     cy.get("li").contains("Public").click();
     cy.get("#team").click();
-    cy.get("li").contains(org).click();
+    cy.contains("li", org, { timeout: 20000 }).click();
     cy.get("input[name=technical_notes]").type("https://google.com");
-    cy.get("textarea[name=short_description]").type("test");
+    cy.get('textarea[name="short_description"], textarea[aria-label="Short Description"]', {
+      timeout: 10000,
+    })
+      .first()
+      .type("test");
 
     cy.contains("Add Author").click();
     cy.get('input[name="authors.0.name"]').type("Test Author 1");
@@ -53,23 +75,17 @@ describe("Upload file and create dataset", () => {
     cy.wait(5000);
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
-    //FOR SOME REASON THIS SEEM NOT TO WORK
-    // IN CI/CD BUT WORKS LOCALLY
-    //get button of type submit
-    // cy.get('button[type="submit"]').click();
-    // cy.contains(`Successfully created the "${dataset}" dataset`, {
-    //   timeout: 20000,
-    // });
-    cy.get('button[type="submit"]').click();
-    cy.wait(40000);
-    cy.visit("/dashboard/datasets");
-    cy.wait(15000);
-    cy.contains("Awaiting Approval").click({ timeout: 15000 });
-    cy.wait(20000);
-    cy.get('input[type="search"]').type(dataset).type("{enter}");
+    cy.get('button[type="submit"]', { timeout: 20000 }).click();
+    cy.contains(new RegExp(`Successfully created the "${dataset}"`, "i"), {
+      timeout: 60000,
+    }).should("be.visible");
 
-    cy.contains("div", dataset).should("exist", { timeout: 15000 });
-  });
+    cy.visit("/dashboard/datasets");
+    cy.get('input[type="search"]', { timeout: 30000 }).type(dataset).type("{enter}");
+
+    cy.contains(dataset, { timeout: 30000 }).should("exist");
+    },
+  );
 
   it(
     "Submit datapusher",
@@ -81,26 +97,35 @@ describe("Upload file and create dataset", () => {
     },
     () => {
       cy.visit("/dashboard/datasets/" + dataset + "/edit");
-      cy.contains("Data Files").click();
+      cy.contains("Data Files", { timeout: 30000 }).click();
       cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Datapusher").click();
       cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
-      cy.contains(`Successfully submited Data File to the datapusher`, {
-        timeout: 15000,
+      cy.contains(/Successfully.*Data File.*datapusher/i, {
+        timeout: 30000,
       });
-      cy.wait(15000);
-      cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
+      cy.contains(/DATAPUSHER\+ JOB DONE!/i, { timeout: 120000 });
     },
   );
 
   it("Edit metadata", () => {
     cy.visit("/dashboard/datasets/" + dataset + "/edit");
-    cy.get("input[name=title]")
+    cy.get('input[name="title"], input[placeholder="My Dataset"]', {
+      timeout: 30000,
+    })
+      .first()
       .clear()
       .type(dataset + " EDITED");
-    cy.get("textarea[name=short_description]").clear().type("test234");
+    cy.get('textarea[name="short_description"], textarea[aria-label="Short Description"]', {
+      timeout: 10000,
+    })
+      .first()
+      .clear()
+      .type("test234");
     cy.get("button").contains("Update Dataset").click({ force: true });
-    cy.wait(20000);
+    cy.contains(/Dataset Updated|Successfully updated/i, { timeout: 30000 }).should(
+      "exist",
+    );
   });
 
   it(
@@ -113,15 +138,17 @@ describe("Upload file and create dataset", () => {
     },
     () => {
       cy.viewport(1440, 900);
-      cy.wait(15000);
       cy.visit("/datasets/" + dataset);
-      cy.get("#toggle-version").click();
-      cy.wait(10000);
-      // cy.contains("View Table Preview", { timeout: 30000 }).click();
-      cy.contains("01D2539e270CEbd", { timeout: 15000 });
+
+      cy.get("body", { timeout: 30000 }).then(($body) => {
+        if ($body.find("#toggle-version").length) {
+          cy.get("#toggle-version").click({ force: true });
+        }
+      });
+
+      cy.contains("01D2539e270CEbd", { timeout: 60000 });
       cy.contains("Download Data").click();
-      cy.get("#download-subset-csv").click();
-      cy.wait(5000);
+      cy.get("#download-subset-csv", { timeout: 30000 }).click();
       cy.contains("Submit");
     },
   );

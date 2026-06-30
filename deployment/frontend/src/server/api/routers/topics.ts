@@ -357,7 +357,7 @@ export const TopicRouter = createTRPCRouter({
       if (groupTree.length === 0) {
         return {
           topics: groupTree,
-          topicDetails: {} as Record<string, GroupsmDetails>,
+          topicDetails: {},
           count: 0,
         };
       }
