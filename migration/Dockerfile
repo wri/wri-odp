@@ -1,18 +1,18 @@
 FROM python:3.14-slim
 
 WORKDIR /app
-# Copy all jobs to container
-COPY . .
-RUN pip3 install -r requirements.txt
-RUN apt-get update
 
-# Get Ubuntu packages
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     file \
     uchardet \
-    libuchardet-dev
+    libuchardet-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy all jobs to container
+COPY . .
+RUN pip3 install -r requirements.txt
 
 RUN mkdir /app/flow_logs
 

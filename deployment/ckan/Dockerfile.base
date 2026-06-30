@@ -28,7 +28,7 @@ RUN apk update && \
 # 2. Python Setup & Base Libraries
 RUN pip3 install --upgrade setuptools==70.0.0 && \
     pip3 install --force-reinstall -v "Pillow==11.0.0" && \
-    pip3 install --disable-pip-version-check "Cython<3" numpy && \
+    pip3 install --disable-pip-version-check "Cython<3" "numpy>=1.14,<2.0.0" && \
     pip3 install --disable-pip-version-check --no-build-isolation Shapely==2.0.1 && \
     pip3 install pyproj moto ckanapi httpretty mock
 
