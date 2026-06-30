@@ -1,4 +1,4 @@
-FROM viderum/ckan:v2.11.0
+FROM viderum/ckan:v2.11.4
 
 ENV CKAN_INI=/srv/app/production.ini
 ENV APP_DIR=/srv/app
