@@ -89,7 +89,7 @@ export default function LegendItemButtonThreshold<
                                 <div className="absolute right-[65px]">
                                     <Transition
                                         show={open}
-                                        as={Fragment}
+                                        as="div"
                                         leave="transition ease-in duration-100"
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"

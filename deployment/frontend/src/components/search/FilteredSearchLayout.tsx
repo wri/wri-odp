@@ -141,7 +141,7 @@ export default function FilteredSearchLayout({
         ```
       */}
       <div className="flex font-acumin">
-        <Transition.Root show={sidebarOpen} as={Fragment}>
+        <Transition.Root show={sidebarOpen} as="div">
           <Dialog
             as="div"
             className="relative z-50 lg:hidden"
