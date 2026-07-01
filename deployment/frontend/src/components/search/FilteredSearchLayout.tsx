@@ -1,4 +1,4 @@
-import { Dialog, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel, TransitionChild } from '@headlessui/react'
+import { Dialog, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel, TransitionChild } from '@headlessui/react';
 import { type Dispatch, Fragment, type SetStateAction, useState } from 'react';
 import {
   Bars3Icon,

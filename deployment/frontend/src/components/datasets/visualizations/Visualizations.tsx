@@ -1,4 +1,4 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { VisualizationTabs } from './VisualizationTabs';
 import MapView from './MapView';
 import { useEffect, useState } from 'react';

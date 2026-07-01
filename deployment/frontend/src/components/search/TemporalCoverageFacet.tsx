@@ -1,4 +1,4 @@
-import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react';
 import { type Filter } from '@/interfaces/search.interface';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';

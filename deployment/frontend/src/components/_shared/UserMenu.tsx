@@ -1,5 +1,5 @@
-import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
-import React, { Fragment } from 'react';
+import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
+import React from 'react';
 import { UserCircleIcon } from '@heroicons/react/20/solid';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';

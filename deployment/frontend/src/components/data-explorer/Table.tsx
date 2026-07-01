@@ -1,4 +1,4 @@
-import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react'
+import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react';
 import {
     flexRender,
     type Table as TableType,

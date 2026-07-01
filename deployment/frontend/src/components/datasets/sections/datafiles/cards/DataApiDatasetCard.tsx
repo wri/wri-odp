@@ -1,4 +1,4 @@
-import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react';
 import { Button, LoaderButton } from '@/components/_shared/Button';
 import classNames from '@/utils/classnames';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';

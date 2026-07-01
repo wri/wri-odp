@@ -1,4 +1,4 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import classNames from '@/utils/classnames';
 import { Fragment, useEffect, useState } from 'react';
 import SearchPanel from './SearchPanel';

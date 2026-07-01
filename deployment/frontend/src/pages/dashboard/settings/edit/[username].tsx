@@ -1,4 +1,4 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import React from 'react';
 import Header from '@/components/_shared/Header';
 import Layout from '@/components/dashboard/Layout';

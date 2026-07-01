@@ -1,4 +1,4 @@
-import { Dialog, DialogPanel, TransitionChild } from '@headlessui/react'
+import { Dialog, DialogPanel, TransitionChild } from '@headlessui/react';
 import {
     XCircleIcon,
 } from '@heroicons/react/24/outline';

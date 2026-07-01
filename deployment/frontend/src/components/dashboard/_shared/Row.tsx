@@ -1,4 +1,4 @@
-import { Transition } from '@headlessui/react'
+import { Transition } from '@headlessui/react';
 import React, { useState } from 'react';
 import {
     EyeIcon,

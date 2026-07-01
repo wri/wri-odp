@@ -1,4 +1,4 @@
-import { Disclosure, DisclosurePanel } from '@headlessui/react'
+import { DisclosurePanel } from '@headlessui/react';
 import { Bars4Icon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor';

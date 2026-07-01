@@ -1,4 +1,4 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Hero } from '@/components/home/Hero';
 import { HomeFooter } from '@/components/home/HomeFooter';
 import { TopicsCarousel } from '@/components/home/TopicsCarousel';

@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
+import { DialogTitle, Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
 import {
     ArrowUpRightIcon,
     ChevronLeftIcon,

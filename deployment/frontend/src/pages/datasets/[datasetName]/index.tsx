@@ -1,4 +1,4 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
 import Header from '@/components/_shared/Header';
 import Spinner from '@/components/_shared/Spinner';

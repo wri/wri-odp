@@ -1,4 +1,4 @@
-import { Tab } from '@headlessui/react'
+import { Tab } from '@headlessui/react';
 import classNames from '@/utils/classnames';
 import {
     ChevronDoubleLeftIcon,

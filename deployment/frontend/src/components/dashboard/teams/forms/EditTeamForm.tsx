@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { DialogTitle, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import TeamForm from './TeamForm';

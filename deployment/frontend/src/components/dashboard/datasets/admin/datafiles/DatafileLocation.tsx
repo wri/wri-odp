@@ -1,4 +1,4 @@
-import { Disclosure, DisclosurePanel, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { DisclosurePanel, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import {
     ArrowUpTrayIcon,
 } from '@heroicons/react/24/outline';

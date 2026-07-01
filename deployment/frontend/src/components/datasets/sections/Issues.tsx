@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
+import { DialogTitle, Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react';
 import React, { useState } from 'react';
 import {
     MagnifyingGlassIcon,

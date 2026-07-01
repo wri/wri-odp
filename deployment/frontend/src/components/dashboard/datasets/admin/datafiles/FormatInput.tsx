@@ -1,4 +1,4 @@
-import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
+import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 import { useState } from 'react';
 import { CheckIcon } from '@heroicons/react/20/solid';
 import { api } from '@/utils/api';

@@ -1,4 +1,4 @@
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
 import { Button, LoaderButton } from '@/components/_shared/Button';
 import {
   ArrowDownCircleIcon,

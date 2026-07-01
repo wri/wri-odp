@@ -1,5 +1,5 @@
-import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems, Transition, TransitionChild } from '@headlessui/react'
-import React, { Fragment, useEffect, useState } from 'react';
+import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems, Transition, TransitionChild } from '@headlessui/react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import Link from 'next/link';

@@ -1,4 +1,4 @@
-import { Disclosure, DisclosurePanel } from '@headlessui/react'
+import { DisclosurePanel } from '@headlessui/react';
 import {
     ArrowsPointingInIcon,
     InformationCircleIcon,

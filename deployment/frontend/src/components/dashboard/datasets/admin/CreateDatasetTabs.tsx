@@ -1,4 +1,4 @@
-import { Tab, TabList } from '@headlessui/react'
+import { Tab, TabList } from '@headlessui/react';
 import classNames from '@/utils/classnames';
 import { CheckIcon } from '@heroicons/react/20/solid';
 import { match } from 'ts-pattern';

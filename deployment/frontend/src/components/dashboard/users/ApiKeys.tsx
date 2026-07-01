@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle } from '@headlessui/react'
+import { DialogTitle } from '@headlessui/react';
 import { ErrorAlert, InfoAlert } from '@/components/_shared/Alerts';
 import { Button, LoaderButton } from '@/components/_shared/Button';
 import Modal from '@/components/_shared/Modal';

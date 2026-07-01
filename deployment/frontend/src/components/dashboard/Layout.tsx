@@ -1,4 +1,4 @@
-import { Dialog, DialogPanel, Disclosure, DisclosurePanel, TransitionChild } from '@headlessui/react'
+import { Dialog, DialogPanel, Disclosure, DisclosurePanel, TransitionChild } from '@headlessui/react';
 import { Fragment, useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import UserProfile from './UserProfile';

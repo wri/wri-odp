@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle } from '@headlessui/react'
+import { DialogTitle } from '@headlessui/react';
 import React, { useState } from 'react';
 import { Input } from '@/components/_shared/SimpleInput';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';

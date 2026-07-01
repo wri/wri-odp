@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle } from '@headlessui/react'
+import { DialogTitle } from '@headlessui/react';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,

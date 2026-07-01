@@ -1,4 +1,4 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import React from 'react';
 import { PlusSmallIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';

@@ -1,4 +1,4 @@
-import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react';
 import {
     ChevronDownIcon,
     MinusCircleIcon,

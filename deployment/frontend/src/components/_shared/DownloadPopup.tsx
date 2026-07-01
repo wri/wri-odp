@@ -1,4 +1,4 @@
-import { Dialog, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
+import { Dialog, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import SimpleSelect from '@/components/_shared/SimpleSelect';

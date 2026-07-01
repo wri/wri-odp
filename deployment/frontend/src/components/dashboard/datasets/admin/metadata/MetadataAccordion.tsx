@@ -1,4 +1,4 @@
-import { Disclosure, DisclosureButton, Transition } from '@headlessui/react'
+import { Disclosure, DisclosureButton, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 interface MetadataAccordion {

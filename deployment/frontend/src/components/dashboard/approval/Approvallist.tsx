@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle } from '@headlessui/react'
+import { DialogTitle } from '@headlessui/react';
 import React, { useState } from 'react';
 import ApprovalHeader from './ApprovalHeader';
 import ApprovalRow from './ApprovalRow';

@@ -1,4 +1,4 @@
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import React from 'react';
 import DatasetLCardList from './DatasetLCardList';
 import Favourite from './Favourites';

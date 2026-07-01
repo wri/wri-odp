@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle } from '@headlessui/react'
+import { DialogTitle } from '@headlessui/react';
 import React, { useEffect, useState } from 'react';
 import SearchHeader from '../_shared/SearchHeader';
 import RowProfile from '../_shared/RowProfile';

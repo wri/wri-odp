@@ -1,4 +1,4 @@
-import { Switch } from '@headlessui/react'
+import { Switch } from '@headlessui/react';
 import { Fragment } from 'react';
 import { Button } from '@/components/_shared/Button';
 import { InputGroup } from '@/components/_shared/InputGroup';

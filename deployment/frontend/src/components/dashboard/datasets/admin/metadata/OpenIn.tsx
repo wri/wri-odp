@@ -1,4 +1,4 @@
-import { Disclosure, DisclosurePanel } from '@headlessui/react'
+import { DisclosurePanel } from '@headlessui/react';
 import { ArrowUpRightIcon, MinusCircleIcon } from '@heroicons/react/24/outline';
 import { Input } from '@/components/_shared/SimpleInput';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
