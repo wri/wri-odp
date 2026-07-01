@@ -135,6 +135,7 @@ export default function Row({
                 )}
             </div>
             <Transition
+             as="div"
                 show={isShowSubRow}
                 enter="transition duration-100 ease-out"
                 enterFrom="transform scale-95 opacity-0"
