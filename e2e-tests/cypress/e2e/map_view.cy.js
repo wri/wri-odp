@@ -15,7 +15,20 @@ const datasetName2 = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
 const group = `${uuid()}${Cypress.env("GROUP_SUFFIX")}`;
 
-describe("Map view", () => {
+// SKIPPED IN CI: the CI frontend image is built with a dummy Mapbox token
+// (pk.dummy_mapbox_token_for_ci — see .github/workflows/build-frontend-image.yml
+// and ckan-backend-dev/docker-compose.test.ci.yml), so the Mapbox style request
+// returns 401, the map's onLoad never fires, and the legend
+// (.vizzuality__c-legend-map) can never render (see Map.tsx: Legends only mounts
+// after onLoad sets ready=true).
+//
+// Note this spec had not actually been running in CI since ~Oct 2025: the old
+// split-tests.js polluted stdout, mangling the first spec of each group's
+// --spec pattern, and Cypress silently dropped it. Fixing that revealed this
+// spec cannot pass without a valid NEXT_PUBLIC_MAPBOX_TOKEN.
+// To re-enable: provide a real Mapbox token to the CI image build and remove
+// the .skip below.
+describe.skip("Map view", () => {
   before(() => {
     cy.createGroupAPI(group);
 

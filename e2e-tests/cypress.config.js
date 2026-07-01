@@ -32,21 +32,6 @@ export default defineConfig({
         printLogsToConsole: 'always',
       });
 
-      // Headless CI runners typically have no real GPU, which makes
-      // WebGL-heavy pages (Mapbox GL maps/legends) render extremely slowly
-      // or spam "GPU stall due to ReadPixels" warnings. Forcing a software
-      // WebGL fallback keeps rendering fast/stable instead of relying on
-      // (missing) hardware acceleration.
-      on("before:browser:launch", (browser = {}, launchOptions) => {
-        if (browser.family === "chromium") {
-          launchOptions.args.push("--use-gl=swiftshader");
-          launchOptions.args.push("--enable-unsafe-swiftshader");
-          launchOptions.args.push("--ignore-gpu-blocklist");
-          launchOptions.args.push("--disable-gpu-sandbox");
-        }
-        return launchOptions;
-      });
-
       return config;
     },
   },
