@@ -1,4 +1,4 @@
 gevent==25.5.1
 locust==2.41.1
-Requests==2.34.2
+requests==2.34.2
 dotenv==0.9.9
