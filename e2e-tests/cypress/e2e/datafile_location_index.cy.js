@@ -9,19 +9,7 @@ const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
-// SKIPPED IN CI: the "Choose location" flow opens a Mapbox map with a geocoder
-// control. The CI frontend image is built with a dummy Mapbox token
-// (pk.dummy_mapbox_token_for_ci), which makes the map/geocoder crash the page
-// ("Application error: a client-side exception has occurred" — see CI failure
-// screenshots), so .mapboxgl-ctrl-geocoder--input can never appear.
-//
-// Note this spec had not actually been running in CI since ~Oct 2025: the old
-// split-tests.js polluted stdout, mangling the first spec of each group's
-// --spec pattern, and Cypress silently dropped it. Fixing that revealed this
-// spec cannot pass without a valid NEXT_PUBLIC_MAPBOX_TOKEN.
-// To re-enable: provide a real Mapbox token to the CI image build and remove
-// the .skip below.
-describe.skip("Data File location", () => {
+describe("Data File location", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
   });
