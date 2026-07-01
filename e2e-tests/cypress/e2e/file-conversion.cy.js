@@ -61,27 +61,17 @@ describe("Data Files", () => {
     });
   });
 
-  it(
-    "Submit datapusher",
-    {
-      retries: {
-        runMode: 5,
-        openMode: 0,
-      },
-    },
-    () => {
-      cy.visit("/dashboard/datasets/" + datasetName + "/edit");
-      cy.contains("Data Files").click();
-      cy.get(".datafile-accordion-trigger").eq(0).click();
-      cy.contains("Datapusher").click();
-      cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
-      cy.contains(`Successfully submited Data File to the datapusher`, {
-        timeout: 15000,
-      });
-      cy.wait(15000);
-      cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
-    },
-  );
+  it("Submit datapusher", () => {
+    cy.visit("/dashboard/datasets/" + datasetName + "/edit");
+    cy.contains("Data Files").click();
+    cy.get(".datafile-accordion-trigger").eq(0).click();
+    cy.contains("Datapusher").click();
+    cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
+    cy.contains(`Successfully submited Data File to the datapusher`, {
+      timeout: 15000,
+    });
+    cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 120000 });
+  });
 
   after(() => {
     cy.deleteDatasetAPI(datasetName);

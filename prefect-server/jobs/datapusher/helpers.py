@@ -41,35 +41,6 @@ def get_request_headers(api_key, content_type="application/json", **kwargs):
     }
 
 
-# Fields returned by resource_show that are not valid for resource_patch.
-_RESOURCE_PATCH_EXCLUDED_FIELDS = frozenset(
-    {
-        "fileBlob",
-        "isUploading",
-        "resourceId",
-        "layerObj",
-        "layerObjRaw",
-        "layer",
-        "type",
-        "new",
-        "cache_last_updated",
-        "cache_url",
-        "created",
-        "metadata_modified",
-        "last_modified",
-    }
-)
-
-
-def prepare_resource_for_patch(resource):
-    """Return only fields safe to send to CKAN resource_patch."""
-    return {
-        key: value
-        for key, value in resource.items()
-        if key not in _RESOURCE_PATCH_EXCLUDED_FIELDS
-    }
-
-
 def get_url(action, ckan_url):
     """
     Get url for ckan action
@@ -291,12 +262,11 @@ def get_package(package_id, ckan_url, api_key) -> Package:
 
 
 def update_resource(resource, ckan_url, api_key) -> Resource:
-    patch_payload = prepare_resource_for_patch(resource)
-    url = get_url("resource_patch", ckan_url)
+    url = get_url("resource_update", ckan_url)
     r = requests.post(
         url,
         verify=True,
-        data=json.dumps(patch_payload),
+        data=json.dumps(resource),
         headers=get_request_headers(api_key),
     )
 

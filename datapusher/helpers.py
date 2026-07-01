@@ -16,45 +16,6 @@ class DatastoreEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
-
-def get_request_headers(api_key, content_type="application/json", **kwargs):
-    return {
-        "Content-Type": content_type,
-        "Authorization": api_key,
-        "X-From-Frontend-Portal": "true",
-        **kwargs,
-    }
-
-
-# Fields returned by resource_show that are not valid for resource_patch.
-_RESOURCE_PATCH_EXCLUDED_FIELDS = frozenset(
-    {
-        "fileBlob",
-        "isUploading",
-        "resourceId",
-        "layerObj",
-        "layerObjRaw",
-        "layer",
-        "type",
-        "new",
-        "cache_last_updated",
-        "cache_url",
-        "created",
-        "metadata_modified",
-        "last_modified",
-    }
-)
-
-
-def prepare_resource_for_patch(resource):
-    """Return only fields safe to send to CKAN resource_patch."""
-    return {
-        key: value
-        for key, value in resource.items()
-        if key not in _RESOURCE_PATCH_EXCLUDED_FIELDS
-    }
-
-
 def get_url(action, ckan_url):
     """
     Get url for ckan action
@@ -193,7 +154,7 @@ def datastore_resource_exists(resource_id, api_key, ckan_url):
             search_url,
             verify=False,
             data=json.dumps({"id": resource_id, "limit": 0}),
-            headers=get_request_headers(api_key),
+            headers={"Content-Type": "application/json", "Authorization": api_key},
         )
         print("JSON", response.json())
         if response.status_code == 404:
@@ -218,7 +179,7 @@ def delete_datastore_resource(resource_id, api_key, ckan_url):
             delete_url,
             verify=False,
             data=json.dumps({"id": resource_id, "force": True}),
-            headers=get_request_headers(api_key),
+            headers={"Content-Type": "application/json", "Authorization": api_key},
         )
         check_response(
             response,
@@ -269,7 +230,7 @@ def send_resource_to_datastore(
         url,
         verify=False,
         data=json.dumps(request, cls=DatastoreEncoder),
-        headers=get_request_headers(api_key),
+        headers={"Content-Type": "application/json", "Authorization": api_key},
     )
     print('SENT TO DATASTORE', r.json())
     check_response(r, url, "CKAN DataStore")
@@ -284,7 +245,7 @@ def get_package(package_id, ckan_url, api_key):
         url,
         verify=True,
         data=json.dumps({"id": package_id}),
-        headers=get_request_headers(api_key),
+        headers={"Content-Type": "application/json", "Authorization": api_key},
     )
     check_response(r, url, "CKAN")
 
@@ -292,15 +253,14 @@ def get_package(package_id, ckan_url, api_key):
 
 
 def update_resource(resource, ckan_url, api_key) -> Resource:
-    patch_payload = prepare_resource_for_patch(resource)
-    print("Resource patch payload")
-    print(json.dumps(patch_payload, indent=4))
+    print("Resource")
+    print(json.dumps(resource, indent=4))
     url = get_url("resource_patch", ckan_url)
     r = requests.post(
         url,
         verify=True,
-        data=json.dumps(patch_payload),
-        headers=get_request_headers(api_key),
+        data=json.dumps(resource),
+        headers={"Content-Type": "application/json", "Authorization": api_key},
     )
 
     check_response(r, url, "CKAN")

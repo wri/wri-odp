@@ -3,7 +3,7 @@ import requests
 import json
 import time
 from prefect import task
-from helpers import check_response, get_request_headers, get_url
+from helpers import check_response, get_url
 from models import GetResource
 
 @task(retries=3, retry_delay_seconds=15)
@@ -21,7 +21,7 @@ def get_resource_metadata(get_resource: GetResource):
             url,
             verify=True,
             data=json.dumps({"id": resource_id}),
-            headers=get_request_headers(api_key),
+            headers={"Content-Type": "application/json", "Authorization": api_key},
         )
         check_response(r, url, "CKAN")
         print(r.json())
@@ -34,7 +34,7 @@ def get_resource_metadata(get_resource: GetResource):
             url,
             verify=True,
             data=json.dumps({"id": resource_id}),
-            headers=get_request_headers(api_key),
+            headers={"Content-Type": "application/json", "Authorization": api_key},
         )
         check_response(r, url, "CKAN")
         resource = r.json()["result"]
