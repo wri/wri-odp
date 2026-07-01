@@ -12,17 +12,14 @@ export default function TemporalCoverageFacet({
     filters: Filter[];
 }) {
     const getUpdatedState = () => {
-        return ['temporal_coverage_start', 'temporal_coverage_end'].reduce(
-            (a, v) => {
-                const value = filters.find((f) => f?.key == v)?.value ?? '';
+        return ['temporal_coverage_start', 'temporal_coverage_end'].reduce((a, v) => {
+            const value = filters.find((f) => f?.key == v)?.value ?? '';
 
-                return {
-                    ...a,
-                    [v]: value,
-                };
-            },
-            {}
-        );
+            return {
+                ...a,
+                [v]: value,
+            };
+        }, {});
     };
 
     const [optionsState, setOptionsState] = useState<{
@@ -35,11 +32,7 @@ export default function TemporalCoverageFacet({
     }, [filters]);
 
     return (
-        <Disclosure
-            as="div"
-            className="border-b border-r border-stone-200 shadow"
-            role="listitem"
-        >
+        <Disclosure as="div" className="border-b border-r border-stone-200 shadow" role="listitem">
             {({ open }) => (
                 <>
                     <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
@@ -83,54 +76,36 @@ export default function TemporalCoverageFacet({
                                                 min="0"
                                                 max="3000"
                                                 className="h-8 w-28 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
-                                                defaultValue={
-                                                    optionsState.temporal_coverage_start
-                                                }
-                                                value={
-                                                    optionsState.temporal_coverage_start
-                                                }
+                                                defaultValue={optionsState.temporal_coverage_start}
+                                                value={optionsState.temporal_coverage_start}
                                                 onChange={(e) =>
                                                     setOptionsState((prev) => ({
                                                         ...prev,
-                                                        temporal_coverage_start:
-                                                            e.target.value,
+                                                        temporal_coverage_start: e.target.value,
                                                     }))
                                                 }
                                                 onKeyDown={(e: any) => {
                                                     if (e.key == 'Enter') {
                                                         setFilters((prev) => {
-                                                            const value =
-                                                                e?.target
-                                                                    ?.value;
+                                                            const value = e?.target?.value;
 
-                                                            const newFilters = [
-                                                                ...prev,
-                                                            ];
+                                                            const newFilters = [...prev];
 
-                                                            const filter =
-                                                                newFilters.find(
-                                                                    (f) =>
-                                                                        f.key ==
-                                                                        'temporal_coverage_start'
-                                                                );
+                                                            const filter = newFilters.find(
+                                                                (f) =>
+                                                                    f.key ==
+                                                                    'temporal_coverage_start'
+                                                            );
 
-                                                            if (
-                                                                value &&
-                                                                !filter
-                                                            ) {
-                                                                newFilters.push(
-                                                                    {
-                                                                        key: 'temporal_coverage_start',
-                                                                        title: 'Temporal Coverage Start',
-                                                                        value: value,
-                                                                        label: value,
-                                                                    }
-                                                                );
+                                                            if (value && !filter) {
+                                                                newFilters.push({
+                                                                    key: 'temporal_coverage_start',
+                                                                    title: 'Temporal Coverage Start',
+                                                                    value: value,
+                                                                    label: value,
+                                                                });
                                                             }
-                                                            if (
-                                                                value &&
-                                                                filter
-                                                            ) {
+                                                            if (value && filter) {
                                                                 newFilters.splice(
                                                                     newFilters.findIndex(
                                                                         (e) =>
@@ -139,14 +114,12 @@ export default function TemporalCoverageFacet({
                                                                     ),
                                                                     1
                                                                 );
-                                                                newFilters.push(
-                                                                    {
-                                                                        key: 'temporal_coverage_start',
-                                                                        title: 'Temporal Coverage Start',
-                                                                        value: value,
-                                                                        label: value,
-                                                                    }
-                                                                );
+                                                                newFilters.push({
+                                                                    key: 'temporal_coverage_start',
+                                                                    title: 'Temporal Coverage Start',
+                                                                    value: value,
+                                                                    label: value,
+                                                                });
                                                             } else if (!value) {
                                                                 newFilters.splice(
                                                                     newFilters.findIndex(
@@ -185,55 +158,36 @@ export default function TemporalCoverageFacet({
                                                 min="0"
                                                 max="3000"
                                                 placeholder='E.g. "2015"'
-                                                defaultValue={
-                                                    optionsState.temporal_coverage_end
-                                                }
+                                                defaultValue={optionsState.temporal_coverage_end}
                                                 className="h-8 w-28 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
-                                                value={
-                                                    optionsState.temporal_coverage_end
-                                                }
+                                                value={optionsState.temporal_coverage_end}
                                                 onChange={(e) =>
                                                     setOptionsState((prev) => ({
                                                         ...prev,
-                                                        temporal_coverage_end:
-                                                            e.target.value,
+                                                        temporal_coverage_end: e.target.value,
                                                     }))
                                                 }
                                                 onKeyDown={(e: any) => {
                                                     if (e.key == 'Enter') {
                                                         setFilters((prev) => {
-                                                            const value =
-                                                                e?.target
-                                                                    ?.value;
+                                                            const value = e?.target?.value;
 
-                                                            const newFilters = [
-                                                                ...prev,
-                                                            ];
+                                                            const newFilters = [...prev];
 
-                                                            const filter =
-                                                                newFilters.find(
-                                                                    (f) =>
-                                                                        f.key ==
-                                                                        'temporal_coverage_end'
-                                                                );
+                                                            const filter = newFilters.find(
+                                                                (f) =>
+                                                                    f.key == 'temporal_coverage_end'
+                                                            );
 
-                                                            if (
-                                                                value &&
-                                                                !filter
-                                                            ) {
-                                                                newFilters.push(
-                                                                    {
-                                                                        key: 'temporal_coverage_end',
-                                                                        title: 'Temporal Coverage End',
-                                                                        value: value,
-                                                                        label: value,
-                                                                    }
-                                                                );
+                                                            if (value && !filter) {
+                                                                newFilters.push({
+                                                                    key: 'temporal_coverage_end',
+                                                                    title: 'Temporal Coverage End',
+                                                                    value: value,
+                                                                    label: value,
+                                                                });
                                                             }
-                                                            if (
-                                                                value &&
-                                                                filter
-                                                            ) {
+                                                            if (value && filter) {
                                                                 newFilters.splice(
                                                                     newFilters.findIndex(
                                                                         (e) =>
@@ -242,14 +196,12 @@ export default function TemporalCoverageFacet({
                                                                     ),
                                                                     1
                                                                 );
-                                                                newFilters.push(
-                                                                    {
-                                                                        key: 'temporal_coverage_end',
-                                                                        title: 'Temporal Coverage End',
-                                                                        value: value,
-                                                                        label: value,
-                                                                    }
-                                                                );
+                                                                newFilters.push({
+                                                                    key: 'temporal_coverage_end',
+                                                                    title: 'Temporal Coverage End',
+                                                                    value: value,
+                                                                    label: value,
+                                                                });
                                                             } else if (!value) {
                                                                 newFilters.splice(
                                                                     newFilters.findIndex(
