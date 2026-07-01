@@ -1,16 +1,16 @@
-FROM --platform=linux/amd64 node:20-alpine AS deps
+FROM --platform=linux/amd64 node:22.14.0-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
 COPY tableschema-1.12.6.tgz ./
 
-# Omit npm update to save time (node:20 comes with a recent enough npm)
+# Omit npm update to save time (node:22.14.0 comes with a recent enough npm)
 # Use cache mount to speed up repeated installs if lockfile changes
 # Use --legacy-peer-deps to resolve react version conflicts
 RUN --mount=type=cache,target=/root/.npm npm ci --legacy-peer-deps
 
-FROM --platform=linux/amd64 node:20-alpine AS builder
+FROM --platform=linux/amd64 node:22.14.0-alpine AS builder
 ARG NEXTAUTH_SECRET
 ARG NEXTAUTH_URL
 ARG CKAN_URL
@@ -56,7 +56,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN SKIP_ENV_VALIDATION=1 npm run build
 
-FROM --platform=linux/amd64 node:20-alpine AS runner
+FROM --platform=linux/amd64 node:22.14.0-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
