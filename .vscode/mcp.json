@@ -1,0 +1,24 @@
+{
+	"servers": {
+		"wri-storybook": {
+		"command": "npx",
+		"args": ["-y", "storybook-mcp@latest"],
+		"env": {
+			"STORYBOOK_URL": "https://wri.github.io/wri-design-systems/index.json"
+		}
+    	},
+		"chakra-ui": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"@chakra-ui/react-mcp"
+			]
+		},
+		"figma": {
+			"url": "https://mcp.figma.com/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}

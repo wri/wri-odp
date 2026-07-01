@@ -30,8 +30,7 @@ export default function Select({ options }: { options: Option[] }) {
                             </span>
                         </ListboxButton>
 
-                        <Transition as="div"
-                            show={open}
+                        <Transition                            show={open}
                             leave="transition ease-in duration-100"
                             leaveFrom="opacity-100"
                             leaveTo="opacity-0"

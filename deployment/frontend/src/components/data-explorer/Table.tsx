@@ -124,8 +124,7 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
             <PopoverButton className=" p-4 flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
                 Show Columns
             </PopoverButton>
-            <Transition as="div"
-                enter="transition ease-out duration-100"
+            <Transition                enter="transition ease-out duration-100"
                 enterFrom="transform opacity-0 scale-95"
                 enterTo="transform opacity-100 scale-100"
                 leave="transition ease-in duration-75"
@@ -400,8 +399,7 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
                             )}
                         </DefaultTooltip>
                     </PopoverButton>
-                    <Transition as="div"
-                        enter="transition ease-out duration-100"
+                    <Transition                        enter="transition ease-out duration-100"
                         enterFrom="transform opacity-0 scale-95"
                         enterTo="transform opacity-100 scale-100"
                         leave="transition ease-in duration-75"

@@ -167,8 +167,7 @@ export default function Header() {
                                     <Bars3Icon className="text-black h-5 w-5" />
                                 </MenuButton>
                             </div>
-                            <Transition as="div"
-                                enter="transition ease-out duration-100"
+                            <Transition                                enter="transition ease-out duration-100"
                                 enterFrom="transform opacity-0 scale-95"
                                 enterTo="transform opacity-100 scale-100"
                                 leave="transition ease-in duration-75"

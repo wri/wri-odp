@@ -120,8 +120,7 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
                                         </span>
                                     </ListboxButton>
 
-                                    <Transition as="div"
-                                        show={open}
+                                    <Transition                                        show={open}
                                         leave="transition ease-in duration-100"
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"

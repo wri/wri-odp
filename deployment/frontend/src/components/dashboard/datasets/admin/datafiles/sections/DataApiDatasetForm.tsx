@@ -312,8 +312,7 @@ export function DataApiDatasetForm({
                                         <ChevronDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                                     </span>
                                 </ListboxButton>
-                                <Transition as="div"
-                                    show={open}
+                                <Transition                                    show={open}
                                     leave="transition ease-in duration-100"
                                     leaveFrom="opacity-100"
                                     leaveTo="opacity-0"
@@ -377,8 +376,7 @@ export function DataApiDatasetForm({
                                             <ChevronDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                                         </span>
                                     </ListboxButton>
-                                    <Transition as="div"
-                                        show={open}
+                                    <Transition                                        show={open}
                                         leave="transition ease-in duration-100"
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"

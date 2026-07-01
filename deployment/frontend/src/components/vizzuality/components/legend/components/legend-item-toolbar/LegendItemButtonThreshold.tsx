@@ -87,8 +87,7 @@ export default function LegendItemButtonThreshold<
                                 </DefaultTooltip>
 
                                 <div className="absolute right-[65px]">
-                                    <Transition as="div"
-                                        show={open}
+                                    <Transition                                        show={open}
                                         leave="transition ease-in duration-100"
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"
