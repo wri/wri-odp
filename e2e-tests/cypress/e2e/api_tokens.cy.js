@@ -9,6 +9,7 @@ const teamOne = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const adminUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_admin`;
 const adminUserPassword = "test1234";
 const adminUserEmail = Math.random().toString(36).slice(2) + "@test.com";
+const tokenName = `test-token-${uuid()}`;
 
 describe("Can add and remove members from teams and topics", () => {
   before(() => {
