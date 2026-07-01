@@ -15,7 +15,7 @@ openpyxl==3.1.2
 lxml==6.0.4
 pycountry==22.3.5
 ckanapi==4.11
-markdown==3.6.0
+markdown==3.10.2
 urllib3>=2.7.0 # not directly required, pinned by Snyk to avoid a vulnerability
 requests>=2.32.4 # not directly required, pinned by Snyk to avoid a vulnerability
 
