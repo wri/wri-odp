@@ -65,7 +65,7 @@
         "@trpc/react-query": "^10.37.1",
         "@trpc/server": "^10.45.4",
         "@turf/turf": "^7.1.0",
-        "@types/flexsearch": "^0.7.42",
+        "@types/flexsearch": "0.7.42",
         "@types/mdx": "^2.0.13",
         "@types/nprogress": "^0.2.3",
         "@uppy/aws-s3": "^5.1.0",
