@@ -43,7 +43,7 @@ interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant, size, asChild = false, ...props }, ref) => {
+    ({ className, variant, size, ...props }, ref) => {
         return (
             <button
                 className={classNames(
@@ -65,7 +65,6 @@ const LoaderButton = React.forwardRef<
             className,
             variant,
             size,
-            asChild = false,
             loading,
             spinnerClassnames,
             ...props
@@ -122,5 +121,6 @@ const LoaderButton = React.forwardRef<
 );
 
 Button.displayName = 'Button';
+LoaderButton.displayName = 'LoaderButton';
 
 export { Button, LoaderButton, buttonVariants };

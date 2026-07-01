@@ -43,12 +43,6 @@ export default function ActivityStreamCard({
 }: {
     activity: activity;
 }) {
-    const iconMap: Record<string, string> = {
-        changed: 'edit',
-        new: 'add',
-        deleted: 'update',
-    };
-
     return (
         <div className="w-full flex gap-x-3">
             <DefaultTooltip content={activity.actionType}>

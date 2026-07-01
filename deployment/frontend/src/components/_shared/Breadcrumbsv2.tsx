@@ -1,3 +1,5 @@
+import NextLink from 'next/link';
+
 interface Link {
     label: string;
     url: string;
@@ -12,12 +14,12 @@ export function Breadcrumbs({ links }: { links: Link[] }) {
             >
                 <li className="flex">
                     <div className="flex items-center">
-                        <a
+                        <NextLink
                             href="/"
                             className="text-white text-[17px] font-semibold hover:text-gray-100 transition"
                         >
                             Home
-                        </a>
+                        </NextLink>
                     </div>
                 </li>
                 {links.map((page) => (

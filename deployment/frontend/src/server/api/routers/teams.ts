@@ -306,7 +306,7 @@ export const teamRouter = createTRPCRouter({
             if (groupTree.length === 0) {
                 return {
                     teams: groupTree,
-                    teamsDetails: {} as Record<string, GroupsmDetails>,
+                    teamsDetails: {},
                     count: 0,
                 };
             }

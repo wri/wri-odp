@@ -1,8 +1,8 @@
 import { shallow } from 'zustand/shallow';
-import { useStore } from './store';
+import { useStore, type AppStoreState } from './store';
 
 export const useVizIndex = () => {
-    const { vizIndex, setVizIndex } = useStore((store) => ({
+    const { vizIndex, setVizIndex } = useStore((store: AppStoreState) => ({
         vizIndex: store.vizIndex,
         setVizIndex: store.setVizIndex,
     }));
@@ -10,20 +10,20 @@ export const useVizIndex = () => {
 };
 
 export const useDataset = () => {
-    const { dataset } = useStore((store) => ({ dataset: store.dataset }));
+    const { dataset } = useStore((store: AppStoreState) => ({ dataset: store.dataset }));
 
     return { dataset };
 };
 
 export const useLayerAsLayerObj = () => {
-    const { layerAsLayerObj } = useStore((store) => ({
+    const { layerAsLayerObj } = useStore((store: AppStoreState) => ({
         layerAsLayerObj: store.layerAsLayerObj,
     }));
 
     return { layerAsLayerObj };
 };
 export const useActiveCharts = () => {
-    return useStore((store) => ({
+    return useStore((store: AppStoreState) => ({
         activeCharts: store.activeCharts,
         addCharts: store.addCharts,
         removeCharts: store.removeCharts,
@@ -33,7 +33,7 @@ export const useActiveCharts = () => {
 };
 
 export const useRelatedDatasets = () => {
-    const { relatedDatasets } = useStore((store) => ({
+    const { relatedDatasets } = useStore((store: AppStoreState) => ({
         relatedDatasets: store.relatedDatasets,
     }));
 
@@ -41,7 +41,7 @@ export const useRelatedDatasets = () => {
 };
 
 export const useIsEmbeddingMap = () => {
-    const { isEmbedding } = useStore((store) => ({
+    const { isEmbedding } = useStore((store: AppStoreState) => ({
         isEmbedding: store.mapView.isEmbedding,
     }));
 
@@ -50,7 +50,7 @@ export const useIsEmbeddingMap = () => {
 
 export const useToggleLayergroups = () => {
     const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
-        useStore((store) => ({
+        useStore((store: AppStoreState) => ({
             tempLayerAsLayerobj: store.tempLayerAsLayerobj,
             prevLayerGroups: store.prevLayerGroups,
             setToggleLayergroups: store.toggleActiveLayerGroup,
@@ -59,7 +59,7 @@ export const useToggleLayergroups = () => {
 };
 
 export const useIsAddingLayers = () => {
-    const { isAddingLayers, setIsAddingLayers } = useStore((store) => ({
+    const { isAddingLayers, setIsAddingLayers } = useStore((store: AppStoreState) => ({
         isAddingLayers: store.mapView.isAddingLayers,
         setIsAddingLayers: store.setIsAddingLayers,
     }));
@@ -69,7 +69,7 @@ export const useIsAddingLayers = () => {
 
 export const useMapState = () => {
     const { viewState, setViewState } = useStore(
-        (store) => ({
+        (store: AppStoreState) => ({
             viewState: store.mapView.viewState,
             setViewState: store.setViewState,
         }),
@@ -80,7 +80,7 @@ export const useMapState = () => {
 
 export const useBasemap = () => {
     const { selectedBasemap, setBasemap } = useStore(
-        (store) => ({
+        (store: AppStoreState) => ({
             selectedBasemap: store.mapView.basemap,
             setBasemap: store.setBaseMap,
         }),
@@ -92,7 +92,7 @@ export const useBasemap = () => {
 
 export const useInitialRender = () => {
     const { isInitialrender } = useStore(
-        (store) => ({
+        (store: AppStoreState) => ({
             isInitialrender: store.mapView.initialrender,
         }),
         shallow
@@ -103,7 +103,7 @@ export const useInitialRender = () => {
 
 export const useIsDrawing = () => {
     const { isDrawing, setIsDrawing } = useStore(
-        (store) => ({
+        (store: AppStoreState) => ({
             isDrawing: store.mapView.isDrawing,
             setIsDrawing: store.setIsDrawing,
         }),
@@ -115,7 +115,7 @@ export const useIsDrawing = () => {
 
 export const useLabels = () => {
     const { selectedLabels, setLabels } = useStore(
-        (store) => ({
+        (store: AppStoreState) => ({
             selectedLabels: store.mapView.labels,
             setLabels: store.setLabels,
         }),
@@ -127,7 +127,7 @@ export const useLabels = () => {
 
 export const useBoundaries = () => {
     const { showBoundaries, setShowBoundaries } = useStore(
-        (store) => ({
+        (store: AppStoreState) => ({
             showBoundaries: store.mapView.boundaries,
             setShowBoundaries: store.setBoundaries,
         }),
@@ -147,7 +147,7 @@ export const useActiveLayerGroups = () => {
         removeLayerFromLayerGroup,
         addLayerToLayerGroup,
         replaceLayersForLayerGroup,
-    } = useStore((store) => ({
+    } = useStore((store: AppStoreState) => ({
         activeLayerGroups: store.mapView.activeLayerGroups,
         replaceLayersGroups: store.replaceLayerGroups,
         updateLayerGroup: store.updateLayerGroup,
@@ -171,7 +171,7 @@ export const useActiveLayerGroups = () => {
 };
 
 export const useLayerStates = () => {
-    const { currentLayers, updateLayerState } = useStore((store) => ({
+    const { currentLayers, updateLayerState } = useStore((store: AppStoreState) => ({
         currentLayers: store.mapView.layers,
         updateLayerState: store.updateLayerState,
     }));
@@ -180,7 +180,7 @@ export const useLayerStates = () => {
 };
 
 export const useBounds = () => {
-    const { bounds, setBounds } = useStore((store) => ({
+    const { bounds, setBounds } = useStore((store: AppStoreState) => ({
         bounds: store.mapView.bounds,
         setBounds: store.setBounds,
     }));
@@ -189,7 +189,7 @@ export const useBounds = () => {
 };
 
 export const useStoreDirtyFields = () => {
-    const { storeDirtyFields, setStoreDirtyFields } = useStore((store) => ({
+    const { storeDirtyFields, setStoreDirtyFields } = useStore((store: AppStoreState) => ({
         storeDirtyFields: store.storeDirtyFields,
         setStoreDirtyFields: store.setStoreDirtyFields,
     }));
