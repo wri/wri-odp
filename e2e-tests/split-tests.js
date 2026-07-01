@@ -34,9 +34,13 @@ const groupFiles = GROUPS[groupIndex - 1];
 // Build the spec pattern
 const specPattern = groupFiles.map(file => `cypress/e2e/${file}`).join(',');
 
-console.log(`Running group ${groupIndex} of ${totalGroups}`);
-console.log(`Tests in this group (${groupFiles.length}): ${groupFiles.join(', ')}`);
-console.log(`\nSpec pattern: ${specPattern}`);
+// IMPORTANT: this script's output is captured via `$(node split-tests.js N)`
+// in package.json, so stdout must contain ONLY the spec pattern. Diagnostic
+// logging must go to stderr (console.error), otherwise it gets appended to
+// the captured string and breaks Cypress's glob matching.
+console.error(`Running group ${groupIndex} of ${totalGroups}`);
+console.error(`Tests in this group (${groupFiles.length}): ${groupFiles.join(', ')}`);
+console.error(`Spec pattern: ${specPattern}`);
 
 // Output the spec pattern for Cypress to use
 process.stdout.write(specPattern);
