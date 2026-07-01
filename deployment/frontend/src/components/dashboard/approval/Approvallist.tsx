@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle } from '@headlessui/react'
 import React, { useState } from 'react';
 import ApprovalHeader from './ApprovalHeader';
 import ApprovalRow from './ApprovalRow';
@@ -7,7 +8,6 @@ import RejectApproval from './RejectApproval';
 import { type WriDataset } from '@/schema/ckan.schema';
 import { LoaderButton, Button } from '@/components/_shared/Button';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import { type SearchInput } from '@/schema/search.schema';
 import Pagination from '@/components/dashboard/_shared/Pagination';
@@ -154,12 +154,12 @@ export default function Approvallist() {
                             />
                         </div>
                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                            <Dialog.Title
+                            <DialogTitle
                                 as="h3"
                                 className="text-base font-semibold leading-6 text-gray-900"
                             >
                                 Approve Dataset
-                            </Dialog.Title>
+                            </DialogTitle>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
                                     Are you sure you want to approve this

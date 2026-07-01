@@ -1,3 +1,4 @@
+import { Tab, TabGroup, TabList, TabPanel } from '@headlessui/react'
 import { env } from '@/env.mjs';
 import { useDataset } from '@/utils/storeHooks';
 import { Fragment, useEffect, useRef, useState } from 'react';
@@ -18,7 +19,6 @@ import js from 'highlight.js/lib/languages/javascript';
 import r from 'highlight.js/lib/languages/r';
 import { addCopyButton } from '@/utils/highlight';
 import classNames from '@/utils/classnames';
-import { Tab } from '@headlessui/react';
 import {
     ChevronDoubleLeftIcon,
     ChevronDoubleRightIcon,
@@ -57,37 +57,37 @@ export function API({ usecases }: { usecases?: string }) {
         },
     ];
     return (
-        <Tab.Group as="div">
-            <Tab.List
+        <TabGroup as="div">
+            <TabList
                 as="nav"
                 className="-mt-4 flex w-full justify-start items-start bg-neutral-100 font-acumin"
             >
                 <APITabs tabs={tabs.filter((tab) => tab.enabled)} />
-            </Tab.List>
-            <Tab.Panel as="div" className="py-6 overflow-clip">
+            </TabList>
+            <TabPanel as="div" className="py-6 overflow-clip">
                 <QueryInstructions />
-            </Tab.Panel>
-            <Tab.Panel as="div" className="py-6 overflow-clip">
+            </TabPanel>
+            <TabPanel as="div" className="py-6 overflow-clip">
                 <SnippetInstructions
                     language="javascript"
                     getSnippetFn={getJsSnippet}
                 />
-            </Tab.Panel>
-            <Tab.Panel as="div" className="py-6 overflow-clip">
+            </TabPanel>
+            <TabPanel as="div" className="py-6 overflow-clip">
                 <SnippetInstructions
                     language="python"
                     getSnippetFn={getPythonSnippet}
                 />
-            </Tab.Panel>
-            <Tab.Panel as="div" className="py-6 overflow-clip">
+            </TabPanel>
+            <TabPanel as="div" className="py-6 overflow-clip">
                 <SnippetInstructions language="r" getSnippetFn={getRSnippet} />
-            </Tab.Panel>
+            </TabPanel>
             {usecases && (
-                <Tab.Panel as="div" className="py-6 overflow-clip">
+                <TabPanel as="div" className="py-6 overflow-clip">
                     <UseCases usecases={usecases} />
-                </Tab.Panel>
+                </TabPanel>
             )}
-        </Tab.Group>
+        </TabGroup>
     );
 }
 

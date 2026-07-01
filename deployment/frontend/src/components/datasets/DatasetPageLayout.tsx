@@ -1,5 +1,5 @@
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import classNames from '@/utils/classnames';
-import { Disclosure } from '@headlessui/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
@@ -38,7 +38,7 @@ export default function DatasetPageLayout({
             <Disclosure defaultOpen={true}>
                 {({ open }) => (
                     <>
-                        <Disclosure.Button
+                        <DisclosureButton
                             aria-label="Toggle left hand side"
                             onClick={() => {
                                 setLhsOpen(!open);
@@ -72,14 +72,14 @@ export default function DatasetPageLayout({
                                     )}
                                 />
                             </div>
-                        </Disclosure.Button>
-                        <Disclosure.Panel
+                        </DisclosureButton>
+                        <DisclosurePanel
                             as="div"
                             style={{ maxHeight: lhsMaxHeight }}
                             className="md:overflow-y-auto overflow-x-hidden min-w-[100%] lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col py-4 border-r border-gray-200 @container"
                         >
                             {lhs}
-                        </Disclosure.Panel>
+                        </DisclosurePanel>
                     </>
                 )}
             </Disclosure>
@@ -87,7 +87,7 @@ export default function DatasetPageLayout({
             <Disclosure defaultOpen={showLhsByDefault}>
                 {({ open }) => (
                     <>
-                        <Disclosure.Button
+                        <DisclosureButton
                             aria-label="Toggle right hand side"
                             onClick={() => {
                                 setRhsOpen(!open);
@@ -122,8 +122,8 @@ export default function DatasetPageLayout({
                                     )}
                                 />
                             </div>
-                        </Disclosure.Button>
-                        <Disclosure.Panel
+                        </DisclosureButton>
+                        <DisclosurePanel
                             as="div"
                             className={`min-w-[100%] items-stretch min-h-screen lg:min-w-[50%] h-full w-full lg:z-10 lg:flex lg:flex-col border-l border-gray-200 @container`}
                         >
@@ -133,7 +133,7 @@ export default function DatasetPageLayout({
                             >
                                 {rhs}
                             </div>
-                        </Disclosure.Panel>
+                        </DisclosurePanel>
                     </>
                 )}
             </Disclosure>

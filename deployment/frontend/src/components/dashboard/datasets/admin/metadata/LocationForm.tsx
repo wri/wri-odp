@@ -1,10 +1,10 @@
+import { Disclosure, DisclosurePanel, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import {
     ArrowUpTrayIcon,
     FolderArrowDownIcon,
     GlobeEuropeAfricaIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { Disclosure, Tab } from '@headlessui/react';
 import { MetadataAccordion } from './MetadataAccordion';
 import { type UseFormReturn } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
@@ -109,8 +109,8 @@ export function LocationForm({
                 className="hidden"
                 accept="application/geojson"
             />
-            <Disclosure.Panel className="flex flex-col gap-y-8 pb-12 pt-5">
-                <Tab.Group
+            <DisclosurePanel className="flex flex-col gap-y-8 pb-12 pt-5">
+                <TabGroup
                     selectedIndex={match(watch('spatial_type'))
                         .with('geom', () => 0)
                         .with('address', () => 1)
@@ -118,7 +118,7 @@ export function LocationForm({
                         .with('derived_from_resources', () => 3)
                         .otherwise(() => undefined)}
                 >
-                    <Tab.List
+                    <TabList
                         as="div"
                         className={classNames(
                             'grid max-w-[45rem] grid-cols-2 lg:grid-cols-4 gap-3 py-4'
@@ -239,9 +239,9 @@ export function LocationForm({
                                 </DefaultTooltip>
                             )}
                         </Tab>
-                    </Tab.List>
-                    <Tab.Panels as="div" className="mt-2">
-                        <Tab.Panel>
+                    </TabList>
+                    <TabPanels as="div" className="mt-2">
+                        <TabPanel>
                             {watch('spatial') && (
                                 <Map
                                     mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
@@ -278,8 +278,8 @@ export function LocationForm({
                                     <Spinner />
                                 </div>
                             )}
-                        </Tab.Panel>
-                        <Tab.Panel id="choose-address">
+                        </TabPanel>
+                        <TabPanel id="choose-address">
                             <Map
                                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
                                 style={{ height: 300 }}
@@ -305,11 +305,11 @@ export function LocationForm({
                                     }
                                 />
                             </Map>
-                        </Tab.Panel>
-                        <Tab.Panel></Tab.Panel>
-                    </Tab.Panels>
-                </Tab.Group>
-            </Disclosure.Panel>
+                        </TabPanel>
+                        <TabPanel></TabPanel>
+                    </TabPanels>
+                </TabGroup>
+            </DisclosurePanel>
         </MetadataAccordion>
     );
 }

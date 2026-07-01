@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle, Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
 import {
     ArrowUpRightIcon,
     ChevronLeftIcon,
@@ -14,7 +15,6 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { type OpenIn, type WriDataset } from '@/schema/ckan.schema';
-import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import classNames from '@/utils/classnames';
 import { getFormatColor } from '@/utils/formatColors';
@@ -28,7 +28,6 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
 import { LoaderButton } from '@/components/_shared/Button';
-import { Dialog } from '@headlessui/react';
 import { useState } from 'react';
 import Spinner from '../_shared/Spinner';
 import { ErrorAlert } from '@/components/_shared/Alerts';
@@ -192,7 +191,7 @@ function OpenInButton({
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
-                <Menu.Button as={Fragment}>
+                <MenuButton as={Fragment}>
                     {session.data?.user ? (
                         <span
                             className={classNames(
@@ -209,10 +208,9 @@ function OpenInButton({
                             <ArrowUpRightIcon className="mb-1 h-6 w-6" />
                         </Button>
                     )}
-                </Menu.Button>
+                </MenuButton>
             </div>
-            <Transition
-                as={Fragment}
+            <Transition as="div"
                 enter="transition ease-out duration-100"
                 enterFrom="transform opacity-0 scale-95"
                 enterTo="transform opacity-100 scale-100"
@@ -220,7 +218,7 @@ function OpenInButton({
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items
+                <MenuItems
                     className={classNames(
                         'absolute left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none',
                         highlighted
@@ -228,7 +226,7 @@ function OpenInButton({
                 >
                     <div className="py-1">
                         {open_in.map((item) => (
-                            <Menu.Item key={item.url}>
+                            <MenuItem key={item.url}>
                                 {({ active }) => (
                                     <div>
                                         <a
@@ -248,10 +246,10 @@ function OpenInButton({
                                         </a>
                                     </div>
                                 )}
-                            </Menu.Item>
+                            </MenuItem>
                         ))}
                     </div>
-                </Menu.Items>
+                </MenuItems>
             </Transition>
         </Menu>
     );
@@ -330,14 +328,13 @@ flex items-center gap-x-1 mt-4 w-fit
                             className="relative inline-block text-left py-4"
                         >
                             <div>
-                                <Menu.Button>
+                                <MenuButton>
                                     <Button size="sm">
                                         Open external sources for table
                                     </Button>
-                                </Menu.Button>
+                                </MenuButton>
                             </div>
-                            <Transition
-                                as={Fragment}
+                            <Transition as="div"
                                 enter="transition ease-out duration-100"
                                 enterFrom="transform opacity-0 scale-95"
                                 enterTo="transform opacity-100 scale-100"
@@ -345,10 +342,10 @@ flex items-center gap-x-1 mt-4 w-fit
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items className="absolute left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <MenuItems className="absolute left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                     <div className="py-1">
                                         {data.sources.map((item, index) => (
-                                            <Menu.Item key={item}>
+                                            <MenuItem key={item}>
                                                 {({ active }) => (
                                                     <a
                                                         href={item}
@@ -364,10 +361,10 @@ flex items-center gap-x-1 mt-4 w-fit
                                                         Source {index + 1}
                                                     </a>
                                                 )}
-                                            </Menu.Item>
+                                            </MenuItem>
                                         ))}
                                     </div>
-                                </Menu.Items>
+                                </MenuItems>
                             </Transition>
                         </Menu>
                     );
@@ -609,12 +606,12 @@ export function DatasetHeader({
                                     />
                                 </div>
                                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                                    <Dialog.Title
+                                    <DialogTitle
                                         as="h3"
                                         className="text-base font-semibold leading-6 text-gray-900"
                                     >
                                         Add to favourites
-                                    </Dialog.Title>
+                                    </DialogTitle>
                                     <div className="mt-2">
                                         <p className="text-sm text-gray-500">
                                             Are you sure you want to add{' '}
@@ -660,12 +657,12 @@ export function DatasetHeader({
                                     />
                                 </div>
                                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                                    <Dialog.Title
+                                    <DialogTitle
                                         as="h3"
                                         className="text-base font-semibold leading-6 text-gray-900"
                                     >
                                         Remove from favourites
-                                    </Dialog.Title>
+                                    </DialogTitle>
                                     <div className="mt-2">
                                         <p className="text-sm text-gray-500">
                                             Are you sure you want to remove{' '}

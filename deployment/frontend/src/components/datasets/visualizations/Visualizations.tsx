@@ -1,4 +1,4 @@
-import { Tab } from '@headlessui/react';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { VisualizationTabs } from './VisualizationTabs';
 import MapView from './MapView';
 import { useEffect, useState } from 'react';
@@ -91,27 +91,27 @@ export default function Visualizations({
 
     return (
         <div className="h-full grow flex flex-col">
-            <Tab.Group selectedIndex={vizIndex} onChange={setVizIndex}>
-                <Tab.List as="nav" className="flex  w-full">
+            <TabGroup selectedIndex={vizIndex} onChange={setVizIndex}>
+                <TabList as="nav" className="flex  w-full">
                     <VisualizationTabs tabs={tabs} />
-                </Tab.List>
-                <Tab.Panels className="grow flex flex-col">
-                    <Tab.Panel>
+                </TabList>
+                <TabPanels className="grow flex flex-col">
+                    <TabPanel>
                         <MapView />
-                    </Tab.Panel>
-                    <Tab.Panel className="h-full grow flex flex-col justify-center">
+                    </TabPanel>
+                    <TabPanel className="h-full grow flex flex-col justify-center">
                         {tabularResource && (
                             <DataExplorer tabularResource={tabularResource} />
                         )}
-                    </Tab.Panel>
-                    <Tab.Panel>
+                    </TabPanel>
+                    <TabPanel>
                         <ChartView />
-                    </Tab.Panel>
-                    <Tab.Panel className="h-full grow flex flex-col justify-center items-center">
+                    </TabPanel>
+                    <TabPanel className="h-full grow flex flex-col justify-center items-center">
                         <div>No Data Preview</div>
-                    </Tab.Panel>
-                </Tab.Panels>
-            </Tab.Group>
+                    </TabPanel>
+                </TabPanels>
+            </TabGroup>
         </div>
     );
 }

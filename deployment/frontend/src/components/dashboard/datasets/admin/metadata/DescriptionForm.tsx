@@ -1,6 +1,6 @@
+import { Disclosure, DisclosurePanel } from '@headlessui/react'
 import { Bars4Icon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
-import { Disclosure } from '@headlessui/react';
 import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor';
 import { MetadataAccordion } from './MetadataAccordion';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
@@ -27,7 +27,7 @@ export function DescriptionForm({
                 </>
             }
         >
-            <Disclosure.Panel className="flex flex-col gap-y-8 pb-12 pt-5">
+            <DisclosurePanel className="flex flex-col gap-y-8 pb-12 pt-5">
                 <InputGroup
                     required
                     label={
@@ -75,7 +75,7 @@ export function DescriptionForm({
                         defaultValue=""
                     />
                 </InputGroup>
-            </Disclosure.Panel>
+            </DisclosurePanel>
         </MetadataAccordion>
     );
 }

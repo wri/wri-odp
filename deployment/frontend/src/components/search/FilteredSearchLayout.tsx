@@ -1,5 +1,5 @@
+import { Dialog, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel, TransitionChild } from '@headlessui/react'
 import { type Dispatch, Fragment, type SetStateAction, useState } from 'react';
-import { Dialog, Disclosure, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
   ChevronRightIcon,
@@ -141,14 +141,13 @@ export default function FilteredSearchLayout({
         ```
       */}
       <div className="flex font-acumin">
-        <Transition.Root show={sidebarOpen} as={Fragment}>
-          <Dialog
-            as="div"
-            className="relative z-50 lg:hidden"
-            onClose={setSidebarOpen}
-          >
-            <Transition.Child
-              as={Fragment}
+        <Dialog
+          open={sidebarOpen}
+          as="div"
+          className="relative z-50 lg:hidden"
+          onClose={setSidebarOpen}
+        >
+            <TransitionChild
               enter="transition-opacity ease-linear duration-300"
               enterFrom="opacity-0"
               enterTo="opacity-100"
@@ -157,11 +156,10 @@ export default function FilteredSearchLayout({
               leaveTo="opacity-0"
             >
               <div className="fixed inset-0 bg-gray-900/80" />
-            </Transition.Child>
+            </TransitionChild>
 
             <div className="fixed inset-0 flex">
-              <Transition.Child
-                as={Fragment}
+              <TransitionChild
                 enter="transition ease-in-out duration-300 transform"
                 enterFrom="-translate-x-full"
                 enterTo="translate-x-0"
@@ -169,9 +167,8 @@ export default function FilteredSearchLayout({
                 leaveFrom="translate-x-0"
                 leaveTo="-translate-x-full"
               >
-                <Dialog.Panel className="relative mr-16 flex w-full flex-1 md:max-w-sm">
-                  <Transition.Child
-                    as={Fragment}
+                <DialogPanel className="relative mr-16 flex w-full flex-1 md:max-w-sm">
+                  <TransitionChild
                     enter="ease-in-out duration-300"
                     enterFrom="opacity-0"
                     enterTo="opacity-100"
@@ -196,7 +193,7 @@ export default function FilteredSearchLayout({
                         />
                       </button>
                     </div>
-                  </Transition.Child>
+                  </TransitionChild>
                   {/* Sidebar component, swap this element with another sidebar if you like */}
                   <div
                     id="facets-list"
@@ -487,17 +484,16 @@ export default function FilteredSearchLayout({
                       </ul>
                     </nav>
                   </div>
-                </Dialog.Panel>
-              </Transition.Child>
+                </DialogPanel>
+              </TransitionChild>
             </div>
-          </Dialog>
-        </Transition.Root>
+        </Dialog>
 
         {/* Static sidebar for desktop */}
         <Disclosure defaultOpen>
           {({ open }) => (
             <>
-              <Disclosure.Button
+              <DisclosureButton
                 aria-label="collapse sidebar"
                 className="absolute lg:block hidden left-[calc(25%-1.5rem)] md:top-[80vh] lg:top-[75vh] z-20"
               >
@@ -514,13 +510,13 @@ export default function FilteredSearchLayout({
                     )}
                   />
                 </div>
-              </Disclosure.Button>
+              </DisclosureButton>
               <div
                 className={classNames(
                   open ? 'hidden' : 'block min-w-[2%] w-[2%]'
                 )}
               />
-              <Disclosure.Panel
+              <DisclosurePanel
                 as="div"
                 className="hidden w-[25%] min-w-[25%] lg:z-10 lg:flex lg:flex-col"
               >
@@ -798,7 +794,7 @@ export default function FilteredSearchLayout({
                     </ul>
                   </nav>
                 </div>
-              </Disclosure.Panel>
+              </DisclosurePanel>
             </>
           )}
         </Disclosure>

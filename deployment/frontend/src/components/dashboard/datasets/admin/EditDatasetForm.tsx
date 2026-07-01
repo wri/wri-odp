@@ -1,3 +1,4 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { type WriDataset } from '@/schema/ckan.schema';
 import {
     type DataDictionaryFormType,
@@ -6,7 +7,6 @@ import {
     type ResourceFormType,
 } from '@/schema/dataset.schema';
 import classNames from '@/utils/classnames';
-import { Tab } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { Fragment, useState } from 'react';
@@ -260,9 +260,9 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
 
     return (
         <>
-            <Tab.Group>
+            <TabGroup>
                 <div>
-                    <Tab.List
+                    <TabList
                         className="max-w-screen md:max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
                         aria-label="Tabs"
                     >
@@ -292,9 +292,9 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                     </Tab>
                                 ))}
                         </div>
-                    </Tab.List>
-                    <Tab.Panels>
-                        <Tab.Panel
+                    </TabList>
+                    <TabPanels>
+                        <TabPanel
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
@@ -315,8 +315,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 <VersioningForm formObj={formObj} />
                                 <CustomFieldsForm formObj={formObj} />
                             </form>
-                        </Tab.Panel>
-                        <Tab.Panel
+                        </TabPanel>
+                        <TabPanel
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
@@ -324,17 +324,17 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 formObj={formObj}
                                 dataset={dataset}
                             />
-                        </Tab.Panel>
-                        <Tab.Panel
+                        </TabPanel>
+                        <TabPanel
                             as="div"
                             className="flex flex-col gap-y-12 mt-8"
                         >
                             <EditRwSection
                                 formObj={formObj}
                             />
-                        </Tab.Panel>
+                        </TabPanel>
                         {canEditCollaborators && (
-                            <Tab.Panel
+                            <TabPanel
                                 as="div"
                                 className="flex flex-col gap-y-12 mt-8"
                             >
@@ -342,11 +342,11 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                     formObj={formObj}
                                     dataset={dataset}
                                 />
-                            </Tab.Panel>
+                            </TabPanel>
                         )}
-                    </Tab.Panels>
+                    </TabPanels>
                 </div>
-            </Tab.Group>
+            </TabGroup>
             <div
                 className={classNames(
                     'w-full mx-auto sm:px-6 xxl:px-0 max-w-[1380px]'

@@ -1,4 +1,4 @@
-import { Disclosure, Transition } from '@headlessui/react';
+import { Disclosure, DisclosureButton, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 interface MetadataAccordion {
@@ -22,7 +22,7 @@ export function MetadataAccordion({
                 <>
                     <div className="w-full border-b border-blue-800 bg-white shadow">
                         <div className="px-4 sm:px-8">
-                            <Disclosure.Button className="col-span-full flex w-full justify-between border-b border-stone-50 py-5">
+                            <DisclosureButton className="col-span-full flex w-full justify-between border-b border-stone-50 py-5">
                                 <h3 className="flex w-full items-center gap-x-2 font-acumin text-xl font-semibold text-blue-800">
                                     {label}
                                 </h3>
@@ -33,8 +33,8 @@ export function MetadataAccordion({
                                             : ''
                                     } h-5 w-5 text-blue-800`}
                                 />
-                            </Disclosure.Button>
-                            <Transition
+                            </DisclosureButton>
+                            <Transition as="div"
                                 enter="transition duration-100 ease-out"
                                 enterFrom="transform scale-95 opacity-0"
                                 enterTo="transform scale-100 opacity-100"

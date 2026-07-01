@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle, Tab, TabGroup, TabPanel, TabPanels } from '@headlessui/react'
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import { Button, LoaderButton } from '@/components/_shared/Button';
 import { CreateDatasetTabs } from '@/components/dashboard/datasets/admin/CreateDatasetTabs';
@@ -14,7 +15,6 @@ import { api } from '@/utils/api';
 import classNames from '@/utils/classnames';
 import notify from '@/utils/notify';
 import { slugify } from '@/utils/slugify';
-import { Tab } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -29,7 +29,6 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 import { VersioningForm } from './metadata/VersioningForm';
 import { ErrorMessage } from '@hookform/error-message';
 
@@ -117,15 +116,15 @@ export default function CreateDatasetForm() {
 
     return (
         <>
-            <Tab.Group
+            <TabGroup
                 selectedIndex={selectedIndex}
                 onChange={setSelectedIndex}
             >
                 <div className="mx-auto w-full mb-5 3xl:max-w-[1380px]">
                     <CreateDatasetTabs currentStep={selectedIndex} />
                 </div>
-                <Tab.Panels>
-                    <Tab.Panel as="div">
+                <TabPanels>
+                    <TabPanel as="div">
                         <form
                             className="flex flex-col gap-y-12"
                             id="create_dataset_form"
@@ -142,14 +141,14 @@ export default function CreateDatasetForm() {
                             <VersioningForm formObj={formObj} />
                             <CustomFieldsForm formObj={formObj} />
                         </form>
-                    </Tab.Panel>
-                    <Tab.Panel as="div" className="flex flex-col gap-y-12">
+                    </TabPanel>
+                    <TabPanel as="div" className="flex flex-col gap-y-12">
                         <DataFilesSection formObj={formObj} />
-                    </Tab.Panel>
-                    <Tab.Panel as="div" className="flex flex-col gap-y-12">
+                    </TabPanel>
+                    <TabPanel as="div" className="flex flex-col gap-y-12">
                         <CreateLayersSection formObj={formObj} />
-                    </Tab.Panel>
-                    <Tab.Panel as="div">
+                    </TabPanel>
+                    <TabPanel as="div">
                         <form
                             className="flex flex-col gap-y-12"
                             id="create_dataset_form"
@@ -159,9 +158,9 @@ export default function CreateDatasetForm() {
                         >
                             <Preview formObj={formObj} />
                         </form>
-                    </Tab.Panel>
-                </Tab.Panels>
-            </Tab.Group>
+                    </TabPanel>
+                </TabPanels>
+            </TabGroup>
             <div
                 className={classNames(
                     'w-full mx-auto sm:px-6 xxl:px-0 max-w-[1380px]',
@@ -285,12 +284,12 @@ export default function CreateDatasetForm() {
                             />
                         </div>
                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                            <Dialog.Title
+                            <DialogTitle
                                 as="h3"
                                 className="text-base font-semibold leading-6 text-gray-900"
                             >
                                 Save as Draft
-                            </Dialog.Title>
+                            </DialogTitle>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
                                     Are you sure you want to save this Dataset

@@ -1,3 +1,4 @@
+import { Disclosure, DisclosureButton, DisclosurePanel, Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from '@headlessui/react'
 import {
     GlobeAmericasIcon,
     MagnifyingGlassIcon,
@@ -8,7 +9,6 @@ import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { Input } from '@/components/_shared/SimpleInput';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { Disclosure, Listbox, Transition } from '@headlessui/react';
 import { type UseFormReturn } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { api } from '@/utils/api';
@@ -304,24 +304,23 @@ export function DataApiDatasetForm({
                     >
                         {({ open }) => (
                             <div className="relative w-full max-w-md">
-                                <Listbox.Button className="relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6">
+                                <ListboxButton className="relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6">
                                     <span className="block truncate">
                                         {selectedVersion ?? 'Select a version'}
                                     </span>
                                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                         <ChevronDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                                     </span>
-                                </Listbox.Button>
-                                <Transition
+                                </ListboxButton>
+                                <Transition as="div"
                                     show={open}
-                                    as={Fragment}
                                     leave="transition ease-in duration-100"
                                     leaveFrom="opacity-100"
                                     leaveTo="opacity-0"
                                 >
-                                    <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                    <ListboxOptions className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                         {dataApiVersions.map((v) => (
-                                            <Listbox.Option
+                                            <ListboxOption
                                                 key={v}
                                                 value={v}
                                                 className={({ active }) =>
@@ -336,9 +335,9 @@ export function DataApiDatasetForm({
                                                         {v}
                                                     </span>
                                                 )}
-                                            </Listbox.Option>
+                                            </ListboxOption>
                                         ))}
-                                    </Listbox.Options>
+                                    </ListboxOptions>
                                 </Transition>
                             </div>
                         )}
@@ -368,7 +367,7 @@ export function DataApiDatasetForm({
                         >
                             {({ open }) => (
                                 <div className="relative w-full">
-                                    <Listbox.Button className="relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6">
+                                    <ListboxButton className="relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6">
                                         <span className="block truncate">
                                             {selectedAssetId
                                                 ? (dataApiAssets.find((a) => a.asset_id === selectedAssetId)?.asset_uri ?? selectedAssetId)
@@ -377,17 +376,16 @@ export function DataApiDatasetForm({
                                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                             <ChevronDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                                         </span>
-                                    </Listbox.Button>
-                                    <Transition
+                                    </ListboxButton>
+                                    <Transition as="div"
                                         show={open}
-                                        as={Fragment}
                                         leave="transition ease-in duration-100"
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"
                                     >
-                                        <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                        <ListboxOptions className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                             {dataApiAssets.map((asset) => (
-                                                <Listbox.Option
+                                                <ListboxOption
                                                     key={asset.asset_id}
                                                     value={asset.asset_id}
                                                     className={({ active }) =>
@@ -407,9 +405,9 @@ export function DataApiDatasetForm({
                                                             </span>
                                                         </div>
                                                     )}
-                                                </Listbox.Option>
+                                                </ListboxOption>
                                             ))}
-                                        </Listbox.Options>
+                                        </ListboxOptions>
                                     </Transition>
                                 </div>
                             )}
@@ -453,7 +451,7 @@ export function DataApiDatasetForm({
                                 <Disclosure defaultOpen>
                                     {({ open }) => (
                                         <>
-                                            <Disclosure.Button as={Fragment}>
+                                            <DisclosureButton as={Fragment}>
                                                 <Button
                                                     type="button"
                                                     className="my-2 ml-auto group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3"
@@ -463,8 +461,8 @@ export function DataApiDatasetForm({
                                                         : 'Select tiles by location'}
                                                     <GlobeAmericasIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
                                                 </Button>
-                                            </Disclosure.Button>
-                                            <Disclosure.Panel
+                                            </DisclosureButton>
+                                            <DisclosurePanel
                                                 unmount={false}
                                                 className="pb-3 w-full"
                                             >
@@ -479,7 +477,7 @@ export function DataApiDatasetForm({
                                                         addTilesToSelection
                                                     }
                                                 />
-                                            </Disclosure.Panel>
+                                            </DisclosurePanel>
                                         </>
                                     )}
                                 </Disclosure>

@@ -1,5 +1,5 @@
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from '@headlessui/react'
 import { Fragment } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
 import {
     AdjustmentsVerticalIcon,
 } from '@heroicons/react/20/solid';
@@ -73,7 +73,7 @@ export default function LegendItemButtonThreshold<
                         <>
                             <div className="relative">
                                 <DefaultTooltip content="Threshold">
-                                    <Listbox.Button
+                                    <ListboxButton
                                         id={'threshold'}
                                         className={classNames(
                                             'relative text-left block w-full rounded-md border-0 px-5 py-3 hover:text-gray-900 text-gray-600 placeholder:text-gray-400 sm:text-sm sm:leading-6'
@@ -83,18 +83,17 @@ export default function LegendItemButtonThreshold<
                                             <AdjustmentsVerticalIcon className="w-4 mr-1" />
                                             {selected.label}
                                         </span>
-                                    </Listbox.Button>
+                                    </ListboxButton>
                                 </DefaultTooltip>
 
                                 <div className="absolute right-[65px]">
-                                    <Transition
+                                    <Transition as="div"
                                         show={open}
-                                        as={Fragment}
                                         leave="transition ease-in duration-100"
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"
                                     >
-                                        <Listbox.Options
+                                        <ListboxOptions
                                             style={{
                                                 bottom: `${
                                                     (options.length > 3
@@ -106,7 +105,7 @@ export default function LegendItemButtonThreshold<
                                             className="fixed z-50 mt-1 max-h-64 auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
                                         >
                                             {options.map((option) => (
-                                                <Listbox.Option
+                                                <ListboxOption
                                                     key={option.value}
                                                     className={({ active }) =>
                                                         classNames(
@@ -136,9 +135,9 @@ export default function LegendItemButtonThreshold<
                                                             </>
                                                         );
                                                     }}
-                                                </Listbox.Option>
+                                                </ListboxOption>
                                             ))}
-                                        </Listbox.Options>
+                                        </ListboxOptions>
                                     </Transition>
                                 </div>
                             </div>

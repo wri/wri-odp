@@ -1,6 +1,6 @@
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
 import { Button, LoaderButton } from '@/components/_shared/Button';
 import classNames from '@/utils/classnames';
-import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import {
   ArrowDownTrayIcon,
@@ -278,7 +278,7 @@ export function DataApiDatasetCard({
               >
                 <span className="my-auto">Raster Tile Set</span>
               </span>
-              <Disclosure.Button>
+              <DisclosureButton>
                 <h3
                   className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${
                     datafile.title
@@ -288,19 +288,19 @@ export function DataApiDatasetCard({
                 >
                   {datafile.title ?? datafile.name}
                 </h3>
-              </Disclosure.Button>
+              </DisclosureButton>
             </div>
             <div className="gap-x-2 hidden sm:flex">
-              <Disclosure.Button role="button" aria-label="expand">
+              <DisclosureButton role="button" aria-label="expand">
                 <ChevronDownIcon
                   className={`${
                     open ? 'rotate-180 transform transition' : ''
                   } h-5 w-5 text-stone-900`}
                 />
-              </Disclosure.Button>
+              </DisclosureButton>
             </div>
           </div>
-          <Transition
+          <Transition as="div"
             enter="transition duration-100 ease-out"
             enterFrom="transform scale-95 opacity-0"
             enterTo="transform scale-100 opacity-100"
@@ -308,7 +308,7 @@ export function DataApiDatasetCard({
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0"
           >
-            <Disclosure.Panel className="py-3">
+            <DisclosurePanel className="py-3">
               <p
                 className={`font-acumin text-base font-light text-stone-900 ${
                   datafile.description
@@ -497,7 +497,7 @@ export function DataApiDatasetCard({
                   </div>
                 )}
               </div>
-            </Disclosure.Panel>
+            </DisclosurePanel>
           </Transition>
         </div>
       )}

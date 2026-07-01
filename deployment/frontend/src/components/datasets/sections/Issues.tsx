@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle, Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
 import React, { useState } from 'react';
 import {
     MagnifyingGlassIcon,
@@ -5,7 +6,6 @@ import {
     ClockIcon,
 } from '@heroicons/react/24/outline';
 import { type Issue } from '@/schema/ckan.schema';
-import { Disclosure, Transition } from '@headlessui/react';
 import { type Index } from 'flexsearch';
 import classNames from '@/utils/classnames';
 import { SimpleEditorV2 } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditorv2';
@@ -25,7 +25,6 @@ import {
     ExclamationTriangleIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import Image from 'next/image';
@@ -188,7 +187,7 @@ function IssueCard({
                 'flex flex-col relative font-acumin gap-y-1 border-b-2 border-wri-green bg-white p-5 shadow-wri transition hover:bg-slate-100 cursor-pointer'
             )}
         >
-            <Disclosure.Button as="div">
+            <DisclosureButton as="div">
                 <div className="relative">
                     <div className="flex gap-x-2">
                         <h3 className="font-semibold text-[1.125rem]">
@@ -222,8 +221,8 @@ function IssueCard({
                         </div>
                     </div>
                 </div>
-            </Disclosure.Button>
-            <Transition
+            </DisclosureButton>
+            <Transition as="div"
                 enter="transition duration-100 ease-out"
                 enterFrom="transform scale-95 opacity-0"
                 enterTo="transform scale-100 opacity-100"
@@ -231,7 +230,7 @@ function IssueCard({
                 leaveFrom="transform scale-100 opacity-100"
                 leaveTo="transform scale-95 opacity-0"
             >
-                <Disclosure.Panel className="border-t border-gray-400 my-4 pt-4">
+                <DisclosurePanel className="border-t border-gray-400 my-4 pt-4">
                     <p className="font-acumin text-base w-full text-[#1A1919]">
                         Comments
                     </p>
@@ -342,7 +341,7 @@ function IssueCard({
                                 )}
                             </div>
                             <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                                <Dialog.Title
+                                <DialogTitle
                                     as="h3"
                                     className="text-base font-semibold leading-6 text-gray-900"
                                 >
@@ -350,7 +349,7 @@ function IssueCard({
                                         ? 'Close'
                                         : 'Re-open'}{' '}
                                     Issue
-                                </Dialog.Title>
+                                </DialogTitle>
                                 <div className="mt-2">
                                     <p className="text-sm text-gray-500">
                                         Are you sure you want to{' '}
@@ -408,7 +407,7 @@ function IssueCard({
                             </Button>
                         </div>
                     </Modal>
-                </Disclosure.Panel>
+                </DisclosurePanel>
             </Transition>
         </Disclosure>
     );

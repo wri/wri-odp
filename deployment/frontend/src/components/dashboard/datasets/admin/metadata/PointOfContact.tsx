@@ -1,9 +1,9 @@
+import { Disclosure, DisclosurePanel } from '@headlessui/react'
 import {
     ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
 import { Input } from '@/components/_shared/SimpleInput';
 import { InputGroup } from '@/components/_shared/InputGroup';
-import { Disclosure } from '@headlessui/react';
 import { MetadataAccordion } from './MetadataAccordion';
 import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
@@ -60,7 +60,7 @@ export function PointOfContactForm({
                 </>
             }
         >
-            <Disclosure.Panel className="py-5 flex flex-col gap-y-6">
+            <DisclosurePanel className="py-5 flex flex-col gap-y-6">
                 {/* Authors */}
                 <InputGroup
                     label={
@@ -295,7 +295,7 @@ export function PointOfContactForm({
                         </div>
                     </div>
                 </InputGroup>
-            </Disclosure.Panel>
+            </DisclosurePanel>
         </MetadataAccordion>
     );
 }

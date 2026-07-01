@@ -1,3 +1,4 @@
+import { Switch } from '@headlessui/react'
 import { Fragment } from 'react';
 import { Button } from '@/components/_shared/Button';
 import { InputGroup } from '@/components/_shared/InputGroup';
@@ -14,7 +15,6 @@ import {
     rampTypes,
     renderTypeOptions,
 } from '../../../../formOptions';
-import { Switch } from '@headlessui/react';
 import { type FilterFormType, type LayerFormType } from '../layer.schema';
 import { useState } from 'react';
 import classNames from '@/utils/classnames';

@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle } from '@headlessui/react'
 import React, { useState } from 'react';
 import DatasetHeader from './DatasetHeader';
 import DatasetRow from './DatasetRow';
@@ -13,7 +14,6 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 });
 import { LoaderButton, Button } from '@/components/_shared/Button';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 
 export default function DatasetLCardList({
     setQuery,
@@ -101,12 +101,12 @@ export default function DatasetLCardList({
                                 />
                             </div>
                             <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                                <Dialog.Title
+                                <DialogTitle
                                     as="h3"
                                     className="text-base font-semibold leading-6 text-gray-900"
                                 >
                                     Delete Dataset
-                                </Dialog.Title>
+                                </DialogTitle>
                                 <div className="mt-2">
                                     <p className="text-sm text-gray-500">
                                         Are you sure you want to delete this

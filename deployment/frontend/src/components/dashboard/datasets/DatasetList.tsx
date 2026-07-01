@@ -1,5 +1,5 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import React from 'react';
-import { Tab } from '@headlessui/react';
 import DatasetLCardList from './DatasetLCardList';
 import Favourite from './Favourites';
 import Drafts from './Drafts';
@@ -76,7 +76,7 @@ export default function DatasetList() {
 
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
-            <Tab.Group
+            <TabGroup
                 defaultIndex={tabIndex}
                 onChange={(index) => {
                     setQuery({
@@ -88,21 +88,21 @@ export default function DatasetList() {
                     });
                 }}
             >
-                <Tab.List className="flex max-w-8xl  ">
+                <TabList className="flex max-w-8xl  ">
                     <DashboardDatasetTabs tabs={tabs} />
-                </Tab.List>
-                <Tab.Panels className="mt-2">
+                </TabList>
+                <TabPanels className="mt-2">
                     {tabs.map((tab, i) => (
-                        <Tab.Panel key={tab.title} className="">
+                        <TabPanel key={tab.title} className="">
                             <tab.content
                                 setQuery={setQuery}
                                 query={query}
                                 key={tab.title}
                             />
-                        </Tab.Panel>
+                        </TabPanel>
                     ))}
-                </Tab.Panels>
-            </Tab.Group>
+                </TabPanels>
+            </TabGroup>
         </section>
     );
 }

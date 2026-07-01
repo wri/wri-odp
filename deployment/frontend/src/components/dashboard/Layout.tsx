@@ -1,5 +1,5 @@
+import { Dialog, DialogPanel, Disclosure, DisclosurePanel, TransitionChild } from '@headlessui/react'
 import { Fragment, useState } from 'react';
-import { Dialog, Disclosure, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import UserProfile from './UserProfile';
 import { useRouter } from 'next/router';
@@ -118,14 +118,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         ```
       */}
             <div className="flex font-acumin">
-                <Transition.Root show={sidebarOpen} as={Fragment}>
-                    <Dialog
+                <Dialog
+                        open={sidebarOpen}
                         as="div"
                         className="relative z-10 lg:hidden"
                         onClose={setSidebarOpen}
                     >
-                        <Transition.Child
-                            as={Fragment}
+                        <TransitionChild
                             enter="transition-opacity ease-linear duration-300"
                             enterFrom="opacity-0"
                             enterTo="opacity-100"
@@ -134,11 +133,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                             leaveTo="opacity-0"
                         >
                             <div className="fixed inset-0 bg-gray-900/80" />
-                        </Transition.Child>
+                        </TransitionChild>
 
                         <div className="fixed z-[60] inset-0 flex">
-                            <Transition.Child
-                                as={Fragment}
+                            <TransitionChild
                                 enter="transition ease-in-out duration-300 transform"
                                 enterFrom="-translate-x-full"
                                 enterTo="translate-x-0"
@@ -146,9 +144,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 leaveFrom="translate-x-0"
                                 leaveTo="-translate-x-full"
                             >
-                                <Dialog.Panel className="relative mr-16 flex w-full flex-1 md:max-w-sm">
-                                    <Transition.Child
-                                        as={Fragment}
+                                <DialogPanel className="relative mr-16 flex w-full flex-1 md:max-w-sm">
+                                    <TransitionChild
                                         enter="ease-in-out duration-300"
                                         enterFrom="opacity-0"
                                         enterTo="opacity-100"
@@ -173,7 +170,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                 />
                                             </button>
                                         </div>
-                                    </Transition.Child>
+                                    </TransitionChild>
                                     {/* Sidebar component, swap this element with another sidebar if you like */}
                                     <div className="flex grow flex-col gap-y-5 overflow-y-auto   bg-wri-green pb-4 dashboard-sidebar">
                                         <nav className="flex flex-1 flex-col ">
@@ -303,16 +300,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                             </ul>
                                         </nav>
                                     </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
+                                </DialogPanel>
+                            </TransitionChild>
                         </div>
-                    </Dialog>
-                </Transition.Root>
+                </Dialog>
 
                 {/* Static sidebar for desktop */}
                 <Disclosure defaultOpen>
                     <>
-                        <Disclosure.Panel
+                        <DisclosurePanel
                             as="div"
                             className="hidden w-full sm:max-w-[300px] lg:z-10 lg:flex lg:flex-col "
                         >
@@ -440,7 +436,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                     </ul>
                                 </nav>
                             </div>
-                        </Disclosure.Panel>
+                        </DisclosurePanel>
                     </>
                 </Disclosure>
 

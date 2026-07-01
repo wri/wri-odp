@@ -1,5 +1,5 @@
+import { Tab } from '@headlessui/react'
 import classNames from '@/utils/classnames';
-import { Tab } from '@headlessui/react';
 import { Fragment } from 'react';
 
 export function VisualizationTabs({

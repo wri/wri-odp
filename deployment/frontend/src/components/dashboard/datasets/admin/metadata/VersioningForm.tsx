@@ -1,8 +1,8 @@
+import { Disclosure, DisclosurePanel } from '@headlessui/react'
 import {
     ClockIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { Disclosure } from '@headlessui/react';
 import { MetadataAccordion } from './MetadataAccordion';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { type UseFormReturn } from 'react-hook-form';
@@ -29,7 +29,7 @@ export function VersioningForm({
                 </>
             }
         >
-            <Disclosure.Panel className="py-5 flex flex-col gap-y-4">
+            <DisclosurePanel className="py-5 flex flex-col gap-y-4">
                 <InputGroup
                     label={
                         <div className="flex items-center gap-x-1">
@@ -52,7 +52,7 @@ export function VersioningForm({
                     />
                     <ErrorDisplay name="release_notes" errors={errors} />
                 </InputGroup>
-            </Disclosure.Panel>
+            </DisclosurePanel>
         </MetadataAccordion>
     );
 }

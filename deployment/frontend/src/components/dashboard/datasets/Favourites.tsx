@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle } from '@headlessui/react'
 import React, { useState } from 'react';
 import SearchHeader from '../_shared/SearchHeader';
 import { FavouriteRow } from './DatasetRow';
@@ -14,7 +15,6 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 });
 import { LoaderButton, Button } from '@/components/_shared/Button';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 
 export default function Favourite({
@@ -132,12 +132,12 @@ export default function Favourite({
                                 />
                             </div>
                             <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                                <Dialog.Title
+                                <DialogTitle
                                     as="h3"
                                     className="text-base font-semibold leading-6 text-gray-900"
                                 >
                                     Remove from favourites
-                                </Dialog.Title>
+                                </DialogTitle>
                                 <div className="mt-2">
                                     <p className="text-sm text-gray-500">
                                         Are you sure you want to remove this

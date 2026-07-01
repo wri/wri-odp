@@ -1,8 +1,8 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import { Tab } from '@headlessui/react';
 import {
     ArrowPathIcon,
     ArrowTopRightOnSquareIcon,
@@ -145,18 +145,18 @@ function LearnMoreModal({
                         </div>
                     </div>
                 </div>
-                <Tab.Group>
+                <TabGroup>
                     <div>
-                        <Tab.List as="nav" className="mt-6 flex w-fit border-b">
+                        <TabList as="nav" className="mt-6 flex w-fit border-b">
                             <DatasetTabs tabs={tabs} />
-                        </Tab.List>
+                        </TabList>
                         <div className="w-full border-b border-zinc-300" />
                     </div>
-                    <Tab.Panels
+                    <TabPanels
                         as="div"
                         className="max-h-[18rem] overflow-y-auto"
                     >
-                        <Tab.Panel>
+                        <TabPanel>
                             <div
                                 className="prose max-w-none prose-a:text-wri-green font-['Acumin Pro SemiCondensed'] text-justify text-sm font-normal text-black"
                                 dangerouslySetInnerHTML={{
@@ -178,17 +178,17 @@ function LearnMoreModal({
                                     </a>
                                 )}
                             </div>
-                        </Tab.Panel>
-                        <Tab.Panel>
+                        </TabPanel>
+                        <TabPanel>
                             <div
                                 className="prose max-w-none prose-a:text-wri-green font-['Acumin Pro SemiCondensed'] text-justify text-sm font-normal text-black"
                                 dangerouslySetInnerHTML={{
                                     __html: dataset?.methodology ?? '',
                                 }}
                             ></div>
-                        </Tab.Panel>
-                    </Tab.Panels>
-                </Tab.Group>
+                        </TabPanel>
+                    </TabPanels>
+                </TabGroup>
             </div>
         </Modal>
     );

@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle } from '@headlessui/react'
 import React, { useEffect, useState } from 'react';
 import SearchHeader from '../_shared/SearchHeader';
 import RowProfile from '../_shared/RowProfile';
@@ -16,7 +17,6 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 import { useRouter } from 'next/router';
 import { LoaderButton, Button } from '@/components/_shared/Button';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 import type { GroupTree } from '@/schema/ckan.schema';
 import { useQuery } from 'react-query';
 import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/solid';
@@ -358,12 +358,12 @@ function SubCardProfile({
               />
             </div>
             <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-              <Dialog.Title
+              <DialogTitle
                 as="h3"
                 className="text-base font-semibold leading-6 text-gray-900"
               >
                 Delete Team
-              </Dialog.Title>
+              </DialogTitle>
               <div className="mt-2">
                 <p className="text-sm text-gray-500">
                   Are you sure you want to delete this Team?
@@ -579,12 +579,12 @@ export default function TeamCard() {
               />
             </div>
             <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-              <Dialog.Title
+              <DialogTitle
                 as="h3"
                 className="text-base font-semibold leading-6 text-gray-900"
               >
                 Delete Team
-              </Dialog.Title>
+              </DialogTitle>
               <div className="mt-2">
                 <p className="text-sm text-gray-500">
                   Are you sure you want to delete this Team?

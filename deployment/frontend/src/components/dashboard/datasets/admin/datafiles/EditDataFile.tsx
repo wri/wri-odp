@@ -1,3 +1,4 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import {
     LinkIcon,
     GlobeAsiaAustraliaIcon,
@@ -14,7 +15,6 @@ import {
     type ResourceFormType,
 } from '@/schema/dataset.schema';
 import { convertBytes } from '@/utils/convertBytes';
-import { Tab } from '@headlessui/react';
 import { Fragment, useState } from 'react';
 import classNames from '@/utils/classnames';
 import { DataDictionaryTable } from './DataDictionaryTable';
@@ -288,9 +288,9 @@ export function EditDataFile({
                     ) : datafile.type === 'tile-cache' ? (
                         <TileCacheForm formObj={formObj} index={index} />
                     ) : (
-                        <Tab.Group>
+                        <TabGroup>
                             <div>
-                                <Tab.List
+                                <TabList
                                     className="max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
                                     aria-label="Tabs"
                                 >
@@ -395,9 +395,9 @@ export function EditDataFile({
                                                 </Tab>
                                             )}
                                     </div>
-                                </Tab.List>
-                                <Tab.Panels className="px-4 sm:px-6 xxl:px-0 py-4">
-                                    <Tab.Panel>
+                                </TabList>
+                                <TabPanels className="px-4 sm:px-6 xxl:px-0 py-4">
+                                    <TabPanel>
                                         <div className="flex flex-col gap-y-4 font-acumin">
                                             <InputGroup
                                                 label="Title"
@@ -469,22 +469,22 @@ export function EditDataFile({
                                                 index={index}
                                             />
                                         </div>
-                                    </Tab.Panel>
-                                    <Tab.Panel>
+                                    </TabPanel>
+                                    <TabPanel>
                                         <ViewsList
                                             provider="datastore"
                                             datafile={datafile as any}
                                             dataset={dataset}
                                         />
-                                    </Tab.Panel>
+                                    </TabPanel>
                                     {datafile.schema &&
                                         datafile.schema.length > 0 && (
-                                            <Tab.Panel>
+                                            <TabPanel>
                                                 <DataDictionaryTable
                                                     formObj={formObj}
                                                     resourceIndex={index}
                                                 />
-                                            </Tab.Panel>
+                                            </TabPanel>
                                         )}
                                     {[
                                         'xls',
@@ -499,15 +499,15 @@ export function EditDataFile({
                                         datafile.format?.toLowerCase() ?? 'none'
                                     ) &&
                                         datafile.url_type === 'upload' && (
-                                            <Tab.Panel>
+                                            <TabPanel>
                                                 <Datapusher
                                                     datafile={datafile}
                                                 />
-                                            </Tab.Panel>
+                                            </TabPanel>
                                         )}
-                                </Tab.Panels>
+                                </TabPanels>
                             </div>
-                        </Tab.Group>
+                        </TabGroup>
                     )}
                     <div
                         className={classNames(

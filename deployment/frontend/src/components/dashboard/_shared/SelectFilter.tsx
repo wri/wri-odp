@@ -1,5 +1,5 @@
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from '@headlessui/react'
 import { Fragment, useState } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import classNames from '@/utils/classnames';
 import type { SearchInput } from '@/schema/search.schema';
@@ -123,7 +123,7 @@ export default function SelectFilter({
             {({ open }) => (
                 <>
                     <div className="relative w-32 sm:w-48 ">
-                        <Listbox.Button className="relative w-full cursor-default rounded-sm bg-wri-gray py-2 pl-3 pr-8 text-left shadow-sm border-b-wri-gold border-b-2 focus:outline-none  sm:leading-6 text-black text-sm font-normal font-['Acumin Pro SemiCondensed']">
+                        <ListboxButton className="relative w-full cursor-default rounded-sm bg-wri-gray py-2 pl-3 pr-8 text-left shadow-sm border-b-wri-gold border-b-2 focus:outline-none  sm:leading-6 text-black text-sm font-normal font-['Acumin Pro SemiCondensed']">
                             <span className="block truncate text-wri-black">
                                 {selected!.label}
                             </span>
@@ -133,18 +133,17 @@ export default function SelectFilter({
                                     aria-hidden="true"
                                 />
                             </span>
-                        </Listbox.Button>
+                        </ListboxButton>
 
-                        <Transition
+                        <Transition as="div"
                             show={open}
-                            as={Fragment}
                             leave="transition ease-in duration-100"
                             leaveFrom="opacity-100"
                             leaveTo="opacity-0"
                         >
-                            <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                            <ListboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                 {options.map((option) => (
-                                    <Listbox.Option
+                                    <ListboxOption
                                         key={option.id}
                                         className={({ active }) =>
                                             classNames(
@@ -170,9 +169,9 @@ export default function SelectFilter({
                                                 </span>
                                             </>
                                         )}
-                                    </Listbox.Option>
+                                    </ListboxOption>
                                 ))}
-                            </Listbox.Options>
+                            </ListboxOptions>
                         </Transition>
                     </div>
                 </>

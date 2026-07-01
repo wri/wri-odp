@@ -1,5 +1,5 @@
+import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
 import React, { Fragment } from 'react';
-import { Menu, Transition } from '@headlessui/react';
 import { UserCircleIcon } from '@heroicons/react/20/solid';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -53,7 +53,7 @@ export default function UserMenu({
         >
             <Menu as="div" className="relative inline-block text-left  pr-1 ">
                 <div>
-                    <Menu.Button>
+                    <MenuButton>
                         <div className="flex ">
                             <UserCircleIcon
                                 className={`text-black h-5 w-5 mr-2 ${
@@ -68,10 +68,9 @@ export default function UserMenu({
                                 {session.data?.user.name}
                             </div>
                         </div>
-                    </Menu.Button>
+                    </MenuButton>
                 </div>
-                <Transition
-                    as={Fragment}
+                <Transition as="div"
                     enter="transition ease-out duration-100"
                     enterFrom="transform opacity-0 scale-95"
                     enterTo="transform opacity-100 scale-100"
@@ -79,7 +78,7 @@ export default function UserMenu({
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                 >
-                    <Menu.Items className="absolute z-30 right-0 mt-2 w-52 whitespace-nowrap  origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-md text-base font-semibold focus:outline-none">
+                    <MenuItems className="absolute z-30 right-0 mt-2 w-52 whitespace-nowrap  origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-md text-base font-semibold focus:outline-none">
                         {navigation.map((item) => {
                             return (
                                 <div
@@ -87,7 +86,7 @@ export default function UserMenu({
                                     key={`nav-${item.title}`}
                                 >
                                     <div className="px-2 pr-4 py-4 ">
-                                        <Menu.Item>
+                                        <MenuItem>
                                             {item.onClick ? (
                                                 <button onClick={item.onClick}>
                                                     {item.title}
@@ -97,12 +96,12 @@ export default function UserMenu({
                                                     {item.title}
                                                 </Link>
                                             )}
-                                        </Menu.Item>
+                                        </MenuItem>
                                     </div>
                                 </div>
                             );
                         })}
-                    </Menu.Items>
+                    </MenuItems>
                 </Transition>
             </Menu>
         </div>

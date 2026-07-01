@@ -1,9 +1,9 @@
+import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
 import { useState } from 'react';
 import {
     CheckIcon,
     ChevronDownIcon,
 } from '@heroicons/react/20/solid';
-import { Combobox } from '@headlessui/react';
 import classNames from '@/utils/classnames';
 import {
     Controller,
@@ -58,7 +58,7 @@ export default function SimpleCombobox<
                     onChange={setSelected}
                 >
                     <div className="relative w-full">
-                        <Combobox.Input
+                        <ComboboxInput
                             id={name}
                             className={classNames(
                                 'relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 max-w-[70rem]'
@@ -66,17 +66,17 @@ export default function SimpleCombobox<
                             onChange={(event) => setQuery(event.target.value)}
                             displayValue={(item: Option<V>) => item?.label}
                         />
-                        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                        <ComboboxButton className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                             <ChevronDownIcon
                                 className="h-5 w-5 text-gray-400"
                                 aria-hidden="true"
                             />
-                        </Combobox.Button>
+                        </ComboboxButton>
 
                         {filteredItems.length > 0 && (
-                            <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                            <ComboboxOptions className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                 {filteredItems.map((item) => (
-                                    <Combobox.Option
+                                    <ComboboxOption
                                         key={item.value}
                                         value={item}
                                         className={({ active }) =>
@@ -117,9 +117,9 @@ export default function SimpleCombobox<
                                                 )}
                                             </>
                                         )}
-                                    </Combobox.Option>
+                                    </ComboboxOption>
                                 ))}
-                            </Combobox.Options>
+                            </ComboboxOptions>
                         )}
                     </div>
                 </Combobox>

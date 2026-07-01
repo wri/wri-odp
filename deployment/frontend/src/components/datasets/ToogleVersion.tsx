@@ -1,4 +1,4 @@
-import { Switch } from '@headlessui/react';
+import { Switch } from '@headlessui/react'
 import classNames from '@/utils/classnames';
 
 export default function ToggleVersion({

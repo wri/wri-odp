@@ -1,5 +1,5 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import React from 'react';
-import { Tab } from '@headlessui/react';
 import { PlusSmallIcon } from '@heroicons/react/24/outline';
 import UserCard from './UserCard';
 import { useRouter } from 'next/router';
@@ -30,8 +30,8 @@ export default function UserList() {
 
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
-            <Tab.Group>
-                <Tab.List className="flex max-w-9xl outline-1 border-b-2 border-b-wri-gray ">
+            <TabGroup>
+                <TabList className="flex max-w-9xl outline-1 border-b-2 border-b-wri-gray ">
                     {tabs.map((tab) => (
                         <Tab
                             key={tab.title}
@@ -63,10 +63,10 @@ export default function UserList() {
                             )}
                         </Tab>
                     ))}
-                </Tab.List>
-                <Tab.Panels className="mt-2">
+                </TabList>
+                <TabPanels className="mt-2">
                     {tabs.map((tab) => (
-                        <Tab.Panel key={tab.title} className="">
+                        <TabPanel key={tab.title} className="">
                             {tab.id === 'allteams' ? (
                                 <UserCard username={username} />
                             ) : isLoading ? (
@@ -74,10 +74,10 @@ export default function UserList() {
                             ) : (
                                 <AddUserForm orgList={data?.adminOrg} />
                             )}
-                        </Tab.Panel>
+                        </TabPanel>
                     ))}
-                </Tab.Panels>
-            </Tab.Group>
+                </TabPanels>
+            </TabGroup>
         </section>
     );
 }

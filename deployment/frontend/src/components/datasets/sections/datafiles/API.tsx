@@ -1,8 +1,8 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import { Tab } from '@headlessui/react';
 import { BookOpenIcon } from '@heroicons/react/24/outline';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import classNames from '@/utils/classnames';
@@ -110,8 +110,8 @@ function OpenInModal({
                 <div className="font-['Acumin Pro SemiCondensed'] text-3xl font-normal text-black">
                     API
                 </div>
-                <Tab.Group>
-                    <Tab.List
+                <TabGroup>
+                    <TabList
                         as="nav"
                         className="mt-6 flex border-b border-zinc-300"
                     >
@@ -147,47 +147,47 @@ function OpenInModal({
                                 )}
                             </Tab>
                         )}
-                    </Tab.List>
-                    <Tab.Panels
+                    </TabList>
+                    <TabPanels
                         as="div"
                         className="max-h-[500px] overflow-y-auto"
                     >
-                        <Tab.Panel>
+                        <TabPanel>
                             <QueryInstructions datafile={datafile} />
-                        </Tab.Panel>
-                        <Tab.Panel>
+                        </TabPanel>
+                        <TabPanel>
                             <SnippetInstructions
                                 datafile={datafile}
                                 language="javascript"
                                 getSnippetFn={getJsSnippet}
                             />
-                        </Tab.Panel>
-                        <Tab.Panel>
+                        </TabPanel>
+                        <TabPanel>
                             <SnippetInstructions
                                 datafile={datafile}
                                 language="python"
                                 getSnippetFn={getPythonSnippet}
                             />
-                        </Tab.Panel>
-                        <Tab.Panel>
+                        </TabPanel>
+                        <TabPanel>
                             <SnippetInstructions
                                 datafile={datafile}
                                 language="r"
                                 getSnippetFn={getRSnippet}
                             />
-                        </Tab.Panel>
+                        </TabPanel>
                         {datafile.advanced_api_usage && (
-                            <Tab.Panel as="div" className="py-6 overflow-clip">
+                            <TabPanel as="div" className="py-6 overflow-clip">
                                 <AdvancedApiUsage
                                     advancedApiUsage={
                                         datafile.advanced_api_usage
                                     }
                                     datafileId={datafile.id}
                                 />
-                            </Tab.Panel>
+                            </TabPanel>
                         )}
-                    </Tab.Panels>
-                </Tab.Group>
+                    </TabPanels>
+                </TabGroup>
             </div>
         </Modal>
     );

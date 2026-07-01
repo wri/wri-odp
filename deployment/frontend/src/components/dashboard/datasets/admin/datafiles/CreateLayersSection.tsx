@@ -1,4 +1,4 @@
-import { Tab } from '@headlessui/react';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import {
     FolderPlusIcon,
     Square3Stack3DIcon,
@@ -173,7 +173,7 @@ export function AddLayer({
                 }
             >
                 <div className="px-4 py-8">
-                    <Tab.Group
+                    <TabGroup
                         selectedIndex={match(datafile.type)
                             .with('empty-layer', () => 0)
                             .with('layer', () => 1)
@@ -181,7 +181,7 @@ export function AddLayer({
                             .with('reference-layer', () => 3)
                             .otherwise(() => 0)}
                     >
-                        <Tab.List
+                        <TabList
                             as="div"
                             className={classNames(
                                 'grid max-w-[50rem] grid-cols-2 lg:grid-cols-4 gap-3 py-4',
@@ -286,10 +286,10 @@ export function AddLayer({
                                     </DefaultTooltip>
                                 )}
                             </Tab>
-                        </Tab.List>
-                        <Tab.Panels as="div" className="mt-2">
-                            <Tab.Panel className="hidden"></Tab.Panel>
-                            <Tab.Panel>
+                        </TabList>
+                        <TabPanels as="div" className="mt-2">
+                            <TabPanel className="hidden"></TabPanel>
+                            <TabPanel>
                                 {formObj.getValues(`resources.${index}.type`) ==
                                     'layer' && (
                                     <BuildALayer
@@ -297,8 +297,8 @@ export function AddLayer({
                                         index={index}
                                     />
                                 )}
-                            </Tab.Panel>
-                            <Tab.Panel>
+                            </TabPanel>
+                            <TabPanel>
                                 {formObj.getValues(`resources.${index}.type`) ==
                                     'layer-raw' && (
                                     <BuildALayerRaw
@@ -306,15 +306,15 @@ export function AddLayer({
                                         index={index}
                                     />
                                 )}
-                            </Tab.Panel>
-                            <Tab.Panel>
+                            </TabPanel>
+                            <TabPanel>
                                 <DerivedLayerForm
                                     formObj={formObj}
                                     index={index}
                                 />
-                            </Tab.Panel>
-                        </Tab.Panels>
-                    </Tab.Group>
+                            </TabPanel>
+                        </TabPanels>
+                    </TabGroup>
                 </div>
             </DataFileAccordion>
         </>

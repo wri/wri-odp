@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle } from '@headlessui/react'
 import { ErrorAlert, InfoAlert } from '@/components/_shared/Alerts';
 import { Button, LoaderButton } from '@/components/_shared/Button';
 import Modal from '@/components/_shared/Modal';
@@ -5,7 +6,6 @@ import { type ApiToken } from '@/interfaces/user.interface';
 import { api } from '@/utils/api';
 import classNames from '@/utils/classnames';
 import notify from '@/utils/notify';
-import { Dialog } from '@headlessui/react';
 import {
     ExclamationTriangleIcon,
     TrashIcon,
@@ -88,12 +88,12 @@ function TokenCard({ token }: { token: ApiToken }) {
                         />
                     </div>
                     <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                        <Dialog.Title
+                        <DialogTitle
                             as="h3"
                             className="text-base font-semibold leading-6 text-gray-900"
                         >
                             Delete API Token
-                        </Dialog.Title>
+                        </DialogTitle>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500">
                                 Are you sure you want to delete this API Token?

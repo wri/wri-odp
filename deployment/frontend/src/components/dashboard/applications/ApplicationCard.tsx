@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle } from '@headlessui/react'
 import React, { useState } from 'react';
 import SearchHeader from '../_shared/SearchHeader';
 import Row from '../_shared/Row';
@@ -14,7 +15,6 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 import { useRouter } from 'next/router';
 import { LoaderButton, Button } from '@/components/_shared/Button';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 import Image from 'next/image';
 import type { Application } from '@/schema/ckan.schema';
 
@@ -193,12 +193,12 @@ export default function ApplicationCard() {
                                 />
                             </div>
                             <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                                <Dialog.Title
+                                <DialogTitle
                                     as="h3"
                                     className="text-base font-semibold leading-6 text-gray-900"
                                 >
                                     Delete Application
-                                </Dialog.Title>
+                                </DialogTitle>
                                 <div className="mt-2">
                                     <p className="text-sm text-gray-500">
                                         Are you sure you want to delete this

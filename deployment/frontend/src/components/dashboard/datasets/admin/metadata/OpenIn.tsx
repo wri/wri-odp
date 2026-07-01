@@ -1,5 +1,5 @@
+import { Disclosure, DisclosurePanel } from '@headlessui/react'
 import { ArrowUpRightIcon, MinusCircleIcon } from '@heroicons/react/24/outline';
-import { Disclosure } from '@headlessui/react';
 import { Input } from '@/components/_shared/SimpleInput';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
@@ -84,7 +84,7 @@ export function OpenInForm({
                 </>
             }
         >
-            <Disclosure.Panel className="py-5 flex flex-col gap-y-4">
+            <DisclosurePanel className="py-5 flex flex-col gap-y-4">
                 {fields.map((field, index) => (
                     <OpenIn
                         key={field.id}
@@ -113,7 +113,7 @@ export function OpenInForm({
                         </button>
                     </DefaultTooltip>
                 </div>
-            </Disclosure.Panel>
+            </DisclosurePanel>
         </MetadataAccordion>
     );
 }

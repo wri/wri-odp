@@ -1,3 +1,4 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbs';
 import Header from '@/components/_shared/Header';
 import Spinner from '@/components/_shared/Spinner';
@@ -21,7 +22,6 @@ import {
   getOnePendingDataset,
   getRecipient,
 } from '@/utils/apiUtils';
-import { Tab } from '@headlessui/react';
 import { Index } from 'flexsearch';
 import {
   type GetServerSidePropsContext,
@@ -685,12 +685,12 @@ export default function DatasetPage(
                 is_approved={is_approved}
               />
               <div className="px-4 sm:px-6">
-                <Tab.Group
+                <TabGroup
                   as="div"
                   selectedIndex={selectedIndex}
                   onChange={setSelectedIndex}
                 >
-                  <Tab.List
+                  <TabList
                     as="nav"
                     className="flex w-full gap-x-2 border-b border-zinc-300"
                   >
@@ -699,11 +699,11 @@ export default function DatasetPage(
                         (tab) => tab.enabled
                       )}
                     />
-                  </Tab.List>
+                  </TabList>
                   <div className="mb-4 mr-9" />
                   <div>
-                    <Tab.Panels as="div">
-                      <Tab.Panel as="div">
+                    <TabPanels as="div">
+                      <TabPanel as="div">
                         <DataFiles
                           //@ts-ignore
                           dataset={
@@ -734,8 +734,8 @@ export default function DatasetPage(
                             resourceDiffValues
                           }
                         />
-                      </Tab.Panel>
-                      <Tab.Panel as="div">
+                      </TabPanel>
+                      <TabPanel as="div">
                         <About
                           //@ts-ignore
                           dataset={
@@ -748,8 +748,8 @@ export default function DatasetPage(
                           }
                           diffFields={diffFields}
                         />
-                      </Tab.Panel>
-                      <Tab.Panel as="div">
+                      </TabPanel>
+                      <TabPanel as="div">
                         <API
                           usecases={
                             isCurrentVersion
@@ -757,9 +757,9 @@ export default function DatasetPage(
                               : datasetData.usecases
                           }
                         />
-                      </Tab.Panel>
+                      </TabPanel>
                       {datasetData.methodology && (
-                        <Tab.Panel as="div">
+                        <TabPanel as="div">
                           <Methodology
                             methodology={
                               isCurrentVersion
@@ -772,9 +772,9 @@ export default function DatasetPage(
                                 : datasetData.technical_notes
                             }
                           />
-                        </Tab.Panel>
+                        </TabPanel>
                       )}
-                      <Tab.Panel as="div">
+                      <TabPanel as="div">
                         <Contact
                           //@ts-ignore
                           dataset={
@@ -787,23 +787,23 @@ export default function DatasetPage(
                           }
                           diffFields={diffFields}
                         />
-                      </Tab.Panel>
-                      <Tab.Panel as="div">
+                      </TabPanel>
+                      <TabPanel as="div">
                         <RelatedDatasets />
-                      </Tab.Panel>
+                      </TabPanel>
                       {collaborators.data && (
-                        <Tab.Panel as="div">
+                        <TabPanel as="div">
                           <Members
                             members={
                               collaborators.data
                             }
                           />
-                        </Tab.Panel>
+                        </TabPanel>
                       )}
                       {issues.data &&
                         !isCurrentVersion &&
                         issues.data.length > 0 && (
-                          <Tab.Panel as="div">
+                          <TabPanel as="div">
                             <Issues
                               issues={issues.data}
                               index={indexIssues}
@@ -823,9 +823,9 @@ export default function DatasetPage(
                                 generalAuthorized
                               }
                             />
-                          </Tab.Panel>
+                          </TabPanel>
                         )}
-                      <Tab.Panel as="div">
+                      <TabPanel as="div">
                         <Versioning
                           //@ts-ignore
                           dataset={
@@ -838,10 +838,10 @@ export default function DatasetPage(
                           }
                           diffFields={diffFields}
                         />
-                      </Tab.Panel>
-                    </Tab.Panels>
+                      </TabPanel>
+                    </TabPanels>
                   </div>
-                </Tab.Group>
+                </TabGroup>
               </div>
             </>
           )

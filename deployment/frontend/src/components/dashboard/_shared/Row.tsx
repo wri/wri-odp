@@ -1,10 +1,10 @@
+import { Transition } from '@headlessui/react'
 import React, { useState } from 'react';
 import {
     EyeIcon,
     ChevronDownIcon,
     ChevronUpIcon,
 } from '@heroicons/react/24/outline';
-import { Transition } from '@headlessui/react';
 import classNames from '@/utils/classnames';
 import { useSession } from 'next-auth/react';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
@@ -134,7 +134,7 @@ export default function Row({
                     </div>
                 )}
             </div>
-            <Transition
+            <Transition as="div"
                 show={isShowSubRow}
                 enter="transition duration-100 ease-out"
                 enterFrom="transform scale-95 opacity-0"

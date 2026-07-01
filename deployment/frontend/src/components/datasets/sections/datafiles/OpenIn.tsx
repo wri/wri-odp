@@ -1,5 +1,5 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import Modal from '@/components/_shared/Modal';
-import { Tab } from '@headlessui/react';
 import {
     ArrowTopRightOnSquareIcon,
     ClipboardIcon,
@@ -52,8 +52,8 @@ function OpenInModal({
                 <div className="font-['Acumin Pro SemiCondensed'] text-3xl font-normal text-black">
                     Open In
                 </div>
-                <Tab.Group>
-                    <Tab.List
+                <TabGroup>
+                    <TabList
                         as="nav"
                         className="mt-6 flex border-b border-zinc-300"
                     >
@@ -73,12 +73,12 @@ function OpenInModal({
                                 )}
                             </Tab>
                         ))}
-                    </Tab.List>
-                    <Tab.Panels
+                    </TabList>
+                    <TabPanels
                         as="div"
                         className="max-h-[18rem] overflow-y-auto"
                     >
-                        <Tab.Panel>
+                        <TabPanel>
                             <div className="font-['Acumin Pro SemiCondensed'] flex flex-col gap-y-3 text-justify text-sm font-normal text-black">
                                 <div className="font-['Acumin Pro SemiCondensed'] text-base font-normal text-zinc-800">
                                     Copy the following URL and Insert it into
@@ -105,9 +105,9 @@ function OpenInModal({
                                     Then do lorem ipsum mipsum..
                                 </div>
                             </div>
-                        </Tab.Panel>
-                    </Tab.Panels>
-                </Tab.Group>
+                        </TabPanel>
+                    </TabPanels>
+                </TabGroup>
             </div>
         </Modal>
     );

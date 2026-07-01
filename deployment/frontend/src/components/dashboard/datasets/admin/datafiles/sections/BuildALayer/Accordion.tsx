@@ -1,5 +1,5 @@
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
 import classNames from '@/utils/classnames';
-import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 export function Accordion({
@@ -22,7 +22,7 @@ export function Accordion({
         >
             {({ open }) => (
                 <>
-                    <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
+                    <DisclosureButton className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
                         <div className="flex h-16 w-full items-center gap-x-2">
                             {text}
                         </div>
@@ -31,8 +31,8 @@ export function Accordion({
                                 open ? 'rotate-180 transform  transition' : ''
                             } h-5 w-5 text-black`}
                         />
-                    </Disclosure.Button>
-                    <Transition
+                    </DisclosureButton>
+                    <Transition as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -40,9 +40,9 @@ export function Accordion({
                         leaveFrom="transform scale-100 opacity-100"
                         leaveTo="transform scale-95 opacity-0"
                     >
-                        <Disclosure.Panel className="border-t-2 border-amber-400 bg-white p-4 text-sm text-gray-500">
+                        <DisclosurePanel className="border-t-2 border-amber-400 bg-white p-4 text-sm text-gray-500">
                             {children}
-                        </Disclosure.Panel>
+                        </DisclosurePanel>
                     </Transition>
                 </>
             )}

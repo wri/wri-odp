@@ -1,10 +1,10 @@
+import { Disclosure, DisclosurePanel } from '@headlessui/react'
 import {
     ArrowsPointingInIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Input } from '@/components/_shared/SimpleInput';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
-import { Disclosure } from '@headlessui/react';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { TopicsSelect } from '../TopicsSelect';
 import { MetadataAccordion } from './MetadataAccordion';
@@ -54,7 +54,7 @@ export function OverviewForm({
                 </>
             }
         >
-            <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
+            <DisclosurePanel className="grid grid-cols-1 items-start gap-x-12 gap-y-4 py-5 lg:grid-cols-2 xxl:gap-x-24">
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup label="Title" required>
                         <Input
@@ -487,7 +487,7 @@ export function OverviewForm({
                         </div>
                     </div>
                 </div>
-            </Disclosure.Panel>
+            </DisclosurePanel>
         </MetadataAccordion>
     );
 }

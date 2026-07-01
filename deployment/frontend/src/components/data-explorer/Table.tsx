@@ -1,3 +1,4 @@
+import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react'
 import {
     flexRender,
     type Table as TableType,
@@ -22,7 +23,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { DefaultTooltip } from '../_shared/Tooltip';
 import { match } from 'ts-pattern';
-import { Popover, Transition } from '@headlessui/react';
 import { DebouncedInput } from '../_shared/SimpleInput';
 import {
     Controller,
@@ -121,11 +121,10 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
               });
     return (
         <Popover as="div" className="relative inline-block text-left">
-            <Popover.Button className=" p-4 flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
+            <PopoverButton className=" p-4 flex items-center justify-center h-8 rounded-md bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs ">
                 Show Columns
-            </Popover.Button>
-            <Transition
-                as={Fragment}
+            </PopoverButton>
+            <Transition as="div"
                 enter="transition ease-out duration-100"
                 enterFrom="transform opacity-0 scale-95"
                 enterTo="transform opacity-100 scale-100"
@@ -133,7 +132,7 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Popover.Panel className="absolute overflow-hidden max-h-[200px] overflow-y-auto right-0 z-10 mt-2 py-4 w-64 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <PopoverPanel className="absolute overflow-hidden max-h-[200px] overflow-y-auto right-0 z-10 mt-2 py-4 w-64 origin-top-left rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="px-4 pb-2">
                         <div className="relative w-full rounded-md">
                             <input
@@ -206,7 +205,7 @@ function ToggleColumns({ table }: { table: TableType<any> }) {
                             </div>
                         </div>
                     ))}
-                </Popover.Panel>
+                </PopoverPanel>
             </Transition>
         </Popover>
     );
@@ -392,7 +391,7 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
         <Popover as={Fragment}>
             {({ open }) => (
                 <>
-                    <Popover.Button aria-label="filter">
+                    <PopoverButton aria-label="filter">
                         <DefaultTooltip content="Filter">
                             {open || column.getIsFiltered() ? (
                                 <FunnelIconSolid className="w-4 h-4" />
@@ -400,9 +399,8 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
                                 <FunnelIconOutline className="w-4 h-4" />
                             )}
                         </DefaultTooltip>
-                    </Popover.Button>
-                    <Transition
-                        as={Fragment}
+                    </PopoverButton>
+                    <Transition as="div"
                         enter="transition ease-out duration-100"
                         enterFrom="transform opacity-0 scale-95"
                         enterTo="transform opacity-100 scale-100"
@@ -410,9 +408,9 @@ function FilterColumn({ column }: { column: Column<any, unknown> }) {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                     >
-                        <Popover.Panel className="absolute top-0 left-0 z-10 mt-6 w-56 origin-bottom rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <PopoverPanel className="absolute top-0 left-0 z-10 mt-6 w-56 origin-bottom rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             <FilterForm column={column} />
-                        </Popover.Panel>
+                        </PopoverPanel>
                     </Transition>
                 </>
             )}

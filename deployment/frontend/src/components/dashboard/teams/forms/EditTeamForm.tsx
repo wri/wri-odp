@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import TeamForm from './TeamForm';
@@ -15,10 +16,8 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 import Link from 'next/link';
 import { type RouterOutput } from '@/server/api/root';
-import { Tab } from '@headlessui/react';
 import { Fragment } from 'react';
 import classNames from '@/utils/classnames';
 import { Members } from '../metadata/Members';
@@ -161,12 +160,12 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                         />
                     </div>
                     <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                        <Dialog.Title
+                        <DialogTitle
                             as="h3"
                             className="text-base font-semibold leading-6 text-gray-900"
                         >
                             Delete Team
-                        </Dialog.Title>
+                        </DialogTitle>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500">
                                 Are you sure you want to delete this Team?
@@ -204,9 +203,9 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                         Delete Team
                     </Button>
                 </div>
-                <Tab.Group>
+                <TabGroup>
                     <div>
-                        <Tab.List
+                        <TabList
                             className="max-w-[1380px] mx-auto px-4 sm:px-6 xxl:px-0"
                             aria-label="Tabs"
                         >
@@ -236,9 +235,9 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                                         </Tab>
                                     ))}
                             </div>
-                        </Tab.List>
-                        <Tab.Panels>
-                            <Tab.Panel>
+                        </TabList>
+                        <TabPanels>
+                            <TabPanel>
                                 <form
                                     onSubmit={formObj.handleSubmit((data) => {
                                         editTeam.mutate(data);
@@ -262,16 +261,16 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
                                         </div>
                                     )}
                                 </form>
-                            </Tab.Panel>
-                            <Tab.Panel
+                            </TabPanel>
+                            <TabPanel
                                 as="div"
                                 className="flex flex-col gap-y-12 mt-8"
                             >
                                 <Members team={team} formObj={formObj} />
-                            </Tab.Panel>
-                        </Tab.Panels>
+                            </TabPanel>
+                        </TabPanels>
                     </div>
-                </Tab.Group>
+                </TabGroup>
                 <div className="flex-col sm:flex-row mt-5 gap-y-4 mx-auto flex w-full max-w-[1380px] gap-x-4 justify-end font-acumin text-2xl font-semibold text-black px-4  sm:px-6 xxl:px-0">
                     <Button type="button" variant="outline">
                         <Link href="/dashboard/teams">Cancel</Link>

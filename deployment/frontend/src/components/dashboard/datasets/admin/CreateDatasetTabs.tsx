@@ -1,5 +1,5 @@
+import { Tab, TabList } from '@headlessui/react'
 import classNames from '@/utils/classnames';
-import { Tab } from '@headlessui/react';
 import { CheckIcon } from '@heroicons/react/20/solid';
 import { match } from 'ts-pattern';
 
@@ -19,7 +19,7 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
     });
 
     return (
-        <Tab.List
+        <TabList
             as="nav"
             className="relative isolate h-full w-full md:w-[90%] md:max-w-[82rem] divide-y divide-gray-300 rounded-md md:flex md:divide-y-0"
         >
@@ -114,6 +114,6 @@ export function CreateDatasetTabs({ currentStep }: { currentStep: number }) {
                     )}
                 </Tab>
             ))}
-        </Tab.List>
+        </TabList>
     );
 }

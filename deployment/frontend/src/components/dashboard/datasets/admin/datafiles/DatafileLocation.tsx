@@ -1,7 +1,7 @@
+import { Disclosure, DisclosurePanel, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import {
     ArrowUpTrayIcon,
 } from '@heroicons/react/24/outline';
-import { Disclosure, Tab } from '@headlessui/react';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { MapPinIcon } from '@heroicons/react/20/solid';
 import { useEffect, useRef, useState } from 'react';
@@ -118,8 +118,8 @@ export function DatafileLocation({
                 className="hidden"
                 accept="application/geojson"
             />
-            <Disclosure.Panel className="flex flex-col gap-y-8 pb-12 pt-5">
-                <Tab.Group
+            <DisclosurePanel className="flex flex-col gap-y-8 pb-12 pt-5">
+                <TabGroup
                     selectedIndex={match(
                         watch(`resources.${index}.spatial_type`)
                     )
@@ -127,7 +127,7 @@ export function DatafileLocation({
                         .with('address', () => 1)
                         .otherwise(() => undefined)}
                 >
-                    <Tab.List
+                    <TabList
                         as="div"
                         className={classNames(
                             'grid max-w-[35rem] grid-cols-2 sm:grid-cols-3 gap-3 py-4'
@@ -206,9 +206,9 @@ export function DatafileLocation({
                                 </span>
                             )}
                         </Tab>
-                    </Tab.List>
-                    <Tab.Panels as="div" className="mt-2">
-                        <Tab.Panel>
+                    </TabList>
+                    <TabPanels as="div" className="mt-2">
+                        <TabPanel>
                             {watch(`resources.${index}.spatial_geom`) && (
                                 <Map
                                     mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
@@ -247,8 +247,8 @@ export function DatafileLocation({
                                     <Spinner />
                                 </div>
                             )}
-                        </Tab.Panel>
-                        <Tab.Panel id={`choose-address-${index}`}>
+                        </TabPanel>
+                        <TabPanel id={`choose-address-${index}`}>
                             <Map
                                 mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
                                 style={{ height: 300 }}
@@ -287,10 +287,10 @@ export function DatafileLocation({
                                     }
                                 />
                             </Map>
-                        </Tab.Panel>
-                    </Tab.Panels>
-                </Tab.Group>
-            </Disclosure.Panel>
+                        </TabPanel>
+                    </TabPanels>
+                </TabGroup>
+            </DisclosurePanel>
         </div>
     );
 }

@@ -1,8 +1,8 @@
+import { Disclosure, DisclosurePanel } from '@headlessui/react'
 import {
     InformationCircleIcon,
     SquaresPlusIcon,
 } from '@heroicons/react/24/outline';
-import { Disclosure } from '@headlessui/react';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { MetadataAccordion } from './MetadataAccordion';
 import { type UseFormReturn } from 'react-hook-form';
@@ -29,7 +29,7 @@ export function MoreDetailsForm({
                 </>
             }
         >
-            <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-24 py-5">
+            <DisclosurePanel className="grid grid-cols-1 items-start gap-x-24 py-5">
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup
                         label="Learn more"
@@ -126,7 +126,7 @@ export function MoreDetailsForm({
                         />
                     </InputGroup>
                 </div>
-            </Disclosure.Panel>
+            </DisclosurePanel>
         </MetadataAccordion>
     );
 }

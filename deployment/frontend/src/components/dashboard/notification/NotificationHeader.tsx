@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle } from '@headlessui/react'
 import React, { useState } from 'react';
 import TableHeader from '../_shared/TableHeader';
 import {
@@ -8,7 +9,6 @@ import {
 import { type NotificationType } from '@/schema/notification.schema';
 import { LoaderButton, Button } from '@/components/_shared/Button';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { Dialog } from '@headlessui/react';
 import notify from '@/utils/notify';
 import { api } from '@/utils/api';
 
@@ -153,12 +153,12 @@ function LeftNode({
                             />
                         </div>
                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                            <Dialog.Title
+                            <DialogTitle
                                 as="h3"
                                 className="text-base font-semibold leading-6 text-gray-900"
                             >
                                 Delete Notification
-                            </Dialog.Title>
+                            </DialogTitle>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
                                     Are you sure you want to delete this
@@ -215,12 +215,12 @@ function LeftNode({
                             />
                         </div>
                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                            <Dialog.Title
+                            <DialogTitle
                                 as="h3"
                                 className="text-base font-semibold leading-6 text-gray-900"
                             >
                                 Update Notification
-                            </Dialog.Title>
+                            </DialogTitle>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
                                     Are you sure you want to mark this
@@ -270,12 +270,12 @@ function LeftNode({
                             />
                         </div>
                         <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                            <Dialog.Title
+                            <DialogTitle
                                 as="h3"
                                 className="text-base font-semibold leading-6 text-gray-900"
                             >
                                 Update Notification
-                            </Dialog.Title>
+                            </DialogTitle>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
                                     Are you sure you want to mark this

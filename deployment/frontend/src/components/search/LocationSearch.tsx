@@ -1,4 +1,4 @@
-import { Disclosure, Transition } from '@headlessui/react';
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { Map } from 'react-map-gl';
 import GeocoderControl from './GeocoderControl';
@@ -63,7 +63,7 @@ export default function LocationSearch({
         >
             {({ open }) => (
                 <>
-                    <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
+                    <DisclosureButton className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
                         <div className="flex h-16 w-full items-center gap-x-2">
                             <p className="font-['Acumin Pro SemiCondensed'] text-base font-normal text-black">
                                 Location
@@ -74,8 +74,8 @@ export default function LocationSearch({
                                 open ? 'rotate-180 transform' : ''
                             } h-5 w-5 text-black`}
                         />
-                    </Disclosure.Button>
-                    <Transition
+                    </DisclosureButton>
+                    <Transition as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -83,7 +83,7 @@ export default function LocationSearch({
                         leaveFrom="transform scale-100 opacity-100"
                         leaveTo="transform scale-95 opacity-0"
                     >
-                        <Disclosure.Panel
+                        <DisclosurePanel
                             className={classNames(
                                 'border-t-2 border-amber-400',
                                 globalQValue === 'only' ? '' : 'h-[300px]'
@@ -210,7 +210,7 @@ export default function LocationSearch({
                                     />
                                 </Map>
                             </div>
-                        </Disclosure.Panel>
+                        </DisclosurePanel>
                     </Transition>
                 </>
             )}

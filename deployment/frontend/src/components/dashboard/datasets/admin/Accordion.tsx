@@ -1,5 +1,5 @@
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import { Disclosure, Transition } from '@headlessui/react';
 import classNames from '@/utils/classnames';
 
 interface AccordionProps {
@@ -27,7 +27,7 @@ export function Accordion({
                 <>
                     <div className="w-full border-b border-blue-800 bg-white shadow">
                         <div className="px-8">
-                            <Disclosure.Button className="w-full col-span-full flex justify-between border-b border-stone-50 py-5">
+                            <DisclosureButton className="w-full col-span-full flex justify-between border-b border-stone-50 py-5">
                                 <h3 className="flex w-full items-center gap-x-2 font-acumin text-xl font-semibold text-blue-800">
                                     {icon}
                                     {title}
@@ -39,8 +39,8 @@ export function Accordion({
                                             : ''
                                     } h-5 w-5 text-blue-800`}
                                 />
-                            </Disclosure.Button>
-                            <Transition
+                            </DisclosureButton>
+                            <Transition as="div"
                                 enter="transition duration-100 ease-out"
                                 enterFrom="transform scale-95 opacity-0"
                                 enterTo="transform scale-100 opacity-100"
@@ -48,14 +48,14 @@ export function Accordion({
                                 leaveFrom="transform scale-100 opacity-100"
                                 leaveTo="transform scale-95 opacity-0"
                             >
-                                <Disclosure.Panel
+                                <DisclosurePanel
                                     className={classNames(
                                         'py-5',
                                         className ?? ''
                                     )}
                                 >
                                     {children}
-                                </Disclosure.Panel>
+                                </DisclosurePanel>
                             </Transition>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
 import classNames from '@/utils/classnames';
-import { Disclosure, Transition } from '@headlessui/react';
 import { PaperClipIcon } from '@heroicons/react/20/solid';
 import {
     ChevronDownIcon,
@@ -494,7 +494,7 @@ function Datafile({
         <Disclosure>
             {({ open }) => (
                 <>
-                    <Disclosure.Button
+                    <DisclosureButton
                         className={classNames(
                             'flex w-full items-center justify-between rounded-sm bg-white px-6 pt-3 shadow transition hover:bg-slate-100',
                             open ? 'bg-slate-100' : 'bg-white'
@@ -563,8 +563,8 @@ function Datafile({
                                 )}
                             />
                         </div>
-                    </Disclosure.Button>
-                    <Transition
+                    </DisclosureButton>
+                    <Transition as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -572,7 +572,7 @@ function Datafile({
                         leaveFrom="transform scale-100 opacity-100"
                         leaveTo="transform scale-95 opacity-0"
                     >
-                        <Disclosure.Panel>
+                        <DisclosurePanel>
                             <div className="grid sm:grid-cols-2 gap-4 bg-slate-100 p-6">
                                 <SimpleDescription label="Title" text={title} />
                                 {type !== 'layer' && type !== 'layer-raw' && (
@@ -619,7 +619,7 @@ function Datafile({
                                     </div>
                                 )}
                             </div>
-                        </Disclosure.Panel>
+                        </DisclosurePanel>
                     </Transition>
                 </>
             )}

@@ -1,6 +1,6 @@
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
 import { Button } from '@/components/_shared/Button';
 import classNames from '@/utils/classnames';
-import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import {
   ArrowPathIcon,
@@ -167,7 +167,7 @@ export function DatafileCard({
                   </span>
                 </span>
               )}
-              <Disclosure.Button>
+              <DisclosureButton>
                 <h3
                   className={`font-acumin sm:text-sm xl:text-lg font-semibold text-stone-900 ${datafile.title
                       ? higlighted(
@@ -192,7 +192,7 @@ export function DatafileCard({
                     </p>
                   </div>
                 )}
-              </Disclosure.Button>
+              </DisclosureButton>
             </div>
             <div className="gap-x-2 hidden sm:flex">
               {/* @ts-ignore */}
@@ -375,7 +375,7 @@ export function DatafileCard({
                 </>
               )}
 
-              <Disclosure.Button
+              <DisclosureButton
                 role="button"
                 aria-label="expand"
               >
@@ -385,7 +385,7 @@ export function DatafileCard({
                       : ''
                     } h-5 w-5 text-stone-900`}
                 />
-              </Disclosure.Button>
+              </DisclosureButton>
             </div>
             <Popover>
               <PopoverTrigger className="sm:hidden">
@@ -555,7 +555,7 @@ export function DatafileCard({
               </PopoverContent>
             </Popover>
           </div>
-          <Transition
+          <Transition as="div"
             enter="transition duration-100 ease-out"
             enterFrom="transform scale-95 opacity-0"
             enterTo="transform scale-100 opacity-100"
@@ -563,7 +563,7 @@ export function DatafileCard({
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0"
           >
-            <Disclosure.Panel className="py-3">
+            <DisclosurePanel className="py-3">
               <p
                 className={`font-acumin text-base font-light text-stone-900 ${datafile.description
                     ? higlighted(
@@ -610,7 +610,7 @@ export function DatafileCard({
                 {/*<LearnMoreButton datafile={datafile} dataset={dataset} />*/}
                 <APIButton datafile={datafile} />
               </div>
-            </Disclosure.Panel>
+            </DisclosurePanel>
           </Transition>
         </div>
       )}

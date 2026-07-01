@@ -1,3 +1,4 @@
+import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react'
 import {
     Fragment,
     useRef,
@@ -5,7 +6,6 @@ import {
     type Dispatch,
     type SetStateAction,
 } from 'react';
-import { Combobox } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import classNames from '@/utils/classnames';
 import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -162,18 +162,18 @@ export default function TagMulText({
                         {title}
                     </span>
                     <div className="relative isolate">
-                        <Combobox.Input
+                        <ComboboxInput
                             id={`${name}SearchInput`}
                             onChange={(event) => setQuery(event.target.value)}
                             className="shadow-wri-small block w-full rounded-md border-0 px-5 py-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 disabled:bg-gray-100 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6"
                         />
                     </div>
-                    <Combobox.Options
+                    <ComboboxOptions
                         static
                         className="overflow-auto rounded-md bg-white py-1 text-base focus:outline-none sm:text-sm"
                     >
                         {filteredOptions.map((option: Option) => (
-                            <Combobox.Option
+                            <ComboboxOption
                                 key={option.label}
                                 className={({ active }) =>
                                     classNames(
@@ -200,9 +200,9 @@ export default function TagMulText({
                                         </span>
                                     </>
                                 )}
-                            </Combobox.Option>
+                            </ComboboxOption>
                         ))}
-                    </Combobox.Options>
+                    </ComboboxOptions>
                 </Combobox>
             </PopoverContent>
         </Popover>

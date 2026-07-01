@@ -1,5 +1,5 @@
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react'
 import { Button, LoaderButton } from '@/components/_shared/Button';
-import { Disclosure } from '@headlessui/react';
 import {
   ArrowDownCircleIcon,
   GlobeAmericasIcon,
@@ -260,15 +260,15 @@ export function DataFiles({
           <Disclosure defaultOpen={true}>
             {({ open }) => (
               <>
-                <Disclosure.Button as={Fragment}>
+                <DisclosureButton as={Fragment}>
                   <Button className="my-2 ml-auto group sm:flex items-center justify-center h-8 rounded-md gap-x-1 bg-blue-100 hover:bg-blue-800 hover:text-white text-blue-800 text-xs px-3">
                     {open
                       ? 'Collapse'
                       : 'Open Filter by Location'}
                     <GlobeAmericasIcon className="group-hover:text-white h-4 w-4 text-blue-800 mb-1" />
                   </Button>
-                </Disclosure.Button>
-                <Disclosure.Panel
+                </DisclosureButton>
+                <DisclosurePanel
                   unmount={false}
                   className="pb-3 w-full"
                 >
@@ -282,7 +282,7 @@ export function DataFiles({
                       formObj={formObj}
                     />
                   </div>
-                </Disclosure.Panel>
+                </DisclosurePanel>
               </>
             )}
           </Disclosure>

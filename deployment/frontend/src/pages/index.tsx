@@ -1,3 +1,4 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import { Hero } from '@/components/home/Hero';
 import { HomeFooter } from '@/components/home/HomeFooter';
 import { TopicsCarousel } from '@/components/home/TopicsCarousel';
@@ -14,7 +15,6 @@ import { appRouter } from '@/server/api/root';
 import { getServerAuthSession } from '@/server/auth';
 import dynamic from 'next/dynamic';
 import Spinner from '@/components/_shared/Spinner';
-import { Tab } from '@headlessui/react';
 import { Fragment } from 'react';
 import classNames from '@/utils/classnames';
 import { ApplicationsCarousel } from '@/components/home/ApplicationCarousel';
@@ -157,8 +157,8 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
             </main>
 
             <main className="flex min-h-screen flex-col bg-neutral-50 py-20">
-                <Tab.Group>
-                    <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full">
+                <TabGroup>
+                    <TabList className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full">
                         <Tab as={Fragment}>
                             {({ selected }) => (
                                 <div
@@ -189,9 +189,9 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                 )}
                             </Tab>
                         )}
-                    </Tab.List>
-                    <Tab.Panels>
-                        <Tab.Panel className="topics-carousel relative !ml-auto w-full max-w-[94.5vw]">
+                    </TabList>
+                    <TabPanels>
+                        <TabPanel className="topics-carousel relative !ml-auto w-full max-w-[94.5vw]">
                             <Link
                                 href="/topics"
                                 className="flex justify-end pr-5 text-lg font-semibold pb-3 items-center gap-x-2"
@@ -199,8 +199,8 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                 See all <ArrowRightIcon className="h-4 w-4 inline-block" />
                             </Link>
                             <TopicsCarousel />
-                        </Tab.Panel>
-                        <Tab.Panel className="highlights-carousel relative !ml-auto w-full max-w-[94.5vw]">
+                        </TabPanel>
+                        <TabPanel className="highlights-carousel relative !ml-auto w-full max-w-[94.5vw]">
                             <Link
                                 href="/applications"
                                 className="flex justify-end pr-5 text-lg font-semibold pb-3 items-center gap-x-2"
@@ -208,11 +208,11 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                 See all <ArrowRightIcon className="h-4 w-4 inline-block" />
                             </Link>
                             <ApplicationsCarousel />
-                        </Tab.Panel>
-                    </Tab.Panels>
-                </Tab.Group>
-                <Tab.Group>
-                    <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full pt-20 pb-8">
+                        </TabPanel>
+                    </TabPanels>
+                </TabGroup>
+                <TabGroup>
+                    <TabList className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full pt-20 pb-8">
                         <Tab as={Fragment}>
                             {({ selected }) => (
                                 <div
@@ -255,9 +255,9 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                 </div>
                             )}
                         </Tab>
-                    </Tab.List>
-                    <Tab.Panels>
-                        <Tab.Panel>
+                    </TabList>
+                    <TabPanels>
+                        <TabPanel>
                             {isLoadingFeaturedDatasets ? (
                                 <div className="w-full flex justify-center items-center h-10">
                                     <Spinner />
@@ -278,8 +278,8 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                     />
                                 </div>
                             )}
-                        </Tab.Panel>
-                        <Tab.Panel>
+                        </TabPanel>
+                        <TabPanel>
                             {isLoadingRecentlyAdded ? (
                                 <div className="w-full flex justify-center items-center h-10">
                                     <Spinner />
@@ -300,8 +300,8 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                     />
                                 </div>
                             )}
-                        </Tab.Panel>
-                        <Tab.Panel>
+                        </TabPanel>
+                        <TabPanel>
                             {isLoadingRecentlyUpdated ? (
                                 <div className="w-full flex justify-center items-center h-10">
                                     <Spinner />
@@ -322,9 +322,9 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                                     />
                                 </div>
                             )}
-                        </Tab.Panel>
-                    </Tab.Panels>
-                </Tab.Group>
+                        </TabPanel>
+                    </TabPanels>
+                </TabGroup>
             </main>
             <HomeFooter />
         </>

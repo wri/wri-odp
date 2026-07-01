@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle } from '@headlessui/react'
 import React, { useState } from 'react';
 import {
     CheckIcon,
@@ -19,7 +20,6 @@ import { api } from '@/utils/api';
 import notify from '@/utils/notify';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import { SimpleEditor } from '../dashboard/datasets/admin/metadata/RTE/SimpleEditor';
-import { Dialog } from '@headlessui/react';
 import { useSession } from 'next-auth/react';
 import Spinner from '../_shared/Spinner';
 
@@ -203,12 +203,12 @@ export default function ApprovalRequestCard({
                         />
                     </div>
                     <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                        <Dialog.Title
+                        <DialogTitle
                             as="h3"
                             className="text-base font-semibold leading-6 text-gray-900"
                         >
                             Approve Dataset
-                        </Dialog.Title>
+                        </DialogTitle>
                         <div className="mt-2">
                             <p className="text-sm text-gray-500">
                                 Are you sure you want to approve this Dataset?

@@ -1,5 +1,5 @@
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from '@headlessui/react'
 import { Fragment } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import classNames from '@/utils/classnames';
 import {
@@ -79,7 +79,7 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
                                         maxWidth
                                     )}
                                 >
-                                    <Listbox.Button
+                                    <ListboxButton
                                         id={id}
                                         className={classNames(
                                             'relative text-left block w-full rounded-md border-0 px-5 py-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-b-2 focus:border-blue-800 focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6',
@@ -118,18 +118,17 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
                                                 aria-hidden="true"
                                             />
                                         </span>
-                                    </Listbox.Button>
+                                    </ListboxButton>
 
-                                    <Transition
+                                    <Transition as="div"
                                         show={open}
-                                        as={Fragment}
                                         leave="transition ease-in duration-100"
                                         leaveFrom="opacity-100"
                                         leaveTo="opacity-0"
                                     >
-                                        <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                        <ListboxOptions className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                             {options.map((option) => (
-                                                <Listbox.Option
+                                                <ListboxOption
                                                     key={option.value}
                                                     disabled={option.disabled}
                                                     className={({ active }) =>
@@ -168,9 +167,9 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
                                                             </span>
                                                         </>
                                                     )}
-                                                </Listbox.Option>
+                                                </ListboxOption>
                                             ))}
-                                        </Listbox.Options>
+                                        </ListboxOptions>
                                     </Transition>
                                 </div>
                             </>

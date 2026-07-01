@@ -1,5 +1,5 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import React, { useState } from 'react';
-import { Tab } from '@headlessui/react';
 import DatasetList from './DatasetList';
 import ActivityStreamList from '../_shared/ActivityStreamList';
 import { api } from '@/utils/api';
@@ -19,8 +19,8 @@ export default function TeamTab() {
             id="teamtab"
             className="w-full max-w-9xl xxl:mx-auto mt-10 font-acumin "
         >
-            <Tab.Group>
-                <Tab.List className="flex max-w-9xl">
+            <TabGroup>
+                <TabList className="flex max-w-9xl">
                     <Tab className=" bg-wri-green text-white font-semibold text-[1.063rem] w-[50%] sm:w-[316px]">
                         {({ selected }) => (
                             <div
@@ -43,18 +43,18 @@ export default function TeamTab() {
                             </div>
                         )}
                     </Tab>
-                </Tab.List>
-                <Tab.Panels className="mt-2">
-                    <Tab.Panel className="">
+                </TabList>
+                <TabPanels className="mt-2">
+                    <TabPanel className="">
                         {data?.datasets && (
                             <DatasetList datasets={data?.datasets} />
                         )}
-                    </Tab.Panel>
-                    <Tab.Panel className="">
+                    </TabPanel>
+                    <TabPanel className="">
                         <ActivityStreamList />,
-                    </Tab.Panel>
-                </Tab.Panels>
-            </Tab.Group>
+                    </TabPanel>
+                </TabPanels>
+            </TabGroup>
         </section>
     );
 }

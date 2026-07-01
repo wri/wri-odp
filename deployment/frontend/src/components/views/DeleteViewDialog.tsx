@@ -1,9 +1,9 @@
+import { Dialog, DialogTitle } from '@headlessui/react'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import { Dialog } from '@headlessui/react';
 import { type Dispatch, type SetStateAction } from 'react';
 import { Button, LoaderButton } from '@/components/_shared/Button';
 import { api } from '@/utils/api';
@@ -86,12 +86,12 @@ export default function DeleteViewDialog({
                     />
                 </div>
                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                    <Dialog.Title
+                    <DialogTitle
                         as="h3"
                         className="text-base font-semibold leading-6 text-gray-900"
                     >
                         Delete view
-                    </Dialog.Title>
+                    </DialogTitle>
                     <div className="mt-2">
                         <p className="text-sm text-gray-500">
                             Are you sure you want to delete this view?

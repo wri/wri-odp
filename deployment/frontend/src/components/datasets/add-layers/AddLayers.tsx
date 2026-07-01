@@ -1,5 +1,5 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import classNames from '@/utils/classnames';
-import { Tab } from '@headlessui/react';
 import { Fragment, useEffect, useState } from 'react';
 import SearchPanel from './SearchPanel';
 import FiltersPanel from './FiltersPanel';
@@ -122,8 +122,8 @@ export default function AddLayers() {
     }, [filters]);
 
     return (
-        <Tab.Group>
-            <Tab.List as="nav" className="flex w-full gap-x-2 @sm:pr-8 pr-4">
+        <TabGroup>
+            <TabList as="nav" className="flex w-full gap-x-2 @sm:pr-8 pr-4">
                 {addLayerTabs.map((tab) => (
                     <Tab as="div">
                         {({ selected }: { selected: boolean }) => (
@@ -148,9 +148,9 @@ export default function AddLayers() {
                         )}
                     </Tab>
                 ))}
-            </Tab.List>
-            <Tab.Panels>
-                <Tab.Panel>
+            </TabList>
+            <TabPanels>
+                <TabPanel>
                     {data && !isLoading && (
                         <>
                             <SearchPanel
@@ -172,11 +172,11 @@ export default function AddLayers() {
                             <Spinner />
                         </div>
                     )}
-                </Tab.Panel>
-                <Tab.Panel>
+                </TabPanel>
+                <TabPanel>
                     <FiltersPanel filters={filters} setFilters={setFilters} />
-                </Tab.Panel>
-            </Tab.Panels>
-        </Tab.Group>
+                </TabPanel>
+            </TabPanels>
+        </TabGroup>
     );
 }

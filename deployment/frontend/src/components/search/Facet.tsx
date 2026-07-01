@@ -1,5 +1,5 @@
+import { Disclosure, DisclosureButton, DisclosurePanel, Transition } from '@headlessui/react'
 import { type Filter } from '@/interfaces/search.interface';
-import { Disclosure, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 
@@ -55,7 +55,7 @@ export default function Facet({
         >
             {({ open }) => (
                 <>
-                    <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
+                    <DisclosureButton className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
                         <div className="flex h-16 w-full items-center gap-x-2">
                             <p className="font-['Acumin Pro SemiCondensed'] text-base font-normal text-black">
                                 {text}
@@ -71,8 +71,8 @@ export default function Facet({
                                 open ? 'rotate-180 transform  transition' : ''
                             } h-5 w-5 text-black`}
                         />
-                    </Disclosure.Button>
-                    <Transition
+                    </DisclosureButton>
+                    <Transition as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -80,7 +80,7 @@ export default function Facet({
                         leaveFrom="transform scale-100 opacity-100"
                         leaveTo="transform scale-95 opacity-0"
                     >
-                        <Disclosure.Panel className="border-t-2 border-amber-400 bg-white px-7 pb-2 text-sm text-gray-500">
+                        <DisclosurePanel className="border-t-2 border-amber-400 bg-white px-7 pb-2 text-sm text-gray-500">
                             <fieldset>
                                 <div className="mt-2">
                                     {options.map((option) => (
@@ -182,7 +182,7 @@ export default function Facet({
                                     ))}
                                 </div>
                             </fieldset>
-                        </Disclosure.Panel>
+                        </DisclosurePanel>
                     </Transition>
                 </>
             )}

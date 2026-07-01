@@ -1,4 +1,4 @@
-import { Tab } from '@headlessui/react';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import {
     ArrowUpTrayIcon,
     FolderPlusIcon,
@@ -273,7 +273,7 @@ export function AddDataFile({
             >
                 <div className="px-4">
                     <div className="max-w-[1380px] mx-auto px-4 sm:px-8">
-                        <Tab.Group
+                        <TabGroup
                             selectedIndex={match(datafile.type)
                                 .with('empty-file', () => 0)
                                 .with('upload', () => 1)
@@ -283,7 +283,7 @@ export function AddDataFile({
                                 .with('data-api-dataset', () => 5)
                                 .otherwise(() => 0)}
                         >
-                            <Tab.List
+                            <TabList
                                 as="div"
                                 className={classNames(
                                     'grid max-w-[50rem] grid-cols-2 lg:grid-cols-5 gap-3 py-4',
@@ -412,31 +412,31 @@ export function AddDataFile({
                                         </span>
                                     )}
                                 </Tab>
-                            </Tab.List>
-                            <Tab.Panels as="div" className="mt-2">
-                                <Tab.Panel className="hidden"></Tab.Panel>
-                                <Tab.Panel>
+                            </TabList>
+                            <TabPanels as="div" className="mt-2">
+                                <TabPanel className="hidden"></TabPanel>
+                                <TabPanel>
                                     <UploadForm
                                         formObj={formObj}
                                         index={index}
                                         dataDictionaryLoading={dataDictionaryLoading}
                                         removeFile={handleResetUploadResource}
                                     />
-                                </Tab.Panel>
-                                <Tab.Panel>
+                                </TabPanel>
+                                <TabPanel>
                                     <LinkExternalForm formObj={formObj} index={index} />
-                                </Tab.Panel>
-                                <Tab.Panel>
+                                </TabPanel>
+                                <TabPanel>
                                     <TileCacheForm formObj={formObj} index={index} />
-                                </Tab.Panel>
-                                <Tab.Panel>
+                                </TabPanel>
+                                <TabPanel>
                                     <GeeAssetForm formObj={formObj} index={index} />
-                                </Tab.Panel>
-                                <Tab.Panel>
+                                </TabPanel>
+                                <TabPanel>
                                     <DataApiDatasetForm formObj={formObj} index={index} />
-                                </Tab.Panel>
-                            </Tab.Panels>
-                        </Tab.Group>
+                                </TabPanel>
+                            </TabPanels>
+                        </TabGroup>
                     </div>
                 </div>
             </DataFileAccordion>

@@ -1,3 +1,4 @@
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import React from 'react';
 import Header from '@/components/_shared/Header';
 import Layout from '@/components/dashboard/Layout';
@@ -12,7 +13,6 @@ import { api } from '@/utils/api';
 import Spinner from '@/components/_shared/Spinner';
 import UserForm from '@/components/dashboard/users/UserForm';
 import { type User } from '@portaljs/ckan';
-import { Tab } from '@headlessui/react';
 import { SettingsTabs } from '@/components/dashboard/users/SettingsTabs';
 import { ApiKeys } from '@/components/dashboard/users/ApiKeys';
 
@@ -58,19 +58,19 @@ export default function User(
             <NextSeo title={`User Profile setting`} />
             <Header />
             <Layout>
-                <Tab.Group>
-                    <Tab.List className="flex max-w-8xl mx-auto w-full pt-8">
+                <TabGroup>
+                    <TabList className="flex max-w-8xl mx-auto w-full pt-8">
                         <SettingsTabs />
-                    </Tab.List>
-                    <Tab.Panels className="mt-2">
-                        <Tab.Panel>
+                    </TabList>
+                    <TabPanels className="mt-2">
+                        <TabPanel>
                             <UserForm user={data?.userdetails as User} />
-                        </Tab.Panel>
-                        <Tab.Panel>
+                        </TabPanel>
+                        <TabPanel>
                             <ApiKeys apiTokens={apiTokens ?? []} />
-                        </Tab.Panel>
-                    </Tab.Panels>
-                </Tab.Group>
+                        </TabPanel>
+                    </TabPanels>
+                </TabGroup>
             </Layout>
             <Footer
                 links={{

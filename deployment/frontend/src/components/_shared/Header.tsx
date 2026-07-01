@@ -1,6 +1,6 @@
+import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems, Transition, TransitionChild } from '@headlessui/react'
 import React, { Fragment, useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Menu, Transition, Dialog } from '@headlessui/react';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -121,14 +121,14 @@ export default function Header() {
                         </button>
                     )}
 
-                    <Transition appear show={isOpen} as={Fragment}>
-                        <Dialog
-                            as="div"
-                            className="relative z-50"
-                            onClose={closeModal}
-                        >
-                            <Transition.Child
-                                as={Fragment}
+                    <Dialog
+                        open={isOpen}
+                        appear
+                        as="div"
+                        className="relative z-50"
+                        onClose={closeModal}
+                    >
+                            <TransitionChild
                                 enter="ease-out duration-300"
                                 enterFrom="opacity-0"
                                 enterTo="opacity-100"
@@ -137,12 +137,11 @@ export default function Header() {
                                 leaveTo="opacity-0"
                             >
                                 <div className="fixed inset-0 bg-black bg-opacity-25" />
-                            </Transition.Child>
+                            </TransitionChild>
 
                             <div className="fixed inset-0 overflow-y-auto">
                                 <div className="flex min-h-full items-center justify-center p-4 text-center">
-                                    <Transition.Child
-                                        as={Fragment}
+                                    <TransitionChild
                                         enter="ease-out duration-300"
                                         enterFrom="opacity-0 scale-95"
                                         enterTo="opacity-100 scale-100"
@@ -150,14 +149,13 @@ export default function Header() {
                                         leaveFrom="opacity-100 scale-100"
                                         leaveTo="opacity-0 scale-95"
                                     >
-                                        <Dialog.Panel className="w-full sm:max-w-xl transform overflow-hidden rounded-md bg-white p-6 sm:px-20 text-left align-middle shadow-xl transition-all z-50">
+                                        <DialogPanel className="w-full sm:max-w-xl transform overflow-hidden rounded-md bg-white p-6 sm:px-20 text-left align-middle shadow-xl transition-all z-50">
                                             <Login onSignIn={closeModal} />
-                                        </Dialog.Panel>
-                                    </Transition.Child>
+                                        </DialogPanel>
+                                    </TransitionChild>
                                 </div>
                             </div>
-                        </Dialog>
-                    </Transition>
+                    </Dialog>
 
                     <div className="text-right -ml-6 sm:hidden">
                         <Menu
@@ -165,12 +163,11 @@ export default function Header() {
                             className="relative inline-block text-left mt-1 pr-1"
                         >
                             <div>
-                                <Menu.Button>
+                                <MenuButton>
                                     <Bars3Icon className="text-black h-5 w-5" />
-                                </Menu.Button>
+                                </MenuButton>
                             </div>
-                            <Transition
-                                as={Fragment}
+                            <Transition as="div"
                                 enter="transition ease-out duration-100"
                                 enterFrom="transform opacity-0 scale-95"
                                 enterTo="transform opacity-100 scale-100"
@@ -178,14 +175,14 @@ export default function Header() {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <Menu.Items className="absolute z-30 right-0 mt-2 whitespace-nowrap p-2 origin-top-right divide-y divide-gray-100 rounded-sm bg-white shadow-lg text-base font-medium focus:outline-none">
+                                <MenuItems className="absolute z-30 right-0 mt-2 whitespace-nowrap p-2 origin-top-right divide-y divide-gray-100 rounded-sm bg-white shadow-lg text-base font-medium focus:outline-none">
                                     {navigation.map((item) => {
                                         return (
                                             <div
                                                 className="px-1 py-1"
                                                 key={`nav-${item.title}`}
                                             >
-                                                <Menu.Item>
+                                                <MenuItem>
                                                     {({ active }) => (
                                                         <Link
                                                             className={`${
@@ -197,11 +194,11 @@ export default function Header() {
                                                             {item.title}
                                                         </Link>
                                                     )}
-                                                </Menu.Item>
+                                                </MenuItem>
                                             </div>
                                         );
                                     })}
-                                </Menu.Items>
+                                </MenuItems>
                             </Transition>
                         </Menu>
                     </div>
