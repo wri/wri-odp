@@ -62,27 +62,11 @@ describe("Map view", () => {
     },
     () => {
       cy.visit(`/datasets/${datasetName}`);
-      cy.get("body", { timeout: 60000 }).then(($body) => {
-        if ($body.find(".c-legend-map").length) {
-          cy.get(".c-legend-map", { timeout: 60000 }).contains(
-            "2015 Human Development Index",
-            { timeout: 60000 },
-          );
-          return;
-        }
 
-        cy.log("Legend container not visible; verifying layer resource via API.");
-        cy.request({
-          url: `/api/3/action/package_show?id=${datasetName}`,
-          failOnStatusCode: false,
-        }).then((resp) => {
-          expect(resp.status).to.eq(200);
-          const layer = (resp.body.result?.resources || []).find(
-            (resource) => resource.rw_id,
-          );
-          expect(Boolean(layer)).to.eq(true);
-        });
-      });
+      cy.get(".vizzuality__c-legend-map", { timeout: 60000 }).contains(
+        "2015 Human Development Index",
+        { timeout: 60000 },
+      );
     },
   );
 
@@ -96,26 +80,10 @@ describe("Map view", () => {
     },
     () => {
       cy.visit(`/datasets/${datasetName}`);
-      cy.get("body", { timeout: 60000 }).then(($body) => {
-        if ($body.find(".c-legend-map").length) {
-          cy.get(".c-legend-map .c-legend-item", {
-            timeout: 60000,
-          }).should("have.length.greaterThan", 1);
-          return;
-        }
 
-        cy.log("Legend config not visible in UI; verifying via template layer fallback.");
-        cy.request({
-          url: `/api/3/action/package_show?id=${datasetName}`,
-          failOnStatusCode: false,
-        }).then((resp) => {
-          expect(resp.status).to.eq(200);
-          const layer = (resp.body.result?.resources || []).find(
-            (resource) => resource.rw_id,
-          );
-          expect(Boolean(layer)).to.eq(true);
-        });
-      });
+      cy.get(".vizzuality__c-legend-map .vizzuality__legend-info > div", {
+        timeout: 60000,
+      }).should("have.length", 2);
     },
   );
 

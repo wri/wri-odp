@@ -10,6 +10,25 @@ const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 let datasetCreated = false;
 
+const waitForDatasetAvailability = (name, attempts = 12) => {
+  if (attempts <= 0) {
+    throw new Error(`Dataset ${name} was not available via package_show after retries`);
+  }
+
+  cy.request({
+    url: `/api/3/action/package_show?id=${name}`,
+    failOnStatusCode: false,
+  }).then((showResp) => {
+    if (showResp.status === 200) {
+      expect(showResp.body.result?.name).to.eq(name);
+      return;
+    }
+
+    cy.wait(2000);
+    waitForDatasetAvailability(name, attempts - 1);
+  });
+};
+
 const createDatasetViaAPI = () => {
   cy.fixture("airtravel.csv").then((fileContent) => {
     cy.createDatasetAPI(org, datasetName, true, {
@@ -81,9 +100,7 @@ describe("Chart view", () => {
       });
     });
 
-    cy.request({ url: `/api/3/action/package_show?id=${datasetName}`, failOnStatusCode: false }).then((showResp) => {
-      expect(showResp.status).to.eq(200);
-    });
+    waitForDatasetAvailability(datasetName);
   });
 
   it(
@@ -117,10 +134,7 @@ describe("Chart view", () => {
         }
 
         cy.log("Dataset name not visible in UI. Verifying dataset via API.");
-        cy.request({ url: `/api/3/action/package_show?id=${datasetName}`, failOnStatusCode: false }).then((showResp) => {
-          expect(showResp.status).to.eq(200);
-          expect(showResp.body.result?.name).to.eq(datasetName);
-        });
+        waitForDatasetAvailability(datasetName);
       });
     },
   );
