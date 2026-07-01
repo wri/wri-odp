@@ -52,7 +52,7 @@ export default function UserActivityStreams({ drag }: { drag: boolean }) {
                     return (
                         <ActivityStreamUser
                             key={index}
-                            activity={items as activity}
+                            activity={items}
                         />
                     );
                 })

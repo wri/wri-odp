@@ -77,7 +77,7 @@ const LayerManager = ({ layers }: { layers: APILayerSpec[] }): JSX.Element => {
         return parsedLayers;
     }, [layers, currentLayers]);
 
-    return map && map.getMap() ? (
+    return map?.getMap() ? (
         <VizzLayerManager
             map={map.getMap()}
             plugin={PluginMapboxGl}

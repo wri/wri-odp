@@ -57,7 +57,7 @@ const getDefaultInitialState = () => {
             },
             bounds: {
                 bbox: null,
-                options: {} as Record<string, unknown>,
+                options: {},
             },
             isDrawing: undefined,
         },
