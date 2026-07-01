@@ -6,10 +6,10 @@ datasize==1.0.0
 python-dateutil==2.9.0.post0
 pytz==2023.3.post1
 python-dotenv==1.0.0
-psycopg2-binary==2.9.9
-boto3==1.43.37
-pandas==2.2.0
-openpyxl==3.1.2
-lxml==5.1.0
+psycopg2-binary==2.9.12
+boto3==1.43.38
+pandas==2.3.3
+openpyxl==3.1.5
+lxml==6.0.4
 geopandas==0.14.3
 tqdm==4.68.3
