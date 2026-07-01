@@ -1,7 +1,10 @@
-FROM viderum/ckan:v2.11.0
+FROM viderum/ckan:v2.11.4
 
 ENV CKAN_INI=/srv/app/production.ini
 ENV APP_DIR=/srv/app
+
+# v2.11.4 ships ckan.ini instead of production.ini; keep the old path working
+RUN ln -sf /srv/app/ckan.ini /srv/app/production.ini
 
 USER root
 
@@ -28,7 +31,7 @@ RUN apk update && \
 # 2. Python Setup & Base Libraries
 RUN pip3 install --upgrade setuptools==70.0.0 && \
     pip3 install --force-reinstall -v "Pillow==11.0.0" && \
-    pip3 install --disable-pip-version-check "Cython<3" numpy && \
+    pip3 install --disable-pip-version-check "Cython<3" "numpy>=1.14,<2.0.0" && \
     pip3 install --disable-pip-version-check --no-build-isolation Shapely==2.0.1 && \
     pip3 install pyproj moto ckanapi httpretty mock
 

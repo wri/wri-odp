@@ -1,7 +1,10 @@
-FROM viderum/ckan:v2.11.0
+FROM viderum/ckan:v2.11.4
 
-ENV CKAN_INI /srv/app/production.ini
+ENV CKAN_INI=/srv/app/production.ini
 ENV APP_DIR=/srv/app
+
+# v2.11.4 ships ckan.ini instead of production.ini; keep the old path working
+RUN ln -sf /srv/app/ckan.ini /srv/app/production.ini
 
 USER root
 RUN pip3 install --upgrade setuptools==70.0.0

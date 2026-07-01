@@ -94,7 +94,7 @@ class DataPusherPlusConfig(MutableMapping):
     """
 
     def __init__(self, env):
-        for field in self.__annotations__:
+        for field in get_type_hints(type(self)):
             if not field.isupper():
                 continue
 
