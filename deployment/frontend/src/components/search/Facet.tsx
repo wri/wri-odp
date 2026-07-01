@@ -28,9 +28,7 @@ export default function Facet({
     // console.log('Facetselect79000: ', facetSelectedCount)
     const getUpdatedOptionsState = () => {
         return options.reduce((a, v) => {
-            const checked = filters.find(
-                (f) => f?.key == fqKey && f?.value == v.value
-            );
+            const checked = filters.find((f) => f?.key == fqKey && f?.value == v.value);
 
             return {
                 ...a,
@@ -39,20 +37,15 @@ export default function Facet({
         }, {});
     };
 
-    const [optionsState, setOptionsState] = useState<Record<string, boolean>>(
-        getUpdatedOptionsState()
-    );
+    const [optionsState, setOptionsState] =
+        useState<Record<string, boolean>>(getUpdatedOptionsState());
 
     useEffect(() => {
         setOptionsState(getUpdatedOptionsState);
     }, [filters]);
 
     return (
-        <Disclosure
-            as="div"
-            className="border-b border-r border-stone-200 shadow"
-            role="listitem"
-        >
+        <Disclosure as="div" className="border-b border-r border-stone-200 shadow" role="listitem">
             {({ open }) => (
                 <>
                     <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
@@ -73,6 +66,7 @@ export default function Facet({
                         />
                     </Disclosure.Button>
                     <Transition
+                        as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -93,37 +87,26 @@ export default function Facet({
                                                     id={`facet-${fqKey}-${option.value}`}
                                                     type="checkbox"
                                                     className="h-4 w-4 rounded border-gray-300 text-gray-500 focus:ring-gray-500"
-                                                    checked={
-                                                        optionsState[
-                                                            option.value
-                                                        ]
-                                                    }
+                                                    checked={optionsState[option.value]}
                                                     onChange={(e) => {
-                                                        const checked =
-                                                            e.target.checked;
+                                                        const checked = e.target.checked;
 
                                                         setFilters((prev) => {
-                                                            const newFilters = [
-                                                                ...prev,
-                                                            ];
+                                                            const newFilters = [...prev];
 
                                                             if (checked) {
-                                                                newFilters.push(
-                                                                    {
-                                                                        key: fqKey,
-                                                                        title: text,
-                                                                        value: option.value,
-                                                                        label: option.label,
-                                                                    }
-                                                                );
+                                                                newFilters.push({
+                                                                    key: fqKey,
+                                                                    title: text,
+                                                                    value: option.value,
+                                                                    label: option.label,
+                                                                });
                                                             } else {
                                                                 newFilters.splice(
                                                                     newFilters.findIndex(
                                                                         (e) =>
-                                                                            e.key ==
-                                                                                fqKey &&
-                                                                            e.value ==
-                                                                                option.value
+                                                                            e.key == fqKey &&
+                                                                            e.value == option.value
                                                                     ),
                                                                     1
                                                                 );
@@ -132,39 +115,24 @@ export default function Facet({
                                                             return newFilters;
                                                         });
 
-                                                        if (
-                                                            setFacetSelectedCount
-                                                        ) {
-                                                            setFacetSelectedCount(
-                                                                (prev) => {
-                                                                    if (
-                                                                        checked
-                                                                    ) {
-                                                                        return {
-                                                                            ...prev,
-                                                                            [fqKey]:
-                                                                                (prev[
-                                                                                    fqKey
-                                                                                ] ??
-                                                                                    0) +
-                                                                                1,
-                                                                        };
-                                                                    } else {
-                                                                        return {
-                                                                            ...prev,
-                                                                            [fqKey]:
-                                                                                Math.max(
-                                                                                    (prev[
-                                                                                        fqKey
-                                                                                    ] ??
-                                                                                        0) -
-                                                                                        1,
-                                                                                    0
-                                                                                ),
-                                                                        };
-                                                                    }
+                                                        if (setFacetSelectedCount) {
+                                                            setFacetSelectedCount((prev) => {
+                                                                if (checked) {
+                                                                    return {
+                                                                        ...prev,
+                                                                        [fqKey]:
+                                                                            (prev[fqKey] ?? 0) + 1,
+                                                                    };
+                                                                } else {
+                                                                    return {
+                                                                        ...prev,
+                                                                        [fqKey]: Math.max(
+                                                                            (prev[fqKey] ?? 0) - 1,
+                                                                            0
+                                                                        ),
+                                                                    };
                                                                 }
-                                                            );
+                                                            });
                                                         }
                                                     }}
                                                 />
@@ -174,8 +142,7 @@ export default function Facet({
                                                     htmlFor={`facet-${fqKey}-${option.value}`}
                                                     className="select-none font-medium text-gray-900"
                                                 >
-                                                    {option.label ??
-                                                        option.value}
+                                                    {option.label ?? option.value}
                                                 </label>
                                             </div>
                                         </div>

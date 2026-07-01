@@ -73,6 +73,7 @@ export default function Tags({
                         />
                     </Disclosure.Button>
                     <Transition
+                     as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
