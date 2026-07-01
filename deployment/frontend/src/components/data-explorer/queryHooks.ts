@@ -103,10 +103,7 @@ export function useNumberOfRows({
             datasetId,
             provider,
             tableName: tableName ?? '',
-            filters: filters as {
-                id: string;
-                value: FilterObjType[];
-            }[],
+            filters: filters,
         },
         {
             keepPreviousData: true,

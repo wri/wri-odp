@@ -3,11 +3,35 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Swiper } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
+import type { SwiperOptions } from 'swiper/types';
+
+const defaultBreakpoints: SwiperOptions['breakpoints'] = {
+    1: {
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+    },
+    460: {
+        slidesPerView: 2,
+        slidesPerGroup: 2,
+    },
+    720: {
+        slidesPerView: 2,
+        slidesPerGroup: 2,
+    },
+    1200: {
+        slidesPerView: 3,
+        slidesPerGroup: 3,
+    },
+    1280: {
+        slidesPerView: 4,
+        slidesPerGroup: 4,
+    },
+};
 
 type CarouselProps = {
     children: React.ReactNode;
     identifier: string;
-    breakpoints?: any;
+    breakpoints?: SwiperOptions['breakpoints'];
 };
 
 export default function Carousel({
@@ -23,30 +47,7 @@ export default function Carousel({
             <Swiper
                 modules={[Navigation]}
                 spaceBetween={identifier.includes('recent') ? 18 : 40}
-                breakpoints={
-                    breakpoints ?? {
-                        1: {
-                            slidesPerView: 1,
-                            slidesPerGroup: 1,
-                        },
-                        460: {
-                            slidesPerView: 2,
-                            slidesPerGroup: 2,
-                        },
-                        720: {
-                            slidesPerView: 2,
-                            slidesPerGroup: 2,
-                        },
-                        1200: {
-                            slidesPerView: 3,
-                            slidesPerGroup: 3,
-                        },
-                        1280: {
-                            slidesPerView: 4,
-                            slidesPerGroup: 4,
-                        },
-                    }
-                }
+                breakpoints={breakpoints ?? defaultBreakpoints}
                 navigation={{
                     prevEl: prevEl,
                     nextEl: nextEl,

@@ -67,9 +67,6 @@ export const rwRouter = createTRPCRouter({
                             type: 'any',
                             default: '',
                         })),
-                } as {
-                    tableName: string;
-                    columns: { key: string; name: string; type: string }[];
                 };
                 return columns;
             }

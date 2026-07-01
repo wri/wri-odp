@@ -42,8 +42,7 @@ export default function GeocoderControl(props: GeocoderControlProps) {
                 limit: 8,
             });
             if (
-                props &&
-                props.onLoading &&
+                props?.onLoading &&
                 props.onResults &&
                 props.onResult &&
                 props.onError &&
