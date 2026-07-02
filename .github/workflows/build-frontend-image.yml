@@ -28,6 +28,10 @@ on:
         required: false
         type: string
         default: 'false'
+      pr_number:
+        required: false
+        type: string
+        default: ''
 
 permissions:
   id-token: write
@@ -57,9 +61,16 @@ jobs:
         run: |
           BRANCH="${{ inputs.branch_name || github.ref_name }}"
           REGISTRY="${{ steps.login-ecr.outputs.registry }}"
-          
-          # FRONTEND_IMAGE is set to latest for docker-compose validation (we're building it, not pulling)
-          echo "FRONTEND_IMAGE=$REGISTRY/${{ vars.ECR_FRONTEND_REPO }}:$BRANCH-test" >> $GITHUB_ENV
+          PR_NUMBER="${{ inputs.pr_number }}"
+
+          if [ -n "$PR_NUMBER" ]; then
+            FRONTEND_TAG="${BRANCH}-${PR_NUMBER}-test"
+          else
+            FRONTEND_TAG="${BRANCH}-test"
+          fi
+
+          # FRONTEND_IMAGE is set for docker-compose validation (we're building it, not pulling)
+          echo "FRONTEND_IMAGE=$REGISTRY/${{ vars.ECR_FRONTEND_REPO }}:$FRONTEND_TAG" >> $GITHUB_ENV
           
           # Use latest tags for all containers when triggered via workflow_dispatch
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
@@ -134,10 +145,17 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
-          FRONTEND_TAG: ${{ inputs.branch_name || github.ref_name }}-test
+          BRANCH: ${{ inputs.branch_name || github.ref_name }}
+          PR_NUMBER: ${{ inputs.pr_number }}
           FRONTEND_SHA_TAG: ${{ github.sha }}-test
           NEXT_PUBLIC_MAPBOX_TOKEN: ${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}
         run: |
+          if [ -n "$PR_NUMBER" ]; then
+            FRONTEND_TAG="${BRANCH}-${PR_NUMBER}-test"
+          else
+            FRONTEND_TAG="${BRANCH}-test"
+          fi
+
           docker build \
             --network host \
             --build-arg NEXTAUTH_SECRET="dummy-secret-for-build" \
