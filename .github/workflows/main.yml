@@ -474,7 +474,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        group: [1, 2, 3, 4, 5, 6, 7, 8, 9]
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v5
@@ -499,7 +499,6 @@ jobs:
           echo "CKAN__AUTH__ALLOW_DATASET_COLLABORATORS=true" >> $GITHUB_ENV
           echo "OSANO_URL="YOUR_OSANO_URL/osano.js"" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ needs.setup.outputs.next_public_hotjar_id }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_MAPBOX_TOKEN=${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}" >> $GITHUB_ENV
           echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-test" >> $GITHUB_ENV
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV

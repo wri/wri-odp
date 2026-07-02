@@ -109,8 +109,6 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
-      - dependency-name: "numpy"
-        versions: [">=2.0.0"]
 
   - package-ecosystem: "pip"
     directory: "/ckanext-wri"
@@ -121,8 +119,6 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
-      - dependency-name: "numpy"
-        versions: [">=2.0.0"]
 
   - package-ecosystem: "pip"
     directory: "/scripts/cost-splitting"
