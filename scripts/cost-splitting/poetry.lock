@@ -5,7 +5,7 @@ name = "boto3"
 version = "1.43.38"
 description = "The AWS SDK for Python"
 optional = false
-python-versions = ">= 3.7"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
     {file = "boto3-1.43.38-py3-none-any.whl", hash = "sha256:edffb4a8f49c0a61e8f4aa4104cc2da3c362de8042fc0819216d5e5ce5d38380"},
@@ -25,7 +25,7 @@ name = "botocore"
 version = "1.43.38"
 description = "Low-level, data-driven core of boto 3."
 optional = false
-python-versions = ">= 3.7"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
     {file = "botocore-1.43.38-py3-none-any.whl", hash = "sha256:54c1c41aff82422d2b88a8a7d782fde8ae1299a45f088d00011d85c4bc44b0cc"},
@@ -747,7 +747,7 @@ name = "python-dotenv"
 version = "1.2.2"
 description = "Read key-value pairs from a .env file and set them as environment variables"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
     {file = "python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a"},
@@ -866,7 +866,7 @@ name = "s3transfer"
 version = "0.19.0"
 description = "An Amazon S3 Transfer Manager"
 optional = false
-python-versions = ">= 3.7"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
     {file = "s3transfer-0.19.0-py3-none-any.whl", hash = "sha256:777cc2415536f1debadb5c2ef7779275d0fc0fe0e042411cdd6caebeb2685262"},
@@ -874,10 +874,10 @@ files = [
 ]
 
 [package.dependencies]
-botocore = ">=1.12.36,<2.0a0"
+botocore = ">=1.37.4,<2.0a0"
 
 [package.extras]
-crt = ["botocore[crt] (>=1.20.29,<2.0a0)"]
+crt = ["botocore[crt] (>=1.37.4,<2.0a0)"]
 
 [[package]]
 name = "six"
@@ -1155,4 +1155,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "5610001a471c2e499f3a130908b700de5e3370c2bd8242a36b940ad8a134ed55"
+content-hash = "83067b7c09bbfcd38c2dc2bb5f0a895084e17f1cc616628ecbfeaeb0ee15436f"
