@@ -179,7 +179,6 @@ jobs:
       - build-postgresql
       - build-solr
     if: |
-      github.event_name == 'pull_request' &&
       always() &&
       (needs.setup.result == 'success') &&
       (needs.build-ckan.result == 'success' || needs.build-ckan.result == 'skipped') &&
@@ -187,13 +186,17 @@ jobs:
       (needs.build-prefect.result == 'success' || needs.build-prefect.result == 'skipped') &&
       (needs.build-postgresql.result == 'success' || needs.build-postgresql.result == 'skipped') &&
       (needs.build-solr.result == 'success' || needs.build-solr.result == 'skipped') &&
-      (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.ckan_changed == 'true')
+      (
+        (github.event_name == 'pull_request' && (needs.setup.outputs.frontend_changed == 'true' || needs.setup.outputs.ckan_changed == 'true')) ||
+        (github.event_name == 'push' && github.ref_name == 'dev')
+      )
     concurrency:
       group: ${{ github.workflow }}-build-frontend-${{ github.head_ref || github.ref }}
       cancel-in-progress: true
     uses: ./.github/workflows/build-frontend-image.yml
     with:
       branch_name: ${{ needs.setup.outputs.branch_name }}
+      pr_number: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || '' }}
       datapusher_changed: ${{ needs.setup.outputs.datapusher_changed }}
       ckan_changed: ${{ needs.setup.outputs.ckan_changed }}
       prefect_changed: ${{ needs.setup.outputs.prefect_changed }}
@@ -282,7 +285,7 @@ jobs:
           echo "NEXT_PUBLIC_GTM_ID=${{ vars.NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ vars.NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-test" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_FRONTEND_REPO }}:${{ needs.build-frontend.result == 'success' && format('{0}-{1}-test', needs.setup.outputs.branch_name, github.event.pull_request.number) || format('{0}-test', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_PREFECT_REPO }}:${{ needs.setup.outputs.prefect_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
@@ -392,7 +395,7 @@ jobs:
           echo "NEXT_PUBLIC_GTM_ID=${{ vars.NEXT_PUBLIC_GTM_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ vars.NEXT_PUBLIC_HOTJAR_ID }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_DISABLE_HOTJAR=disabled" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-test" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_FRONTEND_REPO }}:${{ needs.build-frontend.result == 'success' && format('{0}-{1}-test', needs.setup.outputs.branch_name, github.event.pull_request.number) || format('{0}-test', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_PREFECT_REPO }}:${{ needs.setup.outputs.prefect_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
@@ -500,7 +503,7 @@ jobs:
           echo "OSANO_URL="YOUR_OSANO_URL/osano.js"" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_HOTJAR_ID=${{ needs.setup.outputs.next_public_hotjar_id }}" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_MAPBOX_TOKEN=${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_FRONTEND_REPO }}:${{ needs.setup.outputs.branch_name }}-test" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_FRONTEND_REPO }}:${{ needs.build-frontend.result == 'success' && format('{0}-{1}-test', needs.setup.outputs.branch_name, github.event.pull_request.number) || format('{0}-test', needs.setup.outputs.branch_name) }}" >> $GITHUB_ENV
           echo "CKAN_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_CKAN_REPO }}:${{ needs.setup.outputs.ckan_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
           echo "DATAPUSHER_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_DATAPUSHER_REPO }}:${{ needs.setup.outputs.datapusher_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
           echo "PREFECT_IMAGE=${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_PREFECT_REPO }}:${{ needs.setup.outputs.prefect_changed == 'true' && github.sha || needs.setup.outputs.branch_name }}" >> $GITHUB_ENV
@@ -665,7 +668,7 @@ jobs:
           REPOSITORY: ${{ vars.ECR_FRONTEND_REPO }}
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.setup.outputs.branch_name }}-test'
+          image-ref: '${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ needs.setup.outputs.branch_name }}-${{ github.event.pull_request.number }}-test'
           format: 'sarif'
           output: frontend-trivy-results.sarif
           exit-code: '0'
