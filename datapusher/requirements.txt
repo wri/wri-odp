@@ -10,6 +10,6 @@ psycopg2-binary==2.9.12
 boto3==1.43.39
 pandas==2.3.3
 openpyxl==3.1.5
-lxml==6.0.4
+lxml==6.1.1
 geopandas==0.14.4
 tqdm==4.68.3
