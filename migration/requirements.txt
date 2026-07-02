@@ -1,21 +1,21 @@
 # pkg_resources required by ckanapi - must be installed first
 setuptools>=78.1.1
-prefect>=3.0,<4
+prefect>=3.7.6,<4
 pathlib==1.0.1
 semver==3.0.4
 pydantic>=2.13.4,<3
 datasize==1.0.0
 python-dateutil==2.9.0.post0
-pytz==2023.3.post1
+pytz==2023.4
 python-dotenv==1.2.2
 psycopg2-binary==2.9.12
-boto3==1.34.35
+boto3==1.43.39
 pandas==2.3.3
-openpyxl==3.1.2
+openpyxl==3.1.5
 lxml==6.1.1
 pycountry==22.3.5
 ckanapi==4.11
 markdown==3.10.2
 urllib3>=2.7.0 # not directly required, pinned by Snyk to avoid a vulnerability
-requests>=2.32.4 # not directly required, pinned by Snyk to avoid a vulnerability
+requests>=2.34.2 # not directly required, pinned by Snyk to avoid a vulnerability
 
