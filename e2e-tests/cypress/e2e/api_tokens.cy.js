@@ -9,7 +9,6 @@ const teamOne = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const adminUser = `${uuid()}${Cypress.env("USER_NAME_SUFFIX")}_admin`;
 const adminUserPassword = "test1234";
 const adminUserEmail = Math.random().toString(36).slice(2) + "@test.com";
-const tokenName = `test-token-${uuid()}`;
 
 describe("Can add and remove members from teams and topics", () => {
   before(() => {
@@ -23,33 +22,27 @@ describe("Can add and remove members from teams and topics", () => {
 
   it("Create API Token", () => {
     cy.visit(`/dashboard/settings/edit/${adminUser}`);
-    cy.contains("API Tokens", { timeout: 20000 }).click();
-    cy.contains("Create API Token", { timeout: 20000 }).click();
-    cy.get("#name", { timeout: 10000 })
-      .should("be.visible")
-      .clear()
-      .type(tokenName);
-    cy.contains("Create Token", { timeout: 10000 }).click();
-    // After successful creation the modal closes (setOpen(false) in onSuccess)
-    cy.get("#name", { timeout: 30000 }).should("not.exist");
+    cy.contains("API Tokens").click();
+    cy.contains("Create API Token").click();
+    cy.get('#name').type("test-token");
+    cy.contains("Create Token").click();
+    cy.get("#copyButton").click()
+    cy.contains("Copied text to clipboard")
   });
 
   it("List api keys", () => {
     cy.visit(`/dashboard/settings/edit/${adminUser}`);
-    cy.contains("API Tokens", { timeout: 20000 }).click();
-    cy.contains(tokenName, { timeout: 20000 }).should("be.visible");
+    cy.contains("API Tokens").click();
+    cy.contains("test-token")
   });
 
   it("Delete api keys", () => {
     cy.visit(`/dashboard/settings/edit/${adminUser}`);
-    cy.contains("API Tokens", { timeout: 20000 }).click();
-    cy.contains(tokenName, { timeout: 20000 }).should("be.visible");
-    cy.get(".delete-token", { timeout: 20000 })
-      .should("have.length.greaterThan", 0)
-      .first()
-      .click();
-    cy.contains("Delete Token", { timeout: 10000 }).click();
-    cy.contains(tokenName, { timeout: 30000 }).should("not.exist");
+    cy.contains("API Tokens").click();
+    cy.contains("test-token")
+    cy.get('.delete-token').eq(0).click()
+    cy.contains('Delete Token').click()
+    cy.get('.delete-token').should('have.length', 1)
   });
 
   after(() => {

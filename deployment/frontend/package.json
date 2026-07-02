@@ -176,9 +176,6 @@
         "os": false,
         "path": false
     },
-    "engines": {
-        "node": ">=22.14.0"
-    },
     "packageManager": "npm@9.6.7",
     "overrides": {
         "axios": "^1.13.5",
