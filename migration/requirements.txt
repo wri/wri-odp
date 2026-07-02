@@ -17,5 +17,5 @@ pycountry==22.3.5
 ckanapi==4.11
 markdown==3.10.2
 urllib3>=2.7.0 # not directly required, pinned by Snyk to avoid a vulnerability
-requests>=2.32.4 # not directly required, pinned by Snyk to avoid a vulnerability
+requests>=2.34.2 # not directly required, pinned by Snyk to avoid a vulnerability
 
