@@ -4,7 +4,6 @@ import React, {
     useEffect,
     useState,
 } from 'react';
-import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,9 +25,6 @@ export default function Search({
 
     const [isSearch, setIsSearch] = useState(getIsSearching());
 
-    const router = useRouter();
-    const { pathname } = router;
-
     const searchSchema = z.object({ search: z.string() });
     type searchFormType = z.infer<typeof searchSchema>;
 
@@ -40,12 +36,13 @@ export default function Search({
     });
 
     useEffect(() => {
-        setIsSearch(getIsSearching());
+        const searchFilter = filters?.find((f) => f.key == 'search');
+        setIsSearch(!!searchFilter);
 
-        if (watch('search') != filters.find((f) => f.key == 'search')?.value) {
+        if (watch('search') != searchFilter?.value) {
             reset({ search: '' });
         }
-    }, [filters]);
+    }, [filters, reset, watch]);
 
     return (
         <section

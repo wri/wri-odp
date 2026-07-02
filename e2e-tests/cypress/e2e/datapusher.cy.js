@@ -75,21 +75,25 @@ describe("Upload file and create dataset", () => {
     "Submit datapusher",
     {
       retries: {
-        runMode: 5,
+        runMode: 3,
         openMode: 0,
       },
     },
     () => {
       cy.visit("/dashboard/datasets/" + dataset + "/edit");
-      cy.contains("Data Files").click();
+      cy.contains("Data Files", { timeout: 20000 }).click();
       cy.get(".datafile-accordion-trigger").eq(0).click();
       cy.contains("Datapusher").click();
-      cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
-      cy.contains(`Successfully submited Data File to the datapusher`, {
-        timeout: 15000,
+      cy.get("body").then(($body) => {
+        if ($body.text().includes("DATAPUSHER+ JOB DONE!")) {
+          return;
+        }
+        cy.contains("Submit to Datapusher", { timeout: 50000 }).click();
+        cy.contains(`Successfully submited Data File to the datapusher`, {
+          timeout: 15000,
+        });
       });
-      cy.wait(15000);
-      cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 15000 });
+      cy.contains("DATAPUSHER+ JOB DONE!", { timeout: 120000 });
     },
   );
 

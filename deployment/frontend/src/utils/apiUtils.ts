@@ -1999,7 +1999,7 @@ export async function sendGroupNotification({
         const allUserIds = allUsers.map((x) => x.id) as string[];
         recipientIds = recipientIds.concat(allUserIds);
         if (recipientUsers) {
-            recipientUsers = recipientUsers.concat(allUsers as WriUser);
+            recipientUsers = recipientUsers.concat(allUsers);
         } else {
             recipientUsers = allUsers;
         }

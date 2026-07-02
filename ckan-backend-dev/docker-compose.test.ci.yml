@@ -54,7 +54,7 @@ services:
       - SMTP_FROM=${SMTP_FROM}
       - PREFECT_INTERNAL_URL=http://prefect:4200
       - GFW_DATA_API_KEY=
-      - NEXT_PUBLIC_MAPBOX_TOKEN=pk.dummy_token_for_ci_testing
+      - NEXT_PUBLIC_MAPBOX_TOKEN=${NEXT_PUBLIC_MAPBOX_TOKEN:-pk.dummy_token_for_ci_testing}
       - OSANO_URL="YOUR_OSANO_URL/osano.js"
       - OKTA_CLIENT_ID=ffffffffffffffffffffffffffffffff
       - OKTA_ISSUER=https://dev-000000.okta.com/oauth2/default

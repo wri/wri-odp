@@ -45,7 +45,7 @@ function TeamProfile({ user }: { user: IRowProfile | IUser }) {
             <RowProfile
                 imgStyle="w-16 h-16 bg-[#F9F9F9] group-hover:bg-white"
                 isPad
-                profile={user as IRowProfile}
+                profile={user}
             />
             <div className="font-normal text-base sm:text-[14px] text-wri-black sm:self-center sm:ml-auto sm:mr-[20%] lg:mr-[46%]">
                 {UserProfile?.orgnumber
@@ -103,7 +103,7 @@ function SubCardProfile({ user }: { user: IRowProfile | IUser }) {
                                     <RowProfile
                                         imgStyle="w-8 h-8 mt-2"
                                         isPad
-                                        profile={team as IRowProfile}
+                                        profile={team}
                                         defaultImg="/images/placeholders/teams/teamdefault.png"
                                     />
                                     <div className="font-normal text-[14px] text-wri-black sm:self-center sm:ml-auto sm:mr-[40%] lg:mr-[60%]">
@@ -283,7 +283,7 @@ export default function UserCard({ username }: { username: string }) {
                                     key={user.id}
                                     className={`pr-6`}
                                     rowMain={
-                                        <TeamProfile user={user as IUser} />
+                                        <TeamProfile user={user} />
                                     }
                                     controlButtons={[
                                         {

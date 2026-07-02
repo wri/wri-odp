@@ -9,18 +9,11 @@ import {
 } from '@/interfaces/state.interface';
 import { useLayoutEffect } from 'react';
 import { type ViewState } from 'react-map-gl';
-import { create, type UseBoundStore } from 'zustand';
+import { create } from 'zustand';
 import { createContext } from 'zustand-utils';
 import { combine } from 'zustand/middleware';
 
-let store: any;
-
 type InitialState = ReturnType<typeof getDefaultInitialState>;
-type UseStoreState = typeof initializeStore extends (
-    ...args: never
-) => UseBoundStore<infer T>
-    ? T
-    : never;
 
 const getDefaultInitialState = () => {
     const initialState: State = {
@@ -57,7 +50,7 @@ const getDefaultInitialState = () => {
             },
             bounds: {
                 bbox: null,
-                options: {} as Record<string, unknown>,
+                options: {},
             },
             isDrawing: undefined,
         },
@@ -67,27 +60,25 @@ const getDefaultInitialState = () => {
     return initialState;
 };
 
-const zustandContext = createContext<UseStoreState>();
-export const Provider = zustandContext.Provider;
-export const useStore = zustandContext.useStore;
-
-export const initializeStore = (preloadedState: any = {}) => {
+export const initializeStore = (preloadedState: Partial<InitialState> = {}) => {
     // console.log('Initializing store with preloaded state', preloadedState);
     // console.log('Default initial state', getDefaultInitialState());
+    const initialState: InitialState = {
+        ...getDefaultInitialState(),
+        ...preloadedState,
+        mapView: {
+            ...getDefaultInitialState().mapView,
+            ...preloadedState?.mapView,
+            viewState: {
+                ...getDefaultInitialState().mapView.viewState,
+                ...preloadedState?.mapView?.viewState,
+            },
+        },
+    };
+
     return create(
         combine(
-            {
-                ...getDefaultInitialState(),
-                ...preloadedState,
-                mapView: {
-                    ...getDefaultInitialState().mapView,
-                    ...preloadedState?.mapView,
-                    viewState: {
-                        ...getDefaultInitialState().mapView.viewState,
-                        ...preloadedState?.mapView?.viewState,
-                    },
-                },
-            },
+            initialState,
             (set, get) => ({
                 setStoreDirtyFields: (storeDirtyFieldsFunc: () => string[]) => {
                     const storeDirtyFields = storeDirtyFieldsFunc();
@@ -406,7 +397,7 @@ export const initializeStore = (preloadedState: any = {}) => {
                     currentLayers.set(layerId, {
                         ...currentLayer,
                         [keyName]: newValue,
-                    } as LayerState);
+                    });
                     const prev = get();
                     set({
                         ...prev,
@@ -443,6 +434,26 @@ export const initializeStore = (preloadedState: any = {}) => {
     );
 };
 
+export type AppStore = ReturnType<typeof initializeStore>;
+export type AppStoreState = InitialState & Omit<
+    ReturnType<AppStore['getState']>,
+    keyof InitialState
+>;
+
+let store: AppStore | undefined;
+
+const zustandContext = createContext<AppStore>();
+export const Provider = zustandContext.Provider;
+
+const contextUseStore = zustandContext.useStore;
+
+export function useStore<T>(
+    selector: (state: AppStoreState) => T,
+    equalityFn?: (a: T, b: T) => boolean
+): T {
+    return contextUseStore(selector, equalityFn);
+}
+
 export const useCreateStore = (serverInitialState: Partial<InitialState>) => {
     // For SSR & SSG, always use a new store.
     if (typeof window === 'undefined') {
@@ -451,7 +462,8 @@ export const useCreateStore = (serverInitialState: Partial<InitialState>) => {
 
     const isReusingStore = Boolean(store);
     // For CSR, always re-use same store.
-    store = store ?? initializeStore(serverInitialState);
+    const currentStore = store ?? initializeStore(serverInitialState);
+    store = currentStore;
     // And if initialState changes, then merge states in the next render cycle.
     //
     // eslint complaining "React Hooks must be called in the exact same order in every component render"
@@ -462,10 +474,10 @@ export const useCreateStore = (serverInitialState: Partial<InitialState>) => {
         // states on CSR page navigation or not. I have chosen not to, but if you choose to,
         // then add `serverInitialState = getDefaultInitialState()` here.
         if (serverInitialState && isReusingStore) {
-            store.setState(
+            currentStore.setState(
                 {
                     // re-use functions from existing store
-                    ...store.getState(),
+                    ...currentStore.getState(),
                     // but reset all other properties.
                     ...serverInitialState,
                 },
@@ -474,5 +486,5 @@ export const useCreateStore = (serverInitialState: Partial<InitialState>) => {
         }
     });
 
-    return () => store;
+    return () => currentStore;
 };

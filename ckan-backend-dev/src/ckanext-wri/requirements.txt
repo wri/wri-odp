@@ -1,4 +1,4 @@
 pycountry==23.12.11
-Shapely==2.0.1
+Shapely==2.1.2
 GeoAlchemy2==0.20.0
 numpy>=1.14,<2.0.0

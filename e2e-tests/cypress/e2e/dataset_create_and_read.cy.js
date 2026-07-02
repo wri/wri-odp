@@ -294,14 +294,16 @@ describe("Create dataset", () => {
       cy.wait(500);
       cy.get(".datafile-accordion-trigger").eq(2).click();
       cy.get("#tile-cache-link-button").click();
-      cy.get('input[name="resources.2.url"]').type("https://google.com");
-      cy.get('input[name="resources.2.title"]').type("Tile cache");
+      cy.get('input[name="resources.2.url"]').clear().type("https://google.com");
+      cy.get('input[name="resources.2.title"]').clear().type("Tile cache");
       cy.contains("Select cache type").click();
-      cy.contains("Raster").click();
+      // NOTE: must target the dropdown option (li) explicitly. A plain
+      // cy.contains("Raster") matches the "Link to Data API Raster Tile Set"
+      // tab first, which silently switches the resource type away from
+      // tile-cache and breaks the save.
+      cy.get("li").contains("Raster").click();
       cy.get("button").contains("Update Dataset").click();
-      // cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
-      //   timeout: 30000,
-      // });
+      cy.contains("Successfully edited", { timeout: 30000 });
     },
   );
 
@@ -338,14 +340,16 @@ describe("Create dataset", () => {
       cy.wait(500);
       cy.get(".datafile-accordion-trigger").eq(3).click();
       cy.get("#gee-asset-button").click();
-      cy.get('input[name="resources.3.asset_id"]').type("gee asset id");
-      cy.get('input[name="resources.3.title"]').type("Gee asset");
+      cy.get('input[name="resources.3.asset_id"]').clear().type("gee asset id");
+      cy.get('input[name="resources.3.title"]').clear().type("Gee asset");
       cy.contains("Select asset type").click();
-      cy.contains("Raster").click();
+      // NOTE: must target the dropdown option (li) explicitly. A plain
+      // cy.contains("Raster") matches the "Link to Data API Raster Tile Set"
+      // tab first, which silently switches the resource type away from
+      // gee-asset and breaks the save.
+      cy.get("li").contains("Raster").click();
       cy.get("button").contains("Update Dataset").click();
-      // cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
-      //   timeout: 30000,
-      // });
+      cy.contains("Successfully edited", { timeout: 30000 });
     },
   );
 

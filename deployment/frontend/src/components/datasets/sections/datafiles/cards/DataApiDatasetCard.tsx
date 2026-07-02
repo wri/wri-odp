@@ -201,7 +201,7 @@ export function DataApiDatasetCard({
       resources: [datafile.id],
       package_id: datafile.package_id ?? '',
       acceptTerms: true,
-      typeOfForm: 'direct-download' as any,
+      typeOfForm: 'direct-download',
       package_name: `${dataset.name}: ${datafile.title ?? datafile.name}`,
     });
   };

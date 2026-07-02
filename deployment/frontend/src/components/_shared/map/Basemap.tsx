@@ -75,7 +75,7 @@ export default function Basemap({
     );
 
     useEffect(() => {
-        handleBasemap(selectedBasemap as Basemap);
+        handleBasemap(selectedBasemap);
     }, [selectedBasemap, handleBasemap]);
 
     return null;

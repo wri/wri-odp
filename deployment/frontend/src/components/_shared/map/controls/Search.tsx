@@ -61,7 +61,7 @@ export default function Search({
     );
 
     const handleFitBounds = useCallback(() => {
-        const bbox = bounds.bbox as number[];
+        const bbox = bounds.bbox!;
         const options = bounds.options;
         const mapContainer = mapContainerRef.current!;
         if (mapContainer.offsetWidth <= 0 || mapContainer.offsetHeight <= 0) {

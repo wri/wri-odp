@@ -58,7 +58,7 @@ export default function MulText<T extends FieldValues>({
     return (
         <Controller
             control={control}
-            name={name as any}
+            name={name}
             defaultValue={[] as PathValue<T, Path<T>>}
             render={({ field: { onChange, value } }) => (
                 <Popover open={open} onOpenChange={setOpen}>

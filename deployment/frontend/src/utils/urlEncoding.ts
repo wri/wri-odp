@@ -3,7 +3,7 @@ import { type State } from '@/interfaces/state.interface';
 export function decodeMapParam(map?: string): State['mapView'] | null {
     if (!map) return null;
     const decoded = atob(map);
-    const parsed: State['mapView'] = JSON.parse(decoded);
+    const parsed = JSON.parse(decoded) as State['mapView'];
     return parsed;
 }
 
@@ -20,11 +20,11 @@ function deepSortObject<T>(obj: T): T {
         return obj;
     }
     if (Array.isArray(obj)) {
-        return obj.map((el) => deepSortObject(el)) as unknown as T;
+        return (obj as unknown[]).map((el) => deepSortObject(el)) as T;
     }
-    const sortedEntries = Object.entries(obj)
+    const sortedEntries = Object.entries(obj as Record<string, unknown>)
         .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-        .map(([key, val]) => [key, deepSortObject(val)]);
+        .map(([key, val]): [string, unknown] => [key, deepSortObject(val)]);
 
     return Object.fromEntries(sortedEntries) as T;
 }

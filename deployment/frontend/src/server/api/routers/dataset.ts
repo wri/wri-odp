@@ -348,7 +348,7 @@ export const DatasetRouter = createTRPCRouter({
           await sendMemberNotifications(
             user.id,
             newCollaborators as unknown as User[],
-            existingCollaborators as unknown as User[],
+            existingCollaborators,
             input.id ?? '',
             'dataset'
           );

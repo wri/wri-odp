@@ -39,10 +39,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Git clone the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.OIDC_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -136,6 +136,7 @@ jobs:
           FRONTEND_REPO: ${{ vars.ECR_FRONTEND_REPO }}
           FRONTEND_TAG: ${{ inputs.branch_name || github.ref_name }}-test
           FRONTEND_SHA_TAG: ${{ github.sha }}-test
+          NEXT_PUBLIC_MAPBOX_TOKEN: ${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}
         run: |
           docker build \
             --network host \
@@ -147,7 +148,7 @@ jobs:
             --build-arg NEXT_PUBLIC_GTM_ID="dummy-gtm-id" \
             --build-arg NEXT_PUBLIC_DISABLE_HOTJAR="disabled" \
             --build-arg NEXT_PUBLIC_HOTJAR_ID="dummy-hotjar-id" \
-            --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="pk.dummy_mapbox_token_for_ci" \
+            --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="${NEXT_PUBLIC_MAPBOX_TOKEN:-pk.dummy_mapbox_token_for_ci}" \
             --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js" \
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
             --build-arg SYS_ADMIN_API_KEY="${{ env.SYS_ADMIN_API_KEY }}" \
