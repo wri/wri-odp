@@ -7,7 +7,7 @@ python-dateutil==2.9.0.post0
 pytz==2023.4
 python-dotenv==1.0.0
 psycopg2-binary==2.9.12
-boto3==1.43.38
+boto3==1.43.39
 pandas==2.3.3
 openpyxl==3.1.5
 lxml==6.0.4
