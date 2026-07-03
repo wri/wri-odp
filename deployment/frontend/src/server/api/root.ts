@@ -15,6 +15,7 @@ import { datastoreRouter } from './routers/datastore';
 import { notificationRouter } from './routers/notification';
 import type { inferRouterOutputs } from '@trpc/server';
 import { prefectRouter } from './routers/prefect';
+import { dashboardRouter } from './routers/dashboard';
 import { downloadEventRouter } from './routers/download_event';
 
 /**
@@ -39,6 +40,7 @@ export const appRouter = createTRPCRouter({
     datastore: datastoreRouter,
     prefect: prefectRouter,
     downloadEvents: downloadEventRouter,
+    dashboard: dashboardRouter,
 });
 
 // export type definition of API

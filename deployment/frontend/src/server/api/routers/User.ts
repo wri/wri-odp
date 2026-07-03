@@ -6,7 +6,6 @@ import {
   getUserOrganizations,
   getUserDataset,
   getOrgDetails,
-  getAllOrganizations,
   getAllUsers,
   getRandomUsernameFromEmail,
   generateRandomPassword,
@@ -239,25 +238,23 @@ export const UserRouter = createTRPCRouter({
       };
     }),
   getUserCapacity: protectedProcedure.query(async ({ ctx }) => {
-    let isOrgAdmin = false;
-    let adminOrg: WriOrganization[] = [];
     if (ctx.session.user.sysadmin) {
-      isOrgAdmin = true;
-      adminOrg = (await getAllOrganizations({
-        apiKey: ctx.session.user.apikey,
-      }))!;
-    } else {
-      const orgdetails = await getUserOrganizations({
-        userId: ctx.session.user.id,
-        apiKey: ctx.session.user.apikey,
-      });
-      isOrgAdmin = orgdetails?.some((org) => org.capacity === 'admin');
-      adminOrg = orgdetails?.filter((org) => org.capacity === 'admin');
+      return {
+        isOrgAdmin: true,
+        adminOrg: [] as WriOrganization[],
+      };
     }
 
+    const orgdetails = await getUserOrganizations({
+      userId: ctx.session.user.id,
+      apiKey: ctx.session.user.apikey,
+    });
+    const adminOrg =
+      orgdetails?.filter((org) => org.capacity === 'admin') ?? [];
+
     return {
-      isOrgAdmin: isOrgAdmin,
-      adminOrg: adminOrg,
+      isOrgAdmin: adminOrg.length > 0,
+      adminOrg,
     };
   }),
   getUserApiTokens: protectedProcedure.query(async ({ ctx }) => {

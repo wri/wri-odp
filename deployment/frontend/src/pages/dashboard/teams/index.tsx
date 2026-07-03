@@ -24,8 +24,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     });
 
     await Promise.all([
-        helpers.notification.getAllNotifications.prefetch({}),
-        helpers.user.getUserCapacity.prefetch(),
+        helpers.dashboard.getLayoutBadges.prefetch(),
         helpers.organization.getUsersOrganizations.prefetch({
             search: '',
             page: { start: 0, rows: 10 },

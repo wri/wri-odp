@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import SearchHeader from '../_shared/SearchHeader';
 import RowProfile from '../_shared/RowProfile';
 import Row from '../_shared/Row';
@@ -18,7 +18,6 @@ import { LoaderButton, Button } from '@/components/_shared/Button';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import type { GroupTree } from '@/schema/ckan.schema';
-import { useQuery } from 'react-query';
 import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/solid';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import { visibilityTypeLabels } from '@/utils/constants';
@@ -127,10 +126,7 @@ function SubCardProfile({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const deleteTeam = api.teams.deleteDashboardTeam.useMutation({
     onSuccess: async (data) => {
-      await utils.organization.getUsersOrganizations.invalidate({
-        search: '',
-        page: { start: 0, rows: 10 },
-      });
+      await utils.organization.getUsersOrganizations.invalidate();
       setOpen(false);
       notify(
         `Successfully deleted the ${selectedTeam?.title ?? selectedTeam?.name} Team`,
@@ -404,10 +400,6 @@ export default function TeamCard() {
     search: '',
     page: { start: 0, rows: 10 },
   });
-  const [pagination, setPagination] = useState<SearchInput>({
-    search: '',
-    page: { start: 0, rows: 10 },
-  });
   const { data, isLoading, refetch } =
     api.organization.getUsersOrganizations.useQuery(query);
   const [selectedTeam, setSelectedTeam] = useState<GroupTree | null>(null);
@@ -438,27 +430,6 @@ export default function TeamCard() {
     setOpen(true);
   };
 
-  const ProcessedTeam = useQuery(
-    ['paginatedTeams', data, pagination],
-    () => {
-      if (!data) return { organizations: [], org2Image: {}, count: 0 };
-
-      const organizations = data?.organizations.slice(
-        pagination.page.start,
-        pagination.page.start + pagination.page.rows
-      );
-      const org2Image = data?.org2Image;
-      return { organizations, org2Image, count: data?.count };
-    },
-    {
-      enabled: !!data,
-    }
-  );
-
-  useEffect(() => {
-    setPagination({ search: '', page: { start: 0, rows: 10 } });
-  }, [query.search]);
-
   return (
     <section className="w-full max-w-8xl flex flex-col gap-y-4 sm:gap-y-0">
       <SearchHeader
@@ -468,23 +439,23 @@ export default function TeamCard() {
         query={query}
         Pagination={
           <Pagination
-            setQuery={setPagination}
-            query={pagination}
-            isLoading={ProcessedTeam.isLoading}
-            count={ProcessedTeam.data?.count}
+            setQuery={setQuery}
+            query={query}
+            isLoading={isLoading}
+            count={data?.count}
           />
         }
       />
-      {isLoading || ProcessedTeam.isLoading ? (
+      {isLoading ? (
         <div className="flex justify-center items-center h-screen">
           <Spinner className="mx-auto my-2" />
         </div>
-      ) : ProcessedTeam.data?.organizations.length === 0 ? (
+      ) : data?.organizations.length === 0 ? (
         <div className="flex justify-center items-center h-screen">
           No Organization
         </div>
       ) : (
-        ProcessedTeam.data?.organizations.map((team, index) => {
+        data?.organizations.map((team, index) => {
           const isPrivate = team?.visibility === 'private';
           return (
             <div key={team.name}>

@@ -4,7 +4,9 @@ import { api } from '@/utils/api';
 import Spinner from '../_shared/Spinner';
 
 export default function UserProfile() {
-    const { data, isLoading } = api.user.getDashboardUser.useQuery();
+    const { data, isLoading } = api.user.getDashboardUser.useQuery(undefined, {
+        staleTime: 5 * 60 * 1000,
+    });
     if (isLoading)
         return (
             <div className="w-full flex flex-col justify-center items-center font-acumin gap-y-2 text-white pb-6 pt-10">

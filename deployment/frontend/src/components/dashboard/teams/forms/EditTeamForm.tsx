@@ -44,8 +44,9 @@ export default function EditTeamForm({ team }: { team: TeamOutput }) {
     ];
     const userCapacity = api.user.getUserCapacity.useQuery();
     const isAdminCurrentTeam =
-        userCapacity.data?.adminOrg.some((org) => org.name === team.name) ??
-        false;
+        sysadmin ||
+        (userCapacity.data?.adminOrg.some((org) => org.name === team.name) ??
+            false);
 
     const TeamSchemaRefine = TeamSchema.superRefine((val, ctx) => {
         if (val.visibility.value === 'public' && val.parent) {

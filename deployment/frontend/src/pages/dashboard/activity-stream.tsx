@@ -22,17 +22,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         transformer: superjson,
     });
     await Promise.all([
-        helpers.notification.getAllNotifications.prefetch({}),
-        helpers.user.getUserCapacity.prefetch(),
+        helpers.dashboard.getLayoutBadges.prefetch(),
         helpers.dashboardActivity.listActivityStreamDashboard.prefetch({
             search: '',
             fq: {},
             page: { start: 0, rows: 1000 },
-        }),
-        helpers.dataset.getPendingDatasets.prefetch({
-            search: '',
-            page: { start: 0, rows: 0 },
-            sortBy: 'metadata_modified desc',
         }),
         helpers.organization.getAllOrganizations.prefetch(),
         helpers.topics.getAllTopics.prefetch(),

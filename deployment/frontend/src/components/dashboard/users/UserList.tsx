@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import AddUserForm from './AddUserForm';
 import { api } from '@/utils/api';
 import Spinner from '@/components/_shared/Spinner';
+import { useSession } from 'next-auth/react';
 
 function empty({ username }: { username: string }) {
     return <div></div>;
@@ -26,7 +27,13 @@ const tabs = [
 export default function UserList() {
     const { q } = useRouter().query;
     const username = (q as string) ?? '';
+    const { data: session } = useSession();
     const { data, isLoading } = api.user.getUserCapacity.useQuery();
+    const { data: allTeams, isLoading: isLoadingTeams } =
+        api.teams.getAllTeams.useQuery(undefined, {
+            enabled: !!session?.user?.sysadmin,
+        });
+    const orgList = session?.user?.sysadmin ? allTeams : data?.adminOrg;
 
     return (
         <section id="teamtab" className="w-full max-w-8xl  font-acumin ">
@@ -69,10 +76,10 @@ export default function UserList() {
                         <Tab.Panel key={tab.title} className="">
                             {tab.id === 'allteams' ? (
                                 <UserCard username={username} />
-                            ) : isLoading ? (
+                            ) : isLoading || isLoadingTeams ? (
                                 <Spinner />
                             ) : (
-                                <AddUserForm orgList={data?.adminOrg} />
+                                <AddUserForm orgList={orgList} />
                             )}
                         </Tab.Panel>
                     ))}
