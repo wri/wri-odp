@@ -310,17 +310,15 @@ export const teamRouter = createTRPCRouter({
 
             const teamsDetails = collectGroupDetails(paginated);
 
-            if (ctx.session?.user) {
-                const facets = await fetchFacets(
-                    teamsDetails,
-                    'organization',
-                    ctx.session.user.apikey ?? ''
-                );
+            const facets = await fetchFacets(
+                teamsDetails,
+                'organization',
+                ctx?.session?.user.apikey ?? ''
+            );
 
-                for (const group in teamsDetails) {
-                    const team = teamsDetails[group]!;
-                    team.package_count = facets[team.name] ?? 0;
-                }
+            for (const group in teamsDetails) {
+                const team = teamsDetails[group]!;
+                team.package_count = facets[team.name] ?? 0;
             }
 
             return {

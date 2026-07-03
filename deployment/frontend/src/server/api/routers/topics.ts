@@ -346,17 +346,15 @@ export const TopicRouter = createTRPCRouter({
 
       const topicDetails = collectGroupDetails(paginated);
 
-      if (ctx.session?.user) {
-        const facets = await fetchFacets(
-          topicDetails,
-          'groups',
-          ctx.session.user.apikey ?? ''
-        );
+      const facets = await fetchFacets(
+        topicDetails,
+        'groups',
+        ctx?.session?.user.apikey ?? ''
+      );
 
-        for (const group in topicDetails) {
-          const topic = topicDetails[group]!;
-          topic.package_count = facets[topic.name] ?? 0;
-        }
+      for (const group in topicDetails) {
+        const topic = topicDetails[group]!;
+        topic.package_count = facets[topic.name] ?? 0;
       }
 
       return {
