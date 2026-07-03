@@ -38,7 +38,7 @@ export async function getServerSideProps(
         const prevdataset = await getOneDataset(datasetName, session);
 
         const pendingDataset = await getOnePendingDataset(
-            prevdataset.id,
+            datasetName,
             session
         );
         let initialDataset = prevdataset;
@@ -57,6 +57,7 @@ export async function getServerSideProps(
         await helpers.dataset.getLicenses.prefetch();
         await helpers.dataset.getOneActualOrPendingDataset.prefetch({
             id: initialDataset.id,
+            name: datasetName,
             isPending: pendingExist,
         });
         await helpers.dataset.getDatasetCollaborators.prefetch({
@@ -92,8 +93,9 @@ export default function EditDatasetPage(
     const utils = api.useContext();
     const dataset = api.dataset.getOneActualOrPendingDataset.useQuery({
         id: datasetId,
+        name: datasetName,
         isPending: pendingExist,
-    });
+    }, { staleTime: 0 });
 
     const deleteDataset = api.dataset.deleteDataset.useMutation({
         onSuccess: async () => {

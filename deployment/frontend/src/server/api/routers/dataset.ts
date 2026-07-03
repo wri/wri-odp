@@ -1677,20 +1677,23 @@ export const DatasetRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        name: z.string().optional(),
         isPending: z.boolean(),
         noLayer: z.boolean().optional(),
       })
     )
     .query(async ({ input, ctx }) => {
+      const lookupId = input.name ?? input.id;
       if (input.isPending) {
         const dataset = await getOnePendingDataset(
-          input.id,
-          ctx.session
+          lookupId,
+          ctx.session,
+          input.noLayer
         );
         return dataset;
       }
       const dataset = await getOneDataset(
-        input.id,
+        lookupId,
         ctx.session,
         input.noLayer
       );

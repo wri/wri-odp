@@ -79,6 +79,7 @@ function getDiff<T>(dirtyObject: T, changedFields: string[]) {
 export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const router = useRouter();
+    const utils = api.useUtils();
     const possibleLicenses = api.dataset.getLicenses.useQuery();
     const { data: teamUsers } = api.teams.getTeamUsers.useQuery(
         {
@@ -231,6 +232,11 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
 
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
+            await Promise.all([
+                utils.dataset.getOneActualOrPendingDataset.invalidate(),
+                utils.dataset.getOneDataset.invalidate(),
+                utils.dataset.showPendingDiff.invalidate(),
+            ]);
             notify(
                 `Successfully edited the "${title ?? name}" Dataset`,
                 'success'

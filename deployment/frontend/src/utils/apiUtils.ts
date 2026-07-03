@@ -738,12 +738,19 @@ export async function getOneDataset(
 }
 
 export async function getOnePendingDataset(
-    datasetName: string,
+    datasetIdOrName: string,
     session: Session | null,
     noLayer?: boolean
 ) {
+    const isUuid =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            datasetIdOrName
+        );
+    const pendingParam = isUuid
+        ? `package_id=${datasetIdOrName}`
+        : `package_name=${datasetIdOrName}`;
     const response = await fetch(
-        `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_name=${datasetName}`,
+        `${env.CKAN_URL}/api/3/action/pending_dataset_show?${pendingParam}`,
         {
             headers: {
                 Authorization: session?.user.apikey ?? '',

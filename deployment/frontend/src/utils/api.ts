@@ -36,10 +36,8 @@ export const api = createTRPCNext<AppRouter>({
         defaultOptions: {
           queries: {
             // Avoid refetching every query whenever the window regains
-            // focus; most data on the catalog changes infrequently and
-            // individual queries can override this where freshness matters.
+            // focus; most data on the catalog changes infrequently.
             refetchOnWindowFocus: false,
-            staleTime: 30 * 1000,
           },
         },
         queryCache: new QueryCache({

@@ -295,9 +295,14 @@ export default function DatasetPage(
     error: datasetError,
     isLoading,
   } = api.dataset.getOneActualOrPendingDataset.useQuery(
-    { id: datasetId, isPending: pendingExist, noLayer: true },
+    {
+      id: datasetId,
+      name: datasetName,
+      isPending: pendingExist,
+      noLayer: true,
+    },
     // @ts-ignore
-    { retry: 0, initialData: dataset }
+    { retry: 0, initialData: dataset, staleTime: 0 }
   );
 
   const {
@@ -307,7 +312,12 @@ export default function DatasetPage(
   } = api.dataset.getOneDataset.useQuery(
     { id: datasetName, noLayer: true },
     // @ts-ignore
-    { retry: 0, initialData: prevdataset, enabled: !!pendingExist }
+    {
+      retry: 0,
+      initialData: prevdataset,
+      enabled: !!pendingExist,
+      staleTime: 0,
+    }
   );
 
   const {
@@ -321,8 +331,14 @@ export default function DatasetPage(
     {
       enabled: !!pendingExist,
       retry: 0,
+      staleTime: 0,
     }
   );
+
+  const resolvedPendingDataset =
+    pendingExist && diffData?.new_dataset
+      ? (diffData.new_dataset as WriDataset)
+      : datasetData;
   if (!datasetData && datasetError) {
     router.replace('/datasets/404');
   }
@@ -544,7 +560,7 @@ export default function DatasetPage(
   ];
 
   useEffect(() => {
-    const dataset = isCurrentVersion ? prevDatasetData : datasetData;
+    const dataset = isCurrentVersion ? prevDatasetData : resolvedPendingDataset;
     if (dataset?.resources) {
       const LayerResource = dataset?.resources.find(
         (d) => d.format === 'Layer' || d.rw_id
@@ -674,7 +690,7 @@ export default function DatasetPage(
                 dataset={
                   isCurrentVersion
                     ? prevDatasetData
-                    : datasetData
+                    : resolvedPendingDataset
                 }
                 tabularResource={tabularResource}
                 setTabularResource={setTabularResource}
@@ -709,7 +725,7 @@ export default function DatasetPage(
                           dataset={
                             isCurrentVersion
                               ? prevDatasetData
-                              : datasetData
+                              : resolvedPendingDataset
                           }
                           index={index}
                           tabularResource={
@@ -741,7 +757,7 @@ export default function DatasetPage(
                           dataset={
                             isCurrentVersion
                               ? prevDatasetData
-                              : datasetData
+                              : resolvedPendingDataset
                           }
                           isCurrentVersion={
                             isCurrentVersion
@@ -754,7 +770,7 @@ export default function DatasetPage(
                           usecases={
                             isCurrentVersion
                               ? prevDatasetData.usecases
-                              : datasetData.usecases
+                              : resolvedPendingDataset?.usecases
                           }
                         />
                       </Tab.Panel>
@@ -764,12 +780,12 @@ export default function DatasetPage(
                             methodology={
                               isCurrentVersion
                                 ? prevDatasetData.methodology
-                                : datasetData.methodology
+                                : resolvedPendingDataset?.methodology
                             }
                             technical_notes={
                               isCurrentVersion
                                 ? prevDatasetData.technical_notes
-                                : datasetData.technical_notes
+                                : resolvedPendingDataset?.technical_notes
                             }
                           />
                         </Tab.Panel>
@@ -780,7 +796,7 @@ export default function DatasetPage(
                           dataset={
                             isCurrentVersion
                               ? prevDatasetData
-                              : datasetData
+                              : resolvedPendingDataset
                           }
                           isCurrentVersion={
                             isCurrentVersion
@@ -831,7 +847,7 @@ export default function DatasetPage(
                           dataset={
                             isCurrentVersion
                               ? prevDatasetData
-                              : datasetData
+                              : resolvedPendingDataset
                           }
                           isCurrentVersion={
                             isCurrentVersion
