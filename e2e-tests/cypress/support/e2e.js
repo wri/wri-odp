@@ -241,6 +241,7 @@ Cypress.Commands.add("createOrganizationAPI", (name, visibility = "public", pare
     method: "POST",
     url: apiUrl("organization_create"),
     headers: headers,
+    failOnStatusCode: false,
     body: parent
       ? {
           name: name,
@@ -424,7 +425,13 @@ Cypress.Commands.add("updateResourceRecord", (resource) => {
           age: 60,
         },
       ],
-      method: "insert",
+    }).then((response) => {
+      expect(response.status, "organization_create status").to.eq(200);
+      expect(response.body, "organization_create response body").to.have.property("success", true);
+      expect(response.body?.result?.name, "organization_create result name").to.eq(name);
+
+      return cy.wrap(response.body.result, { log: false });
+    });
       force: true,
     },
   });
