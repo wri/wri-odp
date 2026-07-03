@@ -112,11 +112,6 @@ export default function TopicsPage(props: InferGetServerSidePropsType<typeof get
                 query={query}
                 groupType="Topics"
             />
-            <section className="max-w-8xl mx-auto px-8 xxl:px-0 pt-1">
-                <p className="ml-2 text-sm text-neutral-500">
-                    Banner image by Chris Barbalis / Unsplash
-                </p>
-            </section>
             <section className=" px-8 xxl:px-0  max-w-8xl mx-auto flex flex-col font-acumin text-xl font-light leading-loose text-neutral-700 gap-y-6 mt-16">
                 <div className="max-w-[705px] ml-2 2xl:ml-2">
                     <div className="default-home-container w-full border-t-[4px] border-stone-900" />

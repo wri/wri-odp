@@ -15,7 +15,7 @@ export default function TopicsSearch({
     return (
         <section
             id="search"
-            className="bg-cover bg-center bg-no-repeat w-full flex flex-col justify-center font-acumin h-[245px] "
+            className="group relative bg-cover bg-center bg-no-repeat w-full flex flex-col justify-center font-acumin h-[245px] "
             style={{
                 backgroundImage:
                     groupType == 'Topics'
@@ -23,6 +23,9 @@ export default function TopicsSearch({
                         : 'url(/images/banner-teams.png)',
             }}
         >
+            <div className="pointer-events-none absolute bottom-2 left-6 z-10 rounded-full bg-black/45 px-3 py-1 text-xs font-medium text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 xxl:left-20 2xl:left-20">
+                Banner image by Chris Barbalis / Unsplash
+            </div>
             <form
                 onSubmit={(e) => console.log(e)}
                 className="w-full px-8 xxl:px-0 max-w-8xl mx-auto -mt-[37px] "
@@ -37,9 +40,7 @@ export default function TopicsSearch({
                         onChange={(e) => setQuery(e.target.value)}
                         value={query}
                         name="search"
-                        placeholder={`Search ${
-                            groupType === 'Teams' ? 'Teams' : 'Topics'
-                        }`}
+                        placeholder={`Search ${groupType === 'Teams' ? 'Teams' : 'Topics'}`}
                         aria-label="search"
                         className="h-full  block w-full border-0 px-5 py-2 text-[#000000] shadow-wri-small rounded-tr-[3px] rounded-br-[3px]  placeholder:text-gray-900 placeholder:text-base focus:bg-slate-100 focus:ring-0 focus:ring-offset-0 sm:text-sm sm:leading-6 leading-[19.2px] rounded-tl-[3px] rounded-bl-[3px] border-r-0"
                     />
