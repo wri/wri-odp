@@ -38,9 +38,9 @@ describe("Release notes", () => {
       cy.get("input[name=name]").should("have.value", dataset);
       cy.get("input[name=url]").type("https://google.com");
       cy.get("#team").click();
-      cy.get("li").contains(org).click();
+      cy.contains('[role="option"]', org).click();
       cy.get("#visibility_type").click();
-      cy.get("li").contains("Public").click();
+      cy.contains('[role="option"]', "Public").click();
       cy.get("textarea[name=short_description]").type("test");
 
       cy.get("input[name=technical_notes]").type("https://google.com");

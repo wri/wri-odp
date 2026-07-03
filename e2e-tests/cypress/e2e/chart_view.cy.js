@@ -19,9 +19,6 @@ describe("Chart view", () => {
   });
 
   it("Should create dataset", () => {
-    cy.intercept("GET", "**/api/trpc/organization.getAllOrganizations**").as(
-      "getAllOrganizations",
-    );
     cy.visit("/dashboard/datasets/new");
     cy.get("input[name=title]").type(datasetName);
     cy.get("input[name=name]").should("have.value", datasetName);

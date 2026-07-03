@@ -22,7 +22,7 @@ describe("Chart view", () => {
     cy.get("textarea[name=short_description]").type("test");
 
     cy.get("#team").click();
-    cy.get("li").contains(org).click();
+    cy.contains('[role="option"]', org).click();
 
     cy.contains("Add Author").click();
     cy.get('input[name="authors.0.name"]').type("Test Author 1");

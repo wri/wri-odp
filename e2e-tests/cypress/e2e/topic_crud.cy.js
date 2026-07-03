@@ -25,7 +25,7 @@ describe("Create and edit topics", () => {
     cy.get("input[name=name]").should("have.value", topic);
     cy.get("textarea[name=description]").type("Test description");
     cy.get("button[aria-haspopup=listbox]").click();
-    cy.get("li").contains(parentTopic).click();
+    cy.contains('[role="option"]', parentTopic).click();
     cy.get("button[type=submit]").click();
     cy.visit(`/dashboard/topics/${topic}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", topic);

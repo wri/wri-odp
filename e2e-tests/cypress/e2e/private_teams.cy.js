@@ -43,7 +43,7 @@ describe("Create and edit team", () => {
     //get button with aria-haspopup=true
 
     cy.get("button#visibility").click();
-    cy.get("li").contains("Private").click();
+    cy.contains('[role="option"]', "Private").click();
     cy.wait(5000);
     cy.get("button[type=submit]").click();
     cy.wait(5000);
@@ -62,7 +62,7 @@ describe("Create and edit team", () => {
       cy.get("button[aria-haspopup=listbox]")
         .contains("span", "Select a parent")
         .click();
-      cy.get("li").contains(parentOrg).click();
+      cy.contains('[role="option"]', parentOrg).click();
       cy.get("button[type=submit]").click();
       cy.contains(`Successfully edited the ${org} Team`);
       cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
@@ -83,7 +83,7 @@ describe("Create and edit team", () => {
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
       cy.get("button#visibility").click();
-      cy.get("li").contains("Private").click();
+      cy.contains('[role="option"]', "Private").click();
       cy.get("button[type=submit]").click();
       cy.contains(`Successfully edited the ${parentOrg} Team`);
       cy.wait(5000);
@@ -101,7 +101,7 @@ describe("Create and edit team", () => {
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
       cy.get("button#visibility").click();
-      cy.get("li").contains("Public").click();
+      cy.contains('[role="option"]', "Public").click();
       cy.get("button[type=submit]").click();
       cy.contains(`Successfully edited the ${parentOrg} Team`);
     });
@@ -115,11 +115,11 @@ describe("Create and edit team", () => {
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("input[name=url]").type("https://google.com");
     cy.get("#language").click();
-    cy.get("li").contains("English").click();
+    cy.contains('[role="option"]', "English").click();
     cy.get("#visibility_type").click();
-    cy.get("li").contains("Public").click();
+    cy.contains('[role="option"]', "Public").click();
     cy.get("#team").click();
-    cy.get("li").contains(parentOrg).click();
+    cy.contains('[role="option"]', parentOrg).click();
     cy.get("button").contains("Tags").click();
     cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
     cy.get("input[name=project]").focus().type("Project 1");
@@ -147,7 +147,7 @@ describe("Create and edit team", () => {
     cy.visit(`/dashboard/teams/${parentOrg}/edit`).then(() => {
       cy.get("input[name=title]").should("have.value", parentOrg);
       cy.get("button#visibility").click();
-      cy.get("li").contains("Private").click();
+      cy.contains('[role="option"]', "Private").click();
       cy.get("button[type=submit]").click();
       cy.wait(5000);
       cy.contains(
@@ -190,10 +190,10 @@ describe("Create and edit team", () => {
     cy.get("button[aria-haspopup=listbox]")
       .contains("span", "Select a parent")
       .click();
-    cy.get("li").contains(parentOrg).click();
+    cy.contains('[role="option"]', parentOrg).click();
 
     cy.get("button#visibility").click();
-    cy.get("li").contains("Public").click();
+    cy.contains('[role="option"]', "Public").click();
     cy.wait(5000);
     cy.get("button[type=submit]").click();
     cy.wait(5000);
@@ -213,11 +213,11 @@ describe("Create and edit team", () => {
     cy.get("input[name=name]").should("have.value", datasetName2);
     cy.get("input[name=url]").type("https://google.com");
     cy.get("#language").click();
-    cy.get("li").contains("English").click();
+    cy.contains('[role="option"]', "English").click();
     cy.get("#visibility_type").click();
-    cy.get("li").contains("Public").click();
+    cy.contains('[role="option"]', "Public").click();
     cy.get("#team").click();
-    cy.get("li").contains(org2).click();
+    cy.contains('[role="option"]', org2).click();
     cy.get("button").contains("Tags").click();
     cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
     cy.get("input[name=project]").focus().type("Project 1");
@@ -268,11 +268,11 @@ describe("Create and edit team", () => {
     cy.get("input[name=name]").should("have.value", datasetName3);
     cy.get("input[name=url]").type("https://google.com");
     cy.get("#language").click();
-    cy.get("li").contains("English").click();
+    cy.contains('[role="option"]', "English").click();
     cy.get("#visibility_type").click();
-    cy.get("li").contains("Public").click();
+    cy.contains('[role="option"]', "Public").click();
     cy.get("#team").click();
-    cy.get("li").contains(parentOrg).click();
+    cy.contains('[role="option"]', parentOrg).click();
     cy.get("button").contains("Tags").click();
     cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
     cy.get("input[name=project]").focus().type("Project 1");
