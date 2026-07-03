@@ -10,15 +10,90 @@ import type Team from '@/interfaces/team.interface';
 import type Topic from '@/interfaces/topic.interface';
 import { z } from 'zod';
 
+function parseNotificationCount(
+    data: CkanResponse<NotificationType[] | { count: number }>
+): number {
+    if (!data.success) {
+        if (data.error?.message) {
+            throw Error(replaceNames(data.error.message, true));
+        }
+        throw Error(
+            replaceNames(
+                data.error
+                    ? JSON.stringify(data.error)
+                    : 'Failed to fetch notifications',
+                true
+            )
+        );
+    }
+
+    if (
+        data.result &&
+        typeof data.result === 'object' &&
+        !Array.isArray(data.result) &&
+        'count' in data.result
+    ) {
+        return data.result.count;
+    }
+
+    if (!Array.isArray(data.result)) {
+        return 0;
+    }
+
+    return data.result.filter(
+        (notification) => notification.is_unread && notification.state !== 'deleted'
+    ).length;
+}
+
+function parseNotificationList(
+    data: CkanResponse<NotificationType[]>
+): NotificationType[] {
+    if (!data.success) {
+        if (data.error?.message) {
+            throw Error(replaceNames(data.error.message, true));
+        }
+        throw Error(
+            replaceNames(
+                data.error
+                    ? JSON.stringify(data.error)
+                    : 'Failed to fetch notifications',
+                true
+            )
+        );
+    }
+
+    return Array.isArray(data.result) ? data.result : [];
+}
+
 export const notificationRouter = createTRPCRouter({
     getAllNotifications: protectedProcedure
         .input(z.object({ returnLength: z.boolean().optional() }))
         .query(async ({ input, ctx }) => {
+            const authHeader = env.SYS_ADMIN_API_KEY;
+            const recipientId = ctx.session.user.id;
+
+            if (!input.returnLength) {
+                const response = await fetch(
+                    `${env.CKAN_URL}/api/3/action/notification_get_all?recipient_id=${recipientId}&count_only=true`,
+                    {
+                        headers: {
+                            Authorization: authHeader,
+                        },
+                    }
+                );
+
+                const data = (await response.json()) as CkanResponse<
+                    NotificationType[] | { count: number }
+                >;
+
+                return { count: parseNotificationCount(data) };
+            }
+
             const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/notification_get_all?recipient_id=${ctx.session.user.id}`,
+                `${env.CKAN_URL}/api/3/action/notification_get_all?recipient_id=${recipientId}`,
                 {
                     headers: {
-                        Authorization: env.SYS_ADMIN_API_KEY,
+                        Authorization: authHeader,
                     },
                 }
             );
@@ -27,13 +102,7 @@ export const notificationRouter = createTRPCRouter({
                 NotificationType[]
             >;
 
-            if (!input.returnLength) {
-                return {
-                    count: data.result.filter(
-                        (x) => x.is_unread && x.state !== 'deleted'
-                    ).length,
-                };
-            }
+            const notifications = parseNotificationList(data);
 
             const activities: NotificationType[] = [];
 
@@ -44,7 +113,7 @@ export const notificationRouter = createTRPCRouter({
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(' ');
 
-            for (const notification of data.result) {
+            for (const notification of notifications) {
                 if (notification.state === 'deleted') continue;
 
                 const user_data = notification.sender_obj!;

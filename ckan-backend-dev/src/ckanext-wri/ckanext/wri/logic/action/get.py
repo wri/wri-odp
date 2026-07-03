@@ -549,7 +549,15 @@ def notification_get_all(
         )
 
     if not notification_objecst_result:
-        return []
+        return [] if not asbool(data_dict.get("count_only")) else {"count": 0}
+
+    if asbool(data_dict.get("count_only")):
+        unread_count = sum(
+            1
+            for notification in notification_objecst_result
+            if notification.get("is_unread") and notification.get("state") != "deleted"
+        )
+        return {"count": unread_count}
 
     sender_obj = {}
     object_data = {}

@@ -130,7 +130,8 @@ def default_get_notification_schema(
         "object_id": [ignore_empty, ignore_missing],
         "time_sent": [ignore_empty, ignore_missing],
         "is_unread":[ignore_empty, ignore_missing],
-        "state": [ignore_empty, ignore_missing]
+        "state": [ignore_empty, ignore_missing],
+        "count_only": [ignore_empty, ignore_missing],
     }
 
 @validator_args

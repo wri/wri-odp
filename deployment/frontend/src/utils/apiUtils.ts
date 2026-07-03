@@ -455,13 +455,15 @@ export async function getCollaboratorPackages({
 export async function getUserDataset({
     userId,
     apiKey,
+    countOnly = false,
 }: {
     userId: string;
     apiKey: string;
+    countOnly?: boolean;
 }): Promise<{ datasets: WriDataset[]; count: number } | null> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/package_search?q=creator_user_id:${userId}`,
+            `${env.CKAN_URL}/api/3/action/package_search?q=creator_user_id:${userId}&rows=${countOnly ? 0 : 1000}`,
             {
                 headers: {
                     Authorization: apiKey,
@@ -472,7 +474,7 @@ export async function getUserDataset({
             results: WriDataset[];
             count: number;
         }>;
-        const datasets = data.result.results;
+        const datasets = countOnly ? [] : data.result.results;
         const count = data.result.count;
         return { datasets, count };
     } catch (e) {
