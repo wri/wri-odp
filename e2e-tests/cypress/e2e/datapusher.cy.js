@@ -21,9 +21,11 @@ describe("Upload file and create dataset", () => {
     cy.get("input[name=title]").type(dataset);
     cy.get("input[name=name]").should("have.value", dataset);
     cy.get("#visibility_type").click();
-    cy.get("li").contains("Public").click();
+    cy.get('[role="listbox"]').should("be.visible");
+    cy.contains('[role="option"]', "Public").click();
     cy.get("#team").click();
-    cy.get("li").contains(org).click();
+    cy.get('[role="listbox"]').should("be.visible");
+    cy.contains('[role="option"]', org).click();
     cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("textarea[name=short_description]").type("test");
 

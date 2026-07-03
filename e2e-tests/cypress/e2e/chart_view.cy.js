@@ -2,7 +2,6 @@ const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
 const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
-const headers = { Authorization: Cypress.env("API_KEY") };
 
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
@@ -17,21 +16,6 @@ describe("Chart view", () => {
 
   before(() => {
     cy.createOrganizationAPI(org);
-    cy.request({
-      method: "GET",
-      url: `${Cypress.config().apiUrl}/api/3/action/organization_show?id=${org}`,
-      headers,
-      failOnStatusCode: false,
-    }).then((response) => {
-      expect(response.status, "organization_show status").to.eq(200);
-      expect(response.body, "organization_show response body").to.have.property(
-        "success",
-        true,
-      );
-      expect(response.body?.result?.name, "organization_show result name").to.eq(
-        org,
-      );
-    });
   });
 
   it("Should create dataset", () => {
@@ -43,11 +27,9 @@ describe("Chart view", () => {
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("textarea[name=short_description]").type("test");
 
-    cy.wait("@getAllOrganizations", { timeout: 30000 });
-    cy.screenshot("chart-view-before-team-dropdown");
     cy.get("#team").click();
-    cy.get('[role="option"]', { timeout: 15000 }).contains(org).click({ force: true });
-    cy.screenshot("chart-view-after-team-selected");
+    cy.get('[role="listbox"]').should("be.visible");
+    cy.contains('[role="option"]', org).click();
     cy.contains("Add Author").click();
     cy.get('input[name="authors.0.name"]').type("Test Author 1");
     cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");

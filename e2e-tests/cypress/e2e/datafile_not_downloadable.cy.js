@@ -33,7 +33,8 @@ describe("Data File not downloadable", () => {
       cy.get("textarea[name=short_description]").type("test");
 
       cy.get("#team").click();
-      cy.get("li").contains(org).click();
+      cy.get('[role="listbox"]').should("be.visible");
+      cy.contains('[role="option"]', org).click();
       cy.contains("Add Author").click();
       cy.get('input[name="authors.0.name"]').type("Test Author 1");
       cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");

@@ -131,7 +131,9 @@ Run the integration tests:
 ### Run the Unit Tests
 
 Start the containers (if they're not already running):
+
     make up
 
 Enter the CKAN container:
+
     make unit-tests
