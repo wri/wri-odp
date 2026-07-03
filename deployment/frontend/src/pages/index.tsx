@@ -46,6 +46,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             _isUserSearch: false,
             removeUnecessaryDataInResources: true,
         }),
+        helpers.applications.getAllApplications.prefetch(),
     ]);
 
     return {
@@ -57,32 +58,46 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 export default function Home(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [readmore, setReadmore] = useState(false);
+    const [datasetTabIndex, setDatasetTabIndex] = useState(0);
+
+    const homepageDatasetQuery = {
+        search: '',
+        page: { rows: 8, start: 0 },
+        removeUnecessaryDataInResources: true,
+        includeTeamVisibility: false,
+    } as const;
+
     const {
         data: recentlyAdded,
         isLoading: isLoadingRecentlyAdded,
         error: errorRecentlyAdded,
-    } = api.dataset.getAllDataset.useQuery({
-        search: '',
-        page: { rows: 8, start: 0 },
-        sortBy: 'metadata_created desc',
-        removeUnecessaryDataInResources: true,
-    });
+    } = api.dataset.getAllDataset.useQuery(
+        {
+            ...homepageDatasetQuery,
+            sortBy: 'metadata_created desc',
+        },
+        { enabled: datasetTabIndex === 1 }
+    );
 
     const {
         data: recentlyUpdated,
         isLoading: isLoadingRecentlyUpdated,
         error: errorRecentlyUpdated,
-    } = api.dataset.getAllDataset.useQuery({
-        search: '',
-        page: { rows: 8, start: 0 },
-        sortBy: 'metadata_modified desc',
-        removeUnecessaryDataInResources: true,
-    });
+    } = api.dataset.getAllDataset.useQuery(
+        {
+            ...homepageDatasetQuery,
+            sortBy: 'metadata_modified desc',
+        },
+        { enabled: datasetTabIndex === 2 }
+    );
     const {
         data: featuredDatasets,
         isLoading: isLoadingFeaturedDatasets,
         error: errorFeaturedDatasets,
     } = api.dataset.getFeaturedDatasets.useQuery({
+        search: '',
+        page: { start: 0, rows: 8 },
+        sortBy: 'metadata_modified desc',
         removeUnecessaryDataInResources: true,
     });
     const { data: application, isLoading, error } = api.applications.getAllApplications.useQuery();
@@ -211,7 +226,7 @@ export default function Home(props: InferGetServerSidePropsType<typeof getServer
                         </Tab.Panel>
                     </Tab.Panels>
                 </Tab.Group>
-                <Tab.Group>
+                <Tab.Group onChange={setDatasetTabIndex}>
                     <Tab.List className="flex gap-x-12 items-center max-w-[94.5vw] ml-auto w-full pt-20 pb-8">
                         <Tab as={Fragment}>
                             {({ selected }) => (

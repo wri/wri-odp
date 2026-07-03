@@ -324,22 +324,26 @@ export const teamRouter = createTRPCRouter({
                 {} as Record<string, GroupsmDetails>
             );
 
-            const facets = await fetchFacets(
-                teamDetails,
-                'organization',
-                ctx?.session?.user.apikey ?? ''
-            );
+            if (ctx.session?.user) {
+                const facets = await fetchFacets(
+                    teamDetails,
+                    'organization',
+                    ctx.session.user.apikey ?? ''
+                );
 
-            for (const group in teamDetails) {
-                const team = teamDetails[group]!;
-                team.package_count = facets[team.name] ?? 0;
+                for (const group in teamDetails) {
+                    const team = teamDetails[group]!;
+                    team.package_count = facets[team.name] ?? 0;
+                }
             }
 
             const result = groupTree;
+            const subTeamCounts = flattenTree(groupTree);
             return {
                 teams: result,
                 allTeams: allGroups,
                 teamsDetails: teamDetails,
+                subTeamCounts,
                 count: result.length,
             };
         }),
@@ -427,22 +431,6 @@ export const teamRouter = createTRPCRouter({
         return {
             teams: team.result,
         };
-    }),
-    getNumberOfSubTeams: publicProcedure.query(async ({ ctx, input }) => {
-        const teamRes = await fetch(
-            `${env.CKAN_URL}/api/3/action/organization_list_wri`,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${ctx?.session?.user.apikey}`,
-                },
-            }
-        );
-        const team: CkanResponse<GroupTree[]> = await teamRes.json();
-        if (!team.success && team.error)
-            throw Error(replaceNames(team.error.message));
-        const numOfSubtopics = flattenTree(team.result);
-        return numOfSubtopics;
     }),
     removeMember: protectedProcedure
         .input(z.object({ id: z.string(), username: z.string() }))

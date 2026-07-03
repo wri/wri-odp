@@ -1,7 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
-import { api } from '@/utils/api';
 import { type Organization } from '@portaljs/ckan';
 import Link from 'next/link';
 import { visibilityTypeLabels } from '@/utils/constants';
@@ -15,11 +14,12 @@ function isGroupTree(org: GroupTree | Organization): org is GroupTree {
 export default function TeamCard({
     team,
     teamsDetails,
+    subTeamCounts,
 }: {
     team: GroupTree | (Organization & { numSubTeams: number; notes?: string });
     teamsDetails: Record<string, GroupsmDetails>;
+    subTeamCounts?: Record<string, number>;
 }) {
-    const { data: numOfSubTeams } = api.teams.getNumberOfSubTeams.useQuery();
     return (
         <Link
             href={`/teams/${team.name}`}
@@ -82,15 +82,11 @@ export default function TeamCard({
                         </span>
                     </>
                 )}
-                {!isGroupTree(team) && numOfSubTeams && (
+                {!isGroupTree(team) && subTeamCounts && (
                     <>
                         <div className="border-l border-wri-black h-4  mx-2"></div>
                         <span className="ml-2">
-                            {
-                                //@ts-ignore
-                                numOfSubTeams[team.name]
-                            }{' '}
-                            SubTeams
+                            {subTeamCounts[team.name] ?? 0} SubTeams
                         </span>
                     </>
                 )}
