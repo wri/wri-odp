@@ -67,7 +67,12 @@ function parseNotificationList(
 
 export const notificationRouter = createTRPCRouter({
     getAllNotifications: protectedProcedure
-        .input(z.object({ returnLength: z.boolean().optional() }))
+        .input(
+            z.object({
+                returnLength: z.boolean().optional(),
+                limit: z.number().int().positive().optional(),
+            })
+        )
         .query(async ({ input, ctx }) => {
             const authHeader = env.SYS_ADMIN_API_KEY;
             const recipientId = ctx.session.user.id;
@@ -89,8 +94,11 @@ export const notificationRouter = createTRPCRouter({
                 return { count: parseNotificationCount(data) };
             }
 
+            const limitParam =
+                input.limit !== undefined ? `&limit=${input.limit}` : '';
+
             const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/notification_get_all?recipient_id=${recipientId}`,
+                `${env.CKAN_URL}/api/3/action/notification_get_all?recipient_id=${recipientId}${limitParam}`,
                 {
                     headers: {
                         Authorization: authHeader,
@@ -115,16 +123,18 @@ export const notificationRouter = createTRPCRouter({
 
             for (const notification of notifications) {
                 if (notification.state === 'deleted') continue;
+                if (!notification.sender_obj) continue;
 
-                const user_data = notification.sender_obj!;
+                const user_data = notification.sender_obj;
 
                 let objectName = '';
                 let objectIdName = '';
                 let msg = '';
                 if (notification.object_type === 'dataset') {
-                    const dataset = notification.object_data as WriDataset;
-                    objectName = dataset?.title ?? dataset?.name ?? '';
-                    objectIdName = dataset?.name;
+                    const dataset = notification.object_data as WriDataset | undefined;
+                    if (!dataset) continue;
+                    objectName = dataset.title ?? dataset.name ?? '';
+                    objectIdName = dataset.name;
 
                     const actionType = notification.activity_type.split('_');
 
@@ -189,7 +199,9 @@ export const notificationRouter = createTRPCRouter({
                         teamOrTopic = notification.object_data as Topic;
                     }
 
-                    objectName = teamOrTopic?.title ?? teamOrTopic?.name ?? '';
+                    if (!teamOrTopic) continue;
+
+                    objectName = teamOrTopic.title ?? teamOrTopic.name ?? '';
                     objectIdName = teamOrTopic?.name ?? '';
 
                     const actionType = notification.activity_type.split('_');
@@ -227,7 +239,7 @@ export const notificationRouter = createTRPCRouter({
         }),
     updateNotification: protectedProcedure
         .input(NotificationInput)
-        .mutation(async ({ input, ctx }) => {
+        .mutation(async ({ input }) => {
             try {
                 const notificationPayload: NotificationType[] =
                     input.notifications.map((notification) => {

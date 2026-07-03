@@ -130,6 +130,25 @@ async function fetchDatasetCollaborators(
   return collaborators.result;
 }
 
+async function fetchFolloweeDatasets(user: {
+  id: string;
+  apikey: string;
+}): Promise<WriDataset[]> {
+  const response = await fetch(
+    `${env.CKAN_URL}/api/3/action/dataset_followee_list?id=${user.id}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `${user.apikey}`,
+      },
+    }
+  );
+  const data = (await response.json()) as CkanResponse<WriDataset[]>;
+  if (!data.success && data.error) throw Error(data.error.message);
+
+  return data.result ?? [];
+}
+
 export const DatasetRouter = createTRPCRouter({
   createDataset: protectedProcedure
     .input(DatasetSchema)
@@ -1162,24 +1181,37 @@ export const DatasetRouter = createTRPCRouter({
         count: dataset.count,
       };
     }),
-  getFavoriteDataset: protectedProcedure.query(async ({ ctx }) => {
-    const response = await fetch(
-      `${env.CKAN_URL}/api/3/action/dataset_followee_list?id=${ctx.session.user.id}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `${ctx.session.user.apikey}`,
-        },
-      }
-    );
-    const data = (await response.json()) as CkanResponse<WriDataset[]>;
-    if (!data.success && data.error) throw Error(data.error.message);
+  getFavoriteDataset: protectedProcedure
+    .input(
+      z
+        .object({
+          preview: z.boolean().optional(),
+        })
+        .optional()
+    )
+    .query(async ({ ctx, input }): Promise<{ datasets: WriDataset[]; count: number }> => {
+      const datasets = await fetchFolloweeDatasets(ctx.session.user);
 
-    return {
-      datasets: data.result,
-      count: data.result?.length,
-    };
-  }),
+      if (input?.preview) {
+        return {
+          datasets: datasets.slice(0, 10).map((dataset) => ({
+            id: dataset.id,
+            name: dataset.name,
+            title: dataset.title,
+            metadata_modified: dataset.metadata_modified,
+            creator_user_id: dataset.creator_user_id,
+            approval_status: dataset.approval_status,
+            owner_org: dataset.owner_org,
+          })) as WriDataset[],
+          count: datasets.length,
+        };
+      }
+
+      return {
+        datasets,
+        count: datasets.length,
+      };
+    }),
   getFeaturedDatasets: publicProcedure
     .input(
       searchSchema.extend({

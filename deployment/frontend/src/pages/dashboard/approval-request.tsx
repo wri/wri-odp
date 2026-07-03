@@ -22,12 +22,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         transformer: superjson,
     });
 
-    await helpers.notification.getAllNotifications.prefetch({});
-    await helpers.dataset.getPendingDatasets.prefetch({
-        search: '',
-        page: { start: 0, rows: 10 },
-        sortBy: 'metadata_modified desc',
-    });
+    await Promise.all([
+        helpers.notification.getAllNotifications.prefetch({}),
+        helpers.user.getUserCapacity.prefetch(),
+        helpers.dataset.getPendingDatasets.prefetch({
+            search: '',
+            page: { start: 0, rows: 10 },
+            sortBy: 'metadata_modified desc',
+        }),
+        helpers.dataset.getPendingDatasets.prefetch({
+            search: '',
+            page: { start: 0, rows: 0 },
+            sortBy: 'metadata_modified desc',
+        }),
+    ]);
 
     return {
         props: {

@@ -68,11 +68,19 @@ function Notification({ items }: { items: NotificationType }) {
     );
 }
 export default function Notifications({ drag }: { drag: boolean }) {
+    const { data: countData, isLoading: isLoadingCount } =
+        api.notification.getAllNotifications.useQuery({});
     const { data, isLoading } = api.notification.getAllNotifications.useQuery({
         returnLength: true,
+        limit: 6,
     });
 
-    if (isLoading) return <Spinner className="mx-auto" />;
+    const isLoadingAny = isLoading || isLoadingCount;
+    const notificationCount = countData
+        ? (countData as { count: number }).count
+        : 0;
+
+    if (isLoadingAny) return <Spinner className="mx-auto" />;
 
     return (
         <section
@@ -93,22 +101,14 @@ export default function Notifications({ drag }: { drag: boolean }) {
             <div className="flex px-2 mb-6 pb-2 border-b-[0.3px] border-b-gray-100">
                 <div className="flex gap-x-2">
                     <p className="font-normal text-[20px]">Notifications </p>
-                    {isLoading ? (
+                    {isLoadingAny ? (
                         <Spinner className="w-2 h-2" />
-                    ) : (data as NotificationType[])?.length ? (
+                    ) : notificationCount ? (
                         <DefaultTooltip
-                            content={`${
-                                (data as NotificationType[]).filter(
-                                    (item) => item.is_unread
-                                ).length
-                            } unread`}
+                            content={`${notificationCount} unread`}
                         >
                             <div className="rounded-full my-auto w-4 h-4 bg-wri-gold font-bold text-[11px] flex justify-center items-center">
-                                {
-                                    (data as NotificationType[]).filter(
-                                        (item) => item.is_unread
-                                    ).length
-                                }
+                                {notificationCount}
                             </div>
                         </DefaultTooltip>
                     ) : (
@@ -124,7 +124,7 @@ export default function Notifications({ drag }: { drag: boolean }) {
                 </Link>
             </div>
             {(data as NotificationType[])?.length
-                ? (data as NotificationType[])?.slice(0, 6).map((items) => {
+                ? (data as NotificationType[])?.map((items) => {
                       return <Notification key={items.id} items={items} />;
                   })
                 : 'No notifications'}

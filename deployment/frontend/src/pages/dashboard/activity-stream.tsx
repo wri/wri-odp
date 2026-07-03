@@ -21,21 +21,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session, ip: undefined },
         transformer: superjson,
     });
-    await helpers.notification.getAllNotifications.prefetch({});
-    await helpers.user.getUserCapacity.prefetch();
-    await helpers.dashboardActivity.listActivityStreamDashboard.prefetch({
-        search: '',
-        fq: {},
-        page: { start: 0, rows: 1000 },
-    });
-    await helpers.dataset.getPendingDatasets.prefetch({
-        search: '',
-        page: { start: 0, rows: 10 },
-        sortBy: 'metadata_modified desc',
-    });
-    await helpers.dataset.getFavoriteDataset.prefetch();
-    await helpers.organization.getAllOrganizations.prefetch();
-    await helpers.topics.getAllTopics.prefetch();
+    await Promise.all([
+        helpers.notification.getAllNotifications.prefetch({}),
+        helpers.user.getUserCapacity.prefetch(),
+        helpers.dashboardActivity.listActivityStreamDashboard.prefetch({
+            search: '',
+            fq: {},
+            page: { start: 0, rows: 1000 },
+        }),
+        helpers.dataset.getPendingDatasets.prefetch({
+            search: '',
+            page: { start: 0, rows: 0 },
+            sortBy: 'metadata_modified desc',
+        }),
+        helpers.organization.getAllOrganizations.prefetch(),
+        helpers.topics.getAllTopics.prefetch(),
+    ]);
 
     return {
         props: {

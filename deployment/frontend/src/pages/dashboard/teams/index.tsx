@@ -23,12 +23,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         transformer: superjson,
     });
 
-    await helpers.notification.getAllNotifications.prefetch({});
-    await helpers.user.getUserCapacity.prefetch();
-    await helpers.organization.getUsersOrganizations.prefetch({
-        search: '',
-        page: { start: 0, rows: 10 },
-    });
+    await Promise.all([
+        helpers.notification.getAllNotifications.prefetch({}),
+        helpers.user.getUserCapacity.prefetch(),
+        helpers.organization.getUsersOrganizations.prefetch({
+            search: '',
+            page: { start: 0, rows: 10 },
+        }),
+    ]);
     if (!session) {
         return {
             redirect: {

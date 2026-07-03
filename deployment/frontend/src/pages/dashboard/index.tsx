@@ -53,6 +53,17 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             search: '',
             page: { start: 0, rows: 6 },
         }),
+        helpers.dataset.getFavoriteDataset.prefetch({ preview: true }),
+        helpers.notification.getAllNotifications.prefetch({}),
+        helpers.notification.getAllNotifications.prefetch({
+            returnLength: true,
+            limit: 6,
+        }),
+        helpers.dataset.getPendingDatasets.prefetch({
+            search: '',
+            page: { start: 0, rows: 0 },
+            sortBy: 'metadata_modified desc',
+        }),
     ]);
 
     if (!session) {

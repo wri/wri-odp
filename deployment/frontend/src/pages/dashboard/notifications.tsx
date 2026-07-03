@@ -21,16 +21,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         ctx: { session, ip: undefined },
         transformer: superjson,
     });
-    await helpers.notification.getAllNotifications.prefetch({
-        returnLength: true,
-    });
-    await helpers.user.getUserCapacity.prefetch();
-
-    await helpers.dataset.getPendingDatasets.prefetch({
-        search: '',
-        page: { start: 0, rows: 10 },
-        sortBy: 'metadata_modified desc',
-    });
+    await Promise.all([
+        helpers.notification.getAllNotifications.prefetch({
+            returnLength: true,
+        }),
+        helpers.notification.getAllNotifications.prefetch({}),
+        helpers.user.getUserCapacity.prefetch(),
+        helpers.dataset.getPendingDatasets.prefetch({
+            search: '',
+            page: { start: 0, rows: 0 },
+            sortBy: 'metadata_modified desc',
+        }),
+    ]);
     return {
         props: {
             trpcState: helpers.dehydrate(),

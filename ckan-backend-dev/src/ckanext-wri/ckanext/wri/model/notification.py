@@ -85,7 +85,7 @@ class Notification(object):
             if recipient_id:
                 query = query.filter(Notification.recipient_id == recipient_id)
 
-            return query.all()
+            return query.order_by(Notification.time_sent.desc()).all()
     
     @classmethod
     def update(

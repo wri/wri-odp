@@ -132,6 +132,7 @@ def default_get_notification_schema(
         "is_unread":[ignore_empty, ignore_missing],
         "state": [ignore_empty, ignore_missing],
         "count_only": [ignore_empty, ignore_missing],
+        "limit": [ignore_empty, ignore_missing],
     }
 
 @validator_args
