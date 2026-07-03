@@ -23,10 +23,25 @@ const MAX_STACK_LENGTH = 4_000;
 const MAX_SANITIZE_DEPTH = 6;
 const MAX_CAUSE_CHAIN = 5;
 
+const JWT_PATTERN =
+    /^eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/;
+const BEARER_PATTERN = /^Bearer\s+\S+/i;
+
+function looksLikeSensitiveString(value: string): boolean {
+    return BEARER_PATTERN.test(value) || JWT_PATTERN.test(value);
+}
+
 function truncate(value: string, max: number): string {
     return value.length > max
         ? `${value.slice(0, max)}... [truncated ${value.length - max} chars]`
         : value;
+}
+
+function sanitizeString(value: string): string {
+    if (looksLikeSensitiveString(value)) {
+        return '[REDACTED]';
+    }
+    return truncate(value, MAX_STRING_LENGTH);
 }
 
 function sanitizeInput(input: unknown, depth = 0): unknown {
@@ -35,7 +50,7 @@ function sanitizeInput(input: unknown, depth = 0): unknown {
     }
 
     if (typeof input === 'string') {
-        return truncate(input, MAX_STRING_LENGTH);
+        return sanitizeString(input);
     }
 
     if (typeof input !== 'object') {
@@ -75,7 +90,7 @@ function serializeCauseChain(
     while (current instanceof Error && chain.length < MAX_CAUSE_CHAIN) {
         chain.push({
             name: current.name,
-            message: truncate(current.message, MAX_STRING_LENGTH),
+            message: sanitizeString(current.message),
         });
         current = current.cause;
     }
@@ -139,7 +154,7 @@ export function logTrpcError({
         path: path ?? null,
         procedureType: type,
         code: error.code,
-        message: truncate(error.message, MAX_STRING_LENGTH),
+        message: sanitizeString(error.message),
         httpStatus: getHTTPStatusCodeFromError(error),
         user: ctx?.session?.user?.username ?? ctx?.session?.user?.id ?? null,
         sysadmin: ctx?.session?.user?.sysadmin ?? null,

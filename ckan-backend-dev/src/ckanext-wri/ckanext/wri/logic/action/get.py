@@ -492,6 +492,28 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
     return search_results
 
 
+def _notification_object_summary(
+    notification: dict[str, Any],
+) -> dict[str, Any] | None:
+    """Return minimal object metadata for a notification, or None if the object is gone."""
+    object_type = notification["object_type"]
+    object_id = notification["object_id"]
+
+    if object_type == "dataset":
+        pkg = model.Package.get(object_id)
+        if pkg is None:
+            return None
+        return {"id": pkg.id, "name": pkg.name, "title": pkg.title}
+
+    if object_type in ("topic", "team"):
+        grp = model.Group.get(object_id)
+        if grp is None:
+            return None
+        return {"id": grp.id, "name": grp.name, "title": grp.title}
+
+    return {}
+
+
 @logic.side_effect_free
 def notification_get_all(
     context: Context, data_dict: DataDict
@@ -531,6 +553,7 @@ def notification_get_all(
 
     sender_obj = {}
     object_data = {}
+    valid_notifications = []
 
     for notification in notification_objecst_result:
         sender_id = notification["sender_id"]
@@ -538,31 +561,36 @@ def notification_get_all(
         if sender_id in sender_obj:
             notification["sender_obj"] = sender_obj[sender_id]
         else:
-            temp = model_dictize.user_dictize(
-                model.User.get(notification["sender_id"]), context
-            )
+            sender = model.User.get(notification["sender_id"])
+            if sender is None:
+                log.warning(
+                    "Skipping notification %s: sender %s not found",
+                    notification.get("id"),
+                    sender_id,
+                )
+                continue
+            temp = model_dictize.user_dictize(sender, context)
             sender_obj[sender_id] = temp
             notification["sender_obj"] = temp
 
         if object_id in object_data:
             notification["object_data"] = object_data[object_id]
         else:
-            temp = {}
-
-            try:
-                if notification["object_type"] == "dataset":
-                    temp = dict(model.Package.get(notification["object_id"]).as_dict())
-                elif notification["object_type"] == "topic":
-                    temp = dict(model.Group.get(notification["object_id"]).as_dict())
-                elif notification["object_type"] == "team":
-                    temp = dict(model.Group.get(notification["object_id"]).as_dict())
-            except AttributeError:
-                log.error(f"Object not found: {json.dumps(notification, indent=2)}")
-
+            temp = _notification_object_summary(notification)
+            if temp is None:
+                log.warning(
+                    "Skipping notification %s: %s %s not found",
+                    notification.get("id"),
+                    notification["object_type"],
+                    object_id,
+                )
+                continue
             notification["object_data"] = temp
             object_data[object_id] = temp
 
-    return notification_objecst_result
+        valid_notifications.append(notification)
+
+    return valid_notifications
 
 
 @logic.side_effect_free
