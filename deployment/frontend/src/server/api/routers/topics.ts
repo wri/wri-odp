@@ -7,7 +7,6 @@ import {
 import { env } from '@/env.mjs';
 import {
   searchHierarchy,
-  getUserGroups,
   groupList,
   fetchFacets,
 } from '@/utils/apiUtils';

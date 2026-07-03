@@ -6,7 +6,6 @@ import { api } from '@/utils/api';
 import { useState } from 'react';
 import Spinner from '@/components/_shared/Spinner';
 import type { SearchInput } from '@/schema/search.schema';
-import { type GroupTree } from '@/schema/ckan.schema';
 import Pagination from '@/components/datasets/Pagination';
 import { getServerAuthSession } from '@/server/auth';
 import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next';
@@ -57,7 +56,7 @@ export default function TopicsPage(
     );
 
     const filteredTopics = {
-        topics: (data?.topics ?? []) as GroupTree[],
+        topics: (data?.topics ?? []),
         topicDetails: data?.topicDetails ?? {},
         count: data?.count ?? 0,
     };

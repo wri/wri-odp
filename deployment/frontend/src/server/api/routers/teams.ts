@@ -11,13 +11,10 @@ import { z } from 'zod';
 import { replaceNames } from '@/utils/replaceNames';
 import { searchSchema } from '@/schema/search.schema';
 import type {
-    GroupTree,
-    GroupsmDetails,
     User,
     WriOrganization,
 } from '@/schema/ckan.schema';
 import {
-    getAllOrganizations,
     searchHierarchy,
     fetchFacets,
 } from '@/utils/apiUtils';
