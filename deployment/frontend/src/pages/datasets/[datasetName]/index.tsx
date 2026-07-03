@@ -337,7 +337,7 @@ export default function DatasetPage(
 
   const resolvedPendingDataset =
     pendingExist && diffData?.new_dataset
-      ? (diffData.new_dataset as WriDataset)
+      ? (diffData.new_dataset)
       : datasetData;
   if (!datasetData && datasetError) {
     router.replace('/datasets/404');
