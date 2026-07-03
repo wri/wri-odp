@@ -68,19 +68,20 @@ function Notification({ items }: { items: NotificationType }) {
     );
 }
 export default function Notifications({ drag }: { drag: boolean }) {
-    const { data: countData, isLoading: isLoadingCount } =
-        api.notification.getAllNotifications.useQuery({});
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery({
-        returnLength: true,
-        limit: 6,
-    });
+    const { data: layoutBadges } = api.dashboard.getLayoutBadges.useQuery(
+        undefined,
+        { staleTime: 5 * 60 * 1000 }
+    );
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery(
+        {
+            returnLength: true,
+            limit: 6,
+        },
+        { staleTime: 60 * 1000 }
+    );
 
-    const isLoadingAny = isLoading || isLoadingCount;
-    const notificationCount = countData
-        ? (countData as { count: number }).count
-        : 0;
-
-    if (isLoadingAny) return <Spinner className="mx-auto" />;
+    const notificationCount = layoutBadges?.notificationCount ?? 0;
+    const notifications = Array.isArray(data) ? data : [];
 
     return (
         <section
@@ -101,7 +102,7 @@ export default function Notifications({ drag }: { drag: boolean }) {
             <div className="flex px-2 mb-6 pb-2 border-b-[0.3px] border-b-gray-100">
                 <div className="flex gap-x-2">
                     <p className="font-normal text-[20px]">Notifications </p>
-                    {isLoadingAny ? (
+                    {isLoading ? (
                         <Spinner className="w-2 h-2" />
                     ) : notificationCount ? (
                         <DefaultTooltip
@@ -123,8 +124,8 @@ export default function Notifications({ drag }: { drag: boolean }) {
                     <ArrowRightIcon className="w-4 h-4 mb-1" />
                 </Link>
             </div>
-            {(data as NotificationType[])?.length
-                ? (data as NotificationType[])?.map((items) => {
+            {notifications.length
+                ? notifications.map((items) => {
                       return <Notification key={items.id} items={items} />;
                   })
                 : 'No notifications'}

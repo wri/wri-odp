@@ -22,7 +22,7 @@ import {
     fetchFacets,
 } from '@/utils/apiUtils';
 import { sendMemberNotifications } from '@/utils/apiUtils';
-import { flattenTree } from '@/utils/flattenGroupTree';
+import { flattenTree, collectGroupDetails } from '@/utils/flattenGroupTree';
 
 export const teamRouter = createTRPCRouter({
     getAllTeams: protectedProcedure.query(async ({ ctx }) => {
@@ -290,61 +290,47 @@ export const teamRouter = createTRPCRouter({
     getGeneralTeam: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const [groupTree, allGroups] = await Promise.all([
-                searchHierarchy({
-                    isSysadmin: true,
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                    q: '',
-                    group_type: 'organization',
-                }),
-
-                await getAllOrganizations({
-                    apiKey: ctx?.session?.user.apikey ?? '',
-                }),
-            ]);
+            const groupTree = await searchHierarchy({
+                isSysadmin: true,
+                apiKey: ctx?.session?.user.apikey ?? '',
+                q: input.search || undefined,
+                group_type: 'organization',
+            });
 
             if (groupTree.length === 0) {
                 return {
                     teams: groupTree,
                     teamsDetails: {},
+                    subTeamCounts: {},
                     count: 0,
                 };
             }
-            const teamDetails = allGroups.reduce(
-                (acc, org) => {
-                    acc[org.id] = {
-                        img_url: org.image_display_url ?? '',
-                        description: org.description ?? '',
-                        package_count: org.package_count!,
-                        name: org.name,
-                        visibility: org.visibility,
-                    };
-                    return acc;
-                },
-                {} as Record<string, GroupsmDetails>
+
+            const paginated = groupTree.slice(
+                input.page.start,
+                input.page.start + input.page.rows
             );
+
+            const teamsDetails = collectGroupDetails(paginated);
 
             if (ctx.session?.user) {
                 const facets = await fetchFacets(
-                    teamDetails,
+                    teamsDetails,
                     'organization',
                     ctx.session.user.apikey ?? ''
                 );
 
-                for (const group in teamDetails) {
-                    const team = teamDetails[group]!;
+                for (const group in teamsDetails) {
+                    const team = teamsDetails[group]!;
                     team.package_count = facets[team.name] ?? 0;
                 }
             }
 
-            const result = groupTree;
-            const subTeamCounts = flattenTree(groupTree);
             return {
-                teams: result,
-                allTeams: allGroups,
-                teamsDetails: teamDetails,
-                subTeamCounts,
-                count: result.length,
+                teams: paginated,
+                teamsDetails,
+                subTeamCounts: flattenTree(groupTree),
+                count: groupTree.length,
             };
         }),
     getPossibleMembers: protectedProcedure

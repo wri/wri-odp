@@ -25,49 +25,32 @@ import type Topic from '@/interfaces/topic.interface';
 import { TopicSchema } from '@/schema/topic.schema';
 import { replaceNames } from '@/utils/replaceNames';
 import { sendMemberNotifications } from '@/utils/apiUtils';
-import { flattenTree } from '@/utils/flattenGroupTree';
+import {
+  flattenTree,
+  collectGroupDetails,
+  collectGroupTreeImages,
+} from '@/utils/flattenGroupTree';
 
 export const TopicRouter = createTRPCRouter({
   getUsersTopics: protectedProcedure
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
-      let groupTree: GroupTree[] = [];
-      const allGroups = (await getUserGroups({
+      const groupTree = await searchHierarchy({
+        isSysadmin: ctx.session.user.sysadmin,
         apiKey: ctx.session.user.apikey,
-        userId: ctx.session.user.id,
-      }))!;
-      const topic2Image = allGroups.reduce(
-        (acc, org) => {
-          acc[org.id] = org.image_display_url!;
-          return acc;
-        },
-        {} as Record<string, string>
-      );
-      if (input.search) {
-        groupTree = await searchHierarchy({
-          isSysadmin: ctx.session.user.sysadmin,
-          apiKey: ctx.session.user.apikey,
-          q: input.search,
-          group_type: 'group',
-        });
-      } else {
-        groupTree = await searchHierarchy({
-          isSysadmin: ctx.session.user.sysadmin,
-          apiKey: ctx.session.user.apikey,
-          group_type: 'group',
-        });
-      }
+        q: input.search || undefined,
+        group_type: 'group',
+      });
 
-      const result = groupTree;
+      const paginated = groupTree.slice(
+        input.page.start,
+        input.page.start + input.page.rows
+      );
+
       return {
-        topics: input.pageEnabled
-          ? result.slice(
-            input.page.start,
-            input.page.start + input.page.rows
-          )
-          : result,
-        topic2Image: topic2Image,
-        count: result.length,
+        topics: paginated,
+        topic2Image: collectGroupTreeImages(paginated),
+        count: groupTree.length,
       };
     }),
   getTopicsHierarchy: protectedProcedure.query(async ({ ctx }) => {
@@ -342,18 +325,13 @@ export const TopicRouter = createTRPCRouter({
   getGeneralTopics: publicProcedure
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
-      const [groupTree, allGroups] = await Promise.all([
-        searchHierarchy({
-          isSysadmin: true,
-          apiKey: ctx?.session?.user.apikey ?? '',
-          q: '',
-          group_type: 'group',
-        }),
-        getUserGroups({
-          apiKey: ctx?.session?.user.apikey ?? '',
-          userId: '',
-        }),
-      ]);
+      const groupTree = await searchHierarchy({
+        isSysadmin: true,
+        apiKey: ctx?.session?.user.apikey ?? '',
+        q: input.search || undefined,
+        group_type: 'group',
+      });
+
       if (groupTree.length === 0) {
         return {
           topics: groupTree,
@@ -361,36 +339,31 @@ export const TopicRouter = createTRPCRouter({
           count: 0,
         };
       }
-      const topicDetails = (allGroups ?? []).reduce(
-        (acc, org) => {
-          acc[org.id] = {
-            img_url: org.image_display_url,
-            description: org.description,
-            package_count: org.package_count,
-            name: org.name,
-          };
-          return acc;
-        },
-        {} as Record<string, GroupsmDetails>
+
+      const paginated = groupTree.slice(
+        input.page.start,
+        input.page.start + input.page.rows
       );
 
-      const facets = await fetchFacets(
-        topicDetails,
-        'groups',
-        ctx?.session?.user.apikey ?? ''
-      );
+      const topicDetails = collectGroupDetails(paginated);
 
-      for (const group in topicDetails) {
-        const topic = topicDetails[group]!;
-        topic.package_count = facets[topic.name] ?? 0;
+      if (ctx.session?.user) {
+        const facets = await fetchFacets(
+          topicDetails,
+          'groups',
+          ctx.session.user.apikey ?? ''
+        );
+
+        for (const group in topicDetails) {
+          const topic = topicDetails[group]!;
+          topic.package_count = facets[topic.name] ?? 0;
+        }
       }
 
-      const result = groupTree;
       return {
-        topics: result,
-        allTopics: allGroups,
-        topicDetails: topicDetails,
-        count: result.length,
+        topics: paginated,
+        topicDetails,
+        count: groupTree.length,
       };
     }),
   getTopicV2: protectedProcedure

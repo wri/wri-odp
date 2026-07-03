@@ -15,10 +15,7 @@ import { createServerSideHelpers } from '@trpc/react-query/server';
 import superjson from 'superjson';
 import { env } from '@/env.mjs';
 import dynamic from 'next/dynamic';
-import { Index } from 'flexsearch';
-import { type Group as CkanGroup } from '@portaljs/ckan';
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2';
-type Group = CkanGroup & { numSubtopics: number };
 
 const TopicsSearchResults = dynamic(() => import('@/components/topics/TopicsSearchResults'));
 
@@ -31,7 +28,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     });
     await helpers.topics.getGeneralTopics.prefetch({
         search: '',
-        page: { start: 0, rows: 10000 },
+        page: { start: 0, rows: 10 },
         allTree: true,
     });
 
@@ -42,54 +39,28 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
 }
 
-export default function TopicsPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function TopicsPage(
+    props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
     const [pagination, setPagination] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
     });
     const [query, setQuery] = useState<string>('');
-    const { data, isLoading } = api.topics.getGeneralTopics.useQuery({
-        search: '',
-        page: { start: 0, rows: 10000 },
-        allTree: true,
-    });
-    const indexTopics = new Index({
-        tokenize: 'full',
-    });
-    if (data?.allTopics) {
-        data?.allTopics.forEach((topic) => {
-            indexTopics.add(
-                topic.id,
-                JSON.stringify({
-                    title: topic.title,
-                    description: topic.description,
-                })
-            );
-        });
-    }
+    const { data, isLoading } = api.topics.getGeneralTopics.useQuery(
+        {
+            search: query,
+            page: pagination.page,
+            allTree: true,
+        },
+        { staleTime: 5 * 60 * 1000 }
+    );
 
-    function ProcessTopics() {
-        if (!data) return { topics: [], topicDetails: {}, count: 0 };
-        const filteredTopics =
-            query !== ''
-                ? (data?.allTopics
-                      ?.filter((t) => indexTopics.search(query).includes(t.id))
-                      .filter(
-                          (obj, index, self) => index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
-                      ) ?? [])
-                : data.topics.filter(
-                      (obj, index, self) => index === self.findIndex((t) => t.id === obj.id)
-                  ); // Compare based on 'id' property
-        const topics = filteredTopics
-            ?.slice(pagination.page.start, pagination.page.start + pagination.page.rows)
-            .filter(
-                (obj, index, self) => index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
-            ) as GroupTree[] | Group[];
-        const topicDetails = data.topicDetails;
-        return { topics, topicDetails, count: filteredTopics?.length };
-    }
-
-    const filteredTopics = ProcessTopics();
+    const filteredTopics = {
+        topics: (data?.topics ?? []) as GroupTree[],
+        topicDetails: data?.topicDetails ?? {},
+        count: data?.count ?? 0,
+    };
     const links = [{ label: 'Topics', url: '/topics', current: true }];
 
     return (

@@ -2,11 +2,10 @@ import Header from '@/components/_shared/Header';
 import Footer from '@/components/_shared/Footer';
 import { NextSeo } from 'next-seo';
 import { api } from '@/utils/api';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Spinner from '@/components/_shared/Spinner';
 import type { SearchInput } from '@/schema/search.schema';
 import Pagination from '@/components/datasets/Pagination';
-import { type GroupTree } from '@/schema/ckan.schema';
 import { getServerAuthSession } from '@/server/auth';
 import { type GetServerSidePropsContext, type InferGetServerSidePropsType } from 'next';
 import { appRouter } from '@/server/api/root';
@@ -14,14 +13,10 @@ import { createServerSideHelpers } from '@trpc/react-query/server';
 import superjson from 'superjson';
 import { env } from '@/env.mjs';
 import dynamic from 'next/dynamic';
-import { Index } from 'flexsearch';
-import { type Organization as CkanOrg } from '@portaljs/ckan';
 import { Breadcrumbs } from '@/components/_shared/Breadcrumbsv2';
 import TopicsSearch from '@/components/topics/TopicsSearch';
 
 const TeamsSearchResults = dynamic(() => import('@/components/team/TeamsSearchResults'));
-
-type Organization = CkanOrg & { numSubTeams: number };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerAuthSession(context);
@@ -32,6 +27,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     });
     await helpers.teams.getGeneralTeam.prefetch({
         search: '',
+        page: { start: 0, rows: 10 },
         allTree: true,
     });
 
@@ -42,7 +38,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
 }
 
-export default function TeamsPage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function TeamsPage(
+    _props: InferGetServerSidePropsType<typeof getServerSideProps>
+) {
     const [pagination, setPagination] = useState<SearchInput>({
         search: '',
         page: { start: 0, rows: 10 },
@@ -52,60 +50,19 @@ export default function TeamsPage(props: InferGetServerSidePropsType<typeof getS
 
     const { data, isLoading } = api.teams.getGeneralTeam.useQuery(
         {
-            search: '',
+            search: query,
+            page: pagination.page,
             allTree: true,
         },
         { staleTime: 5 * 60 * 1000 }
     );
-    const indexTeams = new Index({
-        tokenize: 'full',
-    });
-    if (data?.allTeams) {
-        data?.allTeams.forEach((team) => {
-            indexTeams.add(
-                team.id,
-                JSON.stringify({
-                    title: team.title,
-                    description: team.description || team.notes,
-                })
-            );
-        });
-    }
 
-    function ProcessTeams() {
-        if (!data) return { teams: [], teamsDetails: {}, count: 0 };
-        const filteredTeams =
-            query !== ''
-                ? (data?.allTeams
-                      ?.filter((t) => indexTeams.search(query).includes(t.id))
-                      .filter(
-                          (obj, index, self) => index === self.findIndex((t) => t.id === obj.id) // Compare based on 'id' property
-                      ) ?? [])
-                : data.teams.filter(
-                      (obj, index, self) => index === self.findIndex((t) => t.id === obj.id)
-                  ); // Compare based on 'id' property
-        const teams = filteredTeams.slice(
-            pagination.page.start,
-            pagination.page.start + pagination.page.rows
-        ) as GroupTree[] | Organization[];
-        const teamsDetails = data?.teamsDetails;
-        return { teams, teamsDetails, count: filteredTeams.length };
-    }
-
-    const filteredTeams = ProcessTeams();
+    const filteredTeams = {
+        teams: data?.teams ?? [],
+        teamsDetails: data?.teamsDetails ?? {},
+        count: data?.count ?? 0,
+    };
     const links = [{ label: 'Teams', url: '/teams', current: true }];
-
-    useEffect(() => {
-        if (typeof window !== 'undefined' && env.NEXT_PUBLIC_DISABLE_HOTJAR !== 'disabled') {
-            const w = window as unknown as { dataLayer?: Record<string, unknown>[] };
-            w.dataLayer = w.dataLayer ?? [];
-            w.dataLayer.push({
-                event: 'teams_page_view',
-                page_path: '/teams',
-                page_section: 'teams',
-            });
-        }
-    }, []);
 
     return (
         <>

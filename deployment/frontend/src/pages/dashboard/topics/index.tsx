@@ -23,8 +23,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     });
 
     await Promise.all([
-        helpers.notification.getAllNotifications.prefetch({}),
-        helpers.user.getUserCapacity.prefetch(),
+        helpers.dashboard.getLayoutBadges.prefetch(),
         helpers.topics.getUsersTopics.prefetch({
             search: '',
             page: { start: 0, rows: 10 },

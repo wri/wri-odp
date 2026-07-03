@@ -48,22 +48,17 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     });
 
     await Promise.all([
-        helpers.user.getUserCapacity.prefetch(),
+        helpers.dashboard.getLayoutBadges.prefetch(),
         helpers.dashboardActivity.listActivityStreamDashboard.prefetch({
             search: '',
             page: { start: 0, rows: 6 },
         }),
         helpers.dataset.getFavoriteDataset.prefetch({ preview: true }),
-        helpers.notification.getAllNotifications.prefetch({}),
         helpers.notification.getAllNotifications.prefetch({
             returnLength: true,
             limit: 6,
         }),
-        helpers.dataset.getPendingDatasets.prefetch({
-            search: '',
-            page: { start: 0, rows: 0 },
-            sortBy: 'metadata_modified desc',
-        }),
+        helpers.user.getDashboardUser.prefetch(),
     ]);
 
     if (!session) {

@@ -6,54 +6,29 @@ import {
     getUserOrganizations,
 } from '@/utils/apiUtils';
 import { searchSchema } from '@/schema/search.schema';
-import type {
-    GroupTree,
-    CkanResponse,
-    WriOrganization,
-} from '@/schema/ckan.schema';
+import type { CkanResponse, WriOrganization } from '@/schema/ckan.schema';
+import { collectGroupTreeImages } from '@/utils/flattenGroupTree';
 
 export const OrganizationRouter = createTRPCRouter({
     getUsersOrganizations: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            let groupTree: GroupTree[] = [];
-            const allOrg = await getAllOrganizations({
+            const groupTree = await searchHierarchy({
+                isSysadmin: ctx.session.user.sysadmin,
                 apiKey: ctx.session.user.apikey,
+                q: input.search || undefined,
+                group_type: 'organization',
             });
-            const Org2Image = allOrg.reduce(
-                (acc, org) => {
-                    acc[org.id] = org.image_display_url!;
-                    return acc;
-                },
-                {} as Record<string, string>
+
+            const paginated = groupTree.slice(
+                input.page.start,
+                input.page.start + input.page.rows
             );
 
-            if (input.search) {
-                groupTree = await searchHierarchy({
-                    isSysadmin: ctx.session.user.sysadmin,
-                    apiKey: ctx.session.user.apikey,
-                    q: input.search,
-                    group_type: 'organization',
-                });
-            } else {
-                groupTree = await searchHierarchy({
-                    isSysadmin: ctx.session.user.sysadmin,
-                    apiKey: ctx.session.user.apikey,
-                    q: '',
-                    group_type: 'organization',
-                });
-            }
-
-            const result = groupTree;
             return {
-                organizations: input.pageEnabled
-                    ? result.slice(
-                          input.page.start,
-                          input.page.start + input.page.rows
-                      )
-                    : result,
-                count: result.length,
-                org2Image: Org2Image,
+                organizations: paginated,
+                count: groupTree.length,
+                org2Image: collectGroupTreeImages(paginated),
             };
         }),
     getAllOrganizations: protectedProcedure.query(async ({ ctx }) => {

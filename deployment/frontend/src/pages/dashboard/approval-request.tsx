@@ -23,16 +23,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     });
 
     await Promise.all([
-        helpers.notification.getAllNotifications.prefetch({}),
-        helpers.user.getUserCapacity.prefetch(),
+        helpers.dashboard.getLayoutBadges.prefetch(),
         helpers.dataset.getPendingDatasets.prefetch({
             search: '',
             page: { start: 0, rows: 10 },
-            sortBy: 'metadata_modified desc',
-        }),
-        helpers.dataset.getPendingDatasets.prefetch({
-            search: '',
-            page: { start: 0, rows: 0 },
             sortBy: 'metadata_modified desc',
         }),
     ]);

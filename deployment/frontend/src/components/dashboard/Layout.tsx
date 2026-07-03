@@ -11,17 +11,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const { asPath } = useRouter();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { data: session } = useSession();
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery(
-        {}
-    );
-    const { data: pendingData, isLoading: isLoadingPending } =
-        api.dataset.getPendingDatasets.useQuery({
-            search: '',
-            page: { start: 0, rows: 0 },
-            sortBy: 'metadata_modified desc',
+    const { data: layoutBadges, isLoading } =
+        api.dashboard.getLayoutBadges.useQuery(undefined, {
+            staleTime: 5 * 60 * 1000,
         });
-    const { data: userIdentity, isLoading: isLoadingIUser } =
-        api.user.getUserCapacity.useQuery();
 
     const routes = [
         {
@@ -105,7 +98,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         return item;
     });
 
-    const notificationCount = data ? (data as { count: number }).count : 0;
+    const notificationCount = layoutBadges?.notificationCount ?? 0;
+    const pendingData = layoutBadges
+        ? { count: layoutBadges.pendingCount }
+        : undefined;
+    const userIdentity = layoutBadges
+        ? { isOrgAdmin: layoutBadges.isOrgAdmin }
+        : undefined;
+    const isLoadingPending = isLoading;
+    const isLoadingIUser = isLoading;
 
     return (
         <>

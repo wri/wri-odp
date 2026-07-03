@@ -3,15 +3,10 @@ import NotificationHeader from './NotificationHeader';
 import NotificationCard from './NotificationCard';
 import { api } from '@/utils/api';
 import Spinner from '@/components/_shared/Spinner';
-import { useQuery } from 'react-query';
 import Pagination from '../_shared/Pagination';
 import type { SearchInput } from '@/schema/search.schema';
-import { type NotificationType } from '@/schema/notification.schema';
 
 export default function NotificationList() {
-    const { data, isLoading } = api.notification.getAllNotifications.useQuery({
-        returnLength: true,
-    });
     const [selected, setSelected] = useState<string[]>([]);
     const [query, setQuery] = useState<SearchInput>({
         search: '',
@@ -19,35 +14,23 @@ export default function NotificationList() {
         page: { start: 0, rows: 10 },
     });
 
-    const paginatedData = useQuery(
-        ['paginatedNotifications', data, query],
-        () => {
-            const notification: NotificationType[] = [];
-            if (!data) return notification;
+    const { data, isLoading } = api.notification.getAllNotifications.useQuery({
+        returnLength: true,
+        limit: 200,
+        includeCount: true,
+    });
 
-            const start = query.page.start;
-            const rows = query.page.rows;
+    const notifications =
+        data && 'notifications' in data ? data.notifications : [];
+    const totalCount =
+        data && 'count' in data ? data.count : notifications.length;
 
-            let slicedData = (data as NotificationType[]).sort((a, b) => {
-                const dateA =
-                    Number(new Date()) - Number(new Date(a.time_sent!));
-                const dateB =
-                    Number(new Date()) - Number(new Date(b.time_sent!));
-                return dateA - dateB;
-            });
-
-            slicedData = (data as NotificationType[]).slice(
-                start,
-                start + rows
-            );
-            return slicedData;
-        },
-        {
-            enabled: !!data,
-        }
+    const paginatedNotifications = notifications.slice(
+        query.page.start,
+        query.page.start + query.page.rows
     );
 
-    if (isLoading || paginatedData.isLoading) {
+    if (isLoading) {
         return <Spinner className="mx-auto" />;
     }
 
@@ -56,24 +39,24 @@ export default function NotificationList() {
             <NotificationHeader
                 setSelected={setSelected}
                 selected={selected}
-                data={paginatedData.data!}
+                data={paginatedNotifications}
                 Pagination={
                     <Pagination
                         setQuery={setQuery}
                         query={query}
-                        isLoading={paginatedData.isLoading}
-                        count={(data as NotificationType[])?.length}
+                        isLoading={isLoading}
+                        count={totalCount}
                     />
                 }
             />
             <div className=" w-full">
-                {paginatedData.data?.length === 0 ? (
+                {paginatedNotifications.length === 0 ? (
                     <div className="pl-4 sm:pl-6 py-4">No notifications</div>
                 ) : (
-                    paginatedData.data?.map((notification, index) => {
+                    paginatedNotifications.map((notification, index) => {
                         return (
                             <NotificationCard
-                                key={index}
+                                key={notification.id ?? index}
                                 rowProfile={notification}
                                 selected={selected}
                                 setSelected={setSelected}
