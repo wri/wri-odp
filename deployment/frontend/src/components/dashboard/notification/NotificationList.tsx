@@ -17,13 +17,10 @@ export default function NotificationList() {
     const { data, isLoading } = api.notification.getAllNotifications.useQuery({
         returnLength: true,
         limit: 200,
-        includeCount: true,
     });
 
-    const notifications =
-        data && 'notifications' in data ? data.notifications : [];
-    const totalCount =
-        data && 'count' in data ? data.count : notifications.length;
+    const notifications = Array.isArray(data) ? data : [];
+    const totalCount = notifications.length;
 
     const paginatedNotifications = notifications.slice(
         query.page.start,

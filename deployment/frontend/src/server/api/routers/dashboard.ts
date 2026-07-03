@@ -45,7 +45,6 @@ async function fetchNotificationCount(recipientId: string): Promise<number> {
 }
 
 async function fetchPendingCount(
-    userId: string,
     apiKey: string,
     sysadmin: boolean,
     organizations: { name: string }[]
@@ -81,7 +80,7 @@ export const dashboardRouter = createTRPCRouter({
         if (user.sysadmin) {
             const [notificationCount, pendingCount] = await Promise.all([
                 fetchNotificationCount(user.id),
-                fetchPendingCount(user.id, user.apikey, true, []),
+                fetchPendingCount(user.apikey, true, []),
             ]);
 
             return {
@@ -91,15 +90,21 @@ export const dashboardRouter = createTRPCRouter({
             };
         }
 
-        const organizations = await getUserOrganizations({
-            userId: user.id,
-            apiKey: user.apikey,
-        });
-
-        const [notificationCount, pendingCount] = await Promise.all([
+        // The notification count is independent of the org lookup, so run
+        // them in parallel; only the pending count needs the org list.
+        const [notificationCount, organizations] = await Promise.all([
             fetchNotificationCount(user.id),
-            fetchPendingCount(user.id, user.apikey, false, organizations),
+            getUserOrganizations({
+                userId: user.id,
+                apiKey: user.apikey,
+            }),
         ]);
+
+        const pendingCount = await fetchPendingCount(
+            user.apikey,
+            false,
+            organizations
+        );
 
         return {
             notificationCount,

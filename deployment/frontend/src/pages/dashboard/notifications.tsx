@@ -26,7 +26,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         helpers.notification.getAllNotifications.prefetch({
             returnLength: true,
             limit: 200,
-            includeCount: true,
         }),
     ]);
     return {

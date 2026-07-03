@@ -213,7 +213,6 @@ export const notificationRouter = createTRPCRouter({
             z.object({
                 returnLength: z.boolean().optional(),
                 limit: z.number().int().positive().optional(),
-                includeCount: z.boolean().optional(),
             })
         )
         .query(async ({ input, ctx }) => {
@@ -234,32 +233,6 @@ export const notificationRouter = createTRPCRouter({
                 >;
 
                 return { count: parseNotificationCount(data) };
-            }
-
-            if (input.includeCount) {
-                const [countResponse, notifications] = await Promise.all([
-                    fetch(
-                        `${env.CKAN_URL}/api/3/action/notification_get_all?recipient_id=${recipientId}&count_only=true`,
-                        {
-                            headers: {
-                                Authorization: env.SYS_ADMIN_API_KEY,
-                            },
-                        }
-                    ).then(
-                        (response) =>
-                            response.json() as Promise<
-                                CkanResponse<
-                                    NotificationType[] | { count: number }
-                                >
-                            >
-                    ),
-                    fetchNotificationList(recipientId, input.limit),
-                ]);
-
-                return {
-                    count: parseNotificationCount(countResponse),
-                    notifications,
-                };
             }
 
             return fetchNotificationList(recipientId, input.limit);

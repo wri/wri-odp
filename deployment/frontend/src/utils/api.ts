@@ -33,20 +33,23 @@ export const api = createTRPCNext<AppRouter>({
 
       // Custom global error callback
       queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            // Avoid refetching every query whenever the window regains
+            // focus; most data on the catalog changes infrequently and
+            // individual queries can override this where freshness matters.
+            refetchOnWindowFocus: false,
+            staleTime: 30 * 1000,
+          },
+        },
         queryCache: new QueryCache({
           onError: (error) => {
             verifyAuthorizationError(error);
-          },
-          onSuccess: (r) => {
-            verifyAuthorizationError(r);
           },
         }),
         mutationCache: new MutationCache({
           onError: (error) => {
             verifyAuthorizationError(error);
-          },
-          onSuccess: (r) => {
-            verifyAuthorizationError(r);
           },
         }),
       },
@@ -87,14 +90,13 @@ export const api = createTRPCNext<AppRouter>({
   ssr: false,
 });
 
-function verifyAuthorizationError(response: any) {
-  if (
-    response?.data?.stack?.includes('Access denied') ||
-    response?.error?.message?.includes('Access denied')
-  ) {
-    console.log('Authorization error detected.');
-    console.log('response:', JSON.stringify(response));
-    console.log('Error', response?.error);
+function verifyAuthorizationError(error: any) {
+  // Only sign the user out when tRPC explicitly reports that the session is
+  // invalid (UNAUTHORIZED). CKAN "Access denied" errors from individual
+  // procedures don't mean the session itself expired, and treating them as
+  // such caused false logouts.
+  if (error?.data?.code === 'UNAUTHORIZED') {
+    console.log('Authorization error detected.', error);
     toast('Your session is no longer valid, please sign in again.', {
       type: 'warning',
     });
