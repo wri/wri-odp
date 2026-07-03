@@ -32,7 +32,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     });
     await helpers.teams.getGeneralTeam.prefetch({
         search: '',
-        page: { start: 0, rows: 10000 },
         allTree: true,
     });
 
@@ -51,11 +50,13 @@ export default function TeamsPage(props: InferGetServerSidePropsType<typeof getS
 
     const [query, setQuery] = useState<string>('');
 
-    const { data, isLoading } = api.teams.getGeneralTeam.useQuery({
-        search: '',
-        page: { start: 0, rows: 10000 },
-        allTree: true,
-    });
+    const { data, isLoading } = api.teams.getGeneralTeam.useQuery(
+        {
+            search: '',
+            allTree: true,
+        },
+        { staleTime: 5 * 60 * 1000 }
+    );
     const indexTeams = new Index({
         tokenize: 'full',
     });
@@ -153,6 +154,7 @@ export default function TeamsPage(props: InferGetServerSidePropsType<typeof getS
                         count={filteredTeams.count}
                         teams={filteredTeams?.teams}
                         teamsDetails={filteredTeams?.teamsDetails}
+                        subTeamCounts={data?.subTeamCounts}
                     />
                     <div className="w-full px-8 xxl:px-0 max-w-8xl mx-auto">
                         <Pagination

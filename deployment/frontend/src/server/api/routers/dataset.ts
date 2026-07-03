@@ -901,6 +901,7 @@ export const DatasetRouter = createTRPCRouter({
           .optional()
           .default(false),
         showPendingDataset: z.boolean().optional().default(false),
+        includeTeamVisibility: z.boolean().optional().default(true),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -951,16 +952,16 @@ export const DatasetRouter = createTRPCRouter({
       let user_organization: WriOrganization[] = [];
       let collab: Collaborator[] = [];
 
-      if (!ctx.session?.user.sysadmin) {
+      if (ctx.session?.user && !ctx.session.user.sysadmin) {
         try {
           [user_organization, collab] = await Promise.all([
             getUserOrganizations({
-              userId: ctx.session?.user.id || '',
-              apiKey: ctx.session?.user.apikey || '',
+              userId: ctx.session.user.id,
+              apiKey: ctx.session.user.apikey,
             }),
             getCollaboratorPackages({
-              userId: ctx.session?.user.id || '',
-              apiKey: ctx.session?.user.apikey || '',
+              userId: ctx.session.user.id,
+              apiKey: ctx.session.user.apikey,
             }),
           ]);
         } catch (e) {
@@ -1010,13 +1011,14 @@ export const DatasetRouter = createTRPCRouter({
         });
       }
 
-      const orgSlugs = [
-        ...new Set(
-          dataset.datasets
-            .map((d) => d.organization?.name)
-            .filter(Boolean)
-        ),
-      ];
+      if (!input.includeTeamVisibility) {
+        return {
+          datasets: _datasets as unknown as WriDataset[],
+          count: dataset.count,
+          searchFacets: dataset.searchFacets,
+          teamVisibility: {},
+        };
+      }
 
       const allOrgs = await getAllOrganizations({
         apiKey: ctx.session?.user.apikey ?? '',

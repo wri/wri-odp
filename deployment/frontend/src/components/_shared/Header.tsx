@@ -7,20 +7,11 @@ import { useRouter } from 'next/router';
 import Login from './Login';
 import UserMenu from './UserMenu';
 import { useSession } from 'next-auth/react';
-import { api } from '@/utils/api';
 
 export default function Header() {
     const { asPath } = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const session = useSession();
-
-    api.auth.getApiTokensList.useQuery(
-        {},
-        {
-            enabled: session.status === 'authenticated',
-            staleTime: 5 * 60 * 1000,
-        }
-    );
 
     function closeModal() {
         setIsOpen(false);

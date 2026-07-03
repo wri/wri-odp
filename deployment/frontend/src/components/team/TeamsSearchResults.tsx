@@ -9,11 +9,13 @@ type Organization = CkanOrg & { numSubTeams: number };
 export default function TeamsSearchResults({
     teams,
     teamsDetails,
+    subTeamCounts,
     count,
     filtered,
 }: {
     teams: GroupTree[] | Organization[];
     teamsDetails: Record<string, GroupsmDetails>;
+    subTeamCounts?: Record<string, number>;
     count: number;
     filtered: boolean;
 }) {
@@ -26,7 +28,13 @@ export default function TeamsSearchResults({
                 className="mt-5 mb-5"
                 items={teams}
                 Card={({ item: team }) => {
-                    return <TeamCard team={team} teamsDetails={teamsDetails} />;
+                    return (
+                        <TeamCard
+                            team={team}
+                            teamsDetails={teamsDetails}
+                            subTeamCounts={subTeamCounts}
+                        />
+                    );
                 }}
             />
         </Container>
