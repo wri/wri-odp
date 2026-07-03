@@ -463,7 +463,7 @@ export async function getUserDataset({
 }): Promise<{ datasets: WriDataset[]; count: number } | null> {
     try {
         const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/package_search?q=creator_user_id:${userId}&rows=${countOnly ? 0 : 1000}`,
+            `${env.CKAN_URL}/api/3/action/package_search?q=creator_user_id:${userId}${countOnly ? '&rows=0' : ''}`,
             {
                 headers: {
                     Authorization: apiKey,

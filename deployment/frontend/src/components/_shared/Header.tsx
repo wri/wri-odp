@@ -14,7 +14,7 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const session = useSession();
 
-    const apiTokenQuery = api.auth.getApiTokensList.useQuery(
+    api.auth.getApiTokensList.useQuery(
         {},
         {
             enabled: session.status === 'authenticated',
