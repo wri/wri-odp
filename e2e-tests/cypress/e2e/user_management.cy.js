@@ -142,7 +142,7 @@ describe("Can add and remove members from teams and topics", () => {
                     if ($capacityButton.length) {
                       cy.wrap($capacityButton).click();
 
-                      cy.contains("li", "Admin").click();
+                      cy.contains('[role="option"]', "Admin").click();
                     } else {
                       cy.log("No capacity button found for the user");
                     }
@@ -281,7 +281,7 @@ describe("Can add and remove members from teams and topics", () => {
                     if ($capacityButton.length) {
                       cy.wrap($capacityButton).click();
 
-                      cy.contains("li", "Admin").click();
+                      cy.contains('[role="option"]', "Admin").click();
                     } else {
                       cy.log("No capacity button found for the user");
                     }

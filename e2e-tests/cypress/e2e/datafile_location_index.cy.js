@@ -33,8 +33,8 @@ describe("Data File location", () => {
       cy.get("textarea[name=short_description]").type("test");
 
       cy.get("#team").click();
-      cy.get('[role="listbox"]', { timeout: 10000 }).should("be.visible");
-      cy.contains('[role="option"]', org, { timeout: 10000 }).click();
+      cy.get('[role="listbox"]').should("be.visible");
+      cy.contains('[role="option"]', org).click();
       cy.contains("Add Author").click();
       cy.get('input[name="authors.0.name"]').type("Test Author 1");
       cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
