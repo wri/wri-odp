@@ -12,6 +12,14 @@ import type {
 import { activityDetails } from '@/utils/apiUtils';
 import { searchSchema } from '@/schema/search.schema';
 
+function withPaginationParams(
+    url: string,
+    page: { start: number; rows: number }
+) {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}limit=${page.rows}&offset=${page.start}`;
+}
+
 export const activityStreamRouter = createTRPCRouter({
     listPackageActivity: publicProcedure
         .input(z.object({ id: z.string() }))
@@ -57,6 +65,9 @@ export const activityStreamRouter = createTRPCRouter({
                     }
                 }
             }
+
+            url = withPaginationParams(url, input.page);
+
             const response = await fetch(url, {
                 headers: {
                     Authorization: ctx.session.user.apikey,
@@ -110,13 +121,8 @@ export const activityStreamRouter = createTRPCRouter({
             }
 
             return {
-                activity: result
-                    ? result.slice(
-                          input.page.start,
-                          input.page.start + input.page.rows
-                      )
-                    : [],
-                count: result.length,
+                activity: result ?? [],
+                count: result?.length ?? 0,
             };
         }),
 });

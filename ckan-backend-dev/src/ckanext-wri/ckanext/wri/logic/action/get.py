@@ -549,13 +549,34 @@ def notification_get_all(
         )
 
     if not notification_objecst_result:
-        return []
+        return [] if not asbool(data_dict.get("count_only")) else {"count": 0}
+
+    if asbool(data_dict.get("count_only")):
+        unread_count = sum(
+            1
+            for notification in notification_objecst_result
+            if notification.get("is_unread") and notification.get("state") != "deleted"
+        )
+        return {"count": unread_count}
+
+    try:
+        limit = int(data_dict.get("limit", 0))
+    except (TypeError, ValueError):
+        limit = 0
 
     sender_obj = {}
     object_data = {}
     valid_notifications = []
 
     for notification in notification_objecst_result:
+        if limit > 0 and len(valid_notifications) >= limit:
+            break
+
+        # The frontend never renders deleted notifications, so skip the
+        # enrichment work (and payload) for them.
+        if notification.get("state") == "deleted":
+            continue
+
         sender_id = notification["sender_id"]
         object_id = notification["object_id"]
         if sender_id in sender_obj:

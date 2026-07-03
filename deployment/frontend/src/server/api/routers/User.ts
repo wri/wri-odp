@@ -27,26 +27,21 @@ import { type ApiToken } from '@/interfaces/user.interface';
 
 export const UserRouter = createTRPCRouter({
   getDashboardUser: protectedProcedure.query(async ({ ctx }) => {
-    const userdetails = await getUser({
-      userId: ctx.session.user.id,
-      apiKey: ctx.session.user.apikey,
-    });
-    const organizations = await getUserOrganizations({
-      userId: ctx.session.user.id,
-      apiKey: ctx.session.user.apikey,
-    });
-    const TeamCount = organizations?.length;
-    const dataset = await getUserDataset({
-      userId: ctx.session.user.id,
-      apiKey: ctx.session.user.apikey,
-    });
-    const DatasetCount = dataset?.count;
+    const userId = ctx.session.user.id;
+    const apiKey = ctx.session.user.apikey;
+
+    const [userdetails, organizations, dataset] = await Promise.all([
+      getUser({ userId, apiKey }),
+      getUserOrganizations({ userId, apiKey }),
+      getUserDataset({ userId, apiKey, countOnly: true }),
+    ]);
+
     const dashboardUser = {
       imageUrl: userdetails?.image_display_url,
       name: userdetails?.name,
       email: userdetails?.email,
-      teamCount: TeamCount,
-      datasetCount: DatasetCount,
+      teamCount: organizations?.length,
+      datasetCount: dataset?.count,
       isSysAdmin: userdetails?.sysadmin,
       email_hash: userdetails?.email_hash,
     };

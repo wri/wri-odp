@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import Image from 'next/image';
 import { Menu, Transition, Dialog } from '@headlessui/react';
 import { Bars3Icon } from '@heroicons/react/20/solid';
@@ -14,19 +14,13 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const session = useSession();
 
-    const apiTokenQuery = api.auth.getApiTokensList.useQuery(
+    api.auth.getApiTokensList.useQuery(
         {},
         {
-            enabled: false,
-            cacheTime: 1,
+            enabled: session.status === 'authenticated',
+            staleTime: 5 * 60 * 1000,
         }
     );
-
-    useEffect(() => {
-        if (session.status == 'authenticated') {
-            apiTokenQuery.refetch();
-        }
-    }, [session?.status]);
 
     function closeModal() {
         setIsOpen(false);

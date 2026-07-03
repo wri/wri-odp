@@ -15,7 +15,7 @@ function StatusChip({ status }: { status?: string }) {
 export default function PendingApprovalTag({
   dataset
 }: {
-  dataset: WriDataset
+  dataset: Pick<WriDataset, 'creator_user_id' | 'approval_status' | 'owner_org'>
 }) {
   const session = useSession();
   const userCapacity = api.user.getUserCapacity.useQuery(undefined, {

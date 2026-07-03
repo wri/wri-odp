@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const { data: pendingData, isLoading: isLoadingPending } =
         api.dataset.getPendingDatasets.useQuery({
             search: '',
-            page: { start: 0, rows: 100 },
+            page: { start: 0, rows: 0 },
             sortBy: 'metadata_modified desc',
         });
     const { data: userIdentity, isLoading: isLoadingIUser } =
@@ -230,14 +230,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                                     }
                                                                                     {isLoadingPending ? (
                                                                                         <Spinner className="w-2 h-2" />
-                                                                                    ) : pendingData
-                                                                                          ?.datasets
-                                                                                          ?.length ? (
+                                                                                    ) : pendingData?.count ? (
                                                                                         <div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
                                                                                             {
-                                                                                                pendingData
-                                                                                                    ?.datasets
-                                                                                                    .length
+                                                                                                pendingData.count
                                                                                             }
                                                                                         </div>
                                                                                     ) : (
@@ -371,14 +367,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                             </div>
                                                                             {isLoadingPending ? (
                                                                                 <Spinner className="w-2 h-2" />
-                                                                            ) : pendingData
-                                                                                  ?.datasets
-                                                                                  ?.length ? (
+                                                                            ) : pendingData?.count ? (
                                                                                 <div className="text-[0.688rem] font-semibold bg-wri-gold text-black  flex justify-center items-center w-5 h-5 rounded-full pt-1">
                                                                                     {
-                                                                                        pendingData
-                                                                                            ?.datasets
-                                                                                            .length
+                                                                                        pendingData.count
                                                                                     }
                                                                                 </div>
                                                                             ) : (

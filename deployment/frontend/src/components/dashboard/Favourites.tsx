@@ -9,9 +9,21 @@ import { api } from '@/utils/api';
 import type { WriDataset } from '@/schema/ckan.schema';
 import { formatDate } from '@/utils/general';
 import PendingApprovalTag from '../_shared/PendingApprovalTag';
+import Spinner from '../_shared/Spinner';
 
-function Favourite({ dataset }: { dataset: WriDataset }) {
-    const created = dataset?.metadata_modified ? dataset.metadata_modified : '';
+type FavouriteDatasetPreview = Pick<
+    WriDataset,
+    | 'id'
+    | 'name'
+    | 'title'
+    | 'metadata_modified'
+    | 'creator_user_id'
+    | 'approval_status'
+    | 'owner_org'
+>;
+
+function Favourite({ dataset }: { dataset: FavouriteDatasetPreview }) {
+    const created = dataset?.metadata_modified ?? '';
     return (
         <div className="flex flex-col hover:bg-slate-100 px-3 pb-2 pt-2 mb-2 pb-2 rounded-md">
             <div className="flex items-center gap-x-2">
@@ -30,7 +42,9 @@ function Favourite({ dataset }: { dataset: WriDataset }) {
     );
 }
 export default function Favourites({ drag }: { drag: boolean }) {
-    const { data, isLoading } = api.dataset.getFavoriteDataset.useQuery();
+    const { data, isLoading } = api.dataset.getFavoriteDataset.useQuery({
+        preview: true,
+    });
     return (
         <section
             id="favourites"
@@ -55,12 +69,14 @@ export default function Favourites({ drag }: { drag: boolean }) {
                     <ArrowRightIcon className="w-4 h-4 mb-1" />
                 </Link>
             </div>
-            {data?.datasets.length === 0 ? (
+            {isLoading ? (
+                <Spinner className="mx-auto" />
+            ) : data?.datasets.length === 0 ? (
                 <div className="flex justify-center items-center h-screen">
                     No data
                 </div>
             ) : (
-                data?.datasets.slice(0, 10).map((items, index) => {
+                data?.datasets.map((items, index) => {
                     return <Favourite key={index} dataset={items} />;
                 })
             )}
