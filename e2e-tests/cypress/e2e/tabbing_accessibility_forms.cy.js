@@ -5,7 +5,6 @@ const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
 const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
 const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
-const headers = { Authorization: Cypress.env("API_KEY") };
 
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
@@ -39,10 +38,10 @@ describe("Create dataset via tabbing", () => {
     // Team
     cy.tabTo({ selector: "#team", timeout: 10000 })
       .should("be.visible")
-      .realPress(["Enter"]);
-    cy.contains('[role="option"]', org, { timeout: 10000 }).click({
-      force: true,
-    });
+      .should("be.focused")
+      .realPress(["ArrowDown"]);
+    cy.realPress([...org]);
+    cy.realPress(["Enter"]);
 
     // Topics
     cy.tabTo({ selector: "#topicsButton" })
@@ -51,7 +50,7 @@ describe("Create dataset via tabbing", () => {
 
     // Visibility
     cy.tabTo({ selector: "#visibility_type" })
-      .realPress(["Enter"])
+      .realPress(["ArrowDown"])
       .realPress(["ArrowDown"])
       .realPress(["Enter"]);
 
@@ -88,16 +87,7 @@ describe("Create dataset via tabbing", () => {
   });
 
   after(() => {
-    cy.request({
-      method: "GET",
-      url: `${Cypress.config().apiUrl}/api/3/action/package_show?id=${dataset}`,
-      headers,
-      failOnStatusCode: false,
-    }).then((response) => {
-      if (response.status === 200 && response.body?.success) {
-        cy.deleteDatasetAPI(dataset);
-      }
-    });
+    cy.deleteDatasetAPI(dataset);
     cy.deleteOrganizationAPI(org);
   });
 });
