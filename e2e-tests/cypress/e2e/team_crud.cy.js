@@ -18,26 +18,27 @@ describe("Create and edit team", () => {
 
   it("Should create and edit team", () => {
     cy.visit("/dashboard/teams/new");
-    //get input with name=title
     cy.get("input[name=title]").type(org);
-    //check if input with name url has the content of "test-team"
     cy.get("input[name=name]").should("have.value", org);
     cy.get("textarea[name=description]").type("Test description");
-    //get button with aria-haspopup=true
     cy.get("button[aria-haspopup=listbox]").contains('span', 'Select a parent').click();
-
-    // get li element that contains the text "test-organization"
     cy.contains('[role="option"]', parentOrg).click();
-    //get button of type submit and click it
     cy.get("button[type=submit]").click();
-    cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", org);
-      cy.get("input[name=title]").clear().type(org + " edited");
-      cy.get("button[type=submit]").click();
-      cy.visit(`/dashboard/teams/${org}/edit`).then(() => {
-        cy.get("input[name=title]").should("have.value", org + " edited");
-      });
+    cy.contains(`Successfully created the ${org} Team`, { timeout: 60000 });
+
+    cy.visit(`/dashboard/teams/${org}/edit`);
+    cy.get("input[name=title]").should("have.value", org);
+    cy.get("input[name=title]").clear().type(org + " edited");
+    cy.get("button[type=submit]").click();
+    cy.contains(`Successfully edited the ${org} edited Team`, {
+      timeout: 60000,
     });
+
+    cy.visit(`/dashboard/teams/${org}/edit`);
+    cy.get("input[name=title]", { timeout: 60000 }).should(
+      "have.value",
+      org + " edited",
+    );
   });
 
   after(() => {

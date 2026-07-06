@@ -27,14 +27,21 @@ describe("Create and edit topics", () => {
     cy.get("button[aria-haspopup=listbox]").click();
     cy.contains('[role="option"]', parentTopic).click();
     cy.get("button[type=submit]").click();
-    cy.visit(`/dashboard/topics/${topic}/edit`).then(() => {
-      cy.get("input[name=title]").should("have.value", topic);
-      cy.get("input[name=title]").clear().type(topic + " edited");
-      cy.get("button[type=submit]").click();
-      cy.visit(`/dashboard/topics/${topic}/edit`).then(() => {
-        cy.get("input[name=title]").should("have.value", topic + " edited");
-      });
+    cy.contains(`Successfully created the ${topic} Topic`, { timeout: 60000 });
+
+    cy.visit(`/dashboard/topics/${topic}/edit`);
+    cy.get("input[name=title]").should("have.value", topic);
+    cy.get("input[name=title]").clear().type(topic + " edited");
+    cy.get("button[type=submit]").click();
+    cy.contains(`Successfully edited the ${topic} edited Topic`, {
+      timeout: 60000,
     });
+
+    cy.visit(`/dashboard/topics/${topic}/edit`);
+    cy.get("input[name=title]", { timeout: 60000 }).should(
+      "have.value",
+      topic + " edited",
+    );
   });
 
   after(() => {

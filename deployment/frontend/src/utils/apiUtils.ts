@@ -1100,9 +1100,15 @@ export async function fetchFacets(
     groupType: 'organization' | 'groups',
     apiKey: string
 ): Promise<Record<string, number>> {
-    const fq = `(${Object.values(teamDetails)
+    const names = Object.values(teamDetails)
         .map((item) => item.name)
-        .join(' OR ')})`;
+        .filter(Boolean);
+
+    if (names.length === 0) {
+        return {};
+    }
+
+    const fq = `(${names.join(' OR ')})`;
 
     const facetsQuery = await getAllDatasetFq({
         apiKey: apiKey,
