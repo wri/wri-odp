@@ -16,8 +16,13 @@ import { capacityOptions } from '../../datasets/admin/formOptions';
 import { type TeamFormType } from '@/schema/team.schema';
 import { type RouterOutput } from '@/server/api/root';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { type UseQueryResult } from '@tanstack/react-query';
 
 type TeamOutput = RouterOutput['teams']['getTeam'];
+type PossibleMembersQuery = UseQueryResult<
+    RouterOutput['teams']['getPossibleMembers'],
+    unknown
+>;
 
 function Membertooltip() {
     return (
@@ -47,6 +52,7 @@ export function Members({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: 'members',
     });
+    const allUsers = api.teams.getPossibleMembers.useQuery({ id: team.id });
 
     return (
         <div className="mx-auto w-full max-w-[1380px] sm:px-6 xxl:px-0">
@@ -67,7 +73,7 @@ export function Members({
                         <div className="flex flex-col gap-y-4">
                             {fields.map((field, index) => (
                                 <MemberForm
-                                    team={team}
+                                    allUsers={allUsers}
                                     key={field.id}
                                     index={index}
                                     remove={remove}
@@ -108,15 +114,13 @@ function MemberForm({
     formObj,
     index,
     remove,
-    team,
+    allUsers,
 }: {
     formObj: UseFormReturn<TeamFormType>;
     index: number;
     remove: UseFieldArrayRemove;
-    team: any;
+    allUsers: PossibleMembersQuery;
 }) {
-    const allUsers = api.teams.getPossibleMembers.useQuery(team);
-
     return (
         <div className="flex items-center gap-x-2">
             <div className="grid grow grid-cols-1 items-start gap-x-24 md:grid-cols-2">
