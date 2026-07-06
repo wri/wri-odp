@@ -15,8 +15,13 @@ import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { capacityOptions } from '../../datasets/admin/formOptions';
 import { type RouterOutput } from '@/server/api/root';
 import { type TopicFormType } from '@/schema/topic.schema';
+import { type UseQueryResult } from '@tanstack/react-query';
 
 type TopicOutput = RouterOutput['topics']['getTopic'];
+type PossibleMembersQuery = UseQueryResult<
+    RouterOutput['topics']['getPossibleMembers'],
+    unknown
+>;
 
 export function Members({
     topic,
@@ -30,6 +35,7 @@ export function Members({
         control, // control props comes from useForm (optional: if you are using FormContext)
         name: 'members',
     });
+    const allUsers = api.topics.getPossibleMembers.useQuery({ id: topic.id! });
 
     return (
         <div className="mx-auto w-full max-w-[1380px] sm:px-6 xxl:px-0">
@@ -44,7 +50,7 @@ export function Members({
                         <div className="flex flex-col gap-y-4">
                             {fields.map((field, index) => (
                                 <MemberForm
-                                    topic={topic}
+                                    allUsers={allUsers}
                                     key={field.id}
                                     index={index}
                                     remove={remove}
@@ -85,15 +91,13 @@ function MemberForm({
     formObj,
     index,
     remove,
-    topic,
+    allUsers,
 }: {
     formObj: UseFormReturn<TopicFormType>;
     index: number;
     remove: UseFieldArrayRemove;
-    topic: any;
+    allUsers: PossibleMembersQuery;
 }) {
-    const allUsers = api.topics.getPossibleMembers.useQuery(topic);
-
     return (
         <div className="flex items-center gap-x-2">
             <div className="grid grow grid-cols-1 items-start gap-x-24 md:grid-cols-2">
