@@ -106,7 +106,10 @@ describe("Upload file and create dataset", () => {
       .type(dataset + " EDITED");
     cy.get("textarea[name=short_description]").clear().type("test234");
     cy.get("button").contains("Update Dataset").click({ force: true });
-    cy.wait(20000);
+    cy.contains(`Successfully edited the "${dataset + " EDITED"}" Dataset`, {
+      timeout: 60000,
+    });
+    cy.url({ timeout: 60000 }).should("include", `/datasets/${dataset}`);
   });
 
   it(
@@ -119,9 +122,9 @@ describe("Upload file and create dataset", () => {
     },
     () => {
       cy.viewport(1440, 900);
-      cy.wait(15000);
       cy.visit("/datasets/" + dataset);
-      cy.get("#toggle-version").click();
+      cy.get("#nav-user-menu", { timeout: 30000 }).should("be.visible");
+      cy.get("#toggle-version", { timeout: 60000 }).should("be.visible").click();
       cy.wait(10000);
       // cy.contains("View Table Preview", { timeout: 30000 }).click();
       cy.contains("01D2539e270CEbd", { timeout: 15000 });

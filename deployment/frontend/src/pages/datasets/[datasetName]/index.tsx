@@ -320,16 +320,16 @@ export default function DatasetPage(
     }
   );
 
+  const sessionReady = session.status !== 'loading';
   const {
     data: diffData,
     isLoading: isLoadingDiff,
-    fetchStatus,
   } = api.dataset.showPendingDiff.useQuery(
     {
       id: datasetId,
     },
     {
-      enabled: !!pendingExist,
+      enabled: !!pendingExist && sessionReady && !!session.data?.user,
       retry: 0,
       staleTime: 0,
     }
@@ -617,7 +617,9 @@ export default function DatasetPage(
     }
   }, [isCurrentVersion]);
 
-  const shouldLoad = pendingExist ? isLoadingDiff : false;
+  const shouldLoad = pendingExist
+    ? !sessionReady || (!!session.data?.user && isLoadingDiff)
+    : false;
 
   if (isLoading || !datasetData || isLoadingPrev || shouldLoad) {
     return (
