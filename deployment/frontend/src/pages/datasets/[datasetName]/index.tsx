@@ -618,7 +618,8 @@ export default function DatasetPage(
   }, [isCurrentVersion]);
 
   const shouldLoad = pendingExist
-    ? !sessionReady || (!!session.data?.user && isLoadingDiff)
+    ? !sessionReady ||
+      (!!session.data?.user && isLoadingDiff && !diffData)
     : false;
 
   if (isLoading || !datasetData || isLoadingPrev || shouldLoad) {

@@ -13,6 +13,15 @@ const user_email = `${uuid()}@gmail.com`;
 const user_2 = `${uuid()}-test-user`;
 const user_email_2 = `${uuid()}@gmail.com`;
 
+const visitDatasetPage = (name = dataset) => {
+  cy.visit("/datasets/" + name);
+  cy.get("#nav-user-menu", { timeout: 30000 }).should("be.visible");
+};
+
+const expectDatasetTitle = (title) => {
+  cy.get("h1", { timeout: 60000 }).should("contain", title);
+};
+
 describe("Create dataset", () => {
   before(() => {
     cy.createUserApi(user, user_email, "test_user");
@@ -149,8 +158,8 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.visit("/datasets/" + dataset);
-      cy.get("h1").contains(dataset, { timeout: 15000 });
+      visitDatasetPage();
+      expectDatasetTitle(dataset);
       cy.get("h2").contains(org);
       cy.contains("Data Files").click();
       cy.contains("PNG");
@@ -245,9 +254,10 @@ describe("Create dataset", () => {
       // cy.get("input").eq(1).click().type(user_2);
       // cy.get("li").contains(user_2).click();
       cy.get("button").contains("Update Dataset").click();
-      // cy.contains(`Successfully edited the "${dataset + " EDITED"}" dataset`, {
-      //   timeout: 30000,
-      // });
+      cy.contains(`Successfully edited the "${dataset + " EDITED"}" Dataset`, {
+        timeout: 60000,
+      });
+      cy.url({ timeout: 60000 }).should("include", `/datasets/${dataset}`);
     },
   );
 
@@ -260,8 +270,8 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.visit("/datasets/" + dataset);
-      cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
+      visitDatasetPage();
+      expectDatasetTitle(dataset + " EDITED");
       cy.contains("Data Files").click();
       cy.contains("jpg");
       cy.contains("Contact").click();
@@ -316,8 +326,8 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.visit("/datasets/" + dataset);
-      cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
+      visitDatasetPage();
+      expectDatasetTitle(dataset + " EDITED");
       cy.contains("Data Files").click();
       cy.contains("Tile cache").click();
       cy.contains("https://google.com");
@@ -362,8 +372,8 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.visit("/datasets/" + dataset);
-      cy.get("h1").contains(dataset + " EDITED", { timeout: 30000 });
+      visitDatasetPage();
+      expectDatasetTitle(dataset + " EDITED");
       cy.contains("Data Files").click();
       cy.contains("Gee asset").click();
       cy.contains("gee asset id");
