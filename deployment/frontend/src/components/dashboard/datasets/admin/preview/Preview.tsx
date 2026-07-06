@@ -18,10 +18,7 @@ import {
 import { useLayoutEffect, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 import { type UseFormReturn } from 'react-hook-form';
-import {
-    type DataDictionaryFormType,
-    type DatasetFormType,
-} from '@/schema/dataset.schema';
+import { type DataDictionaryFormType, type DatasetFormType } from '@/schema/dataset.schema';
 import { convertBytes } from '@/utils/convertBytes';
 import { PreviewMap } from '../datafiles/sections/BuildALayer/BuildALayerSection';
 import {
@@ -34,11 +31,7 @@ import {
 } from '../datafiles/sections/BuildALayer/layer.schema';
 import { InfoAlert } from '@/components/_shared/Alerts';
 
-export function Preview({
-    formObj,
-}: {
-    formObj: UseFormReturn<DatasetFormType>;
-}) {
+export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }) {
     const { watch } = formObj;
     return (
         <div className="mx-auto w-full max-w-[71rem] bg-white px-4 font-acumin shadow sm:px-6 xxl:px-0">
@@ -57,10 +50,7 @@ export function Preview({
                         </h3>
                         <div className="grid sm:grid-cols-2">
                             <dl className="flex flex-col gap-y-6">
-                                <SimpleDescription
-                                    label="Source"
-                                    text={watch('url') ?? '_'}
-                                />
+                                <SimpleDescription label="Source" text={watch('url') ?? '_'} />
                                 <SimpleDescription
                                     label="Language"
                                     text={watch('language')?.label ?? '_'}
@@ -69,38 +59,25 @@ export function Preview({
                                     label="Team"
                                     text={watch('team')?.label ?? '_'}
                                 />
-                                <SimpleDescription
-                                    label="Project"
-                                    text={watch('project') ?? '_'}
-                                />
-                                <ListOfItems
-                                    label="Topics"
-                                    items={watch('topics') ?? []}
-                                />
+                                <SimpleDescription label="Project" text={watch('project') ?? '_'} />
+                                <ListOfItems label="Topics" items={watch('topics') ?? []} />
                                 <SimpleDescription
                                     label="Technical Notes"
                                     text={watch('technical_notes') ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="Featured Dataset"
-                                    text={
-                                        watch('featured_dataset') ? 'Yes' : 'No'
-                                    }
+                                    text={watch('featured_dataset') ? 'Yes' : 'No'}
                                 />
                             </dl>
                             <dl className="flex flex-col gap-y-6">
-                                <ListOfItems
-                                    label="Tags"
-                                    items={watch('tags') ?? []}
-                                />
+                                <ListOfItems label="Tags" items={watch('tags') ?? []} />
                                 <SimpleDescription
                                     label="Temporal Coverage"
                                     text={
                                         watch('temporal_coverage_start') ||
                                         watch('temporal_coverage_end')
-                                            ? `${watch(
-                                                  'temporal_coverage_start'
-                                              )} - ${watch(
+                                            ? `${watch('temporal_coverage_start')} - ${watch(
                                                   'temporal_coverage_end'
                                               )}`
                                             : '_'
@@ -108,9 +85,7 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Update Frequency"
-                                    text={
-                                        watch('update_frequency')?.label ?? '_'
-                                    }
+                                    text={watch('update_frequency')?.label ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="Citation"
@@ -118,9 +93,7 @@ export function Preview({
                                 />
                                 <SimpleDescription
                                     label="Visibility"
-                                    text={
-                                        watch('visibility_type')?.label ?? '_'
-                                    }
+                                    text={watch('visibility_type')?.label ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="License"
@@ -129,10 +102,7 @@ export function Preview({
                                 <SimpleDescription
                                     label="Location"
                                     text={
-                                        watch('spatial_address') ||
-                                        watch('spatial')
-                                            ? 'Yes'
-                                            : '_'
+                                        watch('spatial_address') || watch('spatial') ? 'Yes' : '_'
                                     }
                                 />
                             </dl>
@@ -158,8 +128,7 @@ export function Preview({
                             </dl>
                         </div>
                     )}
-                    {(watch('authors')?.length > 0 ||
-                        watch('maintainers')?.length > 0) && (
+                    {(watch('authors')?.length > 0 || watch('maintainers')?.length > 0) && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 Points of Contact
@@ -180,24 +149,18 @@ export function Preview({
                                     ))}
                                 </dl>
                                 <dl className="flex flex-col gap-y-6">
-                                    {watch('maintainers')?.map(
-                                        (maintainer, index) => (
-                                            <div key={`maintainer-${index}`}>
-                                                <SimpleDescription
-                                                    label="Maintainer Name"
-                                                    text={
-                                                        maintainer.name ?? '_'
-                                                    }
-                                                />
-                                                <SimpleDescription
-                                                    label="Maintainer Email"
-                                                    text={
-                                                        maintainer.email ?? '_'
-                                                    }
-                                                />
-                                            </div>
-                                        )
-                                    )}
+                                    {watch('maintainers')?.map((maintainer, index) => (
+                                        <div key={`maintainer-${index}`}>
+                                            <SimpleDescription
+                                                label="Maintainer Name"
+                                                text={maintainer.name ?? '_'}
+                                            />
+                                            <SimpleDescription
+                                                label="Maintainer Email"
+                                                text={maintainer.email ?? '_'}
+                                            />
+                                        </div>
+                                    ))}
                                 </dl>
                             </div>
                         </div>
@@ -216,10 +179,7 @@ export function Preview({
                                             <div
                                                 className="prose max-w-none prose-sm prose-a:text-wri-green min-h-[100px]"
                                                 dangerouslySetInnerHTML={{
-                                                    __html:
-                                                        watch(
-                                                            'release_notes'
-                                                        ) ?? '_',
+                                                    __html: watch('release_notes') ?? '_',
                                                 }}
                                             ></div>
                                         }
@@ -247,51 +207,42 @@ export function Preview({
                                     <FullDescription label="Function">
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html:
-                                                    watch('function') ?? '_',
+                                                __html: watch('function') ?? '_',
                                             }}
                                         ></div>
                                     </FullDescription>
                                     <FullDescription label="Restrictions">
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html:
-                                                    watch('restrictions') ??
-                                                    '_',
+                                                __html: watch('restrictions') ?? '_',
                                             }}
                                         ></div>
                                     </FullDescription>
                                     <FullDescription label="Reasons for adding">
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html:
-                                                    watch(
-                                                        'reason_for_adding'
-                                                    ) ?? '_',
+                                                __html: watch('reason_for_adding') ?? '_',
                                             }}
                                         ></div>
                                     </FullDescription>
                                     <FullDescription label="Cautions">
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html:
-                                                    watch('cautions') ?? '_',
+                                                __html: watch('cautions') ?? '_',
                                             }}
                                         ></div>
                                     </FullDescription>
                                     <FullDescription label="Methodology">
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html:
-                                                    watch('methodology') ?? '_',
+                                                __html: watch('methodology') ?? '_',
                                             }}
                                         ></div>
                                     </FullDescription>
                                     <FullDescription label="Use cases">
                                         <div
                                             dangerouslySetInnerHTML={{
-                                                __html:
-                                                    watch('usecases') ?? '_',
+                                                __html: watch('usecases') ?? '_',
                                             }}
                                         ></div>
                                     </FullDescription>
@@ -303,15 +254,13 @@ export function Preview({
                         text={
                             <ul className="list-disc">
                                 <li>
-                                    To add a chart view to your Dataset, the
-                                    system first needs to load your Data File.
-                                    Please wait 10-15 minutes and then choose to
-                                    edit your Dataset. You will then be able to
-                                    add a chart.
+                                    To add a chart view to your Dataset, the system first needs to
+                                    load your Data File. Please wait 10-15 minutes and then choose
+                                    to edit your Dataset. You will then be able to add a chart.
                                 </li>
                                 <li>
-                                    Charts views cannot be created while the
-                                    Dataset is awaiting approval
+                                    Charts views cannot be created while the Dataset is awaiting
+                                    approval
                                 </li>
                             </ul>
                         }
@@ -324,13 +273,7 @@ export function Preview({
                             </h3>
                             <div>
                                 {watch('resources')
-                                    .filter(
-                                        (r) =>
-                                            ![
-                                                'empty-file',
-                                                'empty-layer',
-                                            ].includes(r.type)
-                                    )
+                                    .filter((r) => !['empty-file', 'empty-layer'].includes(r.type))
                                     .map((resource) => (
                                         <Datafile
                                             key={resource.resourceId}
@@ -345,15 +288,9 @@ export function Preview({
                                             format={resource.format ?? '-'}
                                             size={resource.size ?? null}
                                             layerObj={resource.layerObj ?? null}
-                                            layerObjRaw={
-                                                resource.layerObjRaw ?? null
-                                            }
-                                            description={
-                                                resource.description ?? '-'
-                                            }
-                                            dataDictionary={
-                                                resource.schema ?? []
-                                            }
+                                            layerObjRaw={resource.layerObjRaw ?? null}
+                                            description={resource.description ?? '-'}
+                                            dataDictionary={resource.schema ?? []}
                                         />
                                     ))}
                             </div>
@@ -365,21 +302,12 @@ export function Preview({
     );
 }
 
-function FullDescription({
-    label,
-    children,
-}: {
-    label: string;
-    children: React.ReactNode;
-}) {
+function FullDescription({ label, children }: { label: string; children: React.ReactNode }) {
     const [showReadMore, setShowReadMore] = useState(false);
     const [readMore, setReadMore] = useState(false);
     const ref = useRef<HTMLDivElement | null>(null);
     useLayoutEffect(() => {
-        if (
-            ref.current &&
-            ref.current.clientHeight < ref.current.scrollHeight
-        ) {
+        if (ref.current && ref.current.clientHeight < ref.current.scrollHeight) {
             setShowReadMore(true);
             return;
         }
@@ -417,13 +345,7 @@ function FullDescription({
     );
 }
 
-function SimpleDescription({
-    label,
-    text,
-}: {
-    label: string;
-    text: string | React.ReactNode;
-}) {
+function SimpleDescription({ label, text }: { label: string; text: string | React.ReactNode }) {
     return (
         <div>
             <dt className="font-['Acumin Pro SemiCondensed'] text-lg font-semibold leading-tight text-black">
@@ -515,9 +437,7 @@ function Datafile({
                                                 {name}
                                             </span>
                                             <span className="text-right font-acumin text-xs font-normal leading-tight text-neutral-500">
-                                                {size
-                                                    ? convertBytes(size)
-                                                    : '-'}
+                                                {size ? convertBytes(size) : '-'}
                                             </span>
                                         </>
                                     ))
@@ -565,6 +485,7 @@ function Datafile({
                         </div>
                     </Disclosure.Button>
                     <Transition
+                        as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -577,10 +498,7 @@ function Datafile({
                                 <SimpleDescription label="Title" text={title} />
                                 {type !== 'layer' && type !== 'layer-raw' && (
                                     <>
-                                        <SimpleDescription
-                                            label="Format"
-                                            text={format}
-                                        />
+                                        <SimpleDescription label="Format" text={format} />
                                         <div className="col-span-full">
                                             <SimpleDescription
                                                 label="Description"
@@ -589,20 +507,15 @@ function Datafile({
                                         </div>
                                     </>
                                 )}
-                                {type === 'upload' &&
-                                    dataDictionary.length > 0 && (
-                                        <div className="col-span-full">
-                                            <PreviewTable
-                                                dataDictionary={dataDictionary}
-                                            />
-                                        </div>
-                                    )}
+                                {type === 'upload' && dataDictionary.length > 0 && (
+                                    <div className="col-span-full">
+                                        <PreviewTable dataDictionary={dataDictionary} />
+                                    </div>
+                                )}
                                 {type === 'layer' && layerObj && (
                                     <div className="col-span-full">
                                         <PreviewMap
-                                            layerFormObj={convertFormToLayerObj(
-                                                layerObj
-                                            )}
+                                            layerFormObj={convertFormToLayerObj(layerObj)}
                                         />
                                     </div>
                                 )}
@@ -610,9 +523,7 @@ function Datafile({
                                     <div className="col-span-full">
                                         <PreviewMap
                                             layerFormObj={{
-                                                ...getApiSpecFromRawObj(
-                                                    layerObjRaw
-                                                ),
+                                                ...getApiSpecFromRawObj(layerObjRaw),
                                                 id: 'sample-id',
                                             }}
                                         />
@@ -627,11 +538,7 @@ function Datafile({
     );
 }
 
-function PreviewTable({
-    dataDictionary,
-}: {
-    dataDictionary: DataDictionaryFormType;
-}) {
+function PreviewTable({ dataDictionary }: { dataDictionary: DataDictionaryFormType }) {
     return (
         <Table>
             <TableHeader>
@@ -654,11 +561,7 @@ function PreviewTable({
                 {dataDictionary.map((field, index) => (
                     <TableRow
                         key={index}
-                        className={
-                            index % 2 != 0
-                                ? 'border-0 bg-[#FDFDFD]'
-                                : 'border-0 bg-white'
-                        }
+                        className={index % 2 != 0 ? 'border-0 bg-[#FDFDFD]' : 'border-0 bg-white'}
                     >
                         <TableCell>{field.id}</TableCell>
                         <TableCell>{field.info.label}</TableCell>

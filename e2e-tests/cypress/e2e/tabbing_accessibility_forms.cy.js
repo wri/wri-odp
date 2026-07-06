@@ -39,11 +39,9 @@ describe("Create dataset via tabbing", () => {
     cy.tabTo({ selector: "#team", timeout: 10000 })
       .should("be.visible")
       .should("be.focused")
-      .type(org)
-      .realPress(["Enter"])
-      .wait(500)
-      .realPress([...org])
-      .realPress(["Enter"]);
+      .realPress(["ArrowDown"]);
+    cy.realPress([...org]);
+    cy.realPress(["Enter"]);
 
     // Topics
     cy.tabTo({ selector: "#topicsButton" })
@@ -52,7 +50,7 @@ describe("Create dataset via tabbing", () => {
 
     // Visibility
     cy.tabTo({ selector: "#visibility_type" })
-      .realPress(["Enter"])
+      .realPress(["ArrowDown"])
       .realPress(["ArrowDown"])
       .realPress(["Enter"]);
 

@@ -13,12 +13,8 @@ export default function MetadataModifiedFacet({
     filters: Filter[];
 }) {
     const getUpdatedState = () => {
-        const sinceValue =
-            filters.find((f) => f?.key === 'metadata_modified_since')?.value ??
-            '';
-        const beforeValue =
-            filters.find((f) => f?.key === 'metadata_modified_before')?.value ??
-            '';
+        const sinceValue = filters.find((f) => f?.key === 'metadata_modified_since')?.value ?? '';
+        const beforeValue = filters.find((f) => f?.key === 'metadata_modified_before')?.value ?? '';
 
         return {
             metadata_modified_since: sinceValue,
@@ -39,28 +35,18 @@ export default function MetadataModifiedFacet({
         setOptionsState((prev) => ({ ...prev, [key]: value }));
 
         const newSince =
-            key === 'metadata_modified_since'
-                ? value
-                : optionsState.metadata_modified_since;
+            key === 'metadata_modified_since' ? value : optionsState.metadata_modified_since;
         const newBefore =
-            key === 'metadata_modified_before'
-                ? value
-                : optionsState.metadata_modified_before;
+            key === 'metadata_modified_before' ? value : optionsState.metadata_modified_before;
 
         if (newSince && newBefore && new Date(newSince) > new Date(newBefore)) {
-            notify(
-                'Invalid date range: "Since" date must be before the "Before" date.',
-                'error'
-            );
+            notify('Invalid date range: "Since" date must be before the "Before" date.', 'error');
             setOptionsState((prev) => ({ ...prev, [key]: '' }));
             return;
         }
 
         if (newSince && new Date(newSince) > new Date()) {
-            notify(
-                'Invalid date range: "Since" date must be today or in the past.',
-                'error'
-            );
+            notify('Invalid date range: "Since" date must be today or in the past.', 'error');
             setOptionsState((prev) => ({ ...prev, [key]: '' }));
             return;
         }
@@ -70,9 +56,7 @@ export default function MetadataModifiedFacet({
         if (value) {
             newFilters.push({
                 key,
-                title:
-                    'Last Updated ' +
-                    (key.endsWith('_since') ? 'After' : 'Before'),
+                title: 'Last Updated ' + (key.endsWith('_since') ? 'After' : 'Before'),
                 value,
                 label: value,
             });
@@ -81,11 +65,7 @@ export default function MetadataModifiedFacet({
     };
 
     return (
-        <Disclosure
-            as="div"
-            className="border-b border-r border-stone-200 shadow"
-            role="listitem"
-        >
+        <Disclosure as="div" className="border-b border-r border-stone-200 shadow" role="listitem">
             {({ open }) => (
                 <>
                     <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
@@ -101,6 +81,7 @@ export default function MetadataModifiedFacet({
                         />
                     </Disclosure.Button>
                     <Transition
+                        as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -125,9 +106,7 @@ export default function MetadataModifiedFacet({
                                                 id="since-date"
                                                 type="date"
                                                 className="h-8 w-[8rem] rounded border-gray-300 text-gray-500 focus:ring-gray-500 px-3"
-                                                value={
-                                                    optionsState.metadata_modified_since
-                                                }
+                                                value={optionsState.metadata_modified_since}
                                                 onChange={(e) =>
                                                     handleDateChange(
                                                         'metadata_modified_since',
@@ -151,9 +130,7 @@ export default function MetadataModifiedFacet({
                                                 id="before-date"
                                                 type="date"
                                                 className="h-8 w-[8rem] rounded border-gray-300 text-gray-500 focus:ring-gray-500 px-3"
-                                                value={
-                                                    optionsState.metadata_modified_before
-                                                }
+                                                value={optionsState.metadata_modified_before}
                                                 onChange={(e) =>
                                                     handleDateChange(
                                                         'metadata_modified_before',

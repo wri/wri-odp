@@ -30,9 +30,7 @@ export default function Tags({
 }) {
     const getUpdatedOptionsState = () => {
         return options.reduce((a, v) => {
-            const checked = filters.find(
-                (f) => f?.key == fqKey && f?.value == v.value
-            );
+            const checked = filters.find((f) => f?.key == fqKey && f?.value == v.value);
 
             return {
                 ...a,
@@ -41,20 +39,15 @@ export default function Tags({
         }, {});
     };
 
-    const [optionsState, setOptionsState] = useState<Record<string, boolean>>(
-        getUpdatedOptionsState()
-    );
+    const [optionsState, setOptionsState] =
+        useState<Record<string, boolean>>(getUpdatedOptionsState());
 
     useEffect(() => {
         setOptionsState(getUpdatedOptionsState);
     }, [filters]);
 
     return (
-        <Disclosure
-            as="div"
-            className="border-b border-r border-stone-200 shadow"
-            role="listitem"
-        >
+        <Disclosure as="div" className="border-b border-r border-stone-200 shadow" role="listitem">
             {({ open }) => (
                 <>
                     <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
@@ -73,6 +66,7 @@ export default function Tags({
                         />
                     </Disclosure.Button>
                     <Transition
+                        as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -88,9 +82,7 @@ export default function Tags({
                                     title="Tags"
                                     filters={filters}
                                     setFilters={setFilters}
-                                    setFacetSelectedCount={
-                                        setFacetSelectedCount
-                                    }
+                                    setFacetSelectedCount={setFacetSelectedCount}
                                     facetSelectedCount={facetSelectedCount}
                                     value={value}
                                     setValue={setValue}

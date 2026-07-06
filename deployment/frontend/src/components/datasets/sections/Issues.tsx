@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import {
-    MagnifyingGlassIcon,
-    ChatBubbleLeftIcon,
-    ClockIcon,
-} from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, ChatBubbleLeftIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { type Issue } from '@/schema/ckan.schema';
 import { Disclosure, Transition } from '@headlessui/react';
 import { type Index } from 'flexsearch';
@@ -21,10 +17,7 @@ import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
-import {
-    ExclamationTriangleIcon,
-    InformationCircleIcon,
-} from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { ErrorAlert } from '@/components/_shared/Alerts';
@@ -48,9 +41,7 @@ export default function Issues({
     const [issueState, setIssueState] = useState<'open' | 'closed'>('open');
     const [q, setQ] = useState('');
     const filteredIssues =
-        q !== ''
-            ? issues?.filter((issue) => index.search(q).includes(issue.id))
-            : issues;
+        q !== '' ? issues?.filter((issue) => index.search(q).includes(issue.id)) : issues;
 
     return (
         <section id="issues">
@@ -66,11 +57,7 @@ export default function Issues({
             <div className="flex flex-col gap-x-3 gap-y-3 min-h-[10rem]">
                 <div className="flex flex-col sm:flex-row gap-y-3">
                     <span className="mb-1">
-                        {
-                            filteredIssues.filter(
-                                (issue) => issue.status === issueState
-                            ).length
-                        }{' '}
+                        {filteredIssues.filter((issue) => issue.status === issueState).length}{' '}
                         Issues
                     </span>
 
@@ -191,9 +178,7 @@ function IssueCard({
             <Disclosure.Button as="div">
                 <div className="relative">
                     <div className="flex gap-x-2">
-                        <h3 className="font-semibold text-[1.125rem]">
-                            {issue.title}
-                        </h3>
+                        <h3 className="font-semibold text-[1.125rem]">{issue.title}</h3>
                         {issue.status === 'closed' && (
                             <div className=" bg-red-500 text-white text-[10px] font-thin rounded-sm my-auto px-[1.5px]">
                                 closed
@@ -203,9 +188,7 @@ function IssueCard({
                     {issue.comment_count > 0 && (
                         <div className="flex absolute right-8 sm:top-[40%] gap-x-1 items-center">
                             <ChatBubbleLeftIcon className="w-5 h-5 text-blue-800" />
-                            <div className=" font-normal text-base">
-                                {issue.comment_count}
-                            </div>
+                            <div className=" font-normal text-base">{issue.comment_count}</div>
                         </div>
                     )}
                     <p
@@ -224,6 +207,7 @@ function IssueCard({
                 </div>
             </Disclosure.Button>
             <Transition
+                as="div"
                 enter="transition duration-100 ease-out"
                 enterFrom="transform scale-95 opacity-0"
                 enterTo="transform scale-100 opacity-100"
@@ -232,9 +216,7 @@ function IssueCard({
                 leaveTo="transform scale-95 opacity-0"
             >
                 <Disclosure.Panel className="border-t border-gray-400 my-4 pt-4">
-                    <p className="font-acumin text-base w-full text-[#1A1919]">
-                        Comments
-                    </p>
+                    <p className="font-acumin text-base w-full text-[#1A1919]">Comments</p>
                     {issue.comments.map((comment) => (
                         <li key={comment.id} className="flex gap-x-4 pt-2">
                             <div className="relative h-12 w-12 ">
@@ -252,14 +234,11 @@ function IssueCard({
                             <div className="flex-auto">
                                 <div className="flex items-baseline justify-between gap-x-4">
                                     <p className="text-sm font-semibold leading-6 text-gray-900">
-                                        {comment.user.display_name ??
-                                            comment.user.name}
+                                        {comment.user.display_name ?? comment.user.name}
                                     </p>
                                     <p className="flex-none text-xs text-gray-600">
                                         <time dateTime={comment.created}>
-                                            {new Date(
-                                                comment.created
-                                            ).toLocaleDateString(
+                                            {new Date(comment.created).toLocaleDateString(
                                                 'en-US',
                                                 options
                                             )}
@@ -298,9 +277,7 @@ function IssueCard({
                                     }}
                                     id={issue.id.toString()}
                                 >
-                                    {issue.status === 'open'
-                                        ? 'Close'
-                                        : 'Re-open'}
+                                    {issue.status === 'open' ? 'Close' : 'Re-open'}
                                 </Button>
                             ) : (
                                 ''
@@ -346,41 +323,25 @@ function IssueCard({
                                     as="h3"
                                     className="text-base font-semibold leading-6 text-gray-900"
                                 >
-                                    {issue.status === 'open'
-                                        ? 'Close'
-                                        : 'Re-open'}{' '}
-                                    Issue
+                                    {issue.status === 'open' ? 'Close' : 'Re-open'} Issue
                                 </Dialog.Title>
                                 <div className="mt-2">
                                     <p className="text-sm text-gray-500">
                                         Are you sure you want to{' '}
-                                        {issue.status === 'open'
-                                            ? 'close'
-                                            : 're-open'}{' '}
-                                        this Issue?
+                                        {issue.status === 'open' ? 'close' : 're-open'} this Issue?
                                     </p>
                                 </div>
                             </div>
                         </div>
                         <div className="mt-5 sm:mt-4 gap-x-4 sm:flex sm:flex-row-reverse">
                             <LoaderButton
-                                variant={
-                                    issue.status === 'open'
-                                        ? 'destructive'
-                                        : 'light'
-                                }
+                                variant={issue.status === 'open' ? 'destructive' : 'light'}
                                 loading={closeOpenIssueApi.isLoading}
                                 onClick={() => {
-                                    if (
-                                        formObj.getValues('comment').trim() !==
-                                        ''
-                                    ) {
+                                    if (formObj.getValues('comment').trim() !== '') {
                                         const payload = {
                                             ...formObj.getValues(),
-                                            status:
-                                                issue.status === 'open'
-                                                    ? 'closed'
-                                                    : 'open',
+                                            status: issue.status === 'open' ? 'closed' : 'open',
                                         };
 
                                         closeOpenIssueApi.mutate(payload);
@@ -388,16 +349,14 @@ function IssueCard({
                                         // Handle the case when the 'comment' field is empty
                                         formObj.setError('comment', {
                                             type: 'manual',
-                                            message:
-                                                'Comment must not be empty',
+                                            message: 'Comment must not be empty',
                                         });
                                         setOpenClose(false);
                                     }
                                 }}
                                 id={issue.number.toString()}
                             >
-                                {issue.status === 'open' ? 'Close' : 'Re-open'}{' '}
-                                Issue
+                                {issue.status === 'open' ? 'Close' : 'Re-open'} Issue
                             </LoaderButton>
                             <Button
                                 variant="outline"

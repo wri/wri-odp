@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import {
-    EyeIcon,
-    ChevronDownIcon,
-    ChevronUpIcon,
-} from '@heroicons/react/24/outline';
+import { EyeIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { Transition } from '@headlessui/react';
 import classNames from '@/utils/classnames';
 import { useSession } from 'next-auth/react';
@@ -56,8 +52,7 @@ export default function Row({
     const router = useRouter();
     // state event to change hover effect on desktop to click effect on mobile
     // const [isHover, setIsHover] = useState(false)
-    const enableControlDiv =
-        isDropDown || controlButtons || linkButton ? true : false;
+    const enableControlDiv = isDropDown || controlButtons || linkButton ? true : false;
     return (
         <div
             className={`flex flex-col hover:bg-wri-slate ${isShowSubRow ? 'bg-wri-slate' : ' '}  `}
@@ -135,6 +130,7 @@ export default function Row({
                 )}
             </div>
             <Transition
+                as="div"
                 show={isShowSubRow}
                 enter="transition duration-100 ease-out"
                 enterFrom="transform scale-95 opacity-0"

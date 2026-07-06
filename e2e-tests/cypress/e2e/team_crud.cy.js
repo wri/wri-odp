@@ -27,7 +27,7 @@ describe("Create and edit team", () => {
     cy.get("button[aria-haspopup=listbox]").contains('span', 'Select a parent').click();
 
     // get li element that contains the text "test-organization"
-    cy.get("li").contains(parentOrg).click();
+    cy.contains('[role="option"]', parentOrg).click();
     //get button of type submit and click it
     cy.get("button[type=submit]").click();
     cy.visit(`/dashboard/teams/${org}/edit`).then(() => {

@@ -48,7 +48,7 @@ describe("Create and verify organizations and groups", () => {
       .contains("span", "Select a parent")
       .click();
     organizations.forEach((org) => {
-      cy.get("li").contains(org).should("exist"); // Ensure every organization is listed in the dropdown
+      cy.contains('[role="option"]', org).should("exist"); // Ensure every organization is listed in the dropdown
     });
   });
 

@@ -14,18 +14,13 @@ export function Accordion({
     return (
         <Disclosure
             as="div"
-            className={classNames(
-                'border-b border-r border-stone-200 shadow',
-                className ?? ''
-            )}
+            className={classNames('border-b border-r border-stone-200 shadow', className ?? '')}
             role="listitem"
         >
             {({ open }) => (
                 <>
                     <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
-                        <div className="flex h-16 w-full items-center gap-x-2">
-                            {text}
-                        </div>
+                        <div className="flex h-16 w-full items-center gap-x-2">{text}</div>
                         <ChevronDownIcon
                             className={`${
                                 open ? 'rotate-180 transform  transition' : ''
@@ -33,6 +28,7 @@ export function Accordion({
                         />
                     </Disclosure.Button>
                     <Transition
+                        as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"

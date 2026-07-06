@@ -21,9 +21,7 @@ export default function LocationSearch({
         setFilters((prev) => {
             const newFilters = prev.length ? [...prev] : [];
 
-            const filterIndex = newFilters.findIndex(
-                (f) => f.key == 'extGlobalQ'
-            );
+            const filterIndex = newFilters.findIndex((f) => f.key == 'extGlobalQ');
             if (value === 'only' && locationFilterIndex >= 0) {
                 newFilters.splice(locationFilterIndex, 1);
             }
@@ -56,11 +54,7 @@ export default function LocationSearch({
         });
     }
     return (
-        <Disclosure
-            as="div"
-            className="border-b border-r border-stone-200 shadow"
-            role="listitem"
-        >
+        <Disclosure as="div" className="border-b border-r border-stone-200 shadow" role="listitem">
             {({ open }) => (
                 <>
                     <Disclosure.Button className="flex h-16 w-full items-center gap-x-2 bg-white px-7 py-6">
@@ -70,12 +64,11 @@ export default function LocationSearch({
                             </p>
                         </div>
                         <ChevronDownIcon
-                            className={`${
-                                open ? 'rotate-180 transform' : ''
-                            } h-5 w-5 text-black`}
+                            className={`${open ? 'rotate-180 transform' : ''} h-5 w-5 text-black`}
                         />
                     </Disclosure.Button>
                     <Transition
+                        as="div"
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-95 opacity-0"
                         enterTo="transform scale-100 opacity-100"
@@ -96,9 +89,7 @@ export default function LocationSearch({
                                         type="checkbox"
                                         onChange={() =>
                                             updateGlobalQ(
-                                                globalQValue === 'only'
-                                                    ? 'include'
-                                                    : 'only'
+                                                globalQValue === 'only' ? 'include' : 'only'
                                             )
                                         }
                                         checked={globalQValue == 'only'}
@@ -117,9 +108,7 @@ export default function LocationSearch({
                                         type="checkbox"
                                         onChange={() =>
                                             updateGlobalQ(
-                                                globalQValue === 'exclude'
-                                                    ? 'include'
-                                                    : 'exclude'
+                                                globalQValue === 'exclude' ? 'include' : 'exclude'
                                             )
                                         }
                                         checked={globalQValue == 'exclude'}
@@ -133,11 +122,7 @@ export default function LocationSearch({
                                     </label>
                                 </div>
                             </div>
-                            <div
-                                className={classNames(
-                                    globalQValue === 'only' ? 'hidden' : ''
-                                )}
-                            >
+                            <div className={classNames(globalQValue === 'only' ? 'hidden' : '')}>
                                 <Map
                                     mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
                                     style={{ height: 300 }}
@@ -151,32 +136,24 @@ export default function LocationSearch({
                                         position="bottom-right"
                                         onResult={(e) => {
                                             setFilters((prev) => {
-                                                const newFilters = prev.length
-                                                    ? [...prev]
-                                                    : [];
+                                                const newFilters = prev.length ? [...prev] : [];
 
-                                                const filterIndex =
-                                                    newFilters.findIndex(
-                                                        (f) =>
-                                                            f.key == 'spatial'
-                                                    );
+                                                const filterIndex = newFilters.findIndex(
+                                                    (f) => f.key == 'spatial'
+                                                );
 
                                                 if (filterIndex >= 0) {
                                                     // @ts-ignore
                                                     newFilters[filterIndex] = {
-                                                        ...newFilters[
-                                                            filterIndex
-                                                        ],
-                                                        label: e.result
-                                                            .place_name,
+                                                        ...newFilters[filterIndex],
+                                                        label: e.result.place_name,
                                                         value: e.result.geometry.coordinates.reverse(),
                                                     };
                                                 } else {
                                                     newFilters.push({
                                                         key: 'spatial',
                                                         title: 'Location',
-                                                        label: e.result
-                                                            .place_name,
+                                                        label: e.result.place_name,
                                                         value: e.result.geometry.coordinates.reverse(),
                                                     });
                                                 }
@@ -186,21 +163,14 @@ export default function LocationSearch({
                                         }}
                                         onClear={() => {
                                             setFilters((prev) => {
-                                                const newFilters = prev.length
-                                                    ? [...prev]
-                                                    : [];
+                                                const newFilters = prev.length ? [...prev] : [];
 
-                                                const filterIndex =
-                                                    newFilters.findIndex(
-                                                        (f) =>
-                                                            f.key == 'spatial'
-                                                    );
+                                                const filterIndex = newFilters.findIndex(
+                                                    (f) => f.key == 'spatial'
+                                                );
 
                                                 if (filterIndex >= 0) {
-                                                    newFilters.splice(
-                                                        filterIndex,
-                                                        1
-                                                    );
+                                                    newFilters.splice(filterIndex, 1);
                                                 }
 
                                                 return newFilters;
