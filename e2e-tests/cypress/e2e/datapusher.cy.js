@@ -122,8 +122,7 @@ describe("Upload file and create dataset", () => {
     },
     () => {
       cy.viewport(1440, 900);
-      cy.visit("/datasets/" + dataset);
-      cy.get("#nav-user-menu", { timeout: 30000 }).should("be.visible");
+      cy.visitDatasetPage(dataset, { waitForTabs: false });
       cy.get("#toggle-version", { timeout: 60000 }).should("be.visible").click();
       cy.wait(10000);
       // cy.contains("View Table Preview", { timeout: 30000 }).click();

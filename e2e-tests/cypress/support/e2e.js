@@ -84,6 +84,25 @@ Cypress.Commands.add("login", (username, password) => {
   });
 });
 
+// Dataset pages wait for session + pending diff before rendering tabs/header.
+Cypress.Commands.add("visitDatasetPage", (datasetName, options = {}) => {
+  const query = options.query
+    ? options.query.startsWith("?")
+      ? options.query
+      : `?${options.query}`
+    : "";
+  cy.visit(`/datasets/${datasetName}${query}`);
+  cy.get("#nav-user-menu", { timeout: 30000 }).should("be.visible");
+  cy.get("h1", { timeout: 60000 }).should("be.visible");
+  if (options.waitForTabs !== false) {
+    cy.contains("Related Datasets", { timeout: 60000 });
+  }
+});
+
+Cypress.Commands.add("expectDatasetTitle", (title) => {
+  cy.get("h1", { timeout: 60000 }).should("contain", title);
+});
+
 Cypress.Commands.add("logout", () => {
   cy.visit("/");
   cy.get("#nav-user-menu").click();

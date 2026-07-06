@@ -252,12 +252,11 @@ describe("Create and edit team", () => {
       .type(datasetName2 + " EDITED");
 
     cy.get("button").contains("Update Dataset").click();
-
-    cy.visit("/datasets/" + datasetName2);
-    cy.wait(5000);
-    cy.get("h1")
-      .contains(datasetName2 + " EDITED")
-      .should("exist");
+    cy.contains(`Successfully edited the "${datasetName2 + " EDITED"}" Dataset`, {
+      timeout: 60000,
+    });
+    cy.url({ timeout: 60000 }).should("include", `/datasets/${datasetName2}`);
+    cy.expectDatasetTitle(datasetName2 + " EDITED");
   });
 
   it("Should create a public datasset under subteam: admin", () => {
@@ -307,12 +306,11 @@ describe("Create and edit team", () => {
       .type(datasetName3 + " EDITED");
 
     cy.get("button").contains("Update Dataset").click();
-
-    cy.visit("/datasets/" + datasetName3);
-    cy.wait(5000);
-    cy.get("h1")
-      .contains(datasetName3 + " EDITED")
-      .should("exist");
+    cy.contains(`Successfully edited the "${datasetName3 + " EDITED"}" Dataset`, {
+      timeout: 60000,
+    });
+    cy.url({ timeout: 60000 }).should("include", `/datasets/${datasetName3}`);
+    cy.expectDatasetTitle(datasetName3 + " EDITED");
   });
 
   after(() => {
