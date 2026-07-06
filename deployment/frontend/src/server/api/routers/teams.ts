@@ -287,28 +287,24 @@ export const teamRouter = createTRPCRouter({
     getGeneralTeam: publicProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const groupTree = await searchHierarchy({
+            const { groups, count } = await searchHierarchy({
                 isSysadmin: true,
                 apiKey: ctx?.session?.user.apikey ?? '',
                 q: input.search || undefined,
                 group_type: 'organization',
+                page: input.page,
             });
 
-            if (groupTree.length === 0) {
+            if (groups.length === 0) {
                 return {
-                    teams: groupTree,
+                    teams: groups,
                     teamsDetails: {},
                     subTeamCounts: {},
                     count: 0,
                 };
             }
 
-            const paginated = groupTree.slice(
-                input.page.start,
-                input.page.start + input.page.rows
-            );
-
-            const teamsDetails = collectGroupDetails(paginated);
+            const teamsDetails = collectGroupDetails(groups, {}, true);
 
             const facets = await fetchFacets(
                 teamsDetails,
@@ -322,10 +318,10 @@ export const teamRouter = createTRPCRouter({
             }
 
             return {
-                teams: paginated,
+                teams: groups,
                 teamsDetails,
-                subTeamCounts: flattenTree(groupTree),
-                count: groupTree.length,
+                subTeamCounts: flattenTree(groups),
+                count,
             };
         }),
     getPossibleMembers: protectedProcedure

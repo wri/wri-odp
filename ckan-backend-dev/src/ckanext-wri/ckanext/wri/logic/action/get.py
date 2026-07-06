@@ -1047,6 +1047,8 @@ def get_hierarchy_group(
     q: Any,
     private_orgs: Any = None,
     user_orgs: Any = None,
+    limit: int | None = None,
+    offset: int = 0,
 ):
     def recurcive_tree_ids(
         org,
@@ -1072,6 +1074,7 @@ def get_hierarchy_group(
 
     group_hierarchy_ids = []
     results = []
+    total_count = 0
 
     for group in groups:
         if group in group_hierarchy_ids:
@@ -1088,13 +1091,50 @@ def get_hierarchy_group(
 
         group_hierarchy_ids += recurcive_tree_ids(group_tree)
 
-        if not context["user"] and (
+        if not context.get("user") and (
             private_orgs and group_tree["name"] in private_orgs
         ):
             continue
 
-        results.append(group_tree)
+        if limit is not None:
+            if total_count >= offset and len(results) < limit:
+                results.append(group_tree)
+            total_count += 1
+        else:
+            results.append(group_tree)
+
+    if limit is not None:
+        return results, total_count
     return results
+
+
+def _paginated_hierarchy_response(
+    context: Context,
+    groups: Any,
+    group_type: str,
+    q: Any,
+    data_dict: DataDict,
+    private_orgs: Any = None,
+    user_orgs: Any = None,
+):
+    limit = data_dict.get("limit")
+    if limit is not None:
+        offset = int(data_dict.get("offset", 0))
+        results, count = get_hierarchy_group(
+            context,
+            groups,
+            group_type,
+            q,
+            private_orgs,
+            user_orgs,
+            limit=int(limit),
+            offset=offset,
+        )
+        return {"results": results, "count": count}
+
+    return get_hierarchy_group(
+        context, groups, group_type, q, private_orgs, user_orgs
+    )
 
 
 # def _get_orgs_or_groups_visibility(orgs: list[dict[str, Any]]) -> dict[str, str]:
@@ -1184,16 +1224,21 @@ def organization_list_wri(context: Context, data_dict: DataDict):
     if user:
         user_orgs = orgs_list
 
-    results = get_hierarchy_group(
-        context, orgs_list, "organization", q, private_orgs, user_orgs
+    results = _paginated_hierarchy_response(
+        context, orgs_list, "organization", q, data_dict, private_orgs, user_orgs
     )
 
+    paginated = isinstance(results, dict)
+    hierarchy_results = results["results"] if paginated else results
+
     if all_fields:
-        results = _set_orgs_or_groups_fields(
-            orgs, results, ["visibility", "notes"], all_fields
+        hierarchy_results = _set_orgs_or_groups_fields(
+            orgs, hierarchy_results, ["visibility", "notes"], all_fields
         )
 
-    return results
+    if paginated:
+        return {"results": hierarchy_results, "count": results["count"]}
+    return hierarchy_results
 
 
 @logic.side_effect_free
@@ -1209,14 +1254,21 @@ def group_list_wri(context: Context, data_dict: DataDict):
 
     q = data_dict.get("q", False)
 
-    results = get_hierarchy_group(context, orgs_list, "group", q)
+    results = _paginated_hierarchy_response(
+        context, orgs_list, "group", q, data_dict
+    )
+
+    paginated = isinstance(results, dict)
+    hierarchy_results = results["results"] if paginated else results
 
     if all_fields:
-        results = _set_orgs_or_groups_fields(
-            orgs, results, ["visibility", "notes"], all_fields
+        hierarchy_results = _set_orgs_or_groups_fields(
+            orgs, hierarchy_results, ["visibility", "notes"], all_fields
         )
 
-    return results
+    if paginated:
+        return {"results": hierarchy_results, "count": results["count"]}
+    return hierarchy_results
 
 
 @logic.side_effect_free
@@ -1232,12 +1284,21 @@ def group_list_authz_wri(context: Context, data_dict: DataDict):
         results = grp_names
     else:
         grp_names = [org["name"] for org in orgs]
-        results = get_hierarchy_group(context, grp_names, "group", q)
-
-    if all_fields:
-        results = _set_orgs_or_groups_fields(
-            orgs, results, ["visibility", "notes"], all_fields
+        results = _paginated_hierarchy_response(
+            context, grp_names, "group", q, data_dict
         )
+
+    paginated = isinstance(results, dict)
+
+    if all_fields and not q:
+        if paginated:
+            results["results"] = _set_orgs_or_groups_fields(
+                orgs, results["results"], ["visibility", "notes"], all_fields
+            )
+        else:
+            results = _set_orgs_or_groups_fields(
+                orgs, results, ["visibility", "notes"], all_fields
+            )
 
     return results
 
@@ -1257,14 +1318,21 @@ def organization_list_for_user_wri(context: Context, data_dict: DataDict):
 
     user = context["user"]
 
-    results = get_hierarchy_group(context, orgs, "organization", q, user_orgs=orgs)
+    results = _paginated_hierarchy_response(
+        context, orgs, "organization", q, data_dict, user_orgs=orgs
+    )
+
+    paginated = isinstance(results, dict)
+    hierarchy_results = results["results"] if paginated else results
 
     if all_fields and full_orgs != orgs:
-        results = _set_orgs_or_groups_fields(
-            full_orgs, results, ["visibility", "notes"], all_fields
+        hierarchy_results = _set_orgs_or_groups_fields(
+            full_orgs, hierarchy_results, ["visibility", "notes"], all_fields
         )
 
-    return results
+    if paginated:
+        return {"results": hierarchy_results, "count": results["count"]}
+    return hierarchy_results
 
 
 @logic.side_effect_free

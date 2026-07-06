@@ -34,22 +34,18 @@ export const TopicRouter = createTRPCRouter({
   getUsersTopics: protectedProcedure
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
-      const groupTree = await searchHierarchy({
+      const { groups, count } = await searchHierarchy({
         isSysadmin: ctx.session.user.sysadmin,
         apiKey: ctx.session.user.apikey,
         q: input.search || undefined,
         group_type: 'group',
+        page: input.page,
       });
 
-      const paginated = groupTree.slice(
-        input.page.start,
-        input.page.start + input.page.rows
-      );
-
       return {
-        topics: paginated,
-        topic2Image: collectGroupTreeImages(paginated),
-        count: groupTree.length,
+        topics: groups,
+        topic2Image: collectGroupTreeImages(groups),
+        count,
       };
     }),
   getTopicsHierarchy: protectedProcedure.query(async ({ ctx }) => {
@@ -86,7 +82,7 @@ export const TopicRouter = createTRPCRouter({
   getTopicsHomePage: publicProcedure.query(async ({ ctx }) => {
     const user = ctx.session?.user;
     const apiKey = user ? user.apikey : null;
-    const [topics, groupTree] = await Promise.all([
+    const [topics, hierarchy] = await Promise.all([
       groupList({ apiKey }),
       searchHierarchy({
         isSysadmin: true,
@@ -95,6 +91,7 @@ export const TopicRouter = createTRPCRouter({
         group_type: 'group',
       }),
     ]);
+    const groupTree = hierarchy.groups;
     const topicDetails = topics.reduce(
       (acc, org) => {
         acc[org.id] = {
@@ -121,7 +118,7 @@ export const TopicRouter = createTRPCRouter({
     return {
       topics: groupTree,
       topicDetails: topicDetails,
-      count: groupTree.length,
+      count: hierarchy.count,
     };
   }),
   getAllTopics: protectedProcedure.query(async ({ ctx }) => {
@@ -324,27 +321,23 @@ export const TopicRouter = createTRPCRouter({
   getGeneralTopics: publicProcedure
     .input(searchSchema)
     .query(async ({ input, ctx }) => {
-      const groupTree = await searchHierarchy({
+      const { groups, count } = await searchHierarchy({
         isSysadmin: true,
         apiKey: ctx?.session?.user.apikey ?? '',
         q: input.search || undefined,
         group_type: 'group',
+        page: input.page,
       });
 
-      if (groupTree.length === 0) {
+      if (groups.length === 0) {
         return {
-          topics: groupTree,
+          topics: groups,
           topicDetails: {},
           count: 0,
         };
       }
 
-      const paginated = groupTree.slice(
-        input.page.start,
-        input.page.start + input.page.rows
-      );
-
-      const topicDetails = collectGroupDetails(paginated);
+      const topicDetails = collectGroupDetails(groups, {}, true);
 
       const facets = await fetchFacets(
         topicDetails,
@@ -358,9 +351,9 @@ export const TopicRouter = createTRPCRouter({
       }
 
       return {
-        topics: paginated,
+        topics: groups,
         topicDetails,
-        count: groupTree.length,
+        count,
       };
     }),
   getTopicV2: protectedProcedure

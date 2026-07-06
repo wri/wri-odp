@@ -64,58 +64,65 @@ export async function searchHierarchy({
     apiKey,
     q,
     group_type,
+    page,
 }: {
     isSysadmin: boolean;
     apiKey: string;
     q?: string;
     group_type: string;
-}): Promise<GroupTree[]> {
+    page?: { start: number; rows: number };
+}): Promise<{ groups: GroupTree[]; count: number }> {
     try {
-        let response: Response;
-        let groups: GroupTree[] | [] = [];
-        if (isSysadmin) {
-            let urLink = '';
-            if (q) {
-                urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group'
-                        ? 'group_list_wri'
-                        : 'organization_list_wri'
-                }?include_extras=true&all_fields=true&q=${q}`;
-            } else {
-                urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group'
-                        ? 'group_list_wri'
-                        : 'organization_list_wri'
-                }?include_extras=true&all_fields=true`;
-            }
+        const params = new URLSearchParams({
+            include_extras: 'true',
+            all_fields: 'true',
+        });
+        if (q) {
+            params.set('q', q);
+        }
+        if (page) {
+            params.set('limit', String(page.rows));
+            params.set('offset', String(page.start));
+        }
 
-            response = await fetch(urLink, {
+        let action: string;
+        if (isSysadmin) {
+            action =
+                group_type == 'group'
+                    ? 'group_list_wri'
+                    : 'organization_list_wri';
+        } else {
+            action =
+                group_type == 'group'
+                    ? 'group_list_authz_wri'
+                    : 'organization_list_for_user_wri';
+        }
+
+        const response = await fetch(
+            `${env.CKAN_URL}/api/3/action/${action}?${params.toString()}`,
+            {
                 headers: {
                     Authorization: apiKey,
                 },
-            });
+            }
+        );
 
-            const data = (await response.json()) as CkanResponse<GroupTree[]>;
-            groups = data.success === true ? data.result : [];
-        } else {
-            response = await fetch(
-                `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group'
-                        ? `group_list_authz_wri?include_extras=true&all_fields=true${q ? `&q=${q}` : ''}`
-                        : `organization_list_for_user_wri?include_extras=true&all_fields=true${q ? `&q=${q}` : ''}`
-                }`,
-                {
-                    headers: {
-                        Authorization: apiKey,
-                    },
-                }
-            );
+        const data = (await response.json()) as CkanResponse<
+            GroupTree[] | { results: GroupTree[]; count: number }
+        >;
 
-            const data = (await response.json()) as CkanResponse<GroupTree[]>;
-            groups = data.success === true ? data.result : [];
+        if (data.success !== true) {
+            return { groups: [], count: 0 };
         }
 
-        return groups;
+        if (Array.isArray(data.result)) {
+            return { groups: data.result, count: data.result.length };
+        }
+
+        return {
+            groups: data.result.results ?? [],
+            count: data.result.count ?? 0,
+        };
     } catch (e) {
         throw new Error(e as string);
     }
@@ -1013,12 +1020,13 @@ export async function getOrganizationTreeDetails({
     let groupTree: GroupTree[] = [];
 
     if (input.search) {
-        groupTree = await searchHierarchy({
+        const hierarchy = await searchHierarchy({
             isSysadmin: true,
             apiKey: session?.user.apikey ?? '',
             q: input.search,
             group_type: 'organization',
         });
+        groupTree = hierarchy.groups;
 
         if (input.tree) {
             for (const gtree of groupTree) {
@@ -1034,12 +1042,14 @@ export async function getOrganizationTreeDetails({
             }
         }
     } else {
-        groupTree = await searchHierarchy({
-            isSysadmin: true,
-            apiKey: session?.user.apikey ?? '',
-            q: '',
-            group_type: 'organization',
-        });
+        groupTree = (
+            await searchHierarchy({
+                isSysadmin: true,
+                apiKey: session?.user.apikey ?? '',
+                q: '',
+                group_type: 'organization',
+            })
+        ).groups;
     }
 
     if (groupTree.length === 0) {
@@ -1114,12 +1124,13 @@ export async function getTopicTreeDetails({
     let groupTree: GroupTree[] = [];
 
     if (input.search) {
-        groupTree = await searchHierarchy({
+        const hierarchy = await searchHierarchy({
             isSysadmin: true,
             apiKey: session?.user.apikey ?? '',
             q: input.search,
             group_type: 'group',
         });
+        groupTree = hierarchy.groups;
 
         if (input.tree) {
             for (const gtree of groupTree) {
@@ -1131,12 +1142,14 @@ export async function getTopicTreeDetails({
             }
         }
     } else {
-        groupTree = await searchHierarchy({
-            isSysadmin: true,
-            apiKey: session?.user.apikey ?? '',
-            q: '',
-            group_type: 'group',
-        });
+        groupTree = (
+            await searchHierarchy({
+                isSysadmin: true,
+                apiKey: session?.user.apikey ?? '',
+                q: '',
+                group_type: 'group',
+            })
+        ).groups;
     }
 
     if (groupTree.length === 0) {

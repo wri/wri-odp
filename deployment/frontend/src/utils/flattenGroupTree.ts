@@ -36,7 +36,8 @@ export function collectGroupTreeImages(
 
 export function collectGroupDetails(
     nodes: GroupTree[],
-    acc: Record<string, GroupsmDetails> = {}
+    acc: Record<string, GroupsmDetails> = {},
+    shallow = false
 ): Record<string, GroupsmDetails> {
     for (const node of nodes) {
         const extended = node as GroupTree & { package_count?: number };
@@ -48,8 +49,8 @@ export function collectGroupDetails(
             name: node.name,
             visibility: node.visibility,
         };
-        if (node.children?.length) {
-            collectGroupDetails(node.children, acc);
+        if (!shallow && node.children?.length) {
+            collectGroupDetails(node.children, acc, shallow);
         }
     }
     return acc;

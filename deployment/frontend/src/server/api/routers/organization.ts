@@ -13,22 +13,18 @@ export const OrganizationRouter = createTRPCRouter({
     getUsersOrganizations: protectedProcedure
         .input(searchSchema)
         .query(async ({ input, ctx }) => {
-            const groupTree = await searchHierarchy({
+            const { groups, count } = await searchHierarchy({
                 isSysadmin: ctx.session.user.sysadmin,
                 apiKey: ctx.session.user.apikey,
                 q: input.search || undefined,
                 group_type: 'organization',
+                page: input.page,
             });
 
-            const paginated = groupTree.slice(
-                input.page.start,
-                input.page.start + input.page.rows
-            );
-
             return {
-                organizations: paginated,
-                count: groupTree.length,
-                org2Image: collectGroupTreeImages(paginated),
+                organizations: groups,
+                count,
+                org2Image: collectGroupTreeImages(groups),
             };
         }),
     getAllOrganizations: protectedProcedure.query(async ({ ctx }) => {

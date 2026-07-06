@@ -28,7 +28,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     await helpers.topics.getGeneralTopics.prefetch({
         search: '',
         page: { start: 0, rows: 10 },
-        allTree: true,
     });
 
     return {
@@ -50,7 +49,6 @@ export default function TopicsPage(
         {
             search: query,
             page: pagination.page,
-            allTree: true,
         },
         { staleTime: 5 * 60 * 1000 }
     );
