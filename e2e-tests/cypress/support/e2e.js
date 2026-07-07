@@ -93,9 +93,16 @@ Cypress.Commands.add("visitDatasetPage", (datasetName, options = {}) => {
     : "";
   cy.visit(`/datasets/${datasetName}${query}`);
   cy.get("#nav-user-menu", { timeout: 30000 }).should("be.visible");
+  // UserMenu shows the username only after NextAuth session is authenticated.
+  cy.get("#nav-user-menu .border-b-wri-gold", { timeout: 120000 })
+    .should("be.visible")
+    .and("not.be.empty");
   // Pending datasets load diff/toggle asynchronously; don't require h1 first.
   if (options.waitForToggle) {
     cy.get("#toggle-version", { timeout: 120000 }).should("be.visible");
+    if (options.title) {
+      cy.get("h1", { timeout: 120000 }).should("contain", options.title);
+    }
   } else {
     cy.get("h1", { timeout: 120000 }).should("be.visible");
     if (options.title) {
@@ -105,6 +112,35 @@ Cypress.Commands.add("visitDatasetPage", (datasetName, options = {}) => {
   if (options.waitForTabs !== false) {
     cy.contains("Related Datasets", { timeout: 120000 });
   }
+});
+
+Cypress.Commands.add("openDatasetTab", (tabId) => {
+  cy.get(`#${tabId}`, { timeout: 60000 }).click({ force: true });
+  cy.get(`#${tabId}`, { timeout: 60000 }).should(
+    "have.class",
+    "border-wri-green",
+  );
+});
+
+Cypress.Commands.add("openDatasetDataFilesTab", () => {
+  cy.openDatasetTab("data-files");
+});
+
+// Public dataset cards use Headless UI Disclosure; pending-diff re-renders can
+// detach the button mid-click unless we re-query via an alias.
+Cypress.Commands.add("expandPublicDatafileCard", (title) => {
+  cy.contains("h3", title, { timeout: 60000 })
+    .closest(".border-green-700")
+    .as("datafileCard");
+  cy.get("@datafileCard").should("be.visible");
+  cy.get("@datafileCard").then(($card) => {
+    const $expand = $card.find('[aria-label="expand"]');
+    if ($expand.length && Cypress.dom.isVisible($expand)) {
+      cy.wrap($expand).click({ force: true });
+    } else {
+      cy.get("@datafileCard").contains("h3", title).click({ force: true });
+    }
+  });
 });
 
 Cypress.Commands.add("expectDatasetTitle", (title) => {

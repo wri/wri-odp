@@ -276,7 +276,6 @@ export default function DatasetPage(
   const datasetName = props.datasetName!;
   const datasetId = props.datasetId!;
   const pendingExist = props.pendingExist!;
-  const datasetAuth = props.generalAuthorized!;
   const isPendingState = props.isPendingState!;
   const is_approved = props.is_approved!;
   const approvalAuth = props.approvalAuth!;
@@ -284,11 +283,29 @@ export default function DatasetPage(
   const apikey = props.apiKey!;
   const router = useRouter();
   const { query } = router;
-  const isApprovalRequest =
-    query?.approval === 'true' ||
-    (approvalAuth && pendingExist && isPendingState);
   const { isAddingLayers } = useIsAddingLayers();
   const session = useSession();
+  const sessionAuthenticated =
+    session.status === 'authenticated' && !!session.data?.user;
+  const datasetAuth =
+    props.generalAuthorized ||
+    !!session.data?.user?.sysadmin ||
+    session.data?.user?.id === (dataset as WriDataset)?.creator_user_id;
+
+  const { data: diffData } = api.dataset.showPendingDiff.useQuery(
+    {
+      id: datasetId,
+    },
+    {
+      enabled: sessionAuthenticated,
+      retry: 0,
+      staleTime: 0,
+      keepPreviousData: true,
+    }
+  );
+
+  const hasPendingDiff = !!diffData?.new_dataset;
+  const effectivePendingExist = pendingExist || hasPendingDiff;
 
   const {
     data: fetchedDatasetData,
@@ -297,7 +314,7 @@ export default function DatasetPage(
     {
       id: datasetId,
       name: datasetName,
-      isPending: pendingExist,
+      isPending: effectivePendingExist,
       noLayer: true,
     },
     // @ts-ignore
@@ -314,28 +331,18 @@ export default function DatasetPage(
     {
       retry: 0,
       initialData: prevdataset,
-      enabled: !!pendingExist,
+      enabled: !!effectivePendingExist,
       staleTime: 0,
       keepPreviousData: true,
     }
   );
-  const prevDatasetData = (fetchedPrevDatasetData ?? prevdataset) as WriDataset;
-
-  const sessionReady = session.status !== 'loading';
-  const { data: diffData } = api.dataset.showPendingDiff.useQuery(
-    {
-      id: datasetId,
-    },
-    {
-      enabled: !!pendingExist && sessionReady && !!session.data?.user,
-      retry: 0,
-      staleTime: 0,
-      keepPreviousData: true,
-    }
-  );
+  const prevDatasetData = (
+    fetchedPrevDatasetData ??
+    diffData?.old_dataset ??
+    prevdataset
+  ) as WriDataset;
 
   const resolvedPendingDataset = (() => {
-    if (!pendingExist) return datasetData;
     const pendingFromDiff = diffData?.new_dataset;
     if (!pendingFromDiff) return datasetData;
     const baseResources = datasetData.resources ?? [];
@@ -352,8 +359,11 @@ export default function DatasetPage(
       ...pendingFromDiff,
       resources,
       release_notes,
-    } as WriDataset;
+    };
   })();
+  const isApprovalRequest =
+    query?.approval === 'true' ||
+    (approvalAuth && effectivePendingExist && isPendingState);
   if (!datasetData && datasetError) {
     router.replace('/datasets/404');
   }
@@ -365,7 +375,10 @@ export default function DatasetPage(
 
   const issues = api.dataset.getDatasetIssues.useQuery(
     { id: datasetName },
-    { enabled: !!session.data?.user.apikey && pendingExist, retry: false }
+    {
+      enabled: !!session.data?.user.apikey && effectivePendingExist,
+      retry: false,
+    }
   );
 
   const teamsDetails = api.teams.getTeam.useQuery(
@@ -441,23 +454,23 @@ export default function DatasetPage(
 
   let diffFields: string[] = [];
 
-  if (pendingExist && diffData) {
+  if (diffData?.diff) {
     diffFields = Object.keys(diffData.diff).filter((item) => {
       if (item.includes('resources') && item.includes('title')) {
         const rtitle = diffData.diff[item]?.old_value;
         if (rtitle === 'null' || rtitle === null) {
           return false;
         }
-      } else {
-        return matchesAnyPattern(item);
+        return true;
       }
+      return matchesAnyPattern(item);
     });
   }
 
   let resourceDiffValues: Array<
     Record<string, { old_value: string; new_value: string }>
   > = [];
-  if (pendingExist && diffData) {
+  if (diffData?.diff) {
     let resourceDiff: Record<
       string,
       Record<string, { old_value: string; new_value: string }>
@@ -630,7 +643,7 @@ export default function DatasetPage(
     } else {
       setDisplayNoPreview(true);
     }
-  }, [isCurrentVersion]);
+  }, [isCurrentVersion, prevDatasetData, resolvedPendingDataset, apikey]);
 
   if (!datasetData) {
     return (

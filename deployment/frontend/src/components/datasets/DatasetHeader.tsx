@@ -507,7 +507,7 @@ export function DatasetHeader({
 
     return (
         <div className="flex w-full flex-col pb-10 font-acumin">
-            {!session.data?.user ? (
+            {session.status === 'unauthenticated' ? (
                 <div className="my-4 flex items-center gap-x-3 px-4 sm:px-6">
                     <Button variant="outline" onClick={() => router.back()}>
                         <ChevronLeftIcon className="mb-1 h-5 w-5" />
