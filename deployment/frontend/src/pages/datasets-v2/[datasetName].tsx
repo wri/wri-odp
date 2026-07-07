@@ -43,7 +43,6 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (context)
 
     try {
         const dataset = await getOneDataset(datasetName, session, true);
-        console.log('dataset', dataset);
         const layerResource = dataset.resources?.find(
             (resource: { format?: string; rw_id?: string | null }) =>
                 resource?.format === 'Layer' || !!resource?.rw_id
