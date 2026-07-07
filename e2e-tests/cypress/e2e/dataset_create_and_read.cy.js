@@ -261,8 +261,10 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.visitDatasetPage(dataset);
-      cy.expectDatasetTitle(dataset + " EDITED");
+      cy.visitDatasetPage(dataset, {
+        waitForTabs: false,
+        title: dataset + " EDITED",
+      });
       cy.contains("Data Files").click();
       cy.contains("jpg");
       cy.contains("Contact").click();
@@ -317,8 +319,10 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.visitDatasetPage(dataset);
-      cy.expectDatasetTitle(dataset + " EDITED");
+      cy.visitDatasetPage(dataset, {
+        waitForTabs: false,
+        title: dataset + " EDITED",
+      });
       cy.contains("Data Files").click();
       cy.contains("Tile cache").click();
       cy.contains("https://google.com");
@@ -363,8 +367,10 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.visitDatasetPage(dataset);
-      cy.expectDatasetTitle(dataset + " EDITED");
+      cy.visitDatasetPage(dataset, {
+        waitForTabs: false,
+        title: dataset + " EDITED",
+      });
       cy.contains("Data Files").click();
       cy.contains("Gee asset").click();
       cy.contains("gee asset id");

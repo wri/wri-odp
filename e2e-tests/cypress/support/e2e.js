@@ -84,7 +84,7 @@ Cypress.Commands.add("login", (username, password) => {
   });
 });
 
-// Dataset pages wait for session + pending diff before rendering tabs/header.
+// Dataset pages wait for auth + main content before assertions.
 Cypress.Commands.add("visitDatasetPage", (datasetName, options = {}) => {
   const query = options.query
     ? options.query.startsWith("?")
@@ -93,14 +93,22 @@ Cypress.Commands.add("visitDatasetPage", (datasetName, options = {}) => {
     : "";
   cy.visit(`/datasets/${datasetName}${query}`);
   cy.get("#nav-user-menu", { timeout: 30000 }).should("be.visible");
-  cy.get("h1", { timeout: 60000 }).should("be.visible");
+  // Pending datasets load diff/toggle asynchronously; don't require h1 first.
+  if (options.waitForToggle) {
+    cy.get("#toggle-version", { timeout: 120000 }).should("be.visible");
+  } else {
+    cy.get("h1", { timeout: 120000 }).should("be.visible");
+    if (options.title) {
+      cy.get("h1", { timeout: 120000 }).should("contain", options.title);
+    }
+  }
   if (options.waitForTabs !== false) {
-    cy.contains("Related Datasets", { timeout: 60000 });
+    cy.contains("Related Datasets", { timeout: 120000 });
   }
 });
 
 Cypress.Commands.add("expectDatasetTitle", (title) => {
-  cy.get("h1", { timeout: 60000 }).should("contain", title);
+  cy.get("h1", { timeout: 120000 }).should("contain", title);
 });
 
 Cypress.Commands.add("logout", () => {

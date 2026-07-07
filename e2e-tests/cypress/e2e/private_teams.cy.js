@@ -256,7 +256,10 @@ describe("Create and edit team", () => {
       timeout: 60000,
     });
     cy.url({ timeout: 60000 }).should("include", `/datasets/${datasetName2}`);
-    cy.expectDatasetTitle(datasetName2 + " EDITED");
+    cy.visitDatasetPage(datasetName2, {
+      waitForTabs: false,
+      title: datasetName2 + " EDITED",
+    });
   });
 
   it("Should create a public datasset under subteam: admin", () => {
@@ -310,7 +313,10 @@ describe("Create and edit team", () => {
       timeout: 60000,
     });
     cy.url({ timeout: 60000 }).should("include", `/datasets/${datasetName3}`);
-    cy.expectDatasetTitle(datasetName3 + " EDITED");
+    cy.visitDatasetPage(datasetName3, {
+      waitForTabs: false,
+      title: datasetName3 + " EDITED",
+    });
   });
 
   after(() => {

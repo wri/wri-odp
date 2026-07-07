@@ -291,9 +291,8 @@ export default function DatasetPage(
   const session = useSession();
 
   const {
-    data: datasetData,
+    data: fetchedDatasetData,
     error: datasetError,
-    isLoading,
   } = api.dataset.getOneActualOrPendingDataset.useQuery(
     {
       id: datasetId,
@@ -302,13 +301,13 @@ export default function DatasetPage(
       noLayer: true,
     },
     // @ts-ignore
-    { retry: 0, initialData: dataset, staleTime: 0 }
+    { retry: 0, initialData: dataset, staleTime: 0, refetchOnMount: false }
   );
+  const datasetData = (fetchedDatasetData ?? dataset) as WriDataset;
 
   const {
-    data: prevDatasetData,
+    data: fetchedPrevDatasetData,
     error: prevDatasetError,
-    isLoading: isLoadingPrev,
   } = api.dataset.getOneDataset.useQuery(
     { id: datasetName, noLayer: true },
     // @ts-ignore
@@ -317,14 +316,13 @@ export default function DatasetPage(
       initialData: prevdataset,
       enabled: !!pendingExist,
       staleTime: 0,
+      refetchOnMount: false,
     }
   );
+  const prevDatasetData = (fetchedPrevDatasetData ?? prevdataset) as WriDataset;
 
   const sessionReady = session.status !== 'loading';
-  const {
-    data: diffData,
-    isLoading: isLoadingDiff,
-  } = api.dataset.showPendingDiff.useQuery(
+  const { data: diffData } = api.dataset.showPendingDiff.useQuery(
     {
       id: datasetId,
     },
@@ -617,12 +615,7 @@ export default function DatasetPage(
     }
   }, [isCurrentVersion]);
 
-  const shouldLoad = pendingExist
-    ? !sessionReady ||
-      (!!session.data?.user && isLoadingDiff && !diffData)
-    : false;
-
-  if (isLoading || !datasetData || isLoadingPrev || shouldLoad) {
+  if (!datasetData) {
     return (
       <>
         <Header />
@@ -678,8 +671,8 @@ export default function DatasetPage(
       )}
       <DatasetPageLayout
         hasViz={
-          canVisualizeDataset(datasetData as any) ||
-          canVisualizeDataset(prevDatasetData as any)
+          canVisualizeDataset(datasetData) ||
+          canVisualizeDataset(prevDatasetData)
         }
         lhs={
           isAddingLayers ? (
