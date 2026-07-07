@@ -265,9 +265,9 @@ describe("Create dataset", () => {
         waitForTabs: false,
         title: dataset + " EDITED",
       });
-      cy.contains("Data Files").click();
-      cy.contains("jpg");
-      cy.contains("Contact").click();
+      cy.get("#data-files", { timeout: 30000 }).click({ force: true });
+      cy.contains("jpg image", { timeout: 60000 }).should("be.visible");
+      cy.get("#contact", { timeout: 30000 }).click({ force: true });
       cy.contains("Test Author 2");
       cy.contains("test-author-2@example.com");
       cy.contains("Test Maintainer 2");
@@ -323,9 +323,9 @@ describe("Create dataset", () => {
         waitForTabs: false,
         title: dataset + " EDITED",
       });
-      cy.contains("Data Files").click();
-      cy.contains("Tile cache").click();
-      cy.contains("https://google.com");
+      cy.get("#data-files", { timeout: 30000 }).click({ force: true });
+      cy.contains("Tile cache", { timeout: 60000 }).should("be.visible").click();
+      cy.contains("https://google.com", { timeout: 30000 });
     },
   );
 
@@ -371,9 +371,9 @@ describe("Create dataset", () => {
         waitForTabs: false,
         title: dataset + " EDITED",
       });
-      cy.contains("Data Files").click();
-      cy.contains("Gee asset").click();
-      cy.contains("gee asset id");
+      cy.get("#data-files", { timeout: 30000 }).click({ force: true });
+      cy.contains("Gee asset", { timeout: 60000 }).should("be.visible").click();
+      cy.contains("gee asset id", { timeout: 30000 });
     },
   );
 

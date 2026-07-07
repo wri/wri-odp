@@ -301,7 +301,7 @@ export default function DatasetPage(
       noLayer: true,
     },
     // @ts-ignore
-    { retry: 0, initialData: dataset, staleTime: 0, refetchOnMount: false }
+    { retry: 0, initialData: dataset, staleTime: 0, keepPreviousData: true }
   );
   const datasetData = (fetchedDatasetData ?? dataset) as WriDataset;
 
@@ -316,7 +316,7 @@ export default function DatasetPage(
       initialData: prevdataset,
       enabled: !!pendingExist,
       staleTime: 0,
-      refetchOnMount: false,
+      keepPreviousData: true,
     }
   );
   const prevDatasetData = (fetchedPrevDatasetData ?? prevdataset) as WriDataset;
@@ -330,13 +330,25 @@ export default function DatasetPage(
       enabled: !!pendingExist && sessionReady && !!session.data?.user,
       retry: 0,
       staleTime: 0,
+      keepPreviousData: true,
     }
   );
 
-  const resolvedPendingDataset =
-    pendingExist && diffData?.new_dataset
-      ? (diffData.new_dataset)
-      : datasetData;
+  const resolvedPendingDataset = (() => {
+    if (!pendingExist) return datasetData;
+    const pendingFromDiff = diffData?.new_dataset;
+    if (!pendingFromDiff) return datasetData;
+    const baseResources = datasetData.resources ?? [];
+    const diffResources = pendingFromDiff.resources ?? [];
+    const resources =
+      diffResources.length >= baseResources.length
+        ? diffResources
+        : baseResources;
+    return {
+      ...pendingFromDiff,
+      resources,
+    } as WriDataset;
+  })();
   if (!datasetData && datasetError) {
     router.replace('/datasets/404');
   }
