@@ -115,7 +115,10 @@ describe("Release notes", () => {
         waitForTabs: false,
       });
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
-      cy.contains("Testing release notes", { timeout: 60000 });
+      cy.contains("Pending", { timeout: 60000 }).should("be.visible");
+      cy.contains("Testing release notes", { timeout: 60000 }).should(
+        "be.visible",
+      );
       cy.contains("Approve request").click({ force: true });
       cy.contains("Approve Dataset").click({ force: true });
       cy.wait(5000);
@@ -133,7 +136,9 @@ describe("Release notes", () => {
     () => {
       cy.visitDatasetPage(dataset, { waitForTabs: false });
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
-      cy.contains("Testing release notes", { timeout: 60000 });
+      cy.contains("Testing release notes", { timeout: 60000 }).should(
+        "be.visible",
+      );
     },
   );
 

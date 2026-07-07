@@ -31,7 +31,12 @@ export function Versioning({
     const isReleaseNotesChanged =
         diffFields.includes('release_notes') && !isCurrentVersion;
 
-    const isFirstReleaseNotes = !releaseNotes?.length && dataset.release_notes;
+    const isFirstReleaseNotes =
+        !releaseNotes?.length && !!dataset.release_notes?.trim();
+    const showPendingReleaseNotes =
+        !isCurrentVersion &&
+        !!dataset.release_notes?.trim() &&
+        (isReleaseNotesChanged || isFirstReleaseNotes);
     const sortedReleaseNotes = releaseNotes?.sort((a, b) => {
         const aDate = new Date(a.date);
         const bDate = new Date(b.date);
@@ -53,7 +58,7 @@ export function Versioning({
             )}
             {!isReleaseNotesLoading && (
                 <div className="flex flex-col gap-y-4">
-                    {(isReleaseNotesChanged || isFirstReleaseNotes) && (
+                    {showPendingReleaseNotes && (
                         <ReleaseNotesCard
                             releaseNotes={dataset.release_notes}
                             version={'Pending'}
@@ -61,7 +66,7 @@ export function Versioning({
                             defaultOpen={true}
                         />
                     )}
-                    {!isFirstReleaseNotes &&
+                    {!showPendingReleaseNotes &&
                         sortedReleaseNotes?.map((rn, i) => (
                             <ReleaseNotesCard
                                 releaseNotes={rn.release_notes}
@@ -73,9 +78,8 @@ export function Versioning({
                                 defaultOpen={!isReleaseNotesChanged && i == 0}
                             />
                         ))}
-                    {!isReleaseNotesChanged &&
-                        !releaseNotes?.length &&
-                        !isFirstReleaseNotes && (
+                    {!showPendingReleaseNotes &&
+                        !releaseNotes?.length && (
                             <span>This Dataset is at its initial version</span>
                         )}
                 </div>

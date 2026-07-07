@@ -344,9 +344,14 @@ export default function DatasetPage(
       diffResources.length >= baseResources.length
         ? diffResources
         : baseResources;
+    const release_notes = pendingFromDiff.release_notes?.trim()
+      ? pendingFromDiff.release_notes
+      : datasetData.release_notes;
     return {
+      ...datasetData,
       ...pendingFromDiff,
       resources,
+      release_notes,
     } as WriDataset;
   })();
   if (!datasetData && datasetError) {
