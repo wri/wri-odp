@@ -1,7 +1,7 @@
 import { type MutableRefObject, useState } from 'react';
 import IconButton from './IconButton';
-import BasemapSelector from './BaseMapSelector';
-import LabelSelector from './LabelSelector';
+import BasemapSelector from '../datasets-v2/map/controls/BaseMapSelector';
+import LabelSelector from '../datasets-v2/map/controls/LabelSelector';
 import { type MapRef } from 'react-map-gl';
 import { SettingsIcon } from '@/components/_shared/icons/SettingsIcon';
 
@@ -10,11 +10,7 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
 });
 
-export default function Settings({
-    mapRef,
-}: {
-    mapRef: MutableRefObject<MapRef | null>;
-}) {
+export default function Settings({ mapRef }: { mapRef: MutableRefObject<MapRef | null> }) {
     const [open, setOpen] = useState(false);
     return (
         <IconButton tooltip="Map settings" onClick={() => setOpen(true)}>

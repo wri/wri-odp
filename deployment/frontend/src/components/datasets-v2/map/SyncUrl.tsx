@@ -21,9 +21,9 @@ function stripZeroViewProps(obj: any) {
         obj.pitch === 0 &&
         obj.bearing === 0 &&
         obj.padding?.top === 0 &&
-        obj.padding.bottom === 0 &&
-        obj.padding.left === 0 &&
-        obj.padding.right === 0
+        obj.padding?.bottom === 0 &&
+        obj.padding?.left === 0 &&
+        obj.padding?.right === 0
     ) {
         delete obj.pitch;
         delete obj.bearing;
@@ -61,8 +61,7 @@ export default function SyncUrl() {
             zoom: debouncedValue.viewState.zoom,
             latitude: debouncedValue.viewState.latitude,
             longitude: debouncedValue.viewState.longitude,
-            layer:
-                activeLayerGroups.length > 0 ? activeLayerGroups[0].layers : [],
+            layer: activeLayerGroups.length > 0 ? activeLayerGroups[0].layers : [],
         },
         1500
     );
@@ -92,22 +91,15 @@ export default function SyncUrl() {
                 labels: selectedLabels,
                 activeLayerGroups,
                 bounds,
-                layersParsed: Array.from(
-                    currentLayers ? currentLayers.entries() : []
-                ),
+                layersParsed: Array.from(currentLayers ? currentLayers.entries() : []),
             });
-            const isStillFirst = initialStateMap.current
-                ? initialStateMap.current === map
-                : true;
+            const isStillFirst = initialStateMap.current ? initialStateMap.current === map : true;
             if (lastMapRef.current === '') {
                 lastMapRef.current = map;
             } else if (isInitialrender === true && isStillFirst) {
                 lastMapRef.current = map;
                 initialStateMap.current = map;
-            } else if (
-                map !== lastMapRef.current &&
-                activeLayerGroups.length > 0
-            ) {
+            } else if (map !== lastMapRef.current && activeLayerGroups.length > 0) {
                 lastMapRef.current = map;
                 updateURLParameter(window.location.href, 'map', map);
             }
@@ -125,11 +117,7 @@ export default function SyncUrl() {
     return null;
 }
 
-function updateURLParameter(
-    url: string,
-    paramName: string,
-    paramValue: string
-) {
+function updateURLParameter(url: string, paramName: string, paramValue: string) {
     const urlObj = new URL(url);
     const searchParams = urlObj.searchParams;
     searchParams.set(paramName, paramValue);

@@ -1,10 +1,6 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import {
-    getThemedFontSize,
-    Navbar,
-    Search,
-} from '@worldresources/wri-design-systems';
+import { getThemedFontSize, Navbar, Search } from '@worldresources/wri-design-systems';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import NavigationLoginModal from './LoginModal';
@@ -49,10 +45,7 @@ export default function Navigation() {
                     },
                 ]}
                 utilitySection={[
-                    <div
-                        key="search"
-                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                    >
+                    <div key="search" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Search
                             size="small"
                             options={[]}
@@ -75,18 +68,16 @@ export default function Navigation() {
                         ? []
                         : [
                               {
-                                  children: 'Log in',
-                                  ariaLabel: 'Log in',
+                                  children: 'Sign in',
+                                  ariaLabel: 'Sign in',
+                                  size: 'small',
                                   onClick: () => setIsOpen(true),
                               },
                           ]
                 }
                 fixed
             />
-            <NavigationLoginModal
-                isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
-            />
+            <NavigationLoginModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
         </>
     );
 }

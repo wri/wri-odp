@@ -1,16 +1,11 @@
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
-interface IconButtonProps
-    extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     children: React.ReactNode;
     tooltip: string;
 }
 
-export default function IconButton({
-    children,
-    tooltip,
-    ...props
-}: IconButtonProps) {
+export default function IconButton({ children, tooltip, ...props }: IconButtonProps) {
     return (
         <DefaultTooltip side="left" content={tooltip}>
             <button

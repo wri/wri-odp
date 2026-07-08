@@ -1,9 +1,9 @@
-import type { MapRef } from 'react-map-gl';
-import Zoom from './Zoom';
 import type { MutableRefObject } from 'react';
-import Search from './Search';
-import Settings from './Settings';
-import Export from './Export';
+import type { MapRef } from 'react-map-gl';
+import Zoom from '../../../icons/Zoom';
+import Search from '../../../icons/Search';
+import Settings from '../../../icons/Settings';
+import Export from '../../../icons/Export';
 
 export default function Controls({
     mapRef,

@@ -18,14 +18,13 @@ import LegendItemButtonThreshold from '@/components/vizzuality/components/legend
 import LegendItemTypesList from '@/components/vizzuality/components/legend/components/legend-item-types/LegendItemTypesList';
 import LegendItemButtonRemoveLayer from '@/components/vizzuality/components/legend/components/legend-item-toolbar/LegendItemButtonRemoveLayer';
 import dynamic from 'next/dynamic';
+import { LEGEND_TIMELINE_PROPERTIES } from './legend.constants';
 
 // @ts-ignore
 const LegendItemTimeline = dynamic(
     () =>
         // @ts-ignore
-        import('old-vizzuality-components').then(
-            (mod) => mod.LegendItemTimeline
-        ),
+        import('old-vizzuality-components').then((mod) => mod.LegendItemTimeline),
     {
         ssr: false,
     }
@@ -57,9 +56,7 @@ export function Legends() {
             <Legend
                 maxHeight={300}
                 sortable={false}
-                onChangeOrder={(datasetIds: string[]) =>
-                    reorderLayerGroups(datasetIds)
-                }
+                onChangeOrder={(datasetIds: string[]) => reorderLayerGroups(datasetIds)}
             >
                 {layerGroups
                     .filter((lg) => lg.layers?.length > 0)
@@ -74,8 +71,7 @@ export function Legends() {
                                         !currentLayers.size ||
                                         lg.layers
                                             .map((l: APILayerSpec) => {
-                                                const layerState =
-                                                    currentLayers.get(l.id);
+                                                const layerState = currentLayers.get(l.id);
 
                                                 if (layerState?.active) {
                                                     return layerState.visibility;
@@ -85,9 +81,7 @@ export function Legends() {
                                             })
                                             .some((l: boolean) => l),
                                     layers: lg.layers.map((l: APILayerSpec) => {
-                                        const layerState = currentLayers.get(
-                                            l.id
-                                        );
+                                        const layerState = currentLayers.get(l.id);
                                         return {
                                             ...l,
                                             ...layerState,
@@ -130,60 +124,33 @@ export function Legends() {
                                     </LegendItemToolbar>
                                 }
                                 onChangeInfo={() => console.log('Info')}
-                                onChangeOpacity={(
-                                    layer: any,
-                                    newOpacity: number
-                                ) => {
+                                onChangeOpacity={(layer: any, newOpacity: number) => {
                                     updateLayerState(layer.id, 'active', true);
-                                    updateLayerState(
-                                        layer.id,
-                                        'opacity',
-                                        newOpacity
-                                    );
+                                    updateLayerState(layer.id, 'opacity', newOpacity);
                                 }}
                                 onChangeVisibility={(layer: any) => {
-                                    const layerState = currentLayers.get(
-                                        layer.id
-                                    );
+                                    const layerState = currentLayers.get(layer.id);
                                     updateLayerState(layer.id, 'active', true);
                                     updateLayerState(
                                         layer.id,
                                         'visibility',
-                                        typeof layerState?.visibility ===
-                                            'undefined'
+                                        typeof layerState?.visibility === 'undefined'
                                             ? false
                                             : !layerState?.visibility
                                     );
                                 }}
-                                onChangeThreshold={(
-                                    layer: any,
-                                    threshold: number
-                                ) => {
-                                    const layerState = currentLayers.get(
-                                        layer.id
-                                    );
+                                onChangeThreshold={(layer: any, threshold: number) => {
+                                    const layerState = currentLayers.get(layer.id);
                                     updateLayerState(layer.id, 'active', true);
-                                    updateLayerState(
-                                        layer.id,
-                                        'threshold',
-                                        threshold
-                                    );
+                                    updateLayerState(layer.id, 'threshold', threshold);
                                 }}
                                 onChangeLayer={(layer: APILayerSpec) => {
-                                    lg.layers.forEach(
-                                        (_layer: APILayerSpec) => {
-                                            updateLayerState(
-                                                _layer.id,
-                                                'active',
-                                                false
-                                            );
-                                        }
-                                    );
+                                    lg.layers.forEach((_layer: APILayerSpec) => {
+                                        updateLayerState(_layer.id, 'active', false);
+                                    });
                                     updateLayerState(layer.id, 'active', true);
                                 }}
-                                onRemoveLayer={(layer: APILayerSpec) =>
-                                    console.log(layer)
-                                }
+                                onRemoveLayer={(layer: APILayerSpec) => console.log(layer)}
                             >
                                 <LegendItemTypesList />
                                 <LegendItemTimeStep
@@ -202,33 +169,20 @@ export function Legends() {
                                     ) && (
                                         <LegendItemTimeline
                                             // @ts-ignore
-                                            onChangeLayer={(
-                                                layer: APILayerSpec
-                                            ) => {
+                                            onChangeLayer={(layer: APILayerSpec) => {
                                                 lg.layers
                                                     .filter(
-                                                        (
-                                                            _layer: APILayerSpec
-                                                        ) =>
-                                                            _layer.id !==
-                                                            layer.id
+                                                        (_layer: APILayerSpec) =>
+                                                            _layer.id !== layer.id
                                                     )
-                                                    .forEach(
-                                                        (
-                                                            _layer: APILayerSpec
-                                                        ) => {
-                                                            updateLayerState(
-                                                                _layer.id,
-                                                                'active',
-                                                                false
-                                                            );
-                                                        }
-                                                    );
-                                                updateLayerState(
-                                                    layer.id,
-                                                    'active',
-                                                    true
-                                                );
+                                                    .forEach((_layer: APILayerSpec) => {
+                                                        updateLayerState(
+                                                            _layer.id,
+                                                            'active',
+                                                            false
+                                                        );
+                                                    });
+                                                updateLayerState(layer.id, 'active', true);
                                             }}
                                             customClass="rw-legend-timeline"
                                             {...LEGEND_TIMELINE_PROPERTIES}
@@ -241,55 +195,3 @@ export function Legends() {
         </div>
     );
 }
-
-const LEGEND_TIMELINE_PROPERTIES = {
-    trackStyle: [
-        { backgroundColor: '#caccd0' },
-        { backgroundColor: '#caccd0' },
-    ],
-    railStyle: {
-        backgroundColor: '#caccd0',
-        height: 2,
-    },
-    handleStyle: [
-        {
-            backgroundColor: '#c32d7b',
-            width: 21,
-            height: 21,
-            borderWidth: 3,
-            borderColor: '#fff',
-            transform: 'translate(calc(-50% + 6px), calc(-50% + 12px))',
-            top: 0,
-        },
-        {
-            backgroundColor: '#c32d7b',
-            width: 21,
-            height: 21,
-            borderWidth: 3,
-            borderColor: '#fff',
-            transform: 'translate(calc(-50% + 6px), calc(-50% + 12px))',
-            top: 0,
-        },
-    ],
-    dotStyle: {
-        width: 16,
-        height: 16,
-        borderColor: '#caccd0',
-        transform: 'translate(calc(-50% + 4px), 50%)',
-        bottom: '50%',
-        borderWidth: 2,
-    },
-    activeDotStyle: {
-        width: 16,
-        height: 16,
-        borderColor: '#caccd0',
-        transform: 'translate(calc(-50% + 4px), 50%)',
-        bottom: '50%',
-    },
-    markStyle: {
-        width: 'auto',
-        margin: 0,
-        fontFamily: "'Lato', 'Helvetica Neue', Helvetica, Arial, sans",
-        color: '#393f44',
-    },
-};

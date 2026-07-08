@@ -31,8 +31,7 @@ export default function SignInForm({ onSignIn, setIsPasswordReset }: Props) {
 
     const [password, setPassword] = useState('');
 
-    const error =
-        errorMessage ?? errors.username?.message ?? errors.password?.message;
+    const error = errorMessage || errors.username?.message || errors.password?.message;
 
     const handleAzureSignIn = async () => {
         setIsLoadingAzure(true);
@@ -53,9 +52,8 @@ export default function SignInForm({ onSignIn, setIsPasswordReset }: Props) {
             <div className="text-center">
                 <InformationCircleIcon className="mx-auto mb-2 h-5 w-5" />
                 <p className="font-light font-wri-black text-[0.813rem]">
-                    Registration Not Available Yet!{' '}
-                    <b>Login for WRI Members Only.</b> You Can Still Use All
-                    Portal Features.
+                    Registration Not Available Yet! <b>Login for WRI Members Only.</b> You Can Still
+                    Use All Portal Features.
                 </p>
                 <h3 className="mt-8 text-[1.75rem] font-semibold">Log In</h3>
             </div>

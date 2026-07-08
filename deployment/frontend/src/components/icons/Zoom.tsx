@@ -2,11 +2,7 @@ import { type MutableRefObject } from 'react';
 import IconButton from './IconButton';
 import { type MapRef } from 'react-map-gl';
 
-export default function Zoom({
-    mapRef,
-}: {
-    mapRef: MutableRefObject<MapRef | null>;
-}) {
+export default function Zoom({ mapRef }: { mapRef: MutableRefObject<MapRef | null> }) {
     return (
         <>
             <IconButton
