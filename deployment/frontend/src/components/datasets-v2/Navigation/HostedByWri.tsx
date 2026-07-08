@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import WriLogo from '@/components/icons/WriLogo';
 
 export default function NavigationHostedByWri() {
     return (
@@ -10,13 +10,7 @@ export default function NavigationHostedByWri() {
                 whiteSpace: 'nowrap',
             }}
         >
-            <Image
-                src="/images/wri_logo.svg"
-                alt="WRI"
-                width={20}
-                height={20}
-                priority
-            />
+            <WriLogo />
             <span>Hosted by WRI</span>
         </div>
     );
