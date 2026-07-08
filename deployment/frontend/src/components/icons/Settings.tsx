@@ -1,0 +1,33 @@
+import { type MutableRefObject, useState } from 'react';
+import IconButton from './IconButton';
+import BasemapSelector from '../datasets-v2/map/controls/BaseMapSelector';
+import LabelSelector from '../datasets-v2/map/controls/LabelSelector';
+import { type MapRef } from 'react-map-gl';
+import { SettingsIcon } from '@/components/_shared/icons/SettingsIcon';
+
+import dynamic from 'next/dynamic';
+const Modal = dynamic(() => import('@/components/_shared/Modal'), {
+    ssr: false,
+});
+
+export default function Settings({ mapRef }: { mapRef: MutableRefObject<MapRef | null> }) {
+    const [open, setOpen] = useState(false);
+    return (
+        <IconButton tooltip="Map settings" onClick={() => setOpen(true)}>
+            <SettingsIcon />
+            <Modal open={open} setOpen={setOpen} className="max-w-[36rem]">
+                <h2 className="font-['Acumin Pro SemiCondensed'] text-3xl font-normal text-black mb-5">
+                    Map settings
+                </h2>
+                <div className="flex flex-row flex-wrap gap-y-5">
+                    <div className="basis-1/2 pr-2">
+                        <BasemapSelector />
+                    </div>
+                    <div className="basis-1/2 pr-2">
+                        <LabelSelector />
+                    </div>
+                </div>
+            </Modal>
+        </IconButton>
+    );
+}

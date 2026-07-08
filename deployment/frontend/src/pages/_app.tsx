@@ -4,7 +4,8 @@ import { type AppProps, type AppType } from 'next/app';
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query';
 import { Provider, useCreateStore } from '@/utils/store';
 import { useState, useEffect } from 'react';
-
+import { ChakraProvider } from '@chakra-ui/react';
+import { system } from '../theme';
 import 'react-toastify/dist/ReactToastify.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
@@ -85,15 +86,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     const newLayersState = new Map();
     if (initialZustandState?.mapView?.layersParsed) {
-        initialZustandState.mapView?.layersParsed?.forEach(
-            (layer: [string, LayerState]) => {
-                newLayersState.set(layer[0], layer[1]);
-            }
-        );
+        initialZustandState.mapView?.layersParsed?.forEach((layer: [string, LayerState]) => {
+            newLayersState.set(layer[0], layer[1]);
+        });
     }
 
-    const activeLayerGroups =
-        initialZustandState?.mapView?.activeLayerGroups || [];
+    const activeLayerGroups = initialZustandState?.mapView?.activeLayerGroups || [];
 
     const layerAsLayerObj = new Map();
     const tempLayerAsLayerobj = new Map();
@@ -176,10 +174,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
             activeLayerGroups,
             viewState: {
                 ...initialZustandState?.mapView?.viewState,
-                latitude:
-                    initialZustandState?.mapView?.viewState?.latitude ?? 0,
-                longitude:
-                    initialZustandState?.mapView?.viewState?.longitude ?? 0,
+                latitude: initialZustandState?.mapView?.viewState?.latitude ?? 0,
+                longitude: initialZustandState?.mapView?.viewState?.longitude ?? 0,
                 zoom: initialZustandState?.mapView?.viewState?.zoom ?? 3,
             },
         },
@@ -187,47 +183,49 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
     return (
         <QueryClientProvider client={queryClient}>
-            <DefaultSeo
-                titleTemplate="%s - WRI Data Explorer"
-                openGraph={{
-                    images: [
-                        {
-                            url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
-                            width: 800,
-                            height: 600,
-                            alt: 'Og Image Alt',
-                        },
-                    ],
-                }}
-                twitter={{
-                    handle: '@WorldResources',
-                    site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
-                    cardType: 'summary_large_image',
-                }}
-                dangerouslySetAllPagesToNoIndex={
-                    ['production', 'prod'].includes(env.NEXT_PUBLIC_DEPLOYMENT_TYPE)
-                        ? false
-                        : true
-                }
-                dangerouslySetAllPagesToNoFollow={
-                    ['production', 'prod'].includes(env.NEXT_PUBLIC_DEPLOYMENT_TYPE)
-                        ? false
-                        : true
-                }
-            />
-            <Hydrate
-                /* @ts-ignore */
-                state={pageProps.dehydratedState}
-            >
-                <Provider createStore={createStore}>
-                    <SessionProvider session={session}>
-                        <ReactToastContainer />
-                        <main className={`${acumin.variable} font-sans`}>
-                            <Component {...pageProps} />
-                        </main>
-                    </SessionProvider>
-                </Provider>
-            </Hydrate>
+            <ChakraProvider value={system}>
+                <DefaultSeo
+                    titleTemplate="%s - WRI Data Explorer"
+                    openGraph={{
+                        images: [
+                            {
+                                url: `${env.NEXT_PUBLIC_NEXTAUTH_URL}/images/WRI_logo_4c.png`,
+                                width: 800,
+                                height: 600,
+                                alt: 'Og Image Alt',
+                            },
+                        ],
+                    }}
+                    twitter={{
+                        handle: '@WorldResources',
+                        site: `${env.NEXT_PUBLIC_NEXTAUTH_URL}`,
+                        cardType: 'summary_large_image',
+                    }}
+                    dangerouslySetAllPagesToNoIndex={
+                        ['production', 'prod'].includes(env.NEXT_PUBLIC_DEPLOYMENT_TYPE)
+                            ? false
+                            : true
+                    }
+                    dangerouslySetAllPagesToNoFollow={
+                        ['production', 'prod'].includes(env.NEXT_PUBLIC_DEPLOYMENT_TYPE)
+                            ? false
+                            : true
+                    }
+                />
+                <Hydrate
+                    /* @ts-ignore */
+                    state={pageProps.dehydratedState}
+                >
+                    <Provider createStore={createStore}>
+                        <SessionProvider session={session}>
+                            <ReactToastContainer />
+                            <main className={`${acumin.variable} font-sans`}>
+                                <Component {...pageProps} />
+                            </main>
+                        </SessionProvider>
+                    </Provider>
+                </Hydrate>
+            </ChakraProvider>
         </QueryClientProvider>
     );
 };
