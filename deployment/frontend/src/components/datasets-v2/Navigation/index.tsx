@@ -55,7 +55,14 @@ export default function Navigation() {
                                 whiteSpace: 'nowrap',
                             }}
                         >
-                            <MagnifyingGlassIcon aria-hidden="true" focusable="false" width={15} height={15} />
+                            <MagnifyingGlassIcon
+                                aria-hidden="true"
+                                focusable="false"
+                                width={15}
+                                height={15}
+                            />
+                            <span>Search</span>
+                        </div>
                     </Link>,
                     <div
                         key="wri-apps"
