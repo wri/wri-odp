@@ -76,7 +76,6 @@ export default function ResetPasswordForm({ setIsPasswordReset }: Props) {
                         errorMessage={errors.email?.message}
                         {...emailField}
                         onChange={(event) => {
-                            void emailField.onChange(event);
                             setValue('email', event.target.value, {
                                 shouldDirty: true,
                                 shouldTouch: true,
