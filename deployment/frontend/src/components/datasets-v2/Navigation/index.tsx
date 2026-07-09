@@ -68,8 +68,7 @@ export default function Navigation() {
                             whiteSpace: 'nowrap',
                         }}
                     >
-                        <WriLogo />
-                        <span>Hosted by WRI</span>
+                        <WriLogo aria-hidden="true" focusable="false" />
                     </div>,
                     ...(session.status === 'authenticated'
                         ? [
