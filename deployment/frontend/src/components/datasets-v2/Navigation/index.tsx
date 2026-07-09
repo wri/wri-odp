@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { getThemedFontSize, Navbar } from '@worldresources/wri-design-systems';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import NavigationLoginModal from './LoginModal';
+import LoginModal from '@/components/_shared/LoginModal';
 import NavigationUserMenu from './UserMenu';
 import WriLogo from '@/components/icons/WriLogo';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -97,7 +97,7 @@ export default function Navigation() {
                 }
                 fixed
             />
-            <NavigationLoginModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+            <LoginModal isOpen={isOpen} closeModal={() => setIsOpen(false)} />
         </>
     );
 }
