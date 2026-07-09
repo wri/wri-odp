@@ -1,11 +1,12 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { getThemedFontSize, Navbar, Search } from '@worldresources/wri-design-systems';
+import { getThemedFontSize, Navbar } from '@worldresources/wri-design-systems';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import NavigationLoginModal from './LoginModal';
 import NavigationUserMenu from './UserMenu';
-import NavigationHostedByWri from './HostedByWri';
+import WriLogo from '@/components/icons/WriLogo';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 export default function Navigation() {
     const router = useRouter();
@@ -45,23 +46,38 @@ export default function Navigation() {
                     },
                 ]}
                 utilitySection={[
-                    <div key="search" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Search
-                            size="small"
-                            options={[]}
-                            placeholder="Search"
-                            displayResults="none"
-                            onQueryChange={() => {
-                                console.log('Search query changed');
+                    <Link href="/search" key="search">
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                whiteSpace: 'nowrap',
                             }}
-                        />
-                    </div>,
-                    <NavigationHostedByWri key="wri-apps" />,
-                    session.status === 'authenticated' ? (
-                        <div key="user-menu">
-                            <NavigationUserMenu />
+                        >
+                            <MagnifyingGlassIcon width={15} height={15} />
+                            <span>Search</span>
                         </div>
-                    ) : null,
+                    </Link>,
+                    <div
+                        key="wri-apps"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        <WriLogo />
+                        <span>Hosted by WRI</span>
+                    </div>,
+                    ...(session.status === 'authenticated'
+                        ? [
+                              <div key="user-menu">
+                                  <NavigationUserMenu />
+                              </div>,
+                          ]
+                        : []),
                 ]}
                 actionsSection={
                     session.status === 'authenticated'

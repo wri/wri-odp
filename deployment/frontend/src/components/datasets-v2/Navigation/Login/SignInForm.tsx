@@ -49,13 +49,13 @@ export default function SignInForm({ onSignIn, setIsPasswordReset }: Props) {
 
     return (
         <>
-            <div className="text-center">
-                <InformationCircleIcon className="mx-auto mb-2 h-5 w-5" />
-                <p className="font-light font-wri-black text-[0.813rem]">
-                    Registration Not Available Yet! <b>Login for WRI Members Only.</b> You Can Still
-                    Use All Portal Features.
-                </p>
-                <h3 className="mt-8 text-[1.75rem] font-semibold">Log In</h3>
+            <div>
+                <h3 className="mb-4 text-[1.75rem] font-semibold">Log In</h3>
+                <InlineMessage
+                    icon={<InformationCircleIcon width={40} height={40} />}
+                    variant="info-white"
+                    label=" Registration Not Available Yet! Login for WRI Members Only. You Can Still Use All Portal Features."
+                />
             </div>
             <div className="mt-4">
                 <form
@@ -87,11 +87,12 @@ export default function SignInForm({ onSignIn, setIsPasswordReset }: Props) {
                     }}
                 >
                     <TextInput
-                        placeholder="Username or Email"
+                        label="Username or Email"
                         size="default"
                         noMarginBottom
                         errorMessage={errors.username?.message}
                         {...register('username')}
+                        required
                     />
                     <div className="w-full">
                         <Password
@@ -107,6 +108,7 @@ export default function SignInForm({ onSignIn, setIsPasswordReset }: Props) {
                                     shouldValidate: true,
                                 });
                             }}
+                            required
                         />
                     </div>
                     {error ? (
@@ -117,20 +119,9 @@ export default function SignInForm({ onSignIn, setIsPasswordReset }: Props) {
                             caption={error}
                         />
                     ) : null}
+
                     <Button
-                        type="button"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            setIsPasswordReset(true);
-                            return false;
-                        }}
-                        id="forgot-password-button"
-                        variant="borderless"
-                        size="small"
-                    >
-                        Forgot password?
-                    </Button>
-                    <Button
+                        className="mt-4"
                         disabled={isLoading}
                         type="submit"
                         id="login-button"
@@ -142,27 +133,44 @@ export default function SignInForm({ onSignIn, setIsPasswordReset }: Props) {
                     </Button>
                 </form>
             </div>
-            <div className="mt-8 flex items-center justify-center gap-x-2 text-center">
+            <div className="mt-5 flex items-center justify-center gap-x-2 text-center">
                 <div className="h-0 w-20 border border-1 border-wri-gray font-light text-[0.875rem]" />
-                <div className="text-wri-black ">or</div>
+                <div className="text-wri-black ">or continue with </div>
                 <div className="h-0 w-20 border border-1 border-wri-gray font-light text-[0.875rem]" />
             </div>
-            <Button
-                type="button"
-                className="mt-8"
-                onClick={handleAzureSignIn}
-                disabled={isLoadingAzure}
-                variant="outline"
-                size="default"
-                loading={isLoadingAzure}
-            >
-                <div className="relative my-auto h-4 w-4">
-                    <Image src="/images/wri_logo.png" alt="WRI Logo" fill />
-                </div>
-                <div className="ml-2 w-fit text-base font-semibold text-wri-black ">
-                    Sign In with your WRI Credentials
-                </div>
-            </Button>
+            <div className="flex w-full flex-col justify-center">
+                <Button
+                    type="button"
+                    className="mt-5 w-full justify-center"
+                    onClick={handleAzureSignIn}
+                    disabled={isLoadingAzure}
+                    variant="outline"
+                    size="default"
+                    loading={isLoadingAzure}
+                >
+                    <div className="relative  h-4 w-4">
+                        <Image src="/images/wri_logo.png" alt="WRI Logo" fill />
+                    </div>
+                    <div className="ml-2 w-fit text-base font-semibold text-wri-black ">
+                        Sign In with your WRI Credentials
+                    </div>
+                </Button>
+
+                <Button
+                    className="mt-4"
+                    type="button"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        setIsPasswordReset(true);
+                        return false;
+                    }}
+                    id="forgot-password-button"
+                    variant="borderless"
+                    size="small"
+                >
+                    Forgot password?
+                </Button>
+            </div>
         </>
     );
 }
