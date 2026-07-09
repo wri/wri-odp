@@ -19,6 +19,7 @@ export default function ResetPasswordForm({ setIsPasswordReset }: Props) {
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors },
     } = useForm<RequestResetPasswordFormType>({
         resolver: zodResolver(RequestResetPasswordSchema),
@@ -34,6 +35,7 @@ export default function ResetPasswordForm({ setIsPasswordReset }: Props) {
     });
 
     const error = errorMessage ?? errors.email?.message;
+    const emailField = register('email');
 
     return (
         <>
@@ -67,14 +69,31 @@ export default function ResetPasswordForm({ setIsPasswordReset }: Props) {
                     <TextInput
                         label="Email"
                         id="reset-link-email"
+                        type="email"
+                        autoComplete="email"
                         size="default"
                         noMarginBottom
                         errorMessage={errors.email?.message}
-                        {...register('email')}
+                        {...emailField}
+                        onChange={(event) => {
+                            void emailField.onChange(event);
+                            setValue('email', event.target.value, {
+                                shouldDirty: true,
+                                shouldTouch: true,
+                                shouldValidate: true,
+                            });
+                        }}
                         required
                     />
 
-                    {result ? <p className="text-center text-green-600">{result}</p> : null}
+                    {result ? (
+                        <InlineMessage
+                            size="full-width"
+                            variant="success"
+                            label={result}
+                            caption=""
+                        />
+                    ) : null}
 
                     {error ? (
                         <InlineMessage
