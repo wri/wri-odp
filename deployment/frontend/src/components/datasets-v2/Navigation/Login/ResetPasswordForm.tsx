@@ -34,7 +34,7 @@ export default function ResetPasswordForm({ setIsPasswordReset }: Props) {
         },
     });
 
-    const error = errorMessage ?? errors.email?.message;
+    const error = errorMessage;
     const emailField = register('email');
 
     return (
