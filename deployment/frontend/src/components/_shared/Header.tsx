@@ -1,13 +1,13 @@
 import React, { Fragment, useState } from 'react';
 import Image from 'next/image';
-import { Menu, Transition, Dialog } from '@headlessui/react';
+import { Menu, Transition } from '@headlessui/react';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Login from './Login';
 import UserMenu from './UserMenu';
 import { useSession } from 'next-auth/react';
 import { api } from '@/utils/api';
+import LoginModal from './LoginModal';
 
 export default function Header() {
     const { asPath } = useRouter();
@@ -115,49 +115,10 @@ export default function Header() {
                         </button>
                     )}
 
-                    <Transition appear show={isOpen} as={Fragment}>
-                        <Dialog
-                            as="div"
-                            className="relative z-50"
-                            onClose={closeModal}
-                        >
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0"
-                                enterTo="opacity-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100"
-                                leaveTo="opacity-0"
-                            >
-                                <div className="fixed inset-0 bg-black bg-opacity-25" />
-                            </Transition.Child>
-
-                            <div className="fixed inset-0 overflow-y-auto">
-                                <div className="flex min-h-full items-center justify-center p-4 text-center">
-                                    <Transition.Child
-                                        as={Fragment}
-                                        enter="ease-out duration-300"
-                                        enterFrom="opacity-0 scale-95"
-                                        enterTo="opacity-100 scale-100"
-                                        leave="ease-in duration-200"
-                                        leaveFrom="opacity-100 scale-100"
-                                        leaveTo="opacity-0 scale-95"
-                                    >
-                                        <Dialog.Panel className="w-full sm:max-w-xl transform overflow-hidden rounded-md bg-white p-6 sm:px-20 text-left align-middle shadow-xl transition-all z-50">
-                                            <Login onSignIn={closeModal} />
-                                        </Dialog.Panel>
-                                    </Transition.Child>
-                                </div>
-                            </div>
-                        </Dialog>
-                    </Transition>
+                    <LoginModal isOpen={isOpen} closeModal={closeModal} />
 
                     <div className="text-right -ml-6 sm:hidden">
-                        <Menu
-                            as="div"
-                            className="relative inline-block text-left mt-1 pr-1"
-                        >
+                        <Menu as="div" className="relative inline-block text-left mt-1 pr-1">
                             <div>
                                 <Menu.Button>
                                     <Bars3Icon className="text-black h-5 w-5" />
@@ -175,17 +136,11 @@ export default function Header() {
                                 <Menu.Items className="absolute z-30 right-0 mt-2 whitespace-nowrap p-2 origin-top-right divide-y divide-gray-100 rounded-sm bg-white shadow-lg text-base font-medium focus:outline-none">
                                     {navigation.map((item) => {
                                         return (
-                                            <div
-                                                className="px-1 py-1"
-                                                key={`nav-${item.title}`}
-                                            >
+                                            <div className="px-1 py-1" key={`nav-${item.title}`}>
                                                 <Menu.Item>
                                                     {({ active }) => (
                                                         <Link
-                                                            className={`${
-                                                                active &&
-                                                                'bg-blue-500'
-                                                            }`}
+                                                            className={`${active && 'bg-blue-500'}`}
                                                             href={item.href}
                                                         >
                                                             {item.title}
