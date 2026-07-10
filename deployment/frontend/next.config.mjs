@@ -40,9 +40,6 @@ const config = {
     images: {
         domains: [
             'wri-dev-ckan-svc',
-            'wri.dev.ckan.datopian.com',
-            'wri.staging.ckan.datopian.com',
-            'wri.prod.ckan.datopian.com',
             'datasets-dev.wri.org',
             'datasets-staging.wri.org',
             'datasets.wri.org',
