@@ -6,12 +6,7 @@ metadata:
     meta.helm.sh/release-name: {{ .Release.Name }}
     meta.helm.sh/release-namespace: {{ .Release.Namespace }}
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers "server: hide";
-      more_set_headers "X-Content-Type-Options: nosniff";
-      more_set_headers "X-Xss-Protection: 1";
-      more_set_headers "Referrer-Policy: origin";
-      more_set_headers "Expect-CT: max-age=86400, enforce, report-uri='[reportURL]'";
-      more_set_headers "X-Permitted-Cross-Domain-Policies: none";
+{{ include "wri.ingress.feCkanConfigurationSnippet" . | indent 6 }}
     nginx.ingress.kubernetes.io/limit-connections: "50"
     nginx.ingress.kubernetes.io/limit-rps: "50"
     nginx.ingress.kubernetes.io/proxy-body-size: 1000M

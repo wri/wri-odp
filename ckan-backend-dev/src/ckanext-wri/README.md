@@ -261,9 +261,9 @@ A successful request will return the Prefect status of the new migration job.
 ##### Usage Example
 
 ```
-% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/migrate_dataset?rw_dataset_id=c12446ce-174f-4ffb-b2f7-77ecb0116aba&rw_application=rw&dx_application=land-carbon-lab&team=migration-test&topics=lucas-topic,nov-16-topic"
+% curl -H "Authorization: YOUR_API_TOKEN" "https://datasets-dev.wri.org/api/3/action/migrate_dataset?rw_dataset_id=c12446ce-174f-4ffb-b2f7-77ecb0116aba&rw_application=rw&dx_application=land-carbon-lab&team=migration-test&topics=lucas-topic,nov-16-topic"
 {
-  "help": "https://wri.dev.ckan.datopian.com/api/3/action/help_show?name=migration_status",
+  "help": "https://datasets-dev.wri.org/api/3/action/help_show?name=migration_status",
   "success": true,
   "result": {
     "id": "2b3d8bf5-80a1-4816-a2f0-55a97f720471",
@@ -364,9 +364,9 @@ A successful request will return the Prefect status of the new migration job.
 Same as above, but with the `/trigger_migration` endpoint.
 
 ```
-% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/trigger_migration"
+% curl -H "Authorization: YOUR_API_TOKEN" "https://datasets-dev.wri.org/api/3/action/trigger_migration"
 {
-  "help": "https://wri.dev.ckan.datopian.com/api/3/action/help_show?name=trigger_migration",
+  "help": "https://datasets-dev.wri.org/api/3/action/help_show?name=trigger_migration",
   "success": true,
   "result": {
     "id": "7cd8a09e-1834-4ab5-8b72-bd638e9392ae",
@@ -487,9 +487,9 @@ A successful request will return the current status of the migration job.
 The following uses the flow run ID from the `/migrate_dataset` endpoint example above:
 
 ```
-% curl -H "Authorization: YOUR_API_TOKEN" "https://wri.dev.ckan.datopian.com/api/3/action/migration_status?id=2b3d8bf5-80a1-4816-a2f0-55a97f720471"
+% curl -H "Authorization: YOUR_API_TOKEN" "https://datasets-dev.wri.org/api/3/action/migration_status?id=2b3d8bf5-80a1-4816-a2f0-55a97f720471"
 {
-  "help": "https://wri.dev.ckan.datopian.com/api/3/action/help_show?name=migration_status",
+  "help": "https://datasets-dev.wri.org/api/3/action/help_show?name=migration_status",
   "success": true,
   "result": {
     "id": "2b3d8bf5-80a1-4816-a2f0-55a97f720471",
