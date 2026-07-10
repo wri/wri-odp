@@ -12,14 +12,13 @@ metadata:
       more_set_headers "Referrer-Policy: origin";
       more_set_headers "Expect-CT: max-age=86400, enforce, report-uri='[reportURL]'";
       more_set_headers "X-Permitted-Cross-Domain-Policies: none";
+{{ include "wri.ingress.botDenylistConfigSnippet" . | nindent 6 }}
     nginx.ingress.kubernetes.io/limit-connections: "50"
     nginx.ingress.kubernetes.io/limit-rps: "50"
     nginx.ingress.kubernetes.io/proxy-body-size: 1000M
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
     nginx.ingress.kubernetes.io/rewrite-target: /api/action/$1
-    nginx.ingress.kubernetes.io/server-snippet: |
-{{ include "wri.ingress.botDenylistSnippet" . | nindent 6 }}
     nginx.ingress.kubernetes.io/use-regex: "true"
   labels:
     app.kubernetes.io/managed-by: Helm

@@ -1,9 +1,9 @@
 {{/*
-  NGINX server-snippet: block known bad bots/scrapers on CKAN API/admin paths only
-  (carried over from ckan.ingress on wri.*.ckan.datopian.com).
-  Applied to frontendInternalApi and frontendInternalAdmin — not the public frontend.
+  NGINX configuration-snippet: block bad bots on CKAN API/admin location blocks only.
+  Injected into frontendInternalApi and frontendInternalAdmin (not server-snippet — same host
+  as the public frontend ingress, which already owns server-snippet for legacy redirects).
 */}}
-{{- define "wri.ingress.botDenylistSnippet" -}}
+{{- define "wri.ingress.botDenylistConfigSnippet" -}}
 {{- $denylistBots := list
     "360Spider"
     "80legs.com"
@@ -319,9 +319,7 @@
     "meta-externalagent"
     "facebookexternalhit"
 -}}
-location / {
-  if ($http_user_agent ~* ({{ join "|" $denylistBots }})) {
-      return 403;
-  }
+if ($http_user_agent ~* ({{ join "|" $denylistBots }})) {
+  return 403;
 }
 {{- end -}}
