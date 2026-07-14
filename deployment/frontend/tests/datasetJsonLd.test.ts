@@ -52,7 +52,16 @@ describe('stripHtmlToText', () => {
     });
 
     it('removes leftover angle brackets from broken markup', () => {
-        expect(stripHtmlToText('Before <script After')).toBe('Before script After');
+        expect(stripHtmlToText('Before <script After')).toBe(
+            'Before script After'
+        );
+    });
+
+    it('does not reintroduce tags via nested markup or entities', () => {
+        const nested = stripHtmlToText('<scr<script>ipt>alert(1)</script>');
+        expect(nested).not.toMatch(/[<>]/);
+        expect(nested).toContain('alert(1)');
+        expect(stripHtmlToText('A &lt;script&gt; B')).toBe('A script B');
     });
 });
 

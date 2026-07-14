@@ -110,38 +110,57 @@ function isHttpUrl(value: string | undefined): value is string {
 
 const HTML_ENTITY_MAP: Record<string, string> = {
     amp: '&',
-    lt: '<',
-    gt: '>',
     quot: '"',
     apos: "'",
     nbsp: ' ',
 };
+
+function decodeHtmlEntities(value: string): string {
+    return value
+        .replace(/&([a-z]+);/gi, (_, entity: string) => {
+            return HTML_ENTITY_MAP[entity.toLowerCase()] ?? '';
+        })
+        .replace(/&#(\d+);/g, (_, code: string) => {
+            const charCode = Number(code);
+            // Skip angle brackets so entity decoding cannot reintroduce markup.
+            if (charCode === 60 || charCode === 62) {
+                return '';
+            }
+            return String.fromCharCode(charCode);
+        })
+        .replace(/&#x([0-9a-f]+);/gi, (_, code: string) => {
+            const charCode = parseInt(code, 16);
+            if (charCode === 60 || charCode === 62) {
+                return '';
+            }
+            return String.fromCharCode(charCode);
+        });
+}
 
 export function stripHtmlToText(value: string | null | undefined): string {
     if (!value) {
         return '';
     }
 
-    return value
+    let text = value
         .replace(/<br\s*\/?>/gi, '\n')
         .replace(/<\/(p|div|h[1-6]|tr|table|section|article)>/gi, '\n\n')
         .replace(/<\/(li|dt)>/gi, '\n')
-        .replace(/<(li|dt)[^>]*>/gi, '- ')
-        .replace(/<[^>]+>/g, '')
-        .replace(/&([a-z]+);/gi, (_, entity: string) => {
-            return HTML_ENTITY_MAP[entity.toLowerCase()] ?? '';
-        })
-        .replace(/&#(\d+);/g, (_, code: string) => {
-            return String.fromCharCode(Number(code));
-        })
-        .replace(/&#x([0-9a-f]+);/gi, (_, code: string) => {
-            return String.fromCharCode(parseInt(code, 16));
-        })
+        .replace(/<(li|dt)\b[^>]*>/gi, '- ');
+
+    // Remove complete tags until stable, then drop any leftover angle brackets.
+    // Single-pass /<[^>]*>/ can leave nested/broken markup; looping + [<>] avoids that.
+    let previous: string;
+    do {
+        previous = text;
+        text = text.replace(/<[^>]*>/g, '');
+    } while (text !== previous);
+    text = text.replace(/[<>]/g, '');
+
+    return decodeHtmlEntities(text)
         .replace(/[ \t]+\n/g, '\n')
         .replace(/\n{3,}/g, '\n\n')
         .replace(/[ \t]{2,}/g, ' ')
-        // Drop any leftover angle brackets after tag stripping (e.g. broken markup).
-        .replace(/[<>]/g, '')
         .trim();
 }
 
