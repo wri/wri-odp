@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
     buildDatasetJsonLd,
+    buildDescription,
     buildDistribution,
+    buildKeywords,
+    buildLicense,
     buildSpatialCoverage,
     formatTemporalCoverage,
+    stripHtmlToText,
 } from '@/utils/datasetJsonLd';
 import { type WriDataset } from '@/schema/ckan.schema';
 
@@ -45,6 +49,108 @@ describe('formatTemporalCoverage', () => {
     it('formats an open-ended interval', () => {
         expect(formatTemporalCoverage('2015', null)).toBe('2015/..');
         expect(formatTemporalCoverage(null, '2020')).toBe('../2020');
+    });
+});
+
+describe('stripHtmlToText', () => {
+    it('strips tags and keeps readable text', () => {
+        expect(
+            stripHtmlToText(
+                '<p>Overview of trees.</p><ul><li>Caution one</li><li>Caution two</li></ul>'
+            )
+        ).toBe('Overview of trees.\n\n- Caution one\n- Caution two');
+    });
+});
+
+describe('buildDescription', () => {
+    it('prefers About notes over short description', () => {
+        expect(
+            buildDescription({
+                short_description: 'Short blurb.',
+                notes: '<p>The tropical tree cover data maps tree extent at the ten-meter scale and tree cover at the half hectare scale to enable accurate monitoring.</p>',
+            })
+        ).toContain('tropical tree cover data maps tree extent');
+    });
+
+    it('appends cautions when present', () => {
+        const description = buildDescription({
+            short_description:
+                'This layer displays tree extent at the ten-meter scale for monitoring.',
+            cautions: '<p>Different tree definition than Hansen.</p>',
+        });
+        expect(description).toContain('Cautions:');
+        expect(description).toContain('Different tree definition than Hansen.');
+    });
+
+    it('falls back to short description when notes are too short', () => {
+        expect(
+            buildDescription({
+                notes: '<p>Short</p>',
+                short_description:
+                    'This layer displays tree extent at the ten-meter scale for monitoring.',
+            })
+        ).toBe(
+            'This layer displays tree extent at the ten-meter scale for monitoring.'
+        );
+    });
+});
+
+describe('buildKeywords', () => {
+    it('merges tags, topics, and applications', () => {
+        expect(
+            buildKeywords({
+                tags: [
+                    { name: 'Tree Cover', display_name: 'Tree Cover' },
+                    { name: 'forests' },
+                ],
+                groups: [
+                    {
+                        type: 'group',
+                        name: 'land',
+                        title: 'Land',
+                        display_name: 'Land',
+                    },
+                    {
+                        type: 'application',
+                        name: 'gfw',
+                        title: 'Global Forest Watch',
+                        display_name: 'Global Forest Watch',
+                    },
+                ],
+            })
+        ).toEqual([
+            'Tree Cover',
+            'forests',
+            'Land',
+            'Global Forest Watch',
+        ]);
+    });
+});
+
+describe('buildLicense', () => {
+    it('returns CreativeWork when title and url are present', () => {
+        expect(
+            buildLicense({
+                license_title: 'Open Data Commons Attribution License',
+                license_url: 'http://www.opendefinition.org/licenses/odc-by',
+            })
+        ).toEqual({
+            '@type': 'CreativeWork',
+            name: 'Open Data Commons Attribution License',
+            url: 'http://www.opendefinition.org/licenses/odc-by',
+        });
+    });
+
+    it('falls back to title-only CreativeWork', () => {
+        expect(
+            buildLicense({
+                license_title: 'Custom Internal License',
+                license_url: null,
+            })
+        ).toEqual({
+            '@type': 'CreativeWork',
+            name: 'Custom Internal License',
+        });
     });
 });
 
@@ -145,10 +251,54 @@ describe('buildDistribution', () => {
 });
 
 describe('buildDatasetJsonLd', () => {
-    it('builds a Google Dataset Search-friendly payload', () => {
+    it('builds a Google Dataset Search-friendly payload from About fields', () => {
         const jsonLd = buildDatasetJsonLd(
             {
                 ...baseDataset,
+                notes: '<p>The tropical tree cover data maps tree extent at the ten-meter scale and tree cover at the half hectare scale to enable accurate monitoring of trees.</p>',
+                citation:
+                    'Brandt, J., et al. (2023). Wall-to-wall mapping of tree extent. https://doi.org/10.1016/j.rse.2023.113574',
+                technical_notes: 'https://doi.org/10.1016/j.rse.2023.113574',
+                methodology:
+                    '<p>Multi-temporal convolutional neural network models applied to Sentinel imagery.</p>',
+                cautions: '<p>Different tree definition than Hansen et al.</p>',
+                url: 'https://data.globalforestwatch.org/datasets/gfw::tropical-tree-cover',
+                groups: [
+                    {
+                        id: 'g1',
+                        name: 'land',
+                        title: 'Land',
+                        display_name: 'Land',
+                        type: 'group',
+                        description: '',
+                        image_display_url: '',
+                        image_url: '',
+                        package_count: 1,
+                        created: '',
+                        is_organization: false,
+                        state: 'active',
+                        revision_id: '',
+                        num_followers: 0,
+                        approval_status: 'approved',
+                    },
+                    {
+                        id: 'a1',
+                        name: 'gfw',
+                        title: 'Global Forest Watch',
+                        display_name: 'Global Forest Watch',
+                        type: 'application',
+                        description: '',
+                        image_display_url: '',
+                        image_url: '',
+                        package_count: 1,
+                        created: '',
+                        is_organization: false,
+                        state: 'active',
+                        revision_id: '',
+                        num_followers: 0,
+                        approval_status: 'approved',
+                    },
+                ],
                 resources: [
                     {
                         id: 'res-1',
@@ -169,10 +319,20 @@ describe('buildDatasetJsonLd', () => {
 
         expect(jsonLd).toMatchObject({
             name: 'Test Dataset',
-            description: 'A short description of the dataset.',
             url: 'https://datasets.wri.org/datasets/test-dataset',
-            license: 'http://www.opendefinition.org/licenses/cc-by',
-            keywords: ['forests'],
+            license: {
+                '@type': 'CreativeWork',
+                name: 'Creative Commons Attribution',
+                url: 'http://www.opendefinition.org/licenses/cc-by',
+            },
+            keywords: ['forests', 'Land', 'Global Forest Watch'],
+            citation:
+                'Brandt, J., et al. (2023). Wall-to-wall mapping of tree extent. https://doi.org/10.1016/j.rse.2023.113574',
+            identifier: 'https://doi.org/10.1016/j.rse.2023.113574',
+            sameAs:
+                'https://data.globalforestwatch.org/datasets/gfw::tropical-tree-cover',
+            measurementTechnique:
+                'Multi-temporal convolutional neural network models applied to Sentinel imagery.',
             temporalCoverage: '2001/2023',
             spatialCoverage: 'Global',
             isAccessibleForFree: true,
@@ -195,5 +355,12 @@ describe('buildDatasetJsonLd', () => {
                 },
             ],
         });
+        expect(jsonLd.description).toContain(
+            'tropical tree cover data maps tree extent'
+        );
+        expect(jsonLd.description).toContain('Cautions:');
+        expect(jsonLd.description).toContain(
+            'Different tree definition than Hansen et al.'
+        );
     });
 });

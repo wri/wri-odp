@@ -13,12 +13,24 @@ type GeoJson = {
     coordinates?: unknown;
 };
 
+export type DatasetJsonLdLicense =
+    | string
+    | {
+          '@type': 'CreativeWork';
+          name: string;
+          url?: string;
+      };
+
 export type DatasetJsonLdOutput = {
     name: string;
     description: string;
     url?: string;
-    license?: string;
+    license?: DatasetJsonLdLicense;
     keywords?: string[];
+    citation?: string;
+    identifier?: string | string[];
+    sameAs?: string | string[];
+    measurementTechnique?: string;
     temporalCoverage?: string;
     spatialCoverage?: string | Record<string, unknown>;
     distribution?: Array<{
@@ -37,6 +49,8 @@ export type DatasetJsonLdOutput = {
     };
 };
 
+const MAX_DESCRIPTION_LENGTH = 5000;
+
 type Bounds = {
     minLat: number;
     maxLat: number;
@@ -46,6 +60,144 @@ type Bounds = {
 
 function isHttpUrl(value: string | undefined): value is string {
     return !!value && /^https?:\/\//i.test(value);
+}
+
+const HTML_ENTITY_MAP: Record<string, string> = {
+    amp: '&',
+    lt: '<',
+    gt: '>',
+    quot: '"',
+    apos: "'",
+    nbsp: ' ',
+};
+
+export function stripHtmlToText(value: string | null | undefined): string {
+    if (!value) {
+        return '';
+    }
+
+    return value
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/(p|div|h[1-6]|tr|table|section|article)>/gi, '\n\n')
+        .replace(/<\/(li|dt)>/gi, '\n')
+        .replace(/<(li|dt)[^>]*>/gi, '- ')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&([a-z]+);/gi, (_, entity: string) => {
+            return HTML_ENTITY_MAP[entity.toLowerCase()] ?? '';
+        })
+        .replace(/&#(\d+);/g, (_, code: string) => {
+            return String.fromCharCode(Number(code));
+        })
+        .replace(/&#x([0-9a-f]+);/gi, (_, code: string) => {
+            return String.fromCharCode(parseInt(code, 16));
+        })
+        .replace(/[ \t]+\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/[ \t]{2,}/g, ' ')
+        .trim();
+}
+
+export function buildDescription(dataset: {
+    notes?: string | null;
+    short_description?: string | null;
+    cautions?: string | null;
+}): string {
+    const about = stripHtmlToText(dataset.notes);
+    const shortDescription = dataset.short_description?.trim() ?? '';
+    const cautions = stripHtmlToText(dataset.cautions);
+
+    const parts: string[] = [];
+    if (about.length >= 50) {
+        parts.push(about);
+    } else if (shortDescription) {
+        parts.push(shortDescription);
+    } else if (about) {
+        parts.push(about);
+    }
+
+    if (cautions) {
+        parts.push(`Cautions:\n${cautions}`);
+    }
+
+    const description = parts.join('\n\n').trim();
+    if (!description) {
+        return '';
+    }
+
+    if (description.length <= MAX_DESCRIPTION_LENGTH) {
+        return description;
+    }
+    return `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1).trimEnd()}…`;
+}
+
+export function buildKeywords(dataset: {
+    tags?: Array<{ name?: string; display_name?: string }> | null;
+    groups?: Array<{
+        type?: string;
+        name?: string;
+        title?: string;
+        display_name?: string;
+    }> | null;
+}): string[] | undefined {
+    const keywords = new Set<string>();
+
+    for (const tag of dataset.tags ?? []) {
+        const name = (tag.display_name ?? tag.name)?.trim();
+        if (name) {
+            keywords.add(name);
+        }
+    }
+
+    for (const group of dataset.groups ?? []) {
+        if (group.type !== 'group' && group.type !== 'application') {
+            continue;
+        }
+        const name = (group.display_name ?? group.title ?? group.name)?.trim();
+        if (name) {
+            keywords.add(name);
+        }
+    }
+
+    return keywords.size ? Array.from(keywords) : undefined;
+}
+
+export function buildLicense(
+    dataset: {
+        license_url?: string | null;
+        license_title?: string | null;
+    }
+): DatasetJsonLdLicense | undefined {
+    const licenseUrl = dataset.license_url?.trim();
+    const licenseTitle = dataset.license_title?.trim();
+
+    if (isHttpUrl(licenseUrl) && licenseTitle) {
+        return {
+            '@type': 'CreativeWork',
+            name: licenseTitle,
+            url: licenseUrl,
+        };
+    }
+    if (isHttpUrl(licenseUrl)) {
+        return licenseUrl;
+    }
+    if (licenseTitle) {
+        return {
+            '@type': 'CreativeWork',
+            name: licenseTitle,
+        };
+    }
+    return undefined;
+}
+
+function uniqueHttpUrls(...values: Array<string | null | undefined>): string[] {
+    const urls = new Set<string>();
+    for (const value of values) {
+        const trimmed = value?.trim();
+        if (isHttpUrl(trimmed)) {
+            urls.add(trimmed);
+        }
+    }
+    return Array.from(urls);
 }
 
 function normalizeTemporalValue(
@@ -322,25 +474,50 @@ export function buildDatasetJsonLd(
     pageUrl: string,
     options?: { catalogName?: string; catalogUrl?: string; ckanBaseUrl?: string }
 ): DatasetJsonLdOutput {
-    const description = dataset.short_description?.trim();
     const name = (dataset.title ?? dataset.name).trim();
-    const licenseUrl = dataset.license_url;
+    const description = buildDescription(dataset) || name;
 
     const output: DatasetJsonLdOutput = {
         name,
-        description: description || name,
+        description,
         url: pageUrl,
     };
 
-    if (isHttpUrl(licenseUrl)) {
-        output.license = licenseUrl;
+    const license = buildLicense(dataset);
+    if (license) {
+        output.license = license;
     }
 
-    const keywords = dataset.tags
-        ?.map((tag) => tag.name?.trim())
-        .filter((tag): tag is string => !!tag);
+    const keywords = buildKeywords(dataset);
     if (keywords?.length) {
         output.keywords = keywords;
+    }
+
+    const citation = dataset.citation?.trim();
+    if (citation) {
+        output.citation = citation;
+    }
+
+    const identifiers = uniqueHttpUrls(dataset.technical_notes);
+    if (identifiers.length === 1) {
+        output.identifier = identifiers[0];
+    } else if (identifiers.length > 1) {
+        output.identifier = identifiers;
+    }
+
+    const sameAs = uniqueHttpUrls(dataset.url).filter((url) => url !== pageUrl);
+    if (sameAs.length === 1) {
+        output.sameAs = sameAs[0];
+    } else if (sameAs.length > 1) {
+        output.sameAs = sameAs;
+    }
+
+    const methodology = stripHtmlToText(dataset.methodology);
+    if (methodology) {
+        output.measurementTechnique =
+            methodology.length > 500
+                ? `${methodology.slice(0, 499).trimEnd()}…`
+                : methodology;
     }
 
     const temporalCoverage = formatTemporalCoverage(
