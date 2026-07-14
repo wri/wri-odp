@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
     Button,
     getThemedColor,
@@ -55,6 +55,7 @@ function DatasetDetailsHeaderSticky({
     openInItems,
 }: DatasetDetailsHeaderStickyProps) {
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
+    const [selectedSectionLabel, setSelectedSectionLabel] = useState('Key details');
     const stickyOpenInItems = openInItems.map((item) => ({
         label: `Open in (${item.label})`,
         value: item.value,
@@ -78,6 +79,12 @@ function DatasetDetailsHeaderSticky({
     ];
 
     const onSectionSelect = (sectionId: string) => {
+        const selectedSection = sectionItems.find((item) => item.value === sectionId);
+
+        if (selectedSection?.label) {
+            setSelectedSectionLabel(selectedSection.label);
+        }
+
         const targetElement = document.getElementById(sectionId);
 
         if (!targetElement) {
@@ -122,12 +129,7 @@ function DatasetDetailsHeaderSticky({
                 {datasetTitle}
             </h1>
 
-            <div
-                style={{
-                    display: 'flex',
-                    gap: getThemedSpacing(400),
-                }}
-            >
+            <div className="flex gap-1 sm:gap-4">
                 <Button variant="primary" size="small" leftIcon={<ArrowDownTrayIcon />}>
                     Download
                 </Button>
@@ -142,8 +144,11 @@ function DatasetDetailsHeaderSticky({
                             <span style={{ fontSize: getThemedFontSize(200), fontWeight: 400 }}>
                                 Section:
                             </span>
-                            <span style={{ fontSize: getThemedFontSize(200), fontWeight: 700 }}>
-                                Key details
+                            <span
+                                className="hidden sm:inline"
+                                style={{ fontSize: getThemedFontSize(200), fontWeight: 700 }}
+                            >
+                                {selectedSectionLabel}
                             </span>
                         </Button>
                     }

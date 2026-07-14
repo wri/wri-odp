@@ -46,8 +46,8 @@ export default function DatasetDetailsHeaderContent({
             <p className="mt-4 text-lg text-stone-600">{datasetDescription ?? 'No description.'}</p>
 
             <div
+                className="flex flex-col md:flex-row md:items-center"
                 style={{
-                    display: 'flex',
                     gap: getThemedSpacing(400),
                     marginTop: getThemedSpacing(400),
                 }}

@@ -104,14 +104,14 @@ function DatasetTable({
                 {rows.map(({ icon: Icon, label, value }) => (
                     <div
                         key={label}
-                        className="grid grid-cols-[24px_280px_1fr] items-center gap-x-6 py-5"
+                        className="grid grid-cols-[24px_1fr] gap-x-4 gap-y-2 py-5 sm:grid-cols-[24px_220px_1fr] sm:items-center sm:gap-x-6"
                     >
                         <Icon
                             className="h-6 w-6"
                             style={{ color: getThemedColor('secondary', 700) }}
                         />
-                        <div>{label}</div>
-                        <div>{value}</div>
+                        <div className="font-semibold sm:font-normal">{label}</div>
+                        <div className="col-start-2 break-words sm:col-start-auto">{value}</div>
                     </div>
                 ))}
             </div>
