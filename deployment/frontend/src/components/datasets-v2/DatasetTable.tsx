@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import {
     UserIcon,
     GlobeAltIcon,
@@ -11,18 +12,7 @@ import {
     getThemedFontSize,
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
-import { type ReactNode } from 'react';
-
-export type DatasetV2KeyDetails = {
-    name?: string;
-    organization?: { title?: string };
-    temporal_coverage_start?: string | null;
-    temporal_coverage_end?: string | null;
-    type?: string;
-    spatial_address?: string;
-    open_in?: Array<{ title: string; url: string }>;
-    extras?: Array<{ key: string; value: string }>;
-};
+import type { WriDataset } from '@/schema/ckan.schema';
 
 function DatasetTable({
     datasetId: _datasetId,
@@ -31,7 +21,7 @@ function DatasetTable({
 }: {
     datasetId: string;
     licenseTitle: string;
-    dataset?: DatasetV2KeyDetails;
+    dataset?: WriDataset;
 }) {
     const getExtraValue = (keys: string[]) => {
         if (!dataset?.extras?.length) return undefined;
@@ -114,14 +104,14 @@ function DatasetTable({
                 {rows.map(({ icon: Icon, label, value }) => (
                     <div
                         key={label}
-                        className="grid grid-cols-[24px_280px_1fr] items-center gap-x-6 py-5"
+                        className="grid grid-cols-[24px_1fr] gap-x-4 gap-y-2 py-5 sm:grid-cols-[24px_220px_1fr] sm:items-center sm:gap-x-6"
                     >
                         <Icon
                             className="h-6 w-6"
                             style={{ color: getThemedColor('secondary', 700) }}
                         />
-                        <div>{label}</div>
-                        <div>{value}</div>
+                        <div className="font-semibold sm:font-normal">{label}</div>
+                        <div className="col-start-2 break-words sm:col-start-auto">{value}</div>
                     </div>
                 ))}
             </div>

@@ -4,6 +4,7 @@ import {
     useIsEmbeddingMap,
     useMapState,
 } from '@/utils/storeHooks';
+import { getThemedColor } from '@worldresources/wri-design-systems';
 import { useEffect, useRef, useState } from 'react';
 import ReactMapGL, { type MapRef } from 'react-map-gl';
 import { useInteractiveLayers } from '@/utils/queryHooks';
@@ -23,7 +24,7 @@ export default function Map({
     layers,
     showControls = true,
     showLegends = true,
-    mapHeight = 'calc(100vh - 63px)',
+    mapHeight = 'calc(100vh - 48px)',
     datasetId,
     layerRwId,
 }: {
@@ -58,11 +59,15 @@ export default function Map({
     }, []);
 
     return (
-        <div ref={mapContainerRef} className="h-full" id="map">
+        <div
+            ref={mapContainerRef}
+            className="h-full"
+            style={{ borderLeft: `1px solid ${getThemedColor('neutral', 400)}` }}
+            id="map"
+        >
             <ReactMapGL
                 ref={(_map) => {
-                    if (_map)
-                        mapRef.current = _map.getMap() as unknown as MapRef;
+                    if (_map) mapRef.current = _map.getMap() as unknown as MapRef;
                 }}
                 {...viewState}
                 mapStyle="mapbox://styles/resourcewatch/cjzmw480d00z41cp2x81gm90h"
@@ -70,10 +75,9 @@ export default function Map({
                 dragRotate={false}
                 touchZoomRotate={false}
                 style={{
-                    height: mapHeight ?? 'calc(100vh - 63px)',
-                    minHeight: '800px',
+                    height: mapHeight ?? 'calc(100vh - 48px)',
                 }}
-                interactiveLayerIds={activeLayersIds ? activeLayersIds : []}
+                interactiveLayerIds={activeLayersIds ?? []}
                 onMove={(evt) => setViewState(evt.viewState)}
                 onClick={mapTooltipRef.current?.onClickLayer}
                 onLoad={() => {
@@ -91,10 +95,7 @@ export default function Map({
                         <Labels mapRef={mapRef} />
                         {showControls && (
                             <>
-                                <Controls
-                                    mapRef={mapRef}
-                                    mapContainerRef={mapContainerRef}
-                                />
+                                <Controls mapRef={mapRef} mapContainerRef={mapContainerRef} />
                                 {!isEmbedding && (
                                     <button
                                         onClick={() => {
