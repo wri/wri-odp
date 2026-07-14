@@ -31,7 +31,7 @@ import { useSession } from 'next-auth/react';
 import { NextSeo, DatasetJsonLd } from 'next-seo';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { env } from '@/env.mjs';
 import SyncUrl from '@/components/_shared/map/SyncUrl';
 import { type TabularResource } from '@/components/datasets/visualizations/Visualizations';
@@ -40,6 +40,7 @@ import { decodeMapParam } from '@/utils/urlEncoding';
 import { type WriDataset } from '@/schema/ckan.schema';
 
 import { matchesAnyPattern } from '@/utils/general';
+import { buildDatasetJsonLd } from '@/utils/datasetJsonLd';
 
 import { Versioning } from '@/components/datasets/sections/Versioning';
 
@@ -601,6 +602,21 @@ export default function DatasetPage(
     }
   }, [isCurrentVersion]);
 
+  const datasetJsonLd = useMemo(() => {
+    if (!datasetData) {
+      return null;
+    }
+    return buildDatasetJsonLd(
+      datasetData,
+      `${NEXTURL}/datasets/${datasetData.name}`,
+      {
+        catalogName: 'WRI Data Explorer',
+        catalogUrl: NEXTURL,
+        ckanBaseUrl: env.NEXT_PUBLIC_CKAN_URL || env.CKAN_URL,
+      }
+    );
+  }, [datasetData, NEXTURL]);
+
   const shouldLoad = pendingExist ? isLoadingDiff : false;
 
   if (isLoading || !datasetData || isLoadingPrev || shouldLoad) {
@@ -641,10 +657,7 @@ export default function DatasetPage(
           cardType: 'summary_large_image',
         }}
       />
-      <DatasetJsonLd
-        description={`${datasetData?.short_description} `}
-        name={`${datasetData?.title ?? datasetData?.name} - Datasets`}
-      />
+      {datasetJsonLd && <DatasetJsonLd {...datasetJsonLd} />}
       <Header />
       <Breadcrumbs links={links} />
       {isApprovalRequest && (
