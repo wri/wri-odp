@@ -84,11 +84,12 @@ function DatasetDetailsHeaderSticky({
             return;
         }
 
-        const navbarHeight = Number.parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue(
-                '--dataset-v2-navbar-height'
-            )
+        const navbarHeightRaw = getComputedStyle(document.documentElement).getPropertyValue(
+            '--dataset-v2-navbar-height'
         );
+        const navbarHeightParsed = Number.parseFloat(navbarHeightRaw);
+        const navbarHeight = Number.isFinite(navbarHeightParsed) ? navbarHeightParsed : 0;
+
         const stickyHeaderHeight = stickyHeaderRef.current?.getBoundingClientRect().height ?? 0;
         const offset = navbarHeight + stickyHeaderHeight;
 
@@ -101,7 +102,7 @@ function DatasetDetailsHeaderSticky({
     return (
         <div
             ref={stickyHeaderRef}
-            className="sticky z-600 top-12 left-0 right-0 z-50 font-acumin"
+            className="sticky z-50 top-12 left-0 right-0 font-acumin"
             style={{
                 backgroundColor: getThemedColor('neutral', 100),
                 padding: `${getThemedSpacing(300)} ${getThemedSpacing(600)}`,

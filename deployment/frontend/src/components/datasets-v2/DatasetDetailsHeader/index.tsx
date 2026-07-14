@@ -67,7 +67,7 @@ function DatasetDetailsHeader({
                     backgroundColor: getThemedColor('secondary', 100),
                     paddingTop: getThemedSpacing(800),
                 }}
-                className="flex justify-between items-center px-2 w-100"
+                className="flex justify-between items-center px-2"
             >
                 <Button
                     variant="borderless"
@@ -110,8 +110,7 @@ function DatasetDetailsHeader({
                 ref={headerRef}
                 style={{
                     position: 'absolute',
-                    border: '1px solid dashed',
-                    top: '80px',
+                    top: '70px',
                 }}
             />
 
