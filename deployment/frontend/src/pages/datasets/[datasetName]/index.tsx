@@ -612,7 +612,7 @@ export default function DatasetPage(
       {
         catalogName: 'WRI Data Explorer',
         catalogUrl: NEXTURL,
-        ckanBaseUrl: env.NEXT_PUBLIC_CKAN_URL || env.CKAN_URL,
+        ckanBaseUrl: env.NEXT_PUBLIC_CKAN_URL,
       }
     );
   }, [datasetData, NEXTURL]);

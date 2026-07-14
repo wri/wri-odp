@@ -60,6 +60,10 @@ describe('stripHtmlToText', () => {
             )
         ).toBe('Overview of trees.\n\n- Caution one\n- Caution two');
     });
+
+    it('removes leftover angle brackets from broken markup', () => {
+        expect(stripHtmlToText('Before <script After')).toBe('Before script After');
+    });
 });
 
 describe('buildDescription', () => {
@@ -362,5 +366,51 @@ describe('buildDatasetJsonLd', () => {
         expect(jsonLd.description).toContain(
             'Different tree definition than Hansen et al.'
         );
+    });
+
+    it('falls back to name when title is blank', () => {
+        const jsonLd = buildDatasetJsonLd(
+            {
+                ...baseDataset,
+                title: '   ',
+            },
+            'https://datasets.wri.org/datasets/test-dataset'
+        );
+
+        expect(jsonLd.name).toBe('test-dataset');
+    });
+
+    it('trims organization and author creator names', () => {
+        expect(
+            buildDatasetJsonLd(
+                {
+                    ...baseDataset,
+                    organization: {
+                        ...baseDataset.organization!,
+                        title: '  Land & Carbon Lab  ',
+                    },
+                },
+                'https://datasets.wri.org/datasets/test-dataset'
+            ).creator
+        ).toEqual({
+            '@type': 'Organization',
+            name: 'Land & Carbon Lab',
+        });
+
+        expect(
+            buildDatasetJsonLd(
+                {
+                    ...baseDataset,
+                    organization: undefined,
+                    authors: [{ name: '  Jane Doe  ', email: 'jane@example.com' }],
+                },
+                'https://datasets.wri.org/datasets/test-dataset'
+            ).creator
+        ).toEqual([
+            {
+                '@type': 'Person',
+                name: 'Jane Doe',
+            },
+        ]);
     });
 });

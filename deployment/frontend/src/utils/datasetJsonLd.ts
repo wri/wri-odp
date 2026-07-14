@@ -94,6 +94,8 @@ export function stripHtmlToText(value: string | null | undefined): string {
         .replace(/[ \t]+\n/g, '\n')
         .replace(/\n{3,}/g, '\n\n')
         .replace(/[ \t]{2,}/g, ' ')
+        // Drop any leftover angle brackets after tag stripping (e.g. broken markup).
+        .replace(/[<>]/g, '')
         .trim();
 }
 
@@ -451,21 +453,26 @@ export function buildDistribution(
 }
 
 function buildCreator(dataset: WriDataset): DatasetJsonLdOutput['creator'] {
-    if (dataset.organization?.title || dataset.organization?.name) {
+    const organizationName =
+        dataset.organization?.title?.trim() ||
+        dataset.organization?.name?.trim();
+    if (organizationName) {
         return {
             '@type': 'Organization',
-            name: dataset.organization.title ?? dataset.organization.name,
+            name: organizationName,
         };
     }
 
-    const authors = dataset.authors?.filter((author) => author.name?.trim());
+    const authors = dataset.authors
+        ?.map((author) => author.name?.trim())
+        .filter((name): name is string => !!name);
     if (!authors?.length) {
         return undefined;
     }
 
-    return authors.map((author) => ({
+    return authors.map((name) => ({
         '@type': 'Person',
-        name: author.name,
+        name,
     }));
 }
 
@@ -474,7 +481,7 @@ export function buildDatasetJsonLd(
     pageUrl: string,
     options?: { catalogName?: string; catalogUrl?: string; ckanBaseUrl?: string }
 ): DatasetJsonLdOutput {
-    const name = (dataset.title ?? dataset.name).trim();
+    const name = dataset.title?.trim() || dataset.name.trim();
     const description = buildDescription(dataset) || name;
 
     const output: DatasetJsonLdOutput = {
