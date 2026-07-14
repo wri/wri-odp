@@ -13,6 +13,7 @@ export interface Dataset {
     isopen?: boolean;
     license_id?: string;
     license_title?: string;
+    license_url?: string;
     maintainer?: string;
     maintainers?: Array<{ name: string; email: string }>;
     maintainer_email?: string;
