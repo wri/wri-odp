@@ -31,7 +31,7 @@ import { useSession } from 'next-auth/react';
 import { NextSeo, DatasetJsonLd } from 'next-seo';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, type ComponentProps } from 'react';
 import { env } from '@/env.mjs';
 import SyncUrl from '@/components/_shared/map/SyncUrl';
 import { type TabularResource } from '@/components/datasets/visualizations/Visualizations';
@@ -657,7 +657,10 @@ export default function DatasetPage(
           cardType: 'summary_large_image',
         }}
       />
-      {datasetJsonLd && <DatasetJsonLd {...datasetJsonLd} />}
+      {datasetJsonLd && (
+        // next-seo types license as string only; Google also accepts CreativeWork.
+        <DatasetJsonLd {...(datasetJsonLd as ComponentProps<typeof DatasetJsonLd>)} />
+      )}
       <Header />
       <Breadcrumbs links={links} />
       {isApprovalRequest && (

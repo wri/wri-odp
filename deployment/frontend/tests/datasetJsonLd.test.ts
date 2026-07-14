@@ -8,38 +8,28 @@ import {
     buildSpatialCoverage,
     formatTemporalCoverage,
     stripHtmlToText,
+    type DatasetJsonLdInput,
 } from '@/utils/datasetJsonLd';
-import { type WriDataset } from '@/schema/ckan.schema';
 
-const baseDataset = {
-    id: 'test-id',
+const baseDataset: DatasetJsonLdInput = {
     name: 'test-dataset',
     title: 'Test Dataset',
     short_description: 'A short description of the dataset.',
-    creator_user_id: 'user-1',
     temporal_coverage_start: '2001',
     temporal_coverage_end: '2023',
-    update_frequency: 'annually' as const,
-    visibility_type: 'public' as const,
-    release_notes: '',
     resources: [],
     license_url: 'http://www.opendefinition.org/licenses/cc-by',
-    license_id: 'cc-by',
     license_title: 'Creative Commons Attribution',
     isopen: true,
     metadata_modified: '2025-05-22T13:42:04.673439',
     spatial_type: 'address',
     spatial_address: 'Global',
-    tags: [{ id: '1', name: 'forests', state: 'active' as const }],
+    tags: [{ name: 'forests' }],
     organization: {
-        id: 'org-1',
         name: 'land-carbon-lab',
         title: 'Land & Carbon Lab',
-        is_organization: true,
-        state: 'active' as const,
-        visibility: 'public',
     },
-} satisfies WriDataset;
+};
 
 describe('formatTemporalCoverage', () => {
     it('formats a closed interval', () => {
@@ -269,38 +259,16 @@ describe('buildDatasetJsonLd', () => {
                 url: 'https://data.globalforestwatch.org/datasets/gfw::tropical-tree-cover',
                 groups: [
                     {
-                        id: 'g1',
+                        type: 'group',
                         name: 'land',
                         title: 'Land',
                         display_name: 'Land',
-                        type: 'group',
-                        description: '',
-                        image_display_url: '',
-                        image_url: '',
-                        package_count: 1,
-                        created: '',
-                        is_organization: false,
-                        state: 'active',
-                        revision_id: '',
-                        num_followers: 0,
-                        approval_status: 'approved',
                     },
                     {
-                        id: 'a1',
+                        type: 'application',
                         name: 'gfw',
                         title: 'Global Forest Watch',
                         display_name: 'Global Forest Watch',
-                        type: 'application',
-                        description: '',
-                        image_display_url: '',
-                        image_url: '',
-                        package_count: 1,
-                        created: '',
-                        is_organization: false,
-                        state: 'active',
-                        revision_id: '',
-                        num_followers: 0,
-                        approval_status: 'approved',
                     },
                 ],
                 resources: [
@@ -386,7 +354,7 @@ describe('buildDatasetJsonLd', () => {
                 {
                     ...baseDataset,
                     organization: {
-                        ...baseDataset.organization!,
+                        ...baseDataset.organization,
                         title: '  Land & Carbon Lab  ',
                     },
                 },
@@ -402,7 +370,7 @@ describe('buildDatasetJsonLd', () => {
                 {
                     ...baseDataset,
                     organization: undefined,
-                    authors: [{ name: '  Jane Doe  ', email: 'jane@example.com' }],
+                    authors: [{ name: '  Jane Doe  ' }],
                 },
                 'https://datasets.wri.org/datasets/test-dataset'
             ).creator

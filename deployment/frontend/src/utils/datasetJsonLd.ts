@@ -1,6 +1,3 @@
-import { type Resource } from '@/interfaces/dataset.interface';
-import { type WriDataset } from '@/schema/ckan.schema';
-
 type GeoJsonGeometry = {
     type: string;
     coordinates?: unknown;
@@ -11,6 +8,55 @@ type GeoJson = {
     geometry?: GeoJsonGeometry;
     features?: GeoJson[];
     coordinates?: unknown;
+};
+
+/** Minimal resource fields needed for Dataset JSON-LD (avoids strict Resource.layerObj*). */
+export type DatasetJsonLdResource = {
+    id?: string;
+    name?: string | null;
+    title?: string | null;
+    format?: string | null;
+    mimetype?: string | null;
+    url?: string | null;
+    state?: string | null;
+    type?: string | null;
+    not_downloadable?: boolean | null;
+    spatial_geom?: GeoJsonGeometry | { geometry?: GeoJsonGeometry } | null;
+};
+
+/** Minimal dataset fields needed for Dataset JSON-LD. */
+export type DatasetJsonLdInput = {
+    name: string;
+    title?: string | null;
+    short_description?: string | null;
+    notes?: string | null;
+    cautions?: string | null;
+    license_url?: string | null;
+    license_title?: string | null;
+    citation?: string | null;
+    technical_notes?: string | null;
+    methodology?: string | null;
+    url?: string | null;
+    tags?: Array<{ name?: string; display_name?: string }> | null;
+    groups?: Array<{
+        type?: string;
+        name?: string;
+        title?: string;
+        display_name?: string;
+    }> | null;
+    temporal_coverage_start?: string | number | null;
+    temporal_coverage_end?: string | number | null;
+    spatial_type?: string | null;
+    spatial_address?: string | null;
+    spatial?: GeoJson | null;
+    resources?: DatasetJsonLdResource[] | null;
+    organization?: {
+        title?: string | null;
+        name?: string | null;
+    } | null;
+    authors?: Array<{ name?: string | null }> | null;
+    isopen?: boolean;
+    metadata_modified?: string | null;
 };
 
 export type DatasetJsonLdLicense =
@@ -340,7 +386,7 @@ function geoJsonToSpatialCoverage(
         };
     }
 
-    const bounds = boundsFromGeometry(geoJson as GeoJsonGeometry);
+    const bounds = boundsFromGeometry(geoJson);
     if (!bounds) {
         return undefined;
     }
@@ -351,12 +397,12 @@ function geoJsonToSpatialCoverage(
 }
 
 export function buildSpatialCoverage(dataset: {
-    spatial_type?: string;
-    spatial_address?: string;
+    spatial_type?: string | null;
+    spatial_address?: string | null;
     spatial?: GeoJson | null;
-    resources?: Resource[];
+    resources?: DatasetJsonLdResource[] | null;
 }): string | Record<string, unknown> | undefined {
-    const spatialType = dataset.spatial_type;
+    const spatialType = dataset.spatial_type ?? undefined;
     const spatialAddress = dataset.spatial_address?.trim();
 
     if (
@@ -377,9 +423,12 @@ export function buildSpatialCoverage(dataset: {
         const bounds = initBounds();
         let hasBounds = false;
         for (const resource of dataset.resources) {
-            const resourceBounds = boundsFromGeometry(
-                resource.spatial_geom?.geometry ?? resource.spatial_geom
-            );
+            const geom = resource.spatial_geom;
+            const geometry =
+                geom && typeof geom === 'object' && 'geometry' in geom
+                    ? geom.geometry
+                    : (geom as GeoJsonGeometry | null | undefined);
+            const resourceBounds = boundsFromGeometry(geometry ?? undefined);
             if (!resourceBounds) {
                 continue;
             }
@@ -405,7 +454,9 @@ export function buildSpatialCoverage(dataset: {
     return undefined;
 }
 
-function resourceEncodingFormat(resource: Resource): string | undefined {
+function resourceEncodingFormat(
+    resource: DatasetJsonLdResource
+): string | undefined {
     const format = resource.format?.trim();
     if (format) {
         return format.toUpperCase() === format ? format : format.toUpperCase();
@@ -414,7 +465,7 @@ function resourceEncodingFormat(resource: Resource): string | undefined {
 }
 
 export function buildDistribution(
-    resources: Resource[] | undefined,
+    resources: DatasetJsonLdResource[] | null | undefined,
     ckanBaseUrl?: string
 ): DatasetJsonLdOutput['distribution'] {
     if (!resources?.length) {
@@ -426,7 +477,7 @@ export function buildDistribution(
         .filter((resource) => resource.not_downloadable !== true)
         .filter((resource) => resource.type !== 'empty')
         .map((resource) => {
-            let contentUrl = resource.url;
+            let contentUrl = resource.url ?? undefined;
             if (!isHttpUrl(contentUrl) && ckanBaseUrl && resource.id) {
                 contentUrl = `${ckanBaseUrl.replace(/\/$/, '')}/dataset/resource/${resource.id}`;
             }
@@ -452,7 +503,9 @@ export function buildDistribution(
     return distribution.length ? distribution : undefined;
 }
 
-function buildCreator(dataset: WriDataset): DatasetJsonLdOutput['creator'] {
+function buildCreator(
+    dataset: DatasetJsonLdInput
+): DatasetJsonLdOutput['creator'] {
     const organizationName =
         dataset.organization?.title?.trim() ||
         dataset.organization?.name?.trim();
@@ -477,7 +530,7 @@ function buildCreator(dataset: WriDataset): DatasetJsonLdOutput['creator'] {
 }
 
 export function buildDatasetJsonLd(
-    dataset: WriDataset,
+    dataset: DatasetJsonLdInput,
     pageUrl: string,
     options?: { catalogName?: string; catalogUrl?: string; ckanBaseUrl?: string }
 ): DatasetJsonLdOutput {
