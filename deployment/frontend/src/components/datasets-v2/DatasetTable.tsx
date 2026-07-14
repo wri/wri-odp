@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import {
     UserIcon,
     GlobeAltIcon,
@@ -11,18 +12,7 @@ import {
     getThemedFontSize,
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
-import { type ReactNode } from 'react';
-
-export type DatasetV2KeyDetails = {
-    name?: string;
-    organization?: { title?: string };
-    temporal_coverage_start?: string | null;
-    temporal_coverage_end?: string | null;
-    type?: string;
-    spatial_address?: string;
-    open_in?: Array<{ title: string; url: string }>;
-    extras?: Array<{ key: string; value: string }>;
-};
+import type { WriDataset } from '@/schema/ckan.schema';
 
 function DatasetTable({
     datasetId: _datasetId,
@@ -31,7 +21,7 @@ function DatasetTable({
 }: {
     datasetId: string;
     licenseTitle: string;
-    dataset?: DatasetV2KeyDetails;
+    dataset?: WriDataset;
 }) {
     const getExtraValue = (keys: string[]) => {
         if (!dataset?.extras?.length) return undefined;

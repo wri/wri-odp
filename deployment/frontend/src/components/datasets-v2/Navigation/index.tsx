@@ -19,6 +19,12 @@ export default function Navigation() {
             <Navbar
                 linkRouter={Link}
                 pathname={pathname}
+                onNavbarHeightChange={(height) => {
+                    document.documentElement.style.setProperty(
+                        '--dataset-v2-navbar-height',
+                        `${height}px`
+                    );
+                }}
                 logo={
                     <Link href="/">
                         <span
