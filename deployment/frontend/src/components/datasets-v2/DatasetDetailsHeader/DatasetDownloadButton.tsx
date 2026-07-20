@@ -4,32 +4,14 @@ import {
     Button,
     getThemedColor,
     getThemedFontSize,
-    getThemedRadius,
     getThemedSpacing,
     List,
     Modal,
     Panel,
 } from '@worldresources/wri-design-systems';
+import { NumberIcon } from './NumberIcon';
 import SelectFilesStep from './DownloadModalSteps/SelectFilesStep';
 import type { DatasetDownloadButtonProps } from './types';
-
-export const NumberIcon = ({ value }: { value: string }) => (
-    <div
-        style={{
-            background: getThemedColor('secondary', 300),
-            height: '16px',
-            width: '16px',
-            textAlign: 'center',
-            color: getThemedColor('secondary', 900),
-            fontSize: getThemedFontSize(300),
-            fontWeight: 700,
-            borderRadius: getThemedRadius(200),
-            lineHeight: '16px',
-        }}
-    >
-        {value}
-    </div>
-);
 
 export default function DatasetDownloadButton({ size }: DatasetDownloadButtonProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);

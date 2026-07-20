@@ -18,19 +18,13 @@ export function HomeFooter() {
                         </p>
                         <div className="flex gap-x-4">
                             <Link href="/topics">
-                                <Button className="mt-10 md:mt-0">
-                                    Explore Topics
-                                </Button>
+                                <Button className="mt-10 md:mt-0">Explore Topics</Button>
                             </Link>
                             <Link href="/teams">
-                                <Button className="mt-10 md:mt-0">
-                                    Explore Teams
-                                </Button>
+                                <Button className="mt-10 md:mt-0">Explore Teams</Button>
                             </Link>
                             <Link href="/applications">
-                                <Button className="mt-10 md:mt-0">
-                                    Explore Applications
-                                </Button>
+                                <Button className="mt-10 md:mt-0">Explore Applications</Button>
                             </Link>
                         </div>
                     </div>
@@ -40,10 +34,7 @@ export function HomeFooter() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 items-center gap-y-8 pt-16 font-bold text-wri-black sm:flex-row sm:items-start leading-[19.2px]">
                     <div className="mb-6 flex w-full flex-col items-center gap-y-4 sm:mb-0 sm:items-start">
                         <p className="text-base font-bold">ABOUT WRI</p>
-                        <a
-                            href="https://www.wri.org/about"
-                            className=" font-normal"
-                        >
+                        <a href="https://www.wri.org/about" className=" font-normal">
                             About Us
                         </a>
                         <a
@@ -132,11 +123,7 @@ export function HomeFooter() {
                                 className="relative h-5 w-5 "
                                 aria-label="LinkedIn"
                             >
-                                <Image
-                                    src="/icons/linkedin.svg"
-                                    alt={''}
-                                    fill
-                                />
+                                <Image src="/icons/linkedin.svg" alt={''} fill />
                             </a>
                         </div>
                     </div>
@@ -166,20 +153,7 @@ export function HomeFooter() {
                                 </a>{' '}
                                 from
                             </span>
-                            <div className=" relative h-6 w-24">
-                                <a
-                                    href="https://www.datopian.com/"
-                                    target="_blank"
-                                    aria-label="Datopian website"
-                                >
-                                    <Image
-                                        src="/images/datopian.png"
-                                        alt=""
-                                        sizes="160px"
-                                        fill
-                                    ></Image>
-                                </a>
-                            </div>
+                            <div className=" relative h-6 w-24"></div>
                         </div>
                     </div>
                 </div>
