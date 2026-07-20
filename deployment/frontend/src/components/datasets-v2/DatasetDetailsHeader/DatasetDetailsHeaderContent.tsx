@@ -5,9 +5,10 @@ import {
     getThemedSpacing,
     Menu,
 } from '@worldresources/wri-design-systems';
-import { ArrowDownTrayIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import { GlobeAltIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
 import type { DatasetDetailsHeaderContentProps } from './types';
+import DatasetDownloadButton from './DatasetDownloadButton';
 
 export default function DatasetDetailsHeaderContent({
     datasetTitle,
@@ -52,9 +53,7 @@ export default function DatasetDetailsHeaderContent({
                     marginTop: getThemedSpacing(400),
                 }}
             >
-                <Button variant="primary" size="default" leftIcon={<ArrowDownTrayIcon />}>
-                    Download
-                </Button>
+                <DatasetDownloadButton size="default" />
 
                 <Button variant="secondary" size="default" leftIcon={<GlobeAltIcon />}>
                     Access API

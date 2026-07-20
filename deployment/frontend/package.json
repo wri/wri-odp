@@ -74,7 +74,7 @@
         "@uppy/core": "^5.2.0",
         "@uppy/react": "^5.2.0",
         "@vizzuality/layer-manager": "^5.0.3",
-        "@worldresources/wri-design-systems": "^2.201.2",
+        "@worldresources/wri-design-systems": "^2.202.2",
         "@xstate/react": "^3.2.2",
         "axios": "^1.13.5",
         "class-variance-authority": "^0.7.0",

@@ -37,3 +37,7 @@ export type DatasetDetailsHeaderStickyProps = {
     datasetTitle: string;
     openInItems: DatasetDetailsHeaderMenuItem[];
 };
+
+export type DatasetDownloadButtonProps = {
+    size: 'default' | 'small';
+};

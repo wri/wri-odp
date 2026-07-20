@@ -6,9 +6,10 @@ import {
     getThemedSpacing,
     Menu,
 } from '@worldresources/wri-design-systems';
-import { ArrowDownTrayIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import type { DatasetDetailsHeaderStickyProps } from './types';
+import DatasetDownloadButton from './DatasetDownloadButton';
 
 const sectionItems = [
     {
@@ -130,9 +131,7 @@ function DatasetDetailsHeaderSticky({
             </h1>
 
             <div className="flex gap-1 sm:gap-4">
-                <Button variant="primary" size="small" leftIcon={<ArrowDownTrayIcon />}>
-                    Download
-                </Button>
+                <DatasetDownloadButton size="small" />
 
                 <Menu
                     label="Section"
