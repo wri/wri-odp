@@ -8,7 +8,7 @@ import {
 
 function ReviewCaution() {
     return (
-        <div id="main-content">
+        <div>
             <h1
                 style={{
                     fontSize: getThemedFontSize(700),
@@ -33,10 +33,10 @@ function ReviewCaution() {
                     variant="warning"
                     label="Caution for using this dataset"
                     size="full-width"
-                    caption="This dataset uses a different definition of a tree and a different definition of tree cover than does Hansen et al. (2013).
+                    caption={`This dataset uses a different definition of a tree and a different definition of tree cover than does Hansen et al. (2013).
 This dataset defines a tree according to both the height and crown diameter. Woody vegetation higher than 5 meters regardless of crown diameter, or between 3 and 5 meters with a minimum crown diameter of 5 meters is considered a tree. This definition is different from Hansen et al. (2013) which defines a tree as any vegetation at least 5 meters in height.
 The tropical tree cover dataset does not disambiguate plantation trees from non-plantation trees.
-Analyses or statistics derived over spatial regions smaller than 0.5 ha may not be accurate."
+Analyses or statistics derived over spatial regions smaller than 0.5 ha may not be accurate.`}
                 />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
