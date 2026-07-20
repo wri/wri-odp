@@ -8,7 +8,7 @@ import {
 
 function ReviewCaution() {
     return (
-        <div id="main-content">
+        <div>
             <h1
                 style={{
                     fontSize: getThemedFontSize(700),
