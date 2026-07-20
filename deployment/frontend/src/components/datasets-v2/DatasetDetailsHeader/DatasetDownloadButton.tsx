@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowDownTrayIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import {
     Button,
     getThemedColor,
@@ -33,11 +33,7 @@ export default function DatasetDownloadButton({ size }: DatasetDownloadButtonPro
     const items = [
         {
             id: 'step-1',
-            label: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: getThemedSpacing(200) }}>
-                    Review caution <CheckIcon height={16} width={16} />
-                </div>
-            ),
+            label: 'Review caution',
             icon: <NumberIcon value="1" />,
             isHighlighted: false,
         },
