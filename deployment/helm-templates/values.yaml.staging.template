@@ -80,13 +80,18 @@ ckan:
       limits:
         cpu: 800m
         memory: 4.5G
+        ephemeral-storage: 15Gi
       requests:
         cpu: 300m
         memory: 4G
+        ephemeral-storage: 6Gi
+    # Datapusher runs a Prefect serve() runner that executes flows in-process.
+    # It must stay a single stable replica: HPA scale-down kills the pod
+    # mid-flight and orphans in-progress flow runs in a PENDING state.
     hpa:
-      enable: true
+      enable: false
       minReplicas: 1
-      maxReplicas: 2
+      maxReplicas: 1
       targetMemoryUtilizationPercentage: 80
     image:
       tag: {{DATAPUSHER_IMAGE_TAG}}
