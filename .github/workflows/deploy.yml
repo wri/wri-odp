@@ -298,7 +298,7 @@ jobs:
         run: |
           echo "Deploying to: $BRANCH_NAME"
           mkdir -p /home/runner/.kube
-          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }} --role-arn ${{ secrets.KUBEROLE }}
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name ${{ secrets.CLUSTER_NAME }}
           chmod 600 ~/.kube/config
 
       - name: Install Helm
