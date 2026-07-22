@@ -10,6 +10,7 @@ import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import type { DatasetDetailsHeaderStickyProps } from './types';
 import DatasetDownloadButton from './DatasetDownloadButton';
+import AccessApiButton from './AccessApiButton';
 
 const sectionItems = [
     {
@@ -56,6 +57,7 @@ function DatasetDetailsHeaderSticky({
     openInItems,
 }: DatasetDetailsHeaderStickyProps) {
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
+    const [isAccessApiModalOpen, setIsAccessApiModalOpen] = useState(false);
     const [selectedSectionLabel, setSelectedSectionLabel] = useState('Key details');
     const stickyOpenInItems = openInItems.map((item) => ({
         label: `Open in (${item.label})`,
@@ -65,7 +67,7 @@ function DatasetDetailsHeaderSticky({
 
     const onOpenInSelect = (value: string) => {
         if (value === 'access-api') {
-            console.log('Access API clicked');
+            setIsAccessApiModalOpen(true);
             return;
         }
 
@@ -132,7 +134,7 @@ function DatasetDetailsHeaderSticky({
 
             <div className="flex gap-1 sm:gap-4">
                 <DatasetDownloadButton size="small" />
-
+                <AccessApiButton hideButton isAccessApiModalOpen={isAccessApiModalOpen} />
                 <Menu
                     label="Section"
                     items={sectionItems}

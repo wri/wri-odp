@@ -41,3 +41,8 @@ export type DatasetDetailsHeaderStickyProps = {
 export type DatasetDownloadButtonProps = {
     size: 'default' | 'small';
 };
+
+export type AccessApiButtonProps = {
+    hideButton?: boolean;
+    isAccessApiModalOpen?: boolean;
+};

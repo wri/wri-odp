@@ -1,0 +1,38 @@
+.modalStepLayout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    max-height: 70vh;
+    overflow: hidden;
+}
+
+.modalStepSidebar {
+    width: 240px;
+    flex: 0 0 240px;
+}
+
+.modalStepMain {
+    flex: 1;
+    min-width: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+@media (max-width: 1023px) {
+    .modalStepLayout {
+        flex-direction: column;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .modalStepSidebar {
+        width: 100%;
+        flex: 1 1 auto;
+    }
+
+    .modalStepMain {
+        width: 100%;
+        max-height: none;
+        overflow: visible;
+    }
+}

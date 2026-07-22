@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
+import { ArrowDownTrayIcon, CheckIcon } from '@heroicons/react/24/outline';
 import {
     Button,
     getThemedColor,
@@ -10,30 +10,21 @@ import {
     Panel,
 } from '@worldresources/wri-design-systems';
 import { NumberIcon } from './NumberIcon';
-import SelectFilesStep from './DownloadModalSteps/SelectFilesStep';
+import SelectFilesStep from './ApiAndDownloadModalSteps/SelectFilesStep';
+import styles from './modalStepLayout.module.scss';
 import type { DatasetDownloadButtonProps } from './types';
 
 export default function DatasetDownloadButton({ size }: DatasetDownloadButtonProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDesktopLayout, setIsDesktopLayout] = useState(false);
-
-    useEffect(() => {
-        const checkViewport = () => {
-            setIsDesktopLayout(window.innerWidth >= 1024);
-        };
-
-        checkViewport();
-        window.addEventListener('resize', checkViewport);
-
-        return () => {
-            window.removeEventListener('resize', checkViewport);
-        };
-    }, []);
 
     const items = [
         {
             id: 'step-1',
-            label: 'Review caution',
+            label: (
+                <div style={{ display: 'flex', alignItems: 'center', gap: getThemedSpacing(200) }}>
+                    Review caution <CheckIcon height={16} width={16} />
+                </div>
+            ),
             icon: <NumberIcon value="1" />,
             isHighlighted: false,
         },
@@ -74,14 +65,13 @@ export default function DatasetDownloadButton({ size }: DatasetDownloadButtonPro
                 header="Download data"
                 content={
                     <div
+                        className={styles.modalStepLayout}
                         style={{
                             padding: getThemedSpacing(600),
                             gap: getThemedSpacing(1000),
-                            display: 'flex',
-                            flexDirection: isDesktopLayout ? 'row' : 'column',
                         }}
                     >
-                        <div style={{ width: isDesktopLayout ? '240px' : '100%' }}>
+                        <div className={styles.modalStepSidebar}>
                             <div>
                                 <List items={items} />
                                 <div style={{ marginTop: getThemedSpacing(400) }}>
@@ -136,7 +126,7 @@ export default function DatasetDownloadButton({ size }: DatasetDownloadButtonPro
                                 </div>
                             </div>
                         </div>
-                        <div id="main-content">
+                        <div id="main-content" className={styles.modalStepMain}>
                             <SelectFilesStep />
                         </div>
                     </div>

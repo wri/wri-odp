@@ -5,10 +5,10 @@ import {
     getThemedSpacing,
     Menu,
 } from '@worldresources/wri-design-systems';
-import { GlobeAltIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
 import type { DatasetDetailsHeaderContentProps } from './types';
 import DatasetDownloadButton from './DatasetDownloadButton';
+import AccessApiButton from './AccessApiButton';
 
 export default function DatasetDetailsHeaderContent({
     datasetTitle,
@@ -55,9 +55,7 @@ export default function DatasetDetailsHeaderContent({
             >
                 <DatasetDownloadButton size="default" />
 
-                <Button variant="secondary" size="default" leftIcon={<GlobeAltIcon />}>
-                    Access API
-                </Button>
+                <AccessApiButton />
 
                 {hasSingleOpenInOption && singleOpenInItem?.value ? (
                     <Button
