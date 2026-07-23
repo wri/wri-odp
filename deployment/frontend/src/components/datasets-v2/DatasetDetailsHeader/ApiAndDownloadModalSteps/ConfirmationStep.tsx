@@ -43,7 +43,12 @@ const whatsNextItems = [
     },
 ];
 
-function ConfirmationStep() {
+type ConfirmationStepProps = {
+    onBack: () => void;
+    onClose: () => void;
+};
+
+function ConfirmationStep({ onBack, onClose }: ConfirmationStepProps) {
     return (
         <div>
             <DownloadStartedBanner variant="direct" fileCount={16} fileSize="13.4 MB" />
@@ -220,9 +225,14 @@ function ConfirmationStep() {
             ))}
 
             <div style={{ marginTop: getThemedSpacing(600) }}>
-                <Button variant="secondary" size="default" onClick={() => console.log('close')}>
-                    Close
-                </Button>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button variant="secondary" size="default" onClick={onBack}>
+                        Back
+                    </Button>
+                    <Button variant="secondary" size="default" onClick={onClose}>
+                        Close
+                    </Button>
+                </div>
             </div>
         </div>
     );

@@ -10,13 +10,22 @@ import {
     Panel,
 } from '@worldresources/wri-design-systems';
 import { NumberIcon } from './NumberIcon';
+import ConfirmationStep from './ApiAndDownloadModalSteps/ConfirmationStep';
+import ReviewCautionStep from './ApiAndDownloadModalSteps/ReviewCautionStep';
+import ReviewDetailsAndTermsStep from './ApiAndDownloadModalSteps/ReviewDetailsAndTermsStep';
 import SelectFilesStep from './ApiAndDownloadModalSteps/SelectFilesStep';
 import styles from './modalStepLayout.module.scss';
 import type { DatasetDownloadButtonProps } from './types';
 
-export default function DatasetDownloadButton({ size }: DatasetDownloadButtonProps) {
+type DownloadStep = 1 | 2 | 3 | 4;
+export default function DatasetDownloadButton({ dataset, size }: DatasetDownloadButtonProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [activeStep, setActiveStep] = useState<DownloadStep>(2);
 
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setActiveStep(2);
+    };
     const items = [
         {
             id: 'step-1',
@@ -26,41 +35,73 @@ export default function DatasetDownloadButton({ size }: DatasetDownloadButtonPro
                 </div>
             ),
             icon: <NumberIcon value="1" />,
-            isHighlighted: false,
+            isHighlighted: activeStep === 1,
         },
         {
             id: 'step-2',
             label: 'Select files',
             icon: <NumberIcon value="2" />,
-            isHighlighted: true,
+            isHighlighted: activeStep === 2,
         },
         {
             id: 'step-3',
             label: 'Review details & terms',
             icon: <NumberIcon value="3" />,
-            isHighlighted: false,
+            isHighlighted: activeStep === 3,
         },
         {
             id: 'step-4',
             label: 'Confirmation',
             icon: <NumberIcon value="4" />,
-            isHighlighted: false,
+            isHighlighted: activeStep === 4,
         },
     ];
+
+    const currentStep = (() => {
+        switch (activeStep) {
+            case 1:
+                return (
+                    <ReviewCautionStep
+                        onBack={() => closeModal()}
+                        onContinue={() => setActiveStep(2)}
+                    />
+                );
+            case 2:
+                return (
+                    <SelectFilesStep
+                        dataset={dataset}
+                        onBack={() => setActiveStep(1)}
+                        onContinue={() => setActiveStep(3)}
+                    />
+                );
+            case 3:
+                return (
+                    <ReviewDetailsAndTermsStep
+                        onBack={() => setActiveStep(2)}
+                        onContinue={() => setActiveStep(4)}
+                    />
+                );
+            case 4:
+                return <ConfirmationStep onBack={() => setActiveStep(3)} onClose={closeModal} />;
+        }
+    })();
     return (
         <>
             <Button
                 variant="primary"
                 size={size}
                 leftIcon={<ArrowDownTrayIcon />}
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                    setActiveStep(2);
+                    setIsModalOpen(true);
+                }}
             >
                 Download
             </Button>
 
             <Modal
                 open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={closeModal}
                 size="xlarge"
                 header="Download data"
                 content={
@@ -126,8 +167,12 @@ export default function DatasetDownloadButton({ size }: DatasetDownloadButtonPro
                                 </div>
                             </div>
                         </div>
-                        <div id="main-content" className={styles.modalStepMain}>
-                            <SelectFilesStep />
+                        <div
+                            id="main-content"
+                            className={styles.modalStepMain}
+                            style={{ paddingBottom: getThemedSpacing(1000) }}
+                        >
+                            {currentStep}
                         </div>
                     </div>
                 }

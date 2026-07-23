@@ -53,6 +53,7 @@ const sectionItems = [
 ];
 
 function DatasetDetailsHeaderSticky({
+    dataset,
     datasetTitle,
     openInItems,
 }: DatasetDetailsHeaderStickyProps) {
@@ -133,7 +134,9 @@ function DatasetDetailsHeaderSticky({
             </h1>
 
             <div className="flex gap-1 sm:gap-4">
-                <DatasetDownloadButton size="small" />
+                {dataset?.resources?.length > 0 && (
+                    <DatasetDownloadButton dataset={dataset} size="small" />
+                )}
                 <AccessApiButton hideButton isAccessApiModalOpen={isAccessApiModalOpen} />
                 <Menu
                     label="Section"

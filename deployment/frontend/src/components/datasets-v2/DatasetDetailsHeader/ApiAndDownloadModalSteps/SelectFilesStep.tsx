@@ -4,10 +4,49 @@ import {
     getThemedFontSize,
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
+import { type WriDataset } from '@/schema/ckan.schema';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import FileCard from './FileCard';
 
-function SelectFilesStep() {
+type SelectFilesStepProps = {
+    dataset: WriDataset;
+    onBack: () => void;
+    onContinue: () => void;
+};
+
+function SelectFilesStep({ dataset, onBack, onContinue }: SelectFilesStepProps) {
+    const datafiles = dataset?.resources;
+
+    const formatDate = (value?: string | null) => {
+        if (!value) {
+            return '';
+        }
+
+        return new Date(value).toLocaleDateString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+        });
+    };
+
+    const formatSize = (value?: number | null) => {
+        if (!value) {
+            return '';
+        }
+
+        if (value < 1024) {
+            return `${value} B`;
+        }
+
+        const sizeInKb = value / 1024;
+
+        if (sizeInKb < 1024) {
+            return `${sizeInKb.toFixed(1)} KB`;
+        }
+
+        return `${(sizeInKb / 1024).toFixed(1)} MB`;
+    };
+
     return (
         <div
             style={{
@@ -52,48 +91,40 @@ function SelectFilesStep() {
                     gap: getThemedSpacing(400),
                 }}
             >
-                <FileCard
-                    title="Dataset instructions"
-                    badge="ZIP"
-                    description="Documentation to help you understand and use this dataset, including methodology, file structure and supporting guidance."
-                    createdAt="Oct 10, 2024"
-                    updatedAt="Oct 10, 2024"
-                    rightContent={
-                        <Button
-                            variant="secondary"
-                            size="default"
-                            leftIcon={<PlusIcon />}
-                            onClick={() => console.log('add')}
-                        >
-                            Add
-                        </Button>
-                    }
-                />
-                <FileCard
-                    title="Tropical Tree Cover GeoTIFF tiles"
-                    badge="GeoTIFF tile set"
-                    description="High-resolution raster tiles covering tropical tree cover across the global tropics."
-                    createdAt="Oct 10, 2024"
-                    updatedAt="Oct 10, 2024"
-                    rightContent={
-                        <Button
-                            variant="secondary"
-                            size="default"
-                            leftIcon={<PlusIcon />}
-                            onClick={() => console.log('add and configure')}
-                        >
-                            Add and configure
-                        </Button>
-                    }
-                />
+                {datafiles?.map((resource) => (
+                    <FileCard
+                        key={resource.id}
+                        title={resource.title}
+                        badge={
+                            resource.type === 'data-api-dataset' &&
+                            (resource.data_api_tiles?.length ?? 0) > 0
+                                ? 'Raster Tile Set'
+                                : (resource.format ?? 'FILE')
+                        }
+                        description={resource.description ?? resource.name ?? ''}
+                        extraInfo={resource.size ? `Size: ${formatSize(resource.size)}` : undefined}
+                        createdAt={formatDate(resource.created)}
+                        updatedAt={formatDate(resource.metadata_modified ?? resource.last_modified)}
+                        rightContent={
+                            <Button
+                                variant="secondary"
+                                size="default"
+                                leftIcon={<PlusIcon />}
+                                onClick={() => console.log(resource.title)}
+                            >
+                                Add
+                            </Button>
+                        }
+                    />
+                ))}
             </div>
 
             {/* Button group */}
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button variant="secondary" size="default" onClick={() => console.log('back')}>
+                <Button variant="secondary" size="default" onClick={onBack}>
                     Back
                 </Button>
-                <Button variant="primary" size="default" disabled>
+                <Button variant="primary" size="default" onClick={onContinue}>
                     Continue
                 </Button>
             </div>

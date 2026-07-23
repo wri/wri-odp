@@ -6,7 +6,12 @@ import {
     InlineMessage,
 } from '@worldresources/wri-design-systems';
 
-function ReviewCaution() {
+type ReviewCautionProps = {
+    onBack: () => void;
+    onContinue: () => void;
+};
+
+function ReviewCaution({ onBack, onContinue }: ReviewCautionProps) {
     return (
         <div>
             <h1
@@ -43,12 +48,12 @@ Analyses or statistics derived over spatial regions smaller than 0.5 ha may not 
                 <Button
                     variant="secondary"
                     size="default"
-                    onClick={() => console.log(false)}
+                    onClick={onBack}
                     style={{ marginRight: getThemedSpacing(200) }}
                 >
                     Back
                 </Button>
-                <Button variant="primary" size="default" onClick={() => console.log(false)}>
+                <Button variant="primary" size="default" onClick={onContinue}>
                     Continue
                 </Button>
             </div>

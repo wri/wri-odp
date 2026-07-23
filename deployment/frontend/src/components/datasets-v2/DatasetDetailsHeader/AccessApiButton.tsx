@@ -67,7 +67,11 @@ export default function AccessApiButton({
                                 <List items={items} highlightedIndex={0} />
                             </div>
                         </div>
-                        <div id="main-content" className={styles.modalStepMain}>
+                        <div
+                            id="main-content"
+                            className={styles.modalStepMain}
+                            style={{ paddingBottom: getThemedSpacing(1000) }}
+                        >
                             <SelectEndpoints />
                         </div>
                     </div>

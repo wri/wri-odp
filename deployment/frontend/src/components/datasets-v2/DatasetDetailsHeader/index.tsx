@@ -80,12 +80,17 @@ function DatasetDetailsHeader({
 
             {!isSticky ? (
                 <DatasetDetailsHeaderContent
+                    dataset={dataset}
                     datasetTitle={datasetTitle}
                     datasetDescription={datasetDescription}
                     openInItems={openInItems}
                 />
             ) : (
-                <DatasetDetailsHeaderSticky datasetTitle={datasetTitle} openInItems={openInItems} />
+                <DatasetDetailsHeaderSticky
+                    dataset={dataset}
+                    datasetTitle={datasetTitle}
+                    openInItems={openInItems}
+                />
             )}
         </>
     );

@@ -11,6 +11,7 @@ import DatasetDownloadButton from './DatasetDownloadButton';
 import AccessApiButton from './AccessApiButton';
 
 export default function DatasetDetailsHeaderContent({
+    dataset,
     datasetTitle,
     datasetDescription,
     openInItems,
@@ -53,8 +54,9 @@ export default function DatasetDetailsHeaderContent({
                     marginTop: getThemedSpacing(400),
                 }}
             >
-                <DatasetDownloadButton size="default" />
-
+                {dataset?.resources?.length > 0 && (
+                    <DatasetDownloadButton dataset={dataset} size="default" />
+                )}
                 <AccessApiButton />
 
                 {hasSingleOpenInOption && singleOpenInItem?.value ? (

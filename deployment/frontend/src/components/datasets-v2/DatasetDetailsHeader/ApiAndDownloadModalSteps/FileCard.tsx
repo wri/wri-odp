@@ -3,6 +3,7 @@ import {
     getThemedFontSize,
     getThemedRadius,
     getThemedSpacing,
+    Tag,
 } from '@worldresources/wri-design-systems';
 
 type FileCardProps = {
@@ -15,7 +16,15 @@ type FileCardProps = {
     rightContent?: React.ReactNode;
 };
 
-function FileCard({ title, badge, description, extraInfo, createdAt, updatedAt, rightContent }: FileCardProps) {
+function FileCard({
+    title,
+    badge,
+    description,
+    extraInfo,
+    createdAt,
+    updatedAt,
+    rightContent,
+}: FileCardProps) {
     return (
         <div
             style={{
@@ -45,19 +54,8 @@ function FileCard({ title, badge, description, extraInfo, createdAt, updatedAt, 
                     >
                         {title}
                     </span>
-                    <span
-                        style={{
-                            fontSize: getThemedFontSize(200),
-                            fontWeight: 700,
-                            color: getThemedColor('secondary', 900),
-                            background: getThemedColor('secondary', 200),
-                            padding: `2px ${getThemedSpacing(200)}`,
-                            borderRadius: getThemedRadius(100),
-                            whiteSpace: 'nowrap',
-                        }}
-                    >
-                        {badge}
-                    </span>
+
+                    <Tag label={badge} variant="success" />
                 </div>
                 <p
                     style={{

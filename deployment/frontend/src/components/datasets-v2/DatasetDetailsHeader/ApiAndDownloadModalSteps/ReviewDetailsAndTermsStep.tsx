@@ -10,7 +10,12 @@ import {
     TextInput,
 } from '@worldresources/wri-design-systems';
 
-function ReviewDetailsAndTermsStep() {
+type ReviewDetailsAndTermsStepProps = {
+    onBack: () => void;
+    onContinue: () => void;
+};
+
+function ReviewDetailsAndTermsStep({ onBack, onContinue }: ReviewDetailsAndTermsStepProps) {
     return (
         <div
             style={{
@@ -19,7 +24,6 @@ function ReviewDetailsAndTermsStep() {
                 gap: getThemedSpacing(600),
             }}
         >
-            {/* Header */}
             <div
                 style={{
                     display: 'flex',
@@ -47,7 +51,6 @@ function ReviewDetailsAndTermsStep() {
                 </p>
             </div>
 
-            {/* Section 1: Delivery details */}
             <div
                 style={{
                     display: 'flex',
@@ -89,7 +92,6 @@ function ReviewDetailsAndTermsStep() {
                 </div>
             </div>
 
-            {/* Divider */}
             <hr
                 style={{
                     border: 'none',
@@ -98,7 +100,6 @@ function ReviewDetailsAndTermsStep() {
                 }}
             />
 
-            {/* Section 2: Tell us about your use case */}
             <div
                 style={{
                     display: 'flex',
@@ -157,7 +158,6 @@ function ReviewDetailsAndTermsStep() {
                 </div>
             </div>
 
-            {/* Divider */}
             <hr
                 style={{
                     border: 'none',
@@ -166,7 +166,6 @@ function ReviewDetailsAndTermsStep() {
                 }}
             />
 
-            {/* Section 3: Licence terms & updates */}
             <div
                 style={{
                     display: 'flex',
@@ -203,7 +202,6 @@ function ReviewDetailsAndTermsStep() {
                     </p>
                 </div>
 
-                {/* Consent checkboxes */}
                 <div
                     style={{
                         display: 'flex',
@@ -211,7 +209,6 @@ function ReviewDetailsAndTermsStep() {
                         gap: getThemedSpacing(400),
                     }}
                 >
-                    {/* Required: Licence Terms */}
                     <div
                         style={{
                             display: 'flex',
@@ -241,7 +238,6 @@ function ReviewDetailsAndTermsStep() {
                         </p>
                     </div>
 
-                    {/* Optional: WRI updates */}
                     <div
                         style={{
                             display: 'flex',
@@ -289,7 +285,6 @@ function ReviewDetailsAndTermsStep() {
                         </div>
                     </div>
 
-                    {/* Optional: Research */}
                     <div
                         style={{
                             display: 'flex',
@@ -337,7 +332,6 @@ function ReviewDetailsAndTermsStep() {
                     </div>
                 </div>
 
-                {/* Your details box */}
                 <div
                     style={{
                         border: `1px solid ${getThemedColor('neutral', 300)}`,
@@ -395,20 +389,17 @@ function ReviewDetailsAndTermsStep() {
                             <TextInput label="Organization" showOptionalLabel noMarginBottom />
                             <TextInput label="Job title" showOptionalLabel noMarginBottom />
                         </div>
-                        <div style={{ width: '50%' }}>
-                            <TextInput label="Email" required noMarginBottom />
-                        </div>
+                        <TextInput label="Email" required noMarginBottom />
                     </div>
                 </div>
             </div>
 
-            {/* Button group */}
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button variant="secondary" size="default" onClick={() => console.log('back')}>
+                <Button variant="secondary" size="default" onClick={onBack}>
                     Back
                 </Button>
-                <Button variant="primary" size="default" onClick={() => console.log('download')}>
-                    Download 1 file
+                <Button variant="primary" size="default" onClick={onContinue}>
+                    Continue
                 </Button>
             </div>
         </div>
