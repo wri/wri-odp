@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ArrowDownTrayIcon, CheckIcon } from '@heroicons/react/24/outline';
 import {
     Button,
@@ -14,26 +14,36 @@ import ConfirmationStep from './ApiAndDownloadModalSteps/ConfirmationStep';
 import ReviewCautionStep from './ApiAndDownloadModalSteps/ReviewCautionStep';
 import ReviewDetailsAndTermsStep from './ApiAndDownloadModalSteps/ReviewDetailsAndTermsStep';
 import SelectFilesStep from './ApiAndDownloadModalSteps/SelectFilesStep';
-import { formatFileSize } from './download-utils';
+import { formatFileSize, getResourceFormatLabel } from './download-utils';
 import styles from './modalStepLayout.module.scss';
+import { buildStepSidebarState, useConditionalStepFlow } from './step-flow.utils';
 import type { DatasetDownloadButtonProps } from './types';
+import { useScrollTopOnStepChange } from './useScrollTopOnStepChange';
 
 type DownloadStep = 'caution' | 'files' | 'terms' | 'confirmation';
 
+const DOWNLOAD_STEPS_WITH_CAUTION = ['caution', 'files', 'terms', 'confirmation'] as const;
+const DOWNLOAD_STEPS_WITHOUT_CAUTION = ['files', 'terms', 'confirmation'] as const;
+const DOWNLOAD_STEP_LABELS: Record<DownloadStep, string> = {
+    caution: 'Review caution',
+    files: 'Select files',
+    terms: 'Review details & terms',
+    confirmation: 'Confirmation',
+};
+
 export default function DatasetDownloadButton({ dataset, size }: DatasetDownloadButtonProps) {
     const hasCautions = Boolean(dataset.cautions?.trim());
-    const firstStep: DownloadStep = hasCautions ? 'caution' : 'files';
-    const stepOrder = useMemo<DownloadStep[]>(
-        () =>
-            hasCautions
-                ? ['caution', 'files', 'terms', 'confirmation']
-                : ['files', 'terms', 'confirmation'],
-        [hasCautions]
-    );
+    const { activeStep, firstStep, resetActiveStep, setActiveStep, stepOrder } =
+        useConditionalStepFlow<DownloadStep>({
+            condition: hasCautions,
+            whenTrue: DOWNLOAD_STEPS_WITH_CAUTION,
+            whenFalse: DOWNLOAD_STEPS_WITHOUT_CAUTION,
+        });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeStep, setActiveStep] = useState<DownloadStep>(firstStep);
     const [selectedResourceIds, setSelectedResourceIds] = useState<string[]>([]);
+
+    useScrollTopOnStepChange(activeStep);
 
     const selectedResources = dataset.resources.filter((resource) =>
         selectedResourceIds.includes(resource.id)
@@ -44,18 +54,12 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
         0
     );
     const selectedFormats = Array.from(
-        new Set(
-            selectedResources.map((resource) =>
-                resource.type === 'data-api-dataset' && (resource.data_api_tiles?.length ?? 0) > 0
-                    ? 'Raster Tile Set'
-                    : (resource.format ?? 'FILE')
-            )
-        )
+        new Set(selectedResources.map((resource) => getResourceFormatLabel(resource)))
     );
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setActiveStep(firstStep);
+        resetActiveStep();
         setSelectedResourceIds([]);
     };
 
@@ -69,22 +73,9 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
         });
     };
 
-    const activeStepIndex = stepOrder.indexOf(activeStep);
-
-    const items = stepOrder.map((step, index) => {
-        const isCompleted = index < activeStepIndex;
-
-        const stepLabel =
-            step === 'caution'
-                ? 'Review caution'
-                : step === 'files'
-                  ? 'Select files'
-                  : step === 'terms'
-                    ? 'Review details & terms'
-                    : 'Confirmation';
-
-        return {
-            id: `step-${index + 1}`,
+    const items = buildStepSidebarState(stepOrder, activeStep, DOWNLOAD_STEP_LABELS).map(
+        (item) => ({
+            id: item.id,
             label: (
                 <div
                     style={{
@@ -93,14 +84,14 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                         gap: getThemedSpacing(200),
                     }}
                 >
-                    {stepLabel}
-                    {isCompleted && <CheckIcon height={16} width={16} />}
+                    {item.label}
+                    {item.isCompleted && <CheckIcon height={16} width={16} />}
                 </div>
             ),
-            icon: <NumberIcon value={String(index + 1)} />,
-            isHighlighted: activeStep === step,
-        };
-    });
+            icon: <NumberIcon value={item.stepNumber} />,
+            isHighlighted: item.isHighlighted,
+        })
+    );
 
     const currentStep = (() => {
         switch (activeStep) {

@@ -7,7 +7,7 @@ import {
 import { type WriDataset } from '@/schema/ckan.schema';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import FileCard from './FileCard';
-import { formatDate, formatFileSize } from '../download-utils';
+import { formatDate, formatFileSize, getResourceFormatLabel } from '../download-utils';
 
 type SelectFilesStepProps = {
     dataset: WriDataset;
@@ -74,12 +74,7 @@ function SelectFilesStep({
                     <FileCard
                         key={resource.id}
                         title={resource.title}
-                        badge={
-                            resource.type === 'data-api-dataset' &&
-                            (resource.data_api_tiles?.length ?? 0) > 0
-                                ? 'Raster Tile Set'
-                                : (resource.format ?? 'FILE')
-                        }
+                        badge={getResourceFormatLabel(resource)}
                         description={resource.description ?? resource.name ?? ''}
                         extraInfo={
                             resource.size ? `Size: ${formatFileSize(resource.size)}` : undefined

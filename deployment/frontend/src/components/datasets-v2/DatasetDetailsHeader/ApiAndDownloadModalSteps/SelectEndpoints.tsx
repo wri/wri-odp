@@ -11,7 +11,12 @@ import {
 	ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/outline';
 
-function SelectEndpoints() {
+type SelectEndpointsProps = {
+	onBack: () => void;
+	onClose: () => void;
+};
+
+function SelectEndpoints({ onBack, onClose }: SelectEndpointsProps) {
 	return (
 		<div
 			style={{
@@ -389,8 +394,11 @@ console.log(data);`}
 				</Button>
 			</div>
 
-			<div>
-				<Button variant="secondary" size="default" onClick={() => console.log('close')}>
+			<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+				<Button variant="secondary" size="default" onClick={onBack}>
+					Back
+				</Button>
+				<Button variant="primary" size="default" onClick={onClose}>
 					Close
 				</Button>
 			</div>

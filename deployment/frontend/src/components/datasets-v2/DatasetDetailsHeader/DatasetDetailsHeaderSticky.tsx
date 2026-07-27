@@ -137,7 +137,11 @@ function DatasetDetailsHeaderSticky({
                 {dataset?.resources?.length > 0 && (
                     <DatasetDownloadButton dataset={dataset} size="small" />
                 )}
-                <AccessApiButton hideButton isAccessApiModalOpen={isAccessApiModalOpen} />
+                <AccessApiButton
+                    dataset={dataset}
+                    hideButton
+                    isAccessApiModalOpen={isAccessApiModalOpen}
+                />
                 <Menu
                     label="Section"
                     items={sectionItems}

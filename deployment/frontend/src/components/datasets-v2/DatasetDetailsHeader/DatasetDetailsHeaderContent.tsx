@@ -57,7 +57,7 @@ export default function DatasetDetailsHeaderContent({
                 {dataset?.resources?.length > 0 && (
                     <DatasetDownloadButton dataset={dataset} size="default" />
                 )}
-                <AccessApiButton />
+                <AccessApiButton dataset={dataset} />
 
                 {hasSingleOpenInOption && singleOpenInItem?.value ? (
                     <Button

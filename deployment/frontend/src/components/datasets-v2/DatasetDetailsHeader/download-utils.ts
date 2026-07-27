@@ -26,3 +26,17 @@ export function formatDate(value?: string | null): string {
         year: 'numeric',
     });
 }
+
+type ResourceLike = {
+    type?: string | null;
+    data_api_tiles?: unknown[] | null;
+    format?: string | null;
+};
+
+export function getResourceFormatLabel(resource: ResourceLike): string {
+    if (resource.type === 'data-api-dataset' && (resource.data_api_tiles?.length ?? 0) > 0) {
+        return 'Raster Tile Set';
+    }
+
+    return resource.format ?? 'FILE';
+}

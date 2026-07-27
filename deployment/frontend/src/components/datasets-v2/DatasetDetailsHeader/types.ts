@@ -38,6 +38,7 @@ export type DatasetDownloadButtonProps = {
 };
 
 export type AccessApiButtonProps = {
+    dataset: WriDataset;
     hideButton?: boolean;
     isAccessApiModalOpen?: boolean;
 };
