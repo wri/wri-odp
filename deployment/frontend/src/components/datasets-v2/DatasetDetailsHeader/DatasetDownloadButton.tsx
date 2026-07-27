@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ArrowDownTrayIcon, CheckIcon } from '@heroicons/react/24/outline';
 import {
     Button,
@@ -14,75 +14,131 @@ import ConfirmationStep from './ApiAndDownloadModalSteps/ConfirmationStep';
 import ReviewCautionStep from './ApiAndDownloadModalSteps/ReviewCautionStep';
 import ReviewDetailsAndTermsStep from './ApiAndDownloadModalSteps/ReviewDetailsAndTermsStep';
 import SelectFilesStep from './ApiAndDownloadModalSteps/SelectFilesStep';
+import { formatFileSize } from './download-utils';
 import styles from './modalStepLayout.module.scss';
 import type { DatasetDownloadButtonProps } from './types';
 
-type DownloadStep = 1 | 2 | 3 | 4;
+type DownloadStep = 'caution' | 'files' | 'terms' | 'confirmation';
+
 export default function DatasetDownloadButton({ dataset, size }: DatasetDownloadButtonProps) {
+    const hasCautions = Boolean(dataset.cautions?.trim());
+    const firstStep: DownloadStep = hasCautions ? 'caution' : 'files';
+    const stepOrder = useMemo<DownloadStep[]>(
+        () =>
+            hasCautions
+                ? ['caution', 'files', 'terms', 'confirmation']
+                : ['files', 'terms', 'confirmation'],
+        [hasCautions]
+    );
+
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeStep, setActiveStep] = useState<DownloadStep>(2);
+    const [activeStep, setActiveStep] = useState<DownloadStep>(firstStep);
+    const [selectedResourceIds, setSelectedResourceIds] = useState<string[]>([]);
+
+    const selectedResources = dataset.resources.filter((resource) =>
+        selectedResourceIds.includes(resource.id)
+    );
+    const selectedCount = selectedResources.length;
+    const totalSelectedBytes = selectedResources.reduce(
+        (sum, resource) => sum + Number(resource.size ?? 0),
+        0
+    );
+    const selectedFormats = Array.from(
+        new Set(
+            selectedResources.map((resource) =>
+                resource.type === 'data-api-dataset' && (resource.data_api_tiles?.length ?? 0) > 0
+                    ? 'Raster Tile Set'
+                    : (resource.format ?? 'FILE')
+            )
+        )
+    );
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setActiveStep(2);
+        setActiveStep(firstStep);
+        setSelectedResourceIds([]);
     };
-    const items = [
-        {
-            id: 'step-1',
+
+    const toggleResourceSelection = (resourceId: string) => {
+        setSelectedResourceIds((currentSelection) => {
+            if (currentSelection.includes(resourceId)) {
+                return currentSelection.filter((id) => id !== resourceId);
+            }
+
+            return [...currentSelection, resourceId];
+        });
+    };
+
+    const activeStepIndex = stepOrder.indexOf(activeStep);
+
+    const items = stepOrder.map((step, index) => {
+        const isCompleted = index < activeStepIndex;
+
+        const stepLabel =
+            step === 'caution'
+                ? 'Review caution'
+                : step === 'files'
+                  ? 'Select files'
+                  : step === 'terms'
+                    ? 'Review details & terms'
+                    : 'Confirmation';
+
+        return {
+            id: `step-${index + 1}`,
             label: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: getThemedSpacing(200) }}>
-                    Review caution <CheckIcon height={16} width={16} />
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: getThemedSpacing(200),
+                    }}
+                >
+                    {stepLabel}
+                    {isCompleted && <CheckIcon height={16} width={16} />}
                 </div>
             ),
-            icon: <NumberIcon value="1" />,
-            isHighlighted: activeStep === 1,
-        },
-        {
-            id: 'step-2',
-            label: 'Select files',
-            icon: <NumberIcon value="2" />,
-            isHighlighted: activeStep === 2,
-        },
-        {
-            id: 'step-3',
-            label: 'Review details & terms',
-            icon: <NumberIcon value="3" />,
-            isHighlighted: activeStep === 3,
-        },
-        {
-            id: 'step-4',
-            label: 'Confirmation',
-            icon: <NumberIcon value="4" />,
-            isHighlighted: activeStep === 4,
-        },
-    ];
+            icon: <NumberIcon value={String(index + 1)} />,
+            isHighlighted: activeStep === step,
+        };
+    });
 
     const currentStep = (() => {
         switch (activeStep) {
-            case 1:
+            case 'caution':
                 return (
                     <ReviewCautionStep
-                        onBack={() => closeModal()}
-                        onContinue={() => setActiveStep(2)}
+                        dataset={dataset}
+                        onBack={closeModal}
+                        onContinue={() => setActiveStep('files')}
                     />
                 );
-            case 2:
+            case 'files':
                 return (
                     <SelectFilesStep
                         dataset={dataset}
-                        onBack={() => setActiveStep(1)}
-                        onContinue={() => setActiveStep(3)}
+                        selectedResourceIds={selectedResourceIds}
+                        onToggleResource={toggleResourceSelection}
+                        onBack={() => {
+                            if (hasCautions) {
+                                setActiveStep('caution');
+                                return;
+                            }
+                            closeModal();
+                        }}
+                        onContinue={() => setActiveStep('terms')}
                     />
                 );
-            case 3:
+            case 'terms':
                 return (
                     <ReviewDetailsAndTermsStep
-                        onBack={() => setActiveStep(2)}
-                        onContinue={() => setActiveStep(4)}
+                        onBack={() => setActiveStep('files')}
+                        onContinue={() => setActiveStep('confirmation')}
                     />
                 );
-            case 4:
-                return <ConfirmationStep onBack={() => setActiveStep(3)} onClose={closeModal} />;
+            case 'confirmation':
+                return (
+                    <ConfirmationStep onBack={() => setActiveStep('terms')} onClose={closeModal} />
+                );
         }
     })();
     return (
@@ -92,7 +148,8 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                 size={size}
                 leftIcon={<ArrowDownTrayIcon />}
                 onClick={() => {
-                    setActiveStep(2);
+                    setActiveStep(firstStep);
+                    setSelectedResourceIds([]);
                     setIsModalOpen(true);
                 }}
             >
@@ -139,28 +196,64 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                                                 <div
                                                     style={{
                                                         fontSize: getThemedFontSize(500),
-                                                        color: getThemedColor('secondary', 900),
+                                                        color:
+                                                            selectedCount === 0
+                                                                ? getThemedColor('neutral', 700)
+                                                                : getThemedColor('secondary', 900),
                                                     }}
                                                 >
-                                                    <span style={{ fontWeight: 700 }}>17</span>
-                                                    {' files added'}
+                                                    {selectedCount === 0 ? (
+                                                        <>
+                                                            <div>No files added yet.</div>
+                                                            <div
+                                                                style={{
+                                                                    fontSize:
+                                                                        getThemedFontSize(300),
+                                                                }}
+                                                            >
+                                                                Files you add will show here.
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span
+                                                                style={{
+                                                                    fontWeight: 700,
+                                                                }}
+                                                            >
+                                                                {selectedCount}
+                                                            </span>
+                                                            {' files added'}
+                                                        </>
+                                                    )}
                                                 </div>
-                                                <div
-                                                    style={{
-                                                        fontSize: getThemedFontSize(300),
-                                                        color: getThemedColor('neutral', 700),
-                                                    }}
-                                                >
-                                                    Estimated size: 13.4 MB
-                                                </div>
-                                                <div
-                                                    style={{
-                                                        fontSize: getThemedFontSize(300),
-                                                        color: getThemedColor('neutral', 700),
-                                                    }}
-                                                >
-                                                    Formats: GeoTIFF, ZIP
-                                                </div>
+                                                {selectedFormats.length > 0 && (
+                                                    <>
+                                                        <div
+                                                            style={{
+                                                                fontSize: getThemedFontSize(300),
+                                                                color: getThemedColor(
+                                                                    'neutral',
+                                                                    700
+                                                                ),
+                                                            }}
+                                                        >
+                                                            Estimated size:{' '}
+                                                            {formatFileSize(totalSelectedBytes)}
+                                                        </div>
+                                                        <div
+                                                            style={{
+                                                                fontSize: getThemedFontSize(300),
+                                                                color: getThemedColor(
+                                                                    'neutral',
+                                                                    700
+                                                                ),
+                                                            }}
+                                                        >
+                                                            Formats: {selectedFormats.join(', ')}
+                                                        </div>
+                                                    </>
+                                                )}
                                             </div>
                                         }
                                     />

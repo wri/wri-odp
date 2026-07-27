@@ -5,47 +5,26 @@ import {
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
 import { type WriDataset } from '@/schema/ckan.schema';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import FileCard from './FileCard';
+import { formatDate, formatFileSize } from '../download-utils';
 
 type SelectFilesStepProps = {
     dataset: WriDataset;
+    selectedResourceIds: string[];
+    onToggleResource: (resourceId: string) => void;
     onBack: () => void;
     onContinue: () => void;
 };
 
-function SelectFilesStep({ dataset, onBack, onContinue }: SelectFilesStepProps) {
+function SelectFilesStep({
+    dataset,
+    selectedResourceIds,
+    onToggleResource,
+    onBack,
+    onContinue,
+}: SelectFilesStepProps) {
     const datafiles = dataset?.resources;
-
-    const formatDate = (value?: string | null) => {
-        if (!value) {
-            return '';
-        }
-
-        return new Date(value).toLocaleDateString('en-US', {
-            month: 'short',
-            day: '2-digit',
-            year: 'numeric',
-        });
-    };
-
-    const formatSize = (value?: number | null) => {
-        if (!value) {
-            return '';
-        }
-
-        if (value < 1024) {
-            return `${value} B`;
-        }
-
-        const sizeInKb = value / 1024;
-
-        if (sizeInKb < 1024) {
-            return `${sizeInKb.toFixed(1)} KB`;
-        }
-
-        return `${(sizeInKb / 1024).toFixed(1)} MB`;
-    };
 
     return (
         <div
@@ -102,17 +81,29 @@ function SelectFilesStep({ dataset, onBack, onContinue }: SelectFilesStepProps) 
                                 : (resource.format ?? 'FILE')
                         }
                         description={resource.description ?? resource.name ?? ''}
-                        extraInfo={resource.size ? `Size: ${formatSize(resource.size)}` : undefined}
+                        extraInfo={
+                            resource.size ? `Size: ${formatFileSize(resource.size)}` : undefined
+                        }
                         createdAt={formatDate(resource.created)}
                         updatedAt={formatDate(resource.metadata_modified ?? resource.last_modified)}
                         rightContent={
                             <Button
-                                variant="secondary"
+                                variant={
+                                    selectedResourceIds.includes(resource.id)
+                                        ? 'negative'
+                                        : 'secondary'
+                                }
                                 size="default"
-                                leftIcon={<PlusIcon />}
-                                onClick={() => console.log(resource.title)}
+                                leftIcon={
+                                    selectedResourceIds.includes(resource.id) ? (
+                                        <TrashIcon />
+                                    ) : (
+                                        <PlusIcon />
+                                    )
+                                }
+                                onClick={() => onToggleResource(resource.id)}
                             >
-                                Add
+                                {selectedResourceIds.includes(resource.id) ? 'Remove' : 'Add'}
                             </Button>
                         }
                     />
@@ -124,7 +115,12 @@ function SelectFilesStep({ dataset, onBack, onContinue }: SelectFilesStepProps) 
                 <Button variant="secondary" size="default" onClick={onBack}>
                     Back
                 </Button>
-                <Button variant="primary" size="default" onClick={onContinue}>
+                <Button
+                    variant="primary"
+                    size="default"
+                    onClick={onContinue}
+                    disabled={selectedResourceIds.length === 0}
+                >
                     Continue
                 </Button>
             </div>
