@@ -16,31 +16,20 @@ import ReviewDetailsAndTermsStep from './ApiAndDownloadModalSteps/ReviewDetailsA
 import SelectFilesStep from './ApiAndDownloadModalSteps/SelectFilesStep';
 import { formatFileSize, getResourceFormatLabel } from './download-utils';
 import styles from './modalStepLayout.module.scss';
-import { buildStepSidebarState, useConditionalStepFlow } from './step-flow.utils';
 import type { DatasetDownloadButtonProps } from './types';
 import { useScrollTopOnStepChange } from './useScrollTopOnStepChange';
 
 type DownloadStep = 'caution' | 'files' | 'terms' | 'confirmation';
 
-const DOWNLOAD_STEPS_WITH_CAUTION = ['caution', 'files', 'terms', 'confirmation'] as const;
-const DOWNLOAD_STEPS_WITHOUT_CAUTION = ['files', 'terms', 'confirmation'] as const;
-const DOWNLOAD_STEP_LABELS: Record<DownloadStep, string> = {
-    caution: 'Review caution',
-    files: 'Select files',
-    terms: 'Review details & terms',
-    confirmation: 'Confirmation',
-};
-
 export default function DatasetDownloadButton({ dataset, size }: DatasetDownloadButtonProps) {
     const hasCautions = Boolean(dataset.cautions?.trim());
-    const { activeStep, firstStep, resetActiveStep, setActiveStep, stepOrder } =
-        useConditionalStepFlow<DownloadStep>({
-            condition: hasCautions,
-            whenTrue: DOWNLOAD_STEPS_WITH_CAUTION,
-            whenFalse: DOWNLOAD_STEPS_WITHOUT_CAUTION,
-        });
+    const stepOrder: DownloadStep[] = hasCautions
+        ? ['caution', 'files', 'terms', 'confirmation']
+        : ['files', 'terms', 'confirmation'];
+    const firstStep = stepOrder[0]!;
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [activeStep, setActiveStep] = useState<DownloadStep>(firstStep);
     const [selectedResourceIds, setSelectedResourceIds] = useState<string[]>([]);
 
     useScrollTopOnStepChange(activeStep);
@@ -59,7 +48,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
 
     const closeModal = () => {
         setIsModalOpen(false);
-        resetActiveStep();
+        setActiveStep(firstStep);
         setSelectedResourceIds([]);
     };
 
@@ -73,9 +62,19 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
         });
     };
 
-    const items = buildStepSidebarState(stepOrder, activeStep, DOWNLOAD_STEP_LABELS).map(
-        (item) => ({
-            id: item.id,
+    const activeStepIndex = stepOrder.indexOf(activeStep);
+    const items = stepOrder.map((step, index) => {
+        const label =
+            step === 'caution'
+                ? 'Review caution'
+                : step === 'files'
+                  ? 'Select files'
+                  : step === 'terms'
+                    ? 'Review details & terms'
+                    : 'Confirmation';
+
+        return {
+            id: `step-${index + 1}`,
             label: (
                 <div
                     style={{
@@ -84,14 +83,14 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                         gap: getThemedSpacing(200),
                     }}
                 >
-                    {item.label}
-                    {item.isCompleted && <CheckIcon height={16} width={16} />}
+                    {label}
+                    {index < activeStepIndex && <CheckIcon height={16} width={16} />}
                 </div>
             ),
-            icon: <NumberIcon value={item.stepNumber} />,
-            isHighlighted: item.isHighlighted,
-        })
-    );
+            icon: <NumberIcon value={String(index + 1)} />,
+            isHighlighted: activeStep === step,
+        };
+    });
 
     const currentStep = (() => {
         switch (activeStep) {

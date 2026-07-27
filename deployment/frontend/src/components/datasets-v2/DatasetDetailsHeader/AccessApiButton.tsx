@@ -6,19 +6,10 @@ import ReviewCautionStep from './ApiAndDownloadModalSteps/ReviewCautionStep';
 import ReviewDetailsAndTermsStep from './ApiAndDownloadModalSteps/ReviewDetailsAndTermsStep';
 import SelectEndpoints from './ApiAndDownloadModalSteps/SelectEndpoints';
 import styles from './modalStepLayout.module.scss';
-import { buildStepSidebarState, useConditionalStepFlow } from './step-flow.utils';
 import type { AccessApiButtonProps } from './types';
 import { useScrollTopOnStepChange } from './useScrollTopOnStepChange';
 
 type ApiStep = 'caution' | 'terms' | 'endpoints';
-
-const API_STEPS_WITH_CAUTION = ['caution', 'terms', 'endpoints'] as const;
-const API_STEPS_WITHOUT_CAUTION = ['terms', 'endpoints'] as const;
-const API_STEP_LABELS: Record<ApiStep, string> = {
-    caution: 'Review caution',
-    terms: 'Review details & terms',
-    endpoints: 'Select endpoints',
-};
 
 export default function AccessApiButton({
     dataset,
@@ -26,32 +17,34 @@ export default function AccessApiButton({
     isAccessApiModalOpen = false,
 }: AccessApiButtonProps) {
     const hasCautions = Boolean(dataset.cautions?.trim());
-    const { activeStep, firstStep, resetActiveStep, setActiveStep, stepOrder } =
-        useConditionalStepFlow<ApiStep>({
-            condition: hasCautions,
-            whenTrue: API_STEPS_WITH_CAUTION,
-            whenFalse: API_STEPS_WITHOUT_CAUTION,
-        });
+    const stepOrder: ApiStep[] = hasCautions ? ['caution', 'terms', 'endpoints'] : ['terms', 'endpoints'];
+    const firstStep = stepOrder[0]!;
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [activeStep, setActiveStep] = useState<ApiStep>(firstStep);
     useScrollTopOnStepChange(activeStep);
 
     const closeModal = () => {
         setIsModalOpen(false);
-        resetActiveStep();
+        setActiveStep(firstStep);
     };
 
-    const items = buildStepSidebarState(stepOrder, activeStep, API_STEP_LABELS).map((item) => ({
-        id: item.id,
-        label: (
-            <div style={{ display: 'flex', alignItems: 'center', gap: getThemedSpacing(200) }}>
-                {item.label}
-                {item.isCompleted && <CheckIcon height={16} width={16} />}
-            </div>
-        ),
-        icon: <NumberIcon value={item.stepNumber} />,
-        isHighlighted: item.isHighlighted,
-    }));
+    const activeStepIndex = stepOrder.indexOf(activeStep);
+    const items = stepOrder.map((step, index) => {
+        const label = step === 'caution' ? 'Review caution' : step === 'terms' ? 'Review details & terms' : 'Select endpoints';
+
+        return {
+            id: `step-${index + 1}`,
+            label: (
+                <div style={{ display: 'flex', alignItems: 'center', gap: getThemedSpacing(200) }}>
+                    {label}
+                    {index < activeStepIndex && <CheckIcon height={16} width={16} />}
+                </div>
+            ),
+            icon: <NumberIcon value={String(index + 1)} />,
+            isHighlighted: activeStep === step,
+        };
+    });
 
     const currentStep = (() => {
         switch (activeStep) {
