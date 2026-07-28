@@ -17,7 +17,9 @@ export default function AccessApiButton({
     isAccessApiModalOpen = false,
 }: AccessApiButtonProps) {
     const hasCautions = Boolean(dataset.cautions?.trim());
-    const stepOrder: ApiStep[] = hasCautions ? ['caution', 'terms', 'endpoints'] : ['terms', 'endpoints'];
+    const stepOrder: ApiStep[] = hasCautions
+        ? ['caution', 'terms', 'endpoints']
+        : ['terms', 'endpoints'];
     const firstStep = stepOrder[0]!;
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,7 +33,12 @@ export default function AccessApiButton({
 
     const activeStepIndex = stepOrder.indexOf(activeStep);
     const items = stepOrder.map((step, index) => {
-        const label = step === 'caution' ? 'Review caution' : step === 'terms' ? 'Review details & terms' : 'Select endpoints';
+        const label =
+            step === 'caution'
+                ? 'Review caution'
+                : step === 'terms'
+                  ? 'Review details & terms'
+                  : 'Select endpoints';
 
         return {
             id: `step-${index + 1}`,
@@ -71,7 +78,11 @@ export default function AccessApiButton({
                 );
             case 'endpoints':
                 return (
-                    <SelectEndpoints onBack={() => setActiveStep('terms')} onClose={closeModal} />
+                    <SelectEndpoints
+                        dataset={dataset}
+                        onBack={() => setActiveStep('terms')}
+                        onClose={closeModal}
+                    />
                 );
         }
     })();
