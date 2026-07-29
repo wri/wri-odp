@@ -13,8 +13,10 @@ import {
     UserIcon,
     DocumentTextIcon,
 } from '@heroicons/react/24/solid';
+import { type Resource } from '@/interfaces/dataset.interface';
 import DownloadStartedBanner from './DownloadStartedBanner';
 import FileCard from './FileCard';
+import { formatDate, formatFileSize, getResourceFormatLabel } from '../download-utils';
 
 const whatsNextItems = [
     {
@@ -44,14 +46,35 @@ const whatsNextItems = [
 ];
 
 type ConfirmationStepProps = {
+    selectedResources: Resource[];
+    totalSelectedBytes: number;
     onBack: () => void;
     onClose: () => void;
 };
 
-function ConfirmationStep({ onBack, onClose }: ConfirmationStepProps) {
+function ConfirmationStep({
+    selectedResources,
+    totalSelectedBytes,
+    onBack,
+    onClose,
+}: ConfirmationStepProps) {
+    const selectedCount = selectedResources.length;
+    const getResourceDescription = (resource: Resource) => {
+        const description = resource.description?.trim() ?? '';
+        if (description) {
+            return description;
+        }
+
+        return 'Selected file included in this export.';
+    };
+
     return (
         <div>
-            <DownloadStartedBanner variant="direct" fileCount={16} fileSize="13.4 MB" />
+            <DownloadStartedBanner
+                variant="direct"
+                fileCount={selectedCount}
+                fileSize={formatFileSize(totalSelectedBytes)}
+            />
 
             {/* What's included */}
             <h3
@@ -65,45 +88,29 @@ function ConfirmationStep({ onBack, onClose }: ConfirmationStepProps) {
                 {"What's included"}
             </h3>
 
-            <div style={{ marginBottom: getThemedSpacing(400) }}>
-                <FileCard
-                    title="Dataset instructions"
-                    badge="ZIP"
-                    description="Documentation to help you understand and use this dataset, including methodology, file structure and supporting guidance."
-                    rightContent={
-                        <span
-                            style={{
-                                fontSize: getThemedFontSize(400),
-                                color: getThemedColor('neutral', 800),
-                                flexShrink: 0,
-                                marginLeft: getThemedSpacing(400),
-                            }}
-                        >
-                            ~2.3 MB
-                        </span>
-                    }
-                />
-            </div>
-            <div style={{ marginBottom: getThemedSpacing(200) }}>
-                <FileCard
-                    title="Tropical Tree Cover GeoTIFF tiles"
-                    badge="GeoTIFF tile set"
-                    description="High-resolution raster tiles covering tropical tree cover across the global tropics."
-                    extraInfo="Tiles downloaded: 16"
-                    rightContent={
-                        <span
-                            style={{
-                                fontSize: getThemedFontSize(400),
-                                color: getThemedColor('neutral', 800),
-                                flexShrink: 0,
-                                marginLeft: getThemedSpacing(400),
-                            }}
-                        >
-                            ~11.1 MB
-                        </span>
-                    }
-                />
-            </div>
+            {selectedResources.map((resource) => (
+                <div key={resource.id} style={{ marginBottom: getThemedSpacing(200) }}>
+                    <FileCard
+                        title={resource.title ?? resource.name ?? 'Selected file'}
+                        badge={getResourceFormatLabel(resource)}
+                        description={getResourceDescription(resource)}
+                        createdAt={formatDate(resource.created)}
+                        updatedAt={formatDate(resource.last_modified)}
+                        rightContent={
+                            <span
+                                style={{
+                                    fontSize: getThemedFontSize(400),
+                                    color: getThemedColor('neutral', 800),
+                                    flexShrink: 0,
+                                    marginLeft: getThemedSpacing(400),
+                                }}
+                            >
+                                {formatFileSize(Number(resource.size ?? 0))}
+                            </span>
+                        }
+                    />
+                </div>
+            ))}
 
             <div
                 style={{
@@ -145,7 +152,7 @@ function ConfirmationStep({ onBack, onClose }: ConfirmationStepProps) {
                         color: getThemedColor('neutral', 900),
                     }}
                 >
-                    ~11.1 MB
+                    {formatFileSize(totalSelectedBytes)}
                 </span>
             </div>
             <hr

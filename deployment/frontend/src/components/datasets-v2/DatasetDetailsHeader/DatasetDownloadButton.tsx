@@ -12,12 +12,16 @@ import {
 import { NumberIcon } from './NumberIcon';
 import ConfirmationStep from './ApiAndDownloadModalSteps/ConfirmationStep';
 import ReviewCautionStep from './ApiAndDownloadModalSteps/ReviewCautionStep';
-import ReviewDetailsAndTermsStep from './ApiAndDownloadModalSteps/ReviewDetailsAndTermsStep';
+import ReviewDetailsAndTermsStep, {
+    type ReviewDetailsAndTermsFormData,
+} from './ApiAndDownloadModalSteps/ReviewDetailsAndTermsStep';
 import SelectFilesStep from './ApiAndDownloadModalSteps/SelectFilesStep';
 import { formatFileSize, getResourceFormatLabel } from './download-utils';
 import styles from './modalStepLayout.module.scss';
 import type { DatasetDownloadButtonProps } from './types';
 import { useScrollTopOnStepChange } from './useScrollTopOnStepChange';
+import { api } from '@/utils/api';
+import { toast } from 'react-toastify';
 
 type DownloadStep = 'caution' | 'files' | 'terms' | 'confirmation';
 
@@ -31,6 +35,8 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeStep, setActiveStep] = useState<DownloadStep>(firstStep);
     const [selectedResourceIds, setSelectedResourceIds] = useState<string[]>([]);
+    const requestDownload = api.dataset.downloadZippedResources.useMutation();
+    const createDownloadEvent = api.downloadEvents.createEvents.useMutation();
 
     useScrollTopOnStepChange(activeStep);
 
@@ -60,6 +66,61 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
 
             return [...currentSelection, resourceId];
         });
+    };
+
+    const submitReviewDetails = async (formData: ReviewDetailsAndTermsFormData) => {
+        if (!formData.email.trim()) {
+            setActiveStep('confirmation');
+            return;
+        }
+
+        const resourceIds = selectedResources.map((resource) => resource.id).filter(Boolean);
+        const keys = selectedResources
+            .map((resource) => resource.key ?? resource.url)
+            .filter(Boolean) as string[];
+
+        if (resourceIds.length === 0 || keys.length === 0) {
+            toast('Please select at least one file to download.', { type: 'error' });
+            return;
+        }
+
+        try {
+            await requestDownload.mutateAsync({
+                email: formData.email,
+                dataset_id: dataset.id,
+                resource_ids: resourceIds,
+                keys,
+            });
+
+            await createDownloadEvent.mutateAsync({
+                email: formData.email,
+                affiliation: {
+                    label: formData.affiliation?.label ?? '',
+                    value: formData.affiliation?.value ?? '',
+                },
+                otherAffiliation: formData.otherAffiliation,
+                organization: formData.organization,
+                jobTitle: formData.jobTitle,
+                country: {
+                    label: formData.country?.label ?? '',
+                    value: formData.country?.value ?? '',
+                },
+                resources: resourceIds,
+                package_id: dataset.id,
+                package_name: dataset.name,
+                acceptTerms: formData.subscribeUpdates || formData.contactForResearch,
+                typeOfForm: 'email-download',
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+            });
+
+            toast("You'll receive an email when the file is ready", {
+                type: 'success',
+            });
+            setActiveStep('confirmation');
+        } catch (error) {
+            toast('Failed to request file', { type: 'error' });
+        }
     };
 
     const activeStepIndex = stepOrder.indexOf(activeStep);
@@ -122,12 +183,18 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                 return (
                     <ReviewDetailsAndTermsStep
                         onBack={() => setActiveStep('files')}
-                        onContinue={() => setActiveStep('confirmation')}
+                        onContinue={submitReviewDetails}
+                        isSubmitting={requestDownload.isLoading || createDownloadEvent.isLoading}
                     />
                 );
             case 'confirmation':
                 return (
-                    <ConfirmationStep onBack={() => setActiveStep('terms')} onClose={closeModal} />
+                    <ConfirmationStep
+                        selectedResources={selectedResources}
+                        totalSelectedBytes={totalSelectedBytes}
+                        onBack={() => setActiveStep('terms')}
+                        onClose={closeModal}
+                    />
                 );
         }
     })();
