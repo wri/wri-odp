@@ -14,21 +14,20 @@ import {
 import { useState } from 'react';
 import { env } from '@/env.mjs';
 import { type WriDataset } from '@/schema/ckan.schema';
-import {
-    getJsSnippet,
-    getPythonSnippet,
-    getRSnippet,
-} from '@/components/datasets/sections/APIEndpoint';
 import { formatDate } from '../download-utils';
 import { useFields } from '@/components/data-explorer/queryHooks';
+import {
+    buildEndpoints,
+    getSnippetByEndpoint,
+    normalizeBaseUrl,
+    type CodeTab,
+} from './selectEndpoints.utils';
 
 type SelectEndpointsProps = {
     dataset: WriDataset;
     onBack: () => void;
     onClose: () => void;
 };
-
-type CodeTab = 'javascript' | 'python' | 'r';
 
 function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
     const [expandedByIndex, setExpandedByIndex] = useState<Record<number, boolean>>({});
@@ -39,48 +38,15 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
         provider: dataset.provider ?? '',
     });
 
-    let publicCkanUrl = env.NEXT_PUBLIC_CKAN_URL;
-    publicCkanUrl = publicCkanUrl.endsWith('/') ? publicCkanUrl.slice(0, -1) : publicCkanUrl;
-
+    const publicCkanUrl = normalizeBaseUrl(env.NEXT_PUBLIC_CKAN_URL);
     const ckanBaseUrl = `${publicCkanUrl}/api/3/action`;
-    const ckanDatasetGetUrl = `${ckanBaseUrl}/package_show?id=${dataset.name}`;
-
     const rwBaseUrl = 'https://api.resourcewatch.org/v1';
-    const rwDatasetGetUrl = `${rwBaseUrl}/dataset/${dataset.rw_id}`;
-    const rwFieldsUrl = `${rwBaseUrl}/fields/${dataset.rw_id}`;
-    const rwQueryUrl = `${rwBaseUrl}/query/${dataset.rw_id}?sql=SELECT * FROM ${data?.tableName} LIMIT 10`;
-
-    const endpoints: { title: string; description: string; url: string }[] = [
-        {
-            title: 'Dataset metadata',
-            description: "Get this dataset's metadata.",
-            url: ckanDatasetGetUrl,
-        },
-        ...(dataset.rw_id
-            ? [
-                  {
-                      title: 'RW dataset metadata',
-                      description:
-                          'Get the metadata stored on the Resource Watch API for this dataset.',
-                      url: rwDatasetGetUrl,
-                  },
-              ]
-            : []),
-        ...(dataset.rw_id && dataset.provider
-            ? [
-                  {
-                      title: 'Records metadata',
-                      description: "Get this dataset's records metadata.",
-                      url: rwFieldsUrl,
-                  },
-                  {
-                      title: 'SQL query',
-                      description: "Run a SQL query against this dataset's records.",
-                      url: rwQueryUrl,
-                  },
-              ]
-            : []),
-    ];
+    const endpoints = buildEndpoints({
+        dataset,
+        ckanBaseUrl,
+        rwBaseUrl,
+        tableName: data?.tableName,
+    });
 
     const copyEndpoint = async (url: string) => {
         await navigator.clipboard.writeText(url);
@@ -123,11 +89,6 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
             {endpoints.map((endpoint, index) => {
                 const isExpanded = expandedByIndex[index] ?? false;
                 const selectedTab = selectedTabByIndex[index] ?? 'javascript';
-                const snippetsByTab: Record<CodeTab, string> = {
-                    javascript: getJsSnippet(endpoint.url),
-                    python: getPythonSnippet(endpoint.url),
-                    r: getRSnippet(endpoint.url),
-                };
 
                 return (
                     <div
@@ -176,7 +137,7 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
                                             color: getThemedColor('neutral', 800),
                                         }}
                                     >
-                                        {endpoint.title}
+                                        {endpoint.resource?.title ?? endpoint.title}
                                     </span>
                                 </div>
                                 <p
@@ -280,7 +241,12 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
                                             marginBottom: getThemedSpacing(400),
                                         }}
                                     >
-                                        {snippetsByTab[selectedTab]}
+                                        {getSnippetByEndpoint({
+                                            endpoint,
+                                            tab: selectedTab,
+                                            ckanBaseUrl,
+                                            rwBaseUrl,
+                                        })}
                                     </div>
 
                                     <div style={{ display: 'flex', gap: getThemedSpacing(200) }}>
@@ -303,7 +269,7 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
                                             rightIcon={<ArrowTopRightOnSquareIcon />}
                                             onClick={() =>
                                                 window.open(
-                                                    'http://localhost:3000/user-guide#Where-to-find-metadata',
+                                                    'https://docs.ckan.org/en/2.10/maintaining/datastore.html',
                                                     '_blank'
                                                 )
                                             }

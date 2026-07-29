@@ -337,15 +337,14 @@ function ReviewDetailsAndTermsStep({
                             >
                                 <span style={{ color: '#c11101' }}>* </span>
                                 {"I agree to the dataset's "}
-                                <a
-                                    href="#"
+                                <span
                                     style={{
                                         textDecoration: 'underline',
                                         color: getThemedColor('neutral', 900),
                                     }}
                                 >
                                     Licence Terms
-                                </a>
+                                </span>
                                 .
                             </p>
                         </Checkbox>
