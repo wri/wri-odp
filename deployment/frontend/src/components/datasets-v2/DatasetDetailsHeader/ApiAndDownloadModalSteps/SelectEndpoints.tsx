@@ -245,7 +245,6 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
                                             endpoint,
                                             tab: selectedTab,
                                             ckanBaseUrl,
-                                            rwBaseUrl,
                                         })}
                                     </div>
 
