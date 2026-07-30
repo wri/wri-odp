@@ -36,12 +36,24 @@ const whatsNextItems = [
         title: 'Share your feedback',
         description: 'Help us improve our datasets and platform.',
         action: 'Leave feedback',
+        onClick: () =>
+            window.open(
+                'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
+                '_blank',
+                'noopener,noreferrer'
+            ),
     },
     {
         icon: <UserIcon width={16} height={16} />,
         title: 'Take part in research',
         description: 'Sign up to take part in upcoming research to improve the Data Explorer.',
         action: 'Sign up',
+        onClick: () =>
+            window.open(
+                'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
+                '_blank',
+                'noopener,noreferrer'
+            ),
     },
 ];
 
@@ -176,7 +188,7 @@ function ConfirmationStep({
                 {"What's next"}
             </h3>
 
-            {whatsNextItems.map(({ icon, title, description, action }) => (
+            {whatsNextItems.map(({ icon, title, description, action, onClick }) => (
                 <div
                     key={title}
                     style={{
@@ -224,7 +236,7 @@ function ConfirmationStep({
                         variant="borderless"
                         size="small"
                         rightIcon={<ChevronRightIcon />}
-                        onClick={() => console.log(action)}
+                        onClick={onClick}
                     >
                         {action}
                     </Button>
