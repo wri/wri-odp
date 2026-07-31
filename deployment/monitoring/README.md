@@ -159,13 +159,50 @@ sum by (namespace, pod) (kube_pod_container_status_restarts_total{namespace=~"wr
 {namespace="wri-odp-prod"} | json | duration > 5s
 ```
 
+## WRI HTTP errors dashboard
+
+Raw Explore log lines from nginx are hard to scan. Use the dedicated dashboard that:
+
+- Charts **2xx/3xx/4xx/5xx** rates and exact **4xx/5xx status code counts**
+- Parses access logs into `status method path upstream latency UA`
+- Filters by status / path / upstream
+- Shows matching frontend/CKAN app error logs
+
+Files:
+
+- `dashboards/wri-http-errors.json` — dashboard definition
+- `dashboards/apply-http-errors-dashboard.sh` — apply as a ConfigMap (Grafana sidecar)
+
+```bash
+./deployment/monitoring/dashboards/apply-http-errors-dashboard.sh
+```
+
+Open: https://odp-grafana.wri.org/d/wri-http-errors
+
+**Note:** nginx Ingress Prometheus metrics are not scraped today (no ServiceMonitor). This dashboard uses Loki-parsed access logs instead.
+
 ## Alerting
 
 Alertmanager is included in the stack. Alerts are pre-configured in the template for:
 - High memory usage (>85% of limit)
 - Pod crash looping
-- High error rate (>5% 5xx responses)
+- High error rate (>5% 5xx responses) — requires nginx Prometheus metrics (not currently scraped)
 - Pod not ready for >10 minutes (excludes completed Job/CronJob pods in `Succeeded` phase)
+- **Ingress HTTP 5xx** — Grafana + Loki access-log alert → Alertmanager → Slack (any 5xx in last 2m)
+
+### Slack alert on every 5xx window
+
+Nginx on this cluster does **not** expose `nginx_ingress_controller_requests` (only Go runtime metrics), so 5xx Slack alerts are based on **Loki access logs** instead.
+
+Apply live (Grafana API):
+
+```bash
+./deployment/monitoring/alerting/apply-5xx-slack-alert.sh
+```
+
+Or bake into the monitoring Helm values (after `./monitoring-values.sh`) and `helm upgrade` the prometheus stack — see `grafana.alerting` in `template.yaml`.
+
+**Noise warning:** this fires when *any* 5xx appears in a 2‑minute window (bots, bad `map=` URLs, `&` search, etc.), not once per request. Evaluation is ~1m; Slack repeat for this alert is 30m.
 
 Slack notifications include a **cluster** label (from `CLUSTER_NAME`) so alerts from `ckan-dev` and `ckan-prod` are distinguishable.
 
