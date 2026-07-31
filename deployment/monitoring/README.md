@@ -159,6 +159,28 @@ sum by (namespace, pod) (kube_pod_container_status_restarts_total{namespace=~"wr
 {namespace="wri-odp-prod"} | json | duration > 5s
 ```
 
+## WRI HTTP errors dashboard
+
+Raw Explore log lines from nginx are hard to scan. Use the dedicated dashboard that:
+
+- Charts **2xx/3xx/4xx/5xx** rates and exact **4xx/5xx status code counts**
+- Parses access logs into `status method path upstream latency UA`
+- Filters by status / path / upstream
+- Shows matching frontend/CKAN app error logs
+
+Files:
+
+- `dashboards/wri-http-errors.json` — dashboard definition
+- `dashboards/apply-http-errors-dashboard.sh` — apply as a ConfigMap (Grafana sidecar)
+
+```bash
+./deployment/monitoring/dashboards/apply-http-errors-dashboard.sh
+```
+
+Open: https://odp-grafana.wri.org/d/wri-http-errors
+
+**Note:** nginx Ingress Prometheus metrics are not scraped today (no ServiceMonitor). This dashboard uses Loki-parsed access logs instead.
+
 ## Alerting
 
 Alertmanager is included in the stack. Alerts are pre-configured in the template for:
