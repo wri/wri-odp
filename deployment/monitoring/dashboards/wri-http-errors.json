@@ -49,7 +49,7 @@
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 1 },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 1 },
       "id": 1,
       "interval": "5m",
       "maxDataPoints": 180,
@@ -67,44 +67,6 @@
       ],
       "title": "Requests/sec by status class",
       "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "loki", "uid": "${datasource}" },
-      "description": "Count of exact status codes in the selected range (5xx + optional 4xx)",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 1 },
-              { "color": "red", "value": 10 }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
-      "id": 2,
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "showUnfilled": true
-      },
-      "maxDataPoints": 1,
-      "targets": [
-        {
-          "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum by (status) (count_over_time({namespace=\"nginx-ingress\"} |~ `\" [45][0-9]{2} ` | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<status>[45][0-9]{2}) ` [$__range]))",
-          "legendFormat": "{{status}}",
-          "queryType": "range",
-          "refId": "A"
-        }
-      ],
-      "title": "4xx / 5xx status code counts",
-      "type": "bargauge"
     },
     {
       "datasource": { "type": "loki", "uid": "${datasource}" },
