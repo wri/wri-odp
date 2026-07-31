@@ -141,6 +141,9 @@ alertmanager:
         slack_configs:
           - channel: '{{SLACK_CHANNEL}}'
             send_resolved: true
+            # Color-code the Slack attachment: green when resolved, red for
+            # firing criticals, yellow for firing warnings.
+            color: '{{ if eq .Status "firing" }}{{ if eq .CommonLabels.severity "critical" }}danger{{ else }}warning{{ end }}{{ else }}good{{ end }}'
             title: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }} ({{ .CommonLabels.cluster }})'
             text: >-
               {{ range .Alerts }}
@@ -211,11 +214,14 @@ additionalPrometheusRulesMap:
               summary: "High error rate detected"
               description: "Error rate is above 5% for the last 5 minutes"
           
-          # Pod not ready (excludes Succeeded pods, e.g. completed CronJob/Job runs)
+          # Pod not ready. Excludes Job/CronJob pods entirely (batch workloads
+          # are expected to terminate, not stay ready) plus any pod in a
+          # terminal Succeeded/Failed phase, so completed cronjob runs don't alert.
           - alert: PodNotReady
             expr: |
               kube_pod_status_ready{condition="true", namespace=~"wri-odp-.*"} == 0
-              unless on (namespace, pod) kube_pod_status_phase{phase="Succeeded", namespace=~"wri-odp-.*"} == 1
+              unless on (namespace, pod) kube_pod_owner{owner_kind="Job", namespace=~"wri-odp-.*"}
+              unless on (namespace, pod) kube_pod_status_phase{phase=~"Succeeded|Failed", namespace=~"wri-odp-.*"} == 1
             for: 10m
             labels:
               severity: warning
