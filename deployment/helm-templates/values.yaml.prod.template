@@ -129,7 +129,7 @@ ckan:
       requests:
         cpu: 200m
         memory: 1.8G
-    replicaCount: 1
+    replicaCount: 2
     image:
       repository: {{REGISTRY}}/{{FRONTEND_REPO}}
       tag: {{FRONTEND_IMAGE_TAG}}
