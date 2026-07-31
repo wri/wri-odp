@@ -42,10 +42,117 @@ grafana:
   # Additional data sources (Loki)
   additionalDataSources:
     - name: Loki
+      uid: loki
       type: loki
       url: http://loki:3100
       access: proxy
       isDefault: false
+
+  # Unified alerting: Loki 5xx → Alertmanager → Slack
+  # (nginx request metrics are not exposed on this cluster, so we alert from access logs)
+  alerting:
+    contactpoints.yaml:
+      apiVersion: 1
+      contactPoints:
+        - orgId: 1
+          name: alertmanager
+          receivers:
+            - uid: wri-alertmanager
+              type: prometheus-alertmanager
+              settings:
+                url: http://prometheus-alertmanager:9093
+    policies.yaml:
+      apiVersion: 1
+      policies:
+        - orgId: 1
+          receiver: alertmanager
+          group_by:
+            - alertname
+            - grafana_folder
+          group_wait: 10s
+          group_interval: 2m
+          repeat_interval: 30m
+          routes:
+            - receiver: alertmanager
+              object_matchers:
+                - ["alertname", "=", "IngressHttp5xx"]
+              group_by:
+                - alertname
+                - cluster
+              group_wait: 10s
+              group_interval: 2m
+              repeat_interval: 30m
+    rules.yaml:
+      apiVersion: 1
+      groups:
+        - orgId: 1
+          name: wri-http-5xx
+          folder: WRI ODP
+          interval: 1m
+          rules:
+            - uid: wri-ingress-http-5xx
+              title: Ingress HTTP 5xx detected
+              condition: C
+              noDataState: OK
+              execErrState: Error
+              for: 0s
+              annotations:
+                summary: HTTP 5xx detected on ingress
+                description: >-
+                  One or more HTTP 5xx responses were logged by nginx-ingress
+                  in the last 2 minutes. Dashboard: https://odp-grafana.wri.org/d/wri-http-errors
+              labels:
+                severity: warning
+                alertname: IngressHttp5xx
+                cluster: "{{CLUSTER_NAME}}"
+              data:
+                - refId: A
+                  relativeTimeRange:
+                    from: 120
+                    to: 0
+                  datasourceUid: loki
+                  model:
+                    refId: A
+                    expr: >-
+                      sum(count_over_time({namespace="nginx-ingress"}
+                      | regexp `"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^"]+" (?P<status>5[0-9]{2}) `
+                      [2m]))
+                    queryType: instant
+                    instant: true
+                    editorMode: code
+                - refId: B
+                  relativeTimeRange:
+                    from: 120
+                    to: 0
+                  datasourceUid: __expr__
+                  model:
+                    refId: B
+                    type: reduce
+                    expression: A
+                    reducer: last
+                    settings:
+                      mode: dropNN
+                - refId: C
+                  relativeTimeRange:
+                    from: 120
+                    to: 0
+                  datasourceUid: __expr__
+                  model:
+                    refId: C
+                    type: threshold
+                    expression: B
+                    conditions:
+                      - evaluator:
+                          type: gt
+                          params: [0]
+                        operator:
+                          type: and
+                        query:
+                          params: [C]
+                        reducer:
+                          type: last
+                          params: []
+                        type: query
   
   # Default dashboards
   defaultDashboardsEnabled: true
@@ -132,6 +239,13 @@ alertmanager:
       repeat_interval: 4h
       receiver: '{{ALERT_RECEIVER}}'
       routes:
+        - match:
+            alertname: IngressHttp5xx
+          group_by: ['alertname', 'cluster']
+          group_wait: 10s
+          group_interval: 2m
+          repeat_interval: 30m
+          receiver: '{{ALERT_RECEIVER}}'
         - match:
             severity: critical
           receiver: '{{ALERT_RECEIVER}}'
