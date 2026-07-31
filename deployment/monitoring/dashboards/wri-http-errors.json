@@ -60,7 +60,7 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum by (class) (rate({namespace=\"nginx-ingress\"} | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<class>[2-5])[0-9]{2} ` | class =~ `[2-5]` [5m]))",
+          "expr": "sum by (class) (rate({namespace=\"nginx-ingress\"} |~ `\" [2-5][0-9]{2} ` | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<class>[2-5])[0-9]{2} ` [5m]))",
           "legendFormat": "{{class}}xx",
           "refId": "A"
         }
@@ -97,7 +97,7 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum by (status) (count_over_time({namespace=\"nginx-ingress\"} | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<status>[45][0-9]{2}) ` | status != \"\" [$__range]))",
+          "expr": "sum by (status) (count_over_time({namespace=\"nginx-ingress\"} |~ `\" [45][0-9]{2} ` | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<status>[45][0-9]{2}) ` [$__range]))",
           "legendFormat": "{{status}}",
           "queryType": "range",
           "refId": "A"
@@ -175,6 +175,8 @@
       },
       "gridPos": { "h": 7, "w": 24, "x": 0, "y": 9 },
       "id": 3,
+      "interval": "1m",
+      "maxDataPoints": 180,
       "options": {
         "legend": {
           "displayMode": "list",
@@ -187,7 +189,7 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum by (status) (count_over_time({namespace=\"nginx-ingress\"} | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<status>5[0-9]{2}) ` | status =~ \"5\\\\d\\\\d\" [$__auto]))",
+          "expr": "sum by (status) (count_over_time({namespace=\"nginx-ingress\"} |~ `\" 5[0-9]{2} ` | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<status>5[0-9]{2}) ` [1m]))",
           "legendFormat": "{{status}}",
           "refId": "A"
         }
@@ -235,7 +237,8 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "{namespace=\"nginx-ingress\"} | regexp `^(?P<client>\\S+) - \\S+ \\[(?P<ts>[^\\]]+)\\] \"(?P<method>\\S+) (?P<path>\\S+) (?P<proto>[^\"]+)\" (?P<status>\\d{3}) (?P<bytes>\\d+) \"(?P<referer>[^\"]*)\" \"(?P<ua>[^\"]*)\" (?P<req_len>\\d+) (?P<req_time>[\\d.]+) \\[(?P<upstream_svc>[^\\]]*)\\] \\[[^\\]]*\\] (?P<upstream_addr>\\S+) (?P<upstream_bytes>\\S+) (?P<upstream_time>\\S+) (?P<upstream_status>\\S+) (?P<req_id>\\S+)` | status =~ `${status}` | path =~ `${path}` | upstream_svc =~ `${upstream}` | line_format \"{{.status}} {{.method}} {{.path}}  up={{.upstream_status}}  {{.req_time}}s  [{{.upstream_svc}}]  {{.ua}}\"",
+          "expr": "{namespace=\"nginx-ingress\"} |~ `\" [0-9]{3} ` | regexp `^(?P<client>\\S+) - \\S+ \\[(?P<ts>[^\\]]+)\\] \"(?P<method>\\S+) (?P<path>\\S+) (?P<proto>[^\"]+)\" (?P<status>\\d{3}) (?P<bytes>\\d+) \"(?P<referer>[^\"]*)\" \"(?P<ua>[^\"]*)\" (?P<req_len>\\d+) (?P<req_time>[\\d.]+) \\[(?P<upstream_svc>[^\\]]*)\\] \\[[^\\]]*\\] (?P<upstream_addr>\\S+) (?P<upstream_bytes>\\S+) (?P<upstream_time>\\S+) (?P<upstream_status>\\S+) (?P<req_id>\\S+)` | status =~ `${status}` | path =~ `${path}` | upstream_svc =~ `${upstream}` | line_format \"{{.status}} {{.method}} {{.path}}  up={{.upstream_status}}  {{.req_time}}s  [{{.upstream_svc}}]  {{.ua}}\"",
+          "maxLines": 200,
           "refId": "A"
         }
       ],
@@ -243,40 +246,43 @@
       "type": "logs"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
       "id": 102,
       "title": "App errors (frontend / CKAN)",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "loki", "uid": "${datasource}" },
-      "description": "Frontend / CKAN application errors in the selected app namespace",
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 32 },
-      "id": 5,
-      "options": {
-        "dedupStrategy": "signature",
-        "enableLogDetails": true,
-        "fontSize": 11,
-        "prettifyLogMessage": true,
-        "showCommonLabels": false,
-        "showLabels": true,
-        "showTime": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
-      },
-      "targets": [
+      "type": "row",
+      "panels": [
         {
           "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "{namespace=\"${app_namespace}\"} |~ `(?i)error|exception|traceback|OAUTH_CALLBACK|too big header|ECONNREFUSED|Failed to fetch`",
-          "refId": "A"
+          "description": "Frontend / CKAN application errors in the selected app namespace",
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 32 },
+          "id": 5,
+          "options": {
+            "dedupStrategy": "signature",
+            "enableLogDetails": true,
+            "fontSize": 11,
+            "prettifyLogMessage": true,
+            "showCommonLabels": false,
+            "showLabels": true,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${datasource}" },
+              "expr": "{namespace=\"${app_namespace}\"} |~ `(?i)error|exception|traceback|OAUTH_CALLBACK|too big header|ECONNREFUSED|Failed to fetch`",
+              "maxLines": 100,
+              "refId": "A"
+            }
+          ],
+          "title": "Application error logs (${app_namespace})",
+          "type": "logs"
         }
-      ],
-      "title": "Application error logs (${app_namespace})",
-      "type": "logs"
+      ]
     }
   ],
-  "refresh": "30s",
+  "refresh": "1m",
   "schemaVersion": 39,
   "tags": ["wri", "http", "errors", "nginx", "loki"],
   "templating": {
@@ -359,7 +365,7 @@
       }
     ]
   },
-  "time": { "from": "now-6h", "to": "now" },
+  "time": { "from": "now-3h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
   "title": "WRI ODP — HTTP errors & access logs",
