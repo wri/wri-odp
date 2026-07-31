@@ -377,6 +377,22 @@ loki-stack:
         reject_old_samples_max_age: {{LOKI_RETENTION}}
         retention_period: {{LOKI_RETENTION}}
         max_entries_limit_per_query: 5000
+        # Must live here (NOT under query_range) on Loki 2.6+ — putting it
+        # under query_range makes Loki refuse to start.
+        split_queries_by_interval: 30m
+        max_query_parallelism: 32
+
+      # Raise queue limits so Grafana query-splitting doesn't hit
+      # "too many outstanding requests" on this single-pod Loki.
+      query_scheduler:
+        max_outstanding_requests_per_tenant: 4096
+      frontend:
+        max_outstanding_per_tenant: 2048
+        compress_responses: true
+      querier:
+        max_concurrent: 16
+      query_range:
+        parallelise_shardable_queries: true
       
       schema_config:
         configs:
@@ -413,11 +429,11 @@ loki-stack:
     
     resources:
       requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        cpu: 500m
+        cpu: 250m
         memory: 512Mi
+      limits:
+        cpu: "2"
+        memory: 2Gi
 
   promtail:
     enabled: true

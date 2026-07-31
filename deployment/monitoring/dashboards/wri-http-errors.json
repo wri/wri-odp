@@ -49,8 +49,10 @@
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 16, "x": 0, "y": 1 },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 1 },
       "id": 1,
+      "interval": "5m",
+      "maxDataPoints": 180,
       "options": {
         "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
         "tooltip": { "mode": "multi", "sort": "desc" }
@@ -58,67 +60,13 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum(count_over_time({namespace=\"nginx-ingress\"} |~ `\" (2[0-9]{2}) ` [$__auto])) / $__auto_interval_seconds",
-          "legendFormat": "2xx",
+          "expr": "sum by (class) (rate({namespace=\"nginx-ingress\"} |~ `\" [2-5][0-9]{2} ` | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<class>[2-5])[0-9]{2} ` [5m]))",
+          "legendFormat": "{{class}}xx",
           "refId": "A"
-        },
-        {
-          "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum(count_over_time({namespace=\"nginx-ingress\"} |~ `\" (3[0-9]{2}) ` [$__auto])) / $__auto_interval_seconds",
-          "legendFormat": "3xx",
-          "refId": "B"
-        },
-        {
-          "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum(count_over_time({namespace=\"nginx-ingress\"} |~ `\" (4[0-9]{2}) ` [$__auto])) / $__auto_interval_seconds",
-          "legendFormat": "4xx",
-          "refId": "C"
-        },
-        {
-          "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum(count_over_time({namespace=\"nginx-ingress\"} |~ `\" (5[0-9]{2}) ` [$__auto])) / $__auto_interval_seconds",
-          "legendFormat": "5xx",
-          "refId": "D"
         }
       ],
       "title": "Requests/sec by status class",
       "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "loki", "uid": "${datasource}" },
-      "description": "Count of exact status codes in the selected range (5xx + optional 4xx)",
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 1 },
-              { "color": "red", "value": 10 }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
-      "id": 2,
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": { "calcs": ["sum"], "fields": "", "values": false },
-        "showUnfilled": true
-      },
-      "targets": [
-        {
-          "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum by (status) (count_over_time({namespace=\"nginx-ingress\"} | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<status>[45][0-9]{2}) ` [$__range]))",
-          "legendFormat": "{{status}}",
-          "refId": "A"
-        }
-      ],
-      "title": "4xx / 5xx status code counts",
-      "type": "bargauge"
     },
     {
       "datasource": { "type": "loki", "uid": "${datasource}" },
@@ -130,7 +78,7 @@
             "drawStyle": "points",
             "fillOpacity": 0,
             "lineWidth": 0,
-            "pointSize": 8,
+            "pointSize": 4,
             "showPoints": "always",
             "spanNulls": false,
             "stacking": { "mode": "none", "group": "A" }
@@ -139,10 +87,58 @@
           "decimals": 0,
           "min": 0
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "500" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "#F2495C" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "501" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "#FF9830" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "502" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "#FFA500" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "503" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "#E0B400" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "504" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "#FF7383" }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": { "h": 7, "w": 24, "x": 0, "y": 9 },
       "id": 3,
+      "interval": "1m",
+      "maxDataPoints": 180,
       "options": {
         "legend": {
           "displayMode": "list",
@@ -155,9 +151,23 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "sum by (status) (count_over_time({namespace=\"nginx-ingress\"} | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<status>5[0-9]{2}) ` [$__auto]))",
+          "expr": "sum by (status) (count_over_time({namespace=\"nginx-ingress\"} |~ `\" 5[0-9]{2} ` | regexp `\"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^\\\"]+\" (?P<status>5[0-9]{2}) ` [1m]))",
           "legendFormat": "{{status}}",
           "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "prepareTimeSeries",
+          "options": { "format": "wide" }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "exclude": {
+              "pattern": "/^Value$/"
+            }
+          }
         }
       ],
       "title": "5xx by exact status code",
@@ -189,7 +199,8 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "{namespace=\"nginx-ingress\"} | regexp `^(?P<client>\\S+) - \\S+ \\[(?P<ts>[^\\]]+)\\] \"(?P<method>\\S+) (?P<path>\\S+) (?P<proto>[^\"]+)\" (?P<status>\\d+) (?P<bytes>\\d+) \"(?P<referer>[^\"]*)\" \"(?P<ua>[^\"]*)\" (?P<req_len>\\d+) (?P<req_time>[\\d.]+) \\[(?P<upstream_svc>[^\\]]*)\\] \\[[^\\]]*\\] (?P<upstream_addr>\\S+) (?P<upstream_bytes>\\S+) (?P<upstream_time>\\S+) (?P<upstream_status>\\S+) (?P<req_id>\\S+)` | status =~ `${status}` | path =~ `${path}` | upstream_svc =~ `${upstream}` | line_format \"{{.status}} {{.method}} {{.path}}  up={{.upstream_status}}  {{.req_time}}s  [{{.upstream_svc}}]  {{.ua}}\"",
+          "expr": "{namespace=\"nginx-ingress\"} |~ `\" [0-9]{3} ` | regexp `^(?P<client>\\S+) - \\S+ \\[(?P<ts>[^\\]]+)\\] \"(?P<method>\\S+) (?P<path>\\S+) (?P<proto>[^\"]+)\" (?P<status>\\d{3}) (?P<bytes>\\d+) \"(?P<referer>[^\"]*)\" \"(?P<ua>[^\"]*)\" (?P<req_len>\\d+) (?P<req_time>[\\d.]+) \\[(?P<upstream_svc>[^\\]]*)\\] \\[[^\\]]*\\] (?P<upstream_addr>\\S+) (?P<upstream_bytes>\\S+) (?P<upstream_time>\\S+) (?P<upstream_status>\\S+) (?P<req_id>\\S+)` | status =~ `${status}` | path =~ `${path}` | upstream_svc =~ `${upstream}` | line_format \"{{.status}} {{.method}} {{.path}}  up={{.upstream_status}}  {{.req_time}}s  [{{.upstream_svc}}]  {{.ua}}\"",
+          "maxLines": 200,
           "refId": "A"
         }
       ],
@@ -197,40 +208,43 @@
       "type": "logs"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
       "id": 102,
       "title": "App errors (frontend / CKAN)",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "loki", "uid": "${datasource}" },
-      "description": "Frontend / CKAN application errors in the selected app namespace",
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 32 },
-      "id": 5,
-      "options": {
-        "dedupStrategy": "signature",
-        "enableLogDetails": true,
-        "fontSize": 11,
-        "prettifyLogMessage": true,
-        "showCommonLabels": false,
-        "showLabels": true,
-        "showTime": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
-      },
-      "targets": [
+      "type": "row",
+      "panels": [
         {
           "datasource": { "type": "loki", "uid": "${datasource}" },
-          "expr": "{namespace=\"${app_namespace}\"} |~ `(?i)error|exception|traceback|OAUTH_CALLBACK|too big header|ECONNREFUSED|Failed to fetch`",
-          "refId": "A"
+          "description": "Frontend / CKAN application errors in the selected app namespace",
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 32 },
+          "id": 5,
+          "options": {
+            "dedupStrategy": "signature",
+            "enableLogDetails": true,
+            "fontSize": 11,
+            "prettifyLogMessage": true,
+            "showCommonLabels": false,
+            "showLabels": true,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "targets": [
+            {
+              "datasource": { "type": "loki", "uid": "${datasource}" },
+              "expr": "{namespace=\"${app_namespace}\"} |~ `(?i)error|exception|traceback|OAUTH_CALLBACK|too big header|ECONNREFUSED|Failed to fetch`",
+              "maxLines": 100,
+              "refId": "A"
+            }
+          ],
+          "title": "Application error logs (${app_namespace})",
+          "type": "logs"
         }
-      ],
-      "title": "Application error logs (${app_namespace})",
-      "type": "logs"
+      ]
     }
   ],
-  "refresh": "30s",
+  "refresh": "1m",
   "schemaVersion": 39,
   "tags": ["wri", "http", "errors", "nginx", "loki"],
   "templating": {
@@ -262,22 +276,23 @@
         "type": "custom"
       },
       {
-        "current": { "selected": true, "text": "5..", "value": "5.." },
+        "current": { "selected": true, "text": "5xx", "value": "5.." },
         "hide": 0,
         "includeAll": false,
+        "multi": false,
         "label": "Status",
         "name": "status",
         "options": [
           { "selected": false, "text": "All", "value": ".*" },
           { "selected": true, "text": "5xx", "value": "5.." },
           { "selected": false, "text": "4xx", "value": "4.." },
-          { "selected": false, "text": "502", "value": "502" },
           { "selected": false, "text": "500", "value": "500" },
+          { "selected": false, "text": "502", "value": "502" },
           { "selected": false, "text": "503", "value": "503" },
           { "selected": false, "text": "401", "value": "401" },
           { "selected": false, "text": "404", "value": "404" }
         ],
-        "query": ".* : All,5.. : 5xx,4.. : 4xx,502,500,503,401,404",
+        "query": "All : .*,5xx : 5..,4xx : 4..,500,502,503,401,404",
         "type": "custom"
       },
       {
@@ -296,21 +311,23 @@
         "type": "custom"
       },
       {
-        "current": { "selected": true, "text": ".*", "value": ".*" },
+        "current": { "selected": true, "text": "All", "value": ".*" },
         "hide": 0,
+        "includeAll": false,
+        "multi": false,
         "label": "Upstream",
         "name": "upstream",
         "options": [
-          { "selected": true, "text": ".*", "value": ".*" },
+          { "selected": true, "text": "All", "value": ".*" },
           { "selected": false, "text": "frontend", "value": ".*frontend.*" },
           { "selected": false, "text": "ckan", "value": ".*ckan.*" }
         ],
-        "query": ".*,.*frontend.* : frontend,.*ckan.* : ckan",
+        "query": "All : .*,frontend : .*frontend.*,ckan : .*ckan.*",
         "type": "custom"
       }
     ]
   },
-  "time": { "from": "now-6h", "to": "now" },
+  "time": { "from": "now-3h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
   "title": "WRI ODP — HTTP errors & access logs",
