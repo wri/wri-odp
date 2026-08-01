@@ -1,6 +1,6 @@
 # pkg_resources required by ckanapi - must be installed first
 setuptools>=78.1.1
-prefect>=3.7.6,<4
+prefect>=3.8.0,<4
 pathlib==1.0.1
 semver==3.0.4
 pydantic>=2.13.4,<3
