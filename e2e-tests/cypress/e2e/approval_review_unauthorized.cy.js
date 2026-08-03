@@ -27,8 +27,12 @@ const reviewerEmail = `${uuid()}@example.com`;
 const reviewerPassword = "test1234";
 
 Cypress.on("uncaught:exception", (err) => {
-  console.log(err);
-  return false;
+  // Keep behavior consistent with cypress/support/e2e.js: ignore known 3rd-party
+  // noise, but fail on real application errors.
+  if (err.message.includes("Osano") || err.message.includes("Hotjar")) {
+    return false;
+  }
+  return true;
 });
 
 /** Create approved public dataset then a pending metadata revision with a visible diff. */
