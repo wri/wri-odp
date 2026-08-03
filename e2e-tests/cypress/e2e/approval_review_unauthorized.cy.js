@@ -117,23 +117,18 @@ describe("Approval Review without team authorization (?approval=true)", () => {
       // Wait for the page (and optional approval bar) to settle
       cy.contains(datasetName, { timeout: 60000 });
 
-      cy.get("body", { timeout: 30000 }).should(($body) => {
-        const hasApprove = $body.text().includes("Approve request");
-        const hasToggle = $body.find("#toggle-version").length > 0;
-        const hasYellowHighlight = $body.find(".bg-yellow-200").length > 0;
+cy.get("body", { timeout: 30000 }).should(($body) => {
+  const hasApprove = $body.text().includes("Approve request");
+  const hasToggle = $body.find("#toggle-version").length > 0;
+  const hasYellowHighlight = $body.find(".bg-yellow-200").length > 0;
 
-        // Documents the broken split: bar forced by ?approval=true while
-        // showPendingDiff stays disabled because pendingExist is false.
-        expect(
-          hasApprove && !hasToggle && !hasYellowHighlight,
-          [
-            "BUG: Approve/Reject shown via ?approval=true without change highlights/toggle.",
-            "pendingExist requires generalAuthorized (sysadmin or team admin/editor of THIS dataset's org),",
-            "but isApprovalRequest is also true when query.approval=true.",
-            `hasApprove=${hasApprove} hasToggle=${hasToggle} hasYellow=${hasYellowHighlight}`,
-          ].join(" ")
-        ).to.eq(false);
-      });
+  expect(
+    hasApprove,
+    "Unauthorized user should not see 'Approve request' for a dataset owned by another team"
+  ).to.eq(false);
+  expect(hasToggle, "Unauthorized user should not see version toggle").to.eq(false);
+  expect(hasYellowHighlight, "Unauthorized user should not see diff highlights").to.eq(false);
+});
     }
   );
 });
