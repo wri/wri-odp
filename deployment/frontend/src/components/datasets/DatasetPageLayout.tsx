@@ -2,20 +2,20 @@ import classNames from '@/utils/classnames';
 import { Disclosure } from '@headlessui/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/router';
 
 export default function DatasetPageLayout({
     lhs,
     rhs,
     hasViz,
+    isApprovalRequest = false,
 }: {
     lhs: React.ReactNode;
     rhs: React.ReactNode;
     hasViz: boolean;
+    /** When true, offset sidebar toggles for the Approve/Reject bar height. */
+    isApprovalRequest?: boolean;
 }) {
     const showLhsByDefault = hasViz;
-    const { query } = useRouter();
-    const isApprovalRequest = query?.approval === 'true';
     const [lhsOpen, setLhsOpen] = useState(true);
     const [rhsOpen, setRhsOpen] = useState(showLhsByDefault);
     const [lhsMaxHeight, setLhsMaxHeight] = useState('auto');

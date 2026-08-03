@@ -80,8 +80,6 @@ export default function DatasetPage(
 
     const datasetName = props.datasetName!;
     const router = useRouter();
-    const { query } = router;
-    const isApprovalRequest = query?.approval === 'true';
     const session = useSession();
     const {
         data: datasetData,

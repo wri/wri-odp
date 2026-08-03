@@ -21,7 +21,6 @@ import { ErrorAlert } from '@/components/_shared/Alerts';
 import { SimpleEditor } from '../dashboard/datasets/admin/metadata/RTE/SimpleEditor';
 import { Dialog } from '@headlessui/react';
 import { useSession } from 'next-auth/react';
-import Spinner from '../_shared/Spinner';
 
 export default function ApprovalRequestCard({
     datasetName,
@@ -43,7 +42,6 @@ export default function ApprovalRequestCard({
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const router = useRouter();
     const { data: session } = useSession();
-    const { query } = router;
     const utils = api.useUtils();
     const formObj = useForm<IssueSchemaType>({
         resolver: zodResolver(IssueSchema),
@@ -59,8 +57,6 @@ export default function ApprovalRequestCard({
 
     const { errors } = formObj.formState;
 
-    const { data: userIdentity, isLoading: isLoadingIUser } =
-        api.user.getUserCapacity.useQuery();
     const approveDataset = api.dataset.approvePendingDataset.useMutation({
         onSuccess: async (data) => {
             await utils.dataset.getPendingDatasets.invalidate({
@@ -104,16 +100,9 @@ export default function ApprovalRequestCard({
         onError: (error) => setErrorMessage(error.message),
     });
 
-    if (!session?.user.sysadmin && isLoadingIUser) {
-        return <Spinner className="mx-auto my-2" />;
-    }
-
-    if (
-        !session?.user.sysadmin &&
-        userIdentity &&
-        !userIdentity.isOrgAdmin &&
-        diffField.length === 0
-    ) {
+    // Sysadmins may always act. Everyone else needs loaded diffs for THIS
+    // dataset — being Team Admin of an unrelated org must not unlock the bar.
+    if (!session?.user.sysadmin && diffField.length === 0) {
         return '';
     }
 

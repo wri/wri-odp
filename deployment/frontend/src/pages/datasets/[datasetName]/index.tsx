@@ -285,9 +285,12 @@ export default function DatasetPage(
   const apikey = props.apiKey!;
   const router = useRouter();
   const { query } = router;
+  // Require authorization + an actual pending revision. Bare ?approval=true must
+  // not show Approve/Reject — that query param is only a navigation hint from
+  // Requests for Approval → Review, and previously unlocked the bar for any
+  // Team Admin (even of an unrelated team) without loading diffs/highlights.
   const isApprovalRequest =
-    query?.approval === 'true' ||
-    (approvalAuth && pendingExist && isPendingState);
+    !!approvalAuth && !!pendingExist && !!isPendingState;
   const { isAddingLayers } = useIsAddingLayers();
   const session = useSession();
 
@@ -674,6 +677,7 @@ export default function DatasetPage(
         />
       )}
       <DatasetPageLayout
+        isApprovalRequest={isApprovalRequest}
         hasViz={
           canVisualizeDataset(datasetData as any) ||
           canVisualizeDataset(prevDatasetData as any)
