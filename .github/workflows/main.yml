@@ -634,7 +634,7 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
       - name: Upload CKAN container Trivy scan results to GitHub Code scanning
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@v4.37.3
         with:
           sarif_file: ckan-trivy-results.sarif
 
@@ -676,7 +676,7 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
       - name: Upload Frontend container Trivy scan results to GitHub Code scanning
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@v4.37.3
         with:
           category: frontend_container_trivy_results
           sarif_file: frontend-trivy-results.sarif
