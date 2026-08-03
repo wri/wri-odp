@@ -1,14 +1,12 @@
 /**
- * Reveals: ?approval=true can show Approve/Reject without loading pending
- * diffs / yellow highlights / version toggle when the reviewer is not
- * authorized for the dataset's team (pendingExist stays false).
+ * Unauthorized Team Admin must not get a partial approval UI.
  *
- * This is the same code path as Dashboard → Requests for Approval → Review
- * (ApprovalRow links to /datasets/<name>?approval=true).
+ * Same URL as Dashboard → Requests for Approval → Review
+ * (`/datasets/<name>?approval=true`).
  *
- * Expected invariant (once fixed): Approve/Reject must not appear without
- * the change-review UI (#toggle-version / .bg-yellow-200). Either both are
- * present (authorized) or neither (unauthorized).
+ * Invariant: Approve/Reject and change-review UI (#toggle-version /
+ * .bg-yellow-200) stay in sync — both for authorized reviewers, neither
+ * for unauthorized ones. Bare ?approval=true must not unlock the bar.
  */
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
@@ -20,7 +18,10 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const teamA = `${uuid()}${orgSuffix}`.toLowerCase();
 const teamB = `${uuid()}${orgSuffix}`.toLowerCase();
-const datasetName = `${uuid()}${datasetSuffix}`.toLowerCase();
+/** Pending dataset owned by Team A — Team A Admin is authorized */
+const teamADatasetName = `${uuid()}${datasetSuffix}`.toLowerCase();
+/** Pending dataset owned by Team B — Team A Admin is NOT authorized */
+const teamBDatasetName = `${uuid()}${datasetSuffix}`.toLowerCase();
 const reviewer = `${uuid()}${userSuffix}_reviewer`.toLowerCase();
 const reviewerEmail = `${uuid()}@example.com`;
 const reviewerPassword = "test1234";
@@ -30,36 +31,103 @@ Cypress.on("uncaught:exception", (err) => {
   return false;
 });
 
+/** Create approved public dataset then a pending metadata revision with a visible diff. */
+function createApprovedDatasetWithPendingRevision(orgName, datasetName) {
+  cy.createDatasetAPI(orgName, datasetName, true, {
+    notes: "baseline notes",
+    short_description: "baseline short description",
+    technical_notes: "https://example.com/notes",
+    visibility_type: "public",
+    update_frequency: "hourly",
+    authors: [{ name: "Author", email: "author@example.com" }],
+    maintainers: [{ name: "Maintainer", email: "maintainer@example.com" }],
+  });
+  // WRI package_create always inserts a pending row equal to the package for
+  // public datasets. Approve first so we have a clean approved baseline;
+  // otherwise pending_dataset_create hits PK conflict and returns the old
+  // identical pending → empty pending_diff_show.
+  cy.approvePendingDatasetAPI(datasetName);
+
+  // Same path as frontend editDataset: old_package_patch + pending_dataset_create.
+  // Do NOT use package_patch — WRI's wrapper crashes activity dictize.
+  cy.datasetMetadata(datasetName).then((dataset) => {
+    cy.request({
+      method: "POST",
+      url: `${Cypress.config().apiUrl}/api/3/action/old_package_patch`,
+      headers: { Authorization: Cypress.env("API_KEY") },
+      body: {
+        id: dataset.id,
+        approval_status: "pending",
+      },
+    })
+      .its("body.success")
+      .should("eq", true);
+
+    cy.request({
+      method: "POST",
+      url: `${Cypress.config().apiUrl}/api/3/action/pending_dataset_create`,
+      headers: { Authorization: Cypress.env("API_KEY") },
+      body: {
+        package_id: dataset.id,
+        package_data: {
+          ...dataset,
+          title: `${dataset.title || dataset.name} EDITED`,
+          short_description: "changed short description for approval review",
+          approval_status: "pending",
+          is_approved: false,
+          is_pending: true,
+        },
+      },
+    })
+      .its("body.success")
+      .should("eq", true);
+
+    cy.request({
+      method: "GET",
+      url: `${Cypress.config().apiUrl}/api/3/action/pending_diff_show?package_id=${dataset.id}`,
+      headers: { Authorization: Cypress.env("API_KEY") },
+    }).then((res) => {
+      expect(res.body.success, JSON.stringify(res.body.error || {})).to.eq(
+        true
+      );
+      expect(
+        Object.keys(res.body.result?.diff || {}),
+        "pending_diff_show should include title/short_description changes"
+      ).to.have.length.greaterThan(0);
+    });
+  });
+}
+
+function assertFullApprovalReviewUi() {
+  cy.contains("Approve request", { timeout: 15000 }).should("be.visible");
+  cy.get("#toggle-version", { timeout: 15000 }).should("exist");
+  cy.get(".bg-yellow-200", { timeout: 15000 }).should("exist");
+}
+
 describe("Approval Review without team authorization (?approval=true)", () => {
   before(() => {
     cy.createUserApi(reviewer, reviewerEmail, reviewerPassword);
 
-    // Team A: reviewer is Admin (sees Requests for Approval via isOrgAdmin)
+    // Team A: reviewer is Admin (authorized for Team A datasets)
     cy.createOrganizationAPI(teamA);
     cy.createOrganizationMemberAPI(teamA, reviewer, "admin");
+    createApprovedDatasetWithPendingRevision(teamA, teamADatasetName);
 
-    // Team B: owns the pending dataset; reviewer is NOT a member
+    // Team B: owns a pending dataset; reviewer is NOT a member
     cy.createOrganizationAPI(teamB);
-    cy.createDatasetAPI(teamB, datasetName, true, {
-      notes: "baseline notes",
-      short_description: "baseline short description",
-      technical_notes: "https://example.com/notes",
-      visibility_type: "public",
-      update_frequency: "hourly",
-      authors: [{ name: "Author", email: "author@example.com" }],
-      maintainers: [{ name: "Maintainer", email: "maintainer@example.com" }],
-    });
+    createApprovedDatasetWithPendingRevision(teamB, teamBDatasetName);
   });
 
   after(() => {
-    cy.deleteDatasetAPI(datasetName);
+    cy.deleteDatasetAPI(teamADatasetName);
+    cy.deleteDatasetAPI(teamBDatasetName);
     cy.deleteOrganizationAPI(teamA);
     cy.deleteOrganizationAPI(teamB);
     cy.deleteUserApi(reviewer);
   });
 
   it(
-    "creates a pending metadata revision on Team B dataset",
+    "control: authorized sysadmin sees Approve/Reject AND change highlights on Team B dataset",
     {
       retries: { runMode: 3, openMode: 0 },
     },
@@ -67,67 +135,59 @@ describe("Approval Review without team authorization (?approval=true)", () => {
       cy.login(ckanUserName, ckanUserPassword);
       cy.viewport(1920, 1080);
 
-      cy.visit(`/dashboard/datasets/${datasetName}/edit`);
-      cy.get("input[name=title]", { timeout: 30000 })
-        .clear()
-        .type(`${datasetName} EDITED`);
-      cy.get("textarea[name=short_description]")
-        .clear()
-        .type("changed short description for approval review");
-      cy.get("button").contains("Update Dataset").click({ force: true });
-      cy.contains(`Successfully edited the "${datasetName}" Dataset`, {
-        timeout: 60000,
-      });
+      cy.visit(`/datasets/${teamBDatasetName}`);
+      assertFullApprovalReviewUi();
     }
   );
 
   it(
-    "control: authorized sysadmin sees Approve/Reject AND change highlights",
+    "control: Team A Admin sees Approve/Reject AND change highlights on Team A dataset",
     {
       retries: { runMode: 3, openMode: 0 },
     },
     () => {
-      cy.login(ckanUserName, ckanUserPassword);
+      cy.clearCookies();
+      cy.clearLocalStorage();
+      cy.login(reviewer, reviewerPassword);
       cy.viewport(1920, 1080);
 
-      cy.visit(`/datasets/${datasetName}`);
-      cy.contains("Approve request", { timeout: 60000 }).should("be.visible");
-      cy.get("#toggle-version", { timeout: 30000 }).should("exist");
-      cy.get(".bg-yellow-200", { timeout: 30000 }).should("exist");
+      cy.visit(`/datasets/${teamADatasetName}?approval=true`);
+      assertFullApprovalReviewUi();
     }
   );
 
   it(
-    "reveals bug: Team A Admin visiting Team B dataset via ?approval=true sees Approve/Reject without change highlights",
+    "Team A Admin on Team B dataset via ?approval=true gets neither Approve/Reject nor change highlights",
     {
       retries: { runMode: 3, openMode: 0 },
     },
     () => {
-      cy.logout();
+      // Clear session without UI signOut (NEXTAUTH_URL=wri-frontend breaks browser redirects)
+      cy.clearCookies();
+      cy.clearLocalStorage();
       cy.login(reviewer, reviewerPassword);
       cy.viewport(1920, 1080);
 
       // Same URL the Review button builds in ApprovalRow
-      cy.visit(`/datasets/${datasetName}?approval=true`);
+      cy.visit(`/datasets/${teamBDatasetName}?approval=true`);
+      cy.contains(teamBDatasetName, { timeout: 15000 });
 
-      // Wait for the page (and optional approval bar) to settle
-      cy.contains(datasetName, { timeout: 60000 });
-
-      cy.get("body", { timeout: 30000 }).should(($body) => {
+      cy.get("body", { timeout: 15000 }).should(($body) => {
         const hasApprove = $body.text().includes("Approve request");
         const hasToggle = $body.find("#toggle-version").length > 0;
         const hasYellowHighlight = $body.find(".bg-yellow-200").length > 0;
 
-        // Documents the broken split: bar forced by ?approval=true while
-        // showPendingDiff stays disabled because pendingExist is false.
         expect(
-          hasApprove && !hasToggle && !hasYellowHighlight,
-          [
-            "BUG: Approve/Reject shown via ?approval=true without change highlights/toggle.",
-            "pendingExist requires generalAuthorized (sysadmin or team admin/editor of THIS dataset's org),",
-            "but isApprovalRequest is also true when query.approval=true.",
-            `hasApprove=${hasApprove} hasToggle=${hasToggle} hasYellow=${hasYellowHighlight}`,
-          ].join(" ")
+          hasApprove,
+          `unauthorized Team Admin must not see Approve/Reject (hasApprove=${hasApprove})`
+        ).to.eq(false);
+        expect(
+          hasToggle,
+          `unauthorized Team Admin must not see version toggle (hasToggle=${hasToggle})`
+        ).to.eq(false);
+        expect(
+          hasYellowHighlight,
+          `unauthorized Team Admin must not see change highlights (hasYellow=${hasYellowHighlight})`
         ).to.eq(false);
       });
     }
