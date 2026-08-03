@@ -10,7 +10,7 @@
 const GROUPS = [
   ['accesibility_test.cy.js', 'api_tokens.cy.js', 'applicatoin_crud.cy.js'],
   ['chart_view.cy.js'],
-  ['auth.cy.js', 'dashboard.cy.js'],
+  ['approval_review_unauthorized.cy.js', 'auth.cy.js', 'dashboard.cy.js'],
   ['datafile_location_index.cy.js', 'datafile_not_downloadable.cy.js', 'datapusher.cy.js'],
   ['dataset_create_and_read.cy.js', 'dataset_permissions.cy.js', 'external_sources.cy.js'],
   ['file-conversion.cy.js', 'group_org_patch.cy.js', 'home.cy.js'],
