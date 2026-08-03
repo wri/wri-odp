@@ -249,34 +249,29 @@ describe("Dashboard Test", () => {
     cy.contains("Pending Approval");
   });
 
-  it("Should reject dataset", () => {
-    cy.visit("/dashboard/approval-request");
-    cy.contains(datasetName, { timeout: 30000 });
-    cy.get(`button#delete-tooltip-${datasetName}`)
-      .first()
-      .click({ force: true });
-
+  it("Should reject dataset from dataset page", () => {
+    // Sysadmin + pending revision shows Approve/Reject without ?approval=true.
+    // Bare ?approval=true no longer unlocks the bar (approval gating fix).
+    cy.visit("/datasets/" + datasetName);
+    cy.contains("Reject request", { timeout: 20000 }).click();
     cy.get("input[id=title]").type("Test");
     cy.get(".tiptap.ProseMirror").type("Test");
-    cy.contains("button", "Reject and send feedback").click({ force: true });
-    cy.wait(15000);
-    // cy.contains(`Dataset ${datasetName} is successfully rejected`, { timeout: 30000 });
-  });
-
-  it("Should have issues", () => {
-    cy.visit("/datasets/" + datasetName + "?approval=true");
-    cy.contains("Reject request").click();
-    cy.get(".tiptap.ProseMirror").type("Test");
-    cy.get("input[id=title]").type("Test");
     cy.get("button[id=reject]").click();
     cy.wait(15000);
   });
 
+  it("Should have issues", () => {
+    // Issue was created by the reject above; status is now "rejected" so the
+    // Approve/Reject bar correctly no longer appears.
+    cy.visit("/datasets/" + datasetName);
+    cy.contains("Issues", { timeout: 20000 }).click({ force: true });
+    cy.contains("Test", { timeout: 20000 }).should("be.visible");
+  });
+
   it("Should view issues", () => {
     cy.visit("/datasets/" + datasetName);
-    cy.wait(18000);
     cy.contains("Issues").click({ force: true });
-    cy.contains("Test");
+    cy.contains("Test").should("be.visible");
     cy.contains("Test").click();
     cy.wait(15000);
     cy.get(".tiptap.ProseMirror").type("issue comment");
