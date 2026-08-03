@@ -5,11 +5,13 @@ import {
     getThemedSpacing,
     Menu,
 } from '@worldresources/wri-design-systems';
-import { ArrowDownTrayIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
 import type { DatasetDetailsHeaderContentProps } from './types';
+import DatasetDownloadButton from './DatasetDownloadButton';
+import AccessApiButton from './AccessApiButton';
 
 export default function DatasetDetailsHeaderContent({
+    dataset,
     datasetTitle,
     datasetDescription,
     openInItems,
@@ -52,13 +54,10 @@ export default function DatasetDetailsHeaderContent({
                     marginTop: getThemedSpacing(400),
                 }}
             >
-                <Button variant="primary" size="default" leftIcon={<ArrowDownTrayIcon />}>
-                    Download
-                </Button>
-
-                <Button variant="secondary" size="default" leftIcon={<GlobeAltIcon />}>
-                    Access API
-                </Button>
+                {dataset?.resources?.length > 0 && (
+                    <DatasetDownloadButton dataset={dataset} size="default" />
+                )}
+                <AccessApiButton dataset={dataset} />
 
                 {hasSingleOpenInOption && singleOpenInItem?.value ? (
                     <Button

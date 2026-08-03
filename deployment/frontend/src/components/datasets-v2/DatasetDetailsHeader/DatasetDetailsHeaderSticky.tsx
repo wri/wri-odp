@@ -6,9 +6,11 @@ import {
     getThemedSpacing,
     Menu,
 } from '@worldresources/wri-design-systems';
-import { ArrowDownTrayIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import type { DatasetDetailsHeaderStickyProps } from './types';
+import DatasetDownloadButton from './DatasetDownloadButton';
+import AccessApiButton from './AccessApiButton';
 
 const sectionItems = [
     {
@@ -51,10 +53,12 @@ const sectionItems = [
 ];
 
 function DatasetDetailsHeaderSticky({
+    dataset,
     datasetTitle,
     openInItems,
 }: DatasetDetailsHeaderStickyProps) {
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
+    const [isAccessApiModalOpen, setIsAccessApiModalOpen] = useState(false);
     const [selectedSectionLabel, setSelectedSectionLabel] = useState('Key details');
     const stickyOpenInItems = openInItems.map((item) => ({
         label: `Open in (${item.label})`,
@@ -64,7 +68,7 @@ function DatasetDetailsHeaderSticky({
 
     const onOpenInSelect = (value: string) => {
         if (value === 'access-api') {
-            console.log('Access API clicked');
+            setIsAccessApiModalOpen(true);
             return;
         }
 
@@ -130,10 +134,14 @@ function DatasetDetailsHeaderSticky({
             </h1>
 
             <div className="flex gap-1 sm:gap-4">
-                <Button variant="primary" size="small" leftIcon={<ArrowDownTrayIcon />}>
-                    Download
-                </Button>
-
+                {dataset?.resources?.length > 0 && (
+                    <DatasetDownloadButton dataset={dataset} size="small" />
+                )}
+                <AccessApiButton
+                    dataset={dataset}
+                    hideButton
+                    isAccessApiModalOpen={isAccessApiModalOpen}
+                />
                 <Menu
                     label="Section"
                     items={sectionItems}
