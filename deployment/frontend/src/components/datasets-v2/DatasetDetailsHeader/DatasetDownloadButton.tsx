@@ -192,6 +192,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                     <ConfirmationStep
                         selectedResources={selectedResources}
                         totalSelectedBytes={totalSelectedBytes}
+                        datasetName={dataset.name}
                         onBack={() => setActiveStep('terms')}
                         onClose={closeModal}
                     />

@@ -14,52 +14,16 @@ import {
     DocumentTextIcon,
 } from '@heroicons/react/24/solid';
 import { type Resource } from '@/interfaces/dataset.interface';
+import { useEffect } from 'react';
 import DownloadStartedBanner from './DownloadStartedBanner';
 import FileCard from './FileCard';
 import { formatDate, formatFileSize, getResourceFormatLabel } from '../download-utils';
-
-const whatsNextItems = [
-    {
-        icon: <DocumentIcon width={16} height={16} />,
-        title: 'View this dataset',
-        description: 'Return to the dataset to explore more details.',
-        action: 'View dataset',
-    },
-    {
-        icon: <CodeBracketSquareIcon width={16} height={16} />,
-        title: 'Access via API',
-        description: 'Integrate this data into your tools and workflows.',
-        action: 'View API options',
-    },
-    {
-        icon: <ChatBubbleLeftEllipsisIcon width={16} height={16} />,
-        title: 'Share your feedback',
-        description: 'Help us improve our datasets and platform.',
-        action: 'Leave feedback',
-        onClick: () =>
-            window.open(
-                'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
-                '_blank',
-                'noopener,noreferrer'
-            ),
-    },
-    {
-        icon: <UserIcon width={16} height={16} />,
-        title: 'Take part in research',
-        description: 'Sign up to take part in upcoming research to improve the Data Explorer.',
-        action: 'Sign up',
-        onClick: () =>
-            window.open(
-                'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
-                '_blank',
-                'noopener,noreferrer'
-            ),
-    },
-];
+import { useDirectDownload } from './useDirectDownload';
 
 type ConfirmationStepProps = {
     selectedResources: Resource[];
     totalSelectedBytes: number;
+    datasetName: string;
     onBack: () => void;
     onClose: () => void;
 };
@@ -67,10 +31,58 @@ type ConfirmationStepProps = {
 function ConfirmationStep({
     selectedResources,
     totalSelectedBytes,
+    datasetName,
     onBack,
     onClose,
 }: ConfirmationStepProps) {
     const selectedCount = selectedResources.length;
+    const { download } = useDirectDownload(datasetName);
+
+    useEffect(() => {
+        void download(selectedResources);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const whatsNextItems = [
+        {
+            icon: <DocumentIcon width={16} height={16} />,
+            title: 'View this dataset',
+            description: 'Return to the dataset to explore more details.',
+            action: 'View dataset',
+            onClick: onClose,
+        },
+        {
+            icon: <CodeBracketSquareIcon width={16} height={16} />,
+            title: 'Access via API',
+            description: 'Integrate this data into your tools and workflows.',
+            action: 'View API options',
+        },
+        {
+            icon: <ChatBubbleLeftEllipsisIcon width={16} height={16} />,
+            title: 'Share your feedback',
+            description: 'Help us improve our datasets and platform.',
+            action: 'Leave feedback',
+            onClick: () =>
+                window.open(
+                    'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
+                    '_blank',
+                    'noopener,noreferrer'
+                ),
+        },
+        {
+            icon: <UserIcon width={16} height={16} />,
+            title: 'Take part in research',
+            description: 'Sign up to take part in upcoming research to improve the Data Explorer.',
+            action: 'Sign up',
+            onClick: () =>
+                window.open(
+                    'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
+                    '_blank',
+                    'noopener,noreferrer'
+                ),
+        },
+    ];
+
     const getResourceDescription = (resource: Resource) => {
         const description = resource.description?.trim() ?? '';
         if (description) {
@@ -86,6 +98,7 @@ function ConfirmationStep({
                 variant="direct"
                 fileCount={selectedCount}
                 fileSize={formatFileSize(totalSelectedBytes)}
+                onRetry={() => void download(selectedResources)}
             />
 
             {/* What's included */}

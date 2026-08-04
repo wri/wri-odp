@@ -14,9 +14,16 @@ type DownloadStartedBannerProps = {
     fileCount: number;
     fileSize: string;
     email?: string;
+    onRetry?: () => void;
 };
 
-function DownloadStartedBanner({ variant, fileCount, fileSize, email }: DownloadStartedBannerProps) {
+function DownloadStartedBanner({
+    variant,
+    fileCount,
+    fileSize,
+    email,
+    onRetry,
+}: DownloadStartedBannerProps) {
     const sharedContainerStyle = {
         border: `1px solid ${getThemedColor('secondary', 200)}`,
         borderRadius: getThemedRadius(300),
@@ -174,7 +181,7 @@ function DownloadStartedBanner({ variant, fileCount, fileSize, email }: Download
                     size="small"
                     leftIcon={<ArrowPathIcon />}
                     style={{ marginTop: getThemedSpacing(400) }}
-                    onClick={() => console.log('retry')}
+                    onClick={onRetry}
                 >
                     Retry download
                 </Button>
