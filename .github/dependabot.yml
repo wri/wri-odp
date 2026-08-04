@@ -59,6 +59,11 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "pip"
     directory: "/ckan-backend-dev"
@@ -69,6 +74,11 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "pip"
     directory: "/migration"
@@ -79,6 +89,11 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "pip"
     directory: "/load-testing"
@@ -89,6 +104,11 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "pip"
     directory: "/prefect-server/jobs/datapusher"
@@ -99,6 +119,11 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "pip"
     directory: "/ckan-backend-dev/src/ckanext-wri"
@@ -111,6 +136,11 @@ updates:
           - "version-update:semver-major"
       - dependency-name: "numpy"
         versions: [">=2.0.0"]
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "pip"
     directory: "/ckanext-wri"
@@ -123,6 +153,11 @@ updates:
           - "version-update:semver-major"
       - dependency-name: "numpy"
         versions: [">=2.0.0"]
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "pip"
     directory: "/scripts/cost-splitting"
@@ -133,6 +168,11 @@ updates:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   # Docker
   - package-ecosystem: "docker"
