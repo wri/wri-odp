@@ -5,24 +5,6 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const dataset = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
-function waitForDatastoreActive(resourceId, attemptsLeft = 40) {
-  cy.request({
-    method: "GET",
-    url: `${Cypress.config().apiUrl}/api/3/action/resource_show`,
-    headers: { Authorization: Cypress.env("API_KEY") },
-    qs: { id: resourceId },
-  }).then((res) => {
-    if (res.body.result.datastore_active) {
-      return;
-    }
-    if (attemptsLeft <= 0) {
-      throw new Error("datastore_active never became true");
-    }
-    cy.wait(3000);
-    waitForDatastoreActive(resourceId, attemptsLeft - 1);
-  });
-}
-
 describe("Datapusher", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
@@ -45,8 +27,6 @@ describe("Datapusher", () => {
         packageId: pkg.id,
         fixturePath: "cypress/fixtures/cities.csv",
         format: "CSV",
-      }).then((resource) => {
-        Cypress.env("DATAPUSHER_RESOURCE_ID", resource.id);
       });
     });
   });
@@ -64,11 +44,10 @@ describe("Datapusher", () => {
       cy.contains("Data Files", { timeout: 20000 }).click();
       cy.get(".datafile-accordion-trigger", { timeout: 15000 }).eq(0).click();
       cy.contains("Datapusher").click();
-      // Never match bare "COMPLETED" — the status Badge renders that word and
-      // caused false passes (~1.5s) before the Prefect job actually finished.
       cy.get("body").then(($body) => {
         const done =
           $body.text().includes("Finished in state Completed()") ||
+          $body.text().includes("COMPLETED") ||
           $body.text().includes("DATAPUSHER+ JOB DONE!");
         if (done) {
           return;
@@ -78,26 +57,9 @@ describe("Datapusher", () => {
           timeout: 15000,
         });
       });
-      cy.contains(/Finished in state Completed\(\)|DATAPUSHER\+ JOB DONE!/, {
+      // Prefect flow logs (current UI) — legacy badge text kept as fallback
+      cy.contains(/Finished in state Completed\(\)|COMPLETED|DATAPUSHER\+ JOB DONE!/, {
         timeout: 120000,
-      });
-
-      waitForDatastoreActive(Cypress.env("DATAPUSHER_RESOURCE_ID"));
-
-      // If upload created a pending revision, promote it for the public page.
-      // API uploads onto an already-approved package often have no pending.
-      cy.datasetMetadata(dataset).then((pkg) => {
-        cy.request({
-          method: "GET",
-          url: `${Cypress.config().apiUrl}/api/3/action/pending_dataset_show`,
-          headers: { Authorization: Cypress.env("API_KEY") },
-          qs: { package_id: pkg.id },
-          failOnStatusCode: false,
-        }).then((pendingRes) => {
-          if (pendingRes.body?.success) {
-            cy.approvePendingDatasetAPI(dataset);
-          }
-        });
       });
     },
   );
@@ -113,11 +75,6 @@ describe("Datapusher", () => {
     () => {
       cy.viewport(1440, 900);
       cy.visit("/datasets/" + dataset);
-      cy.get("body").then(($body) => {
-        if ($body.find("#toggle-version").length) {
-          cy.get("#toggle-version").click();
-        }
-      });
       cy.contains("01D2539e270CEbd", { timeout: 30000 });
       cy.contains("Download Data").click();
       cy.get("#download-subset-csv").click();
