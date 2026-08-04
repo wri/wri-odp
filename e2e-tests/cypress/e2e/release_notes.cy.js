@@ -1,8 +1,3 @@
-const ckanUserName = Cypress.env("CKAN_USERNAME");
-const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
-const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
-const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
-
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
@@ -28,7 +23,7 @@ describe("Release notes", () => {
     "should be optional when creating a dataset",
     {
       retries: {
-        runMode: 5,
+        runMode: 2,
         openMode: 0,
       },
     },
@@ -67,8 +62,9 @@ describe("Release notes", () => {
       cy.contains("Next: Map Visualizations").click();
       cy.contains("Next: Preview").click();
       cy.get('button[type="submit"]').click();
-      cy.wait(5000);
-      cy.contains(dataset);
+      cy.contains(`Successfully created the "${dataset}" Dataset`, {
+        timeout: 20000,
+      });
 
       cy.visit(`/datasets/${dataset}`);
       cy.contains("Related Datasets", { timeout: 10000 });
@@ -82,7 +78,7 @@ describe("Release notes", () => {
     "can be set when dataset has pending approval 1",
     {
       retries: {
-        runMode: 5,
+        runMode: 2,
         openMode: 0,
       },
     },
@@ -106,7 +102,7 @@ describe("Release notes", () => {
     "can be set when dataset has pending approval 2",
     {
       retries: {
-        runMode: 5,
+        runMode: 2,
         openMode: 0,
       },
     },
@@ -117,8 +113,10 @@ describe("Release notes", () => {
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
       cy.contains("Testing release notes", { timeout: 60000 });
       cy.contains("Approve request").click({ force: true });
-      cy.contains("Approve Dataset").click({ force: true });
-      cy.wait(5000);
+      cy.contains("button", "Approve Dataset", { timeout: 15000 }).click({
+        force: true,
+      });
+      // Outcome verified by the following "are shown on dataset page" test.
     },
   );
 
@@ -126,12 +124,11 @@ describe("Release notes", () => {
     "are shown on dataset page",
     {
       retries: {
-        runMode: 5,
+        runMode: 2,
         openMode: 0,
       },
     },
     () => {
-      cy.visit(`/datasets/${dataset}`);
       cy.visit(`/datasets/${dataset}`);
       cy.contains("Related Datasets", { timeout: 10000 });
       cy.contains("Collaborators", { timeout: 50000 });
@@ -141,8 +138,28 @@ describe("Release notes", () => {
   );
 
   after(() => {
-    cy.deleteDatasetAPI(dataset);
-    cy.deleteGroupAPI(topic);
-    cy.deleteOrganizationAPI(org);
+    const api = `${Cypress.config().apiUrl}/api/3/action`;
+    const headers = { Authorization: Cypress.env("API_KEY") };
+    cy.request({
+      method: "POST",
+      url: `${api}/package_delete`,
+      headers,
+      body: { id: dataset },
+      failOnStatusCode: false,
+    });
+    cy.request({
+      method: "POST",
+      url: `${api}/group_delete`,
+      headers,
+      body: { id: topic },
+      failOnStatusCode: false,
+    });
+    cy.request({
+      method: "POST",
+      url: `${api}/organization_delete`,
+      headers,
+      body: { id: org },
+      failOnStatusCode: false,
+    });
   });
 });
