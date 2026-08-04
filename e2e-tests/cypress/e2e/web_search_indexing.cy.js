@@ -2,7 +2,7 @@ describe(
   "Meta Robots Tag Test",
   {
     retries: {
-      runMode: 5,
+      runMode: 2,
       openMode: 0,
     },
   },

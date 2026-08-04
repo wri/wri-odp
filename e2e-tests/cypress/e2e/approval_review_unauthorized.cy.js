@@ -133,7 +133,7 @@ describe("Approval Review without team authorization (?approval=true)", () => {
   it(
     "control: authorized sysadmin sees Approve/Reject AND change highlights on Team B dataset",
     {
-      retries: { runMode: 3, openMode: 0 },
+      retries: { runMode: 2, openMode: 0 },
     },
     () => {
       cy.login(ckanUserName, ckanUserPassword);
@@ -147,11 +147,12 @@ describe("Approval Review without team authorization (?approval=true)", () => {
   it(
     "control: Team A Admin sees Approve/Reject AND change highlights on Team A dataset",
     {
-      retries: { runMode: 3, openMode: 0 },
+      retries: { runMode: 2, openMode: 0 },
     },
     () => {
       cy.clearCookies();
       cy.clearLocalStorage();
+      Cypress.session.clearAllSavedSessions();
       cy.login(reviewer, reviewerPassword);
       cy.viewport(1920, 1080);
 
@@ -163,12 +164,13 @@ describe("Approval Review without team authorization (?approval=true)", () => {
   it(
     "Team A Admin on Team B dataset via ?approval=true gets neither Approve/Reject nor change highlights",
     {
-      retries: { runMode: 3, openMode: 0 },
+      retries: { runMode: 2, openMode: 0 },
     },
     () => {
       // Clear session without UI signOut (NEXTAUTH_URL=wri-frontend breaks browser redirects)
       cy.clearCookies();
       cy.clearLocalStorage();
+      Cypress.session.clearAllSavedSessions();
       cy.login(reviewer, reviewerPassword);
       cy.viewport(1920, 1080);
 

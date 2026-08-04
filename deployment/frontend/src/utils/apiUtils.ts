@@ -2439,29 +2439,36 @@ export async function approvePendingDataset(
         throw Error(JSON.stringify(issues.error));
     }
 
+    // ckanext-issues requires a description when transitioning to closed.
     await Promise.all(
-        issues.result.results.map(async (issue) => {
-            const inputData = {
-                issue_number: issue.number,
-                dataset_id: dataset.result.id,
-                status: 'closed',
-            };
-            const response = await fetch(
-                `${env.CKAN_URL}/api/3/action/issue_update`,
-                {
-                    method: 'POST',
-                    body: JSON.stringify(inputData),
-                    headers: {
-                        Authorization: session.user.apikey,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+        issues.result.results
+            .filter((issue) => issue.status !== 'closed')
+            .map(async (issue) => {
+                const inputData = {
+                    issue_number: issue.number,
+                    dataset_id: dataset.result.id,
+                    status: 'closed',
+                    description:
+                        issue.description ||
+                        'Closed automatically on dataset approval',
+                };
+                const response = await fetch(
+                    `${env.CKAN_URL}/api/3/action/issue_update`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(inputData),
+                        headers: {
+                            Authorization: session.user.apikey,
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
 
-            const data = (await response.json()) as CkanResponse<null>;
-            if (!data.success && data.error) throw Error(data.error.message);
-            return issue;
-        })
+                const data = (await response.json()) as CkanResponse<null>;
+                if (!data.success && data.error)
+                    throw Error(data.error.message);
+                return issue;
+            })
     );
 
     if (!['private', 'draft'].includes(dataset.result.visibility_type)) {
