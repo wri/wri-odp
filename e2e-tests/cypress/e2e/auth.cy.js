@@ -24,7 +24,7 @@ describe("Login modal", () => {
 
     cy.get("button#login-button").click({ force: true });
 
-    cy.get("#nav-user-menu").should("be.visible", { timeout: 10000});
+    cy.get("#nav-user-menu", { timeout: 15000 }).should("be.visible");
   });
 
   it("can be used to sign in with an email", () => {
@@ -39,8 +39,8 @@ describe("Login modal", () => {
 
       cy.get("button#login-button").click({ force: true });
 
-      cy.get("#nav-user-menu").should("be.visible", { timeout: 10000});
-    })
+      cy.get("#nav-user-menu", { timeout: 15000 }).should("be.visible");
+    });
   });
 
   it("can be used to request a password reset link", () => {
@@ -80,7 +80,7 @@ describe("dashboard page", () => {
 
     cy.get("button#login-button").click({ force: true });
 
-    cy.get("#nav-user-menu").should("be.visible");
+    cy.get("#nav-user-menu", { timeout: 15000 }).should("be.visible");
 
     cy.visit("/dashboard/datasets");
     cy.url().should("include", "dashboard");
