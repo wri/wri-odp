@@ -79,8 +79,7 @@ Cypress.Commands.add("login", (username, password) => {
     cy.get("@login-modal").get('input[name="password"]').type(password);
 
     cy.get("button#login-button").click({ force: true });
-    cy.wait(9000);
-    cy.get("#nav-user-menu").should("be.visible");
+    cy.get("#nav-user-menu", { timeout: 30000 }).should("be.visible");
   });
 });
 
@@ -484,25 +483,49 @@ Cypress.Commands.add("facetFilter", (facetType, facetValue) => {
 });
 
 Cypress.Commands.add("prepareFile", (dataset, file, format) => {
-  cy.fixture(`${file}`, "binary")
-    .then(Cypress.Blob.binaryStringToBlob)
-    .then((blob) => {
-      var data = new FormData();
-      data.append("package_id", `${dataset}`);
-      data.append("name", `${file}`);
-      data.append("format", `${format}`);
-      data.append(
-        "description",
-        "Lorem Ipsum is simply dummy text of the printing and type"
-      );
-      data.append("upload", blob, `${file}`);
-      var xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-      xhr.open("POST", apiUrl("resource_create"));
-      xhr.setRequestHeader("Authorization", headers.Authorization);
-      xhr.send(data);
-    });
+  return cy.fixture(`${file}`, "binary").then((binary) => {
+    const blob = Cypress.Blob.binaryStringToBlob(binary);
+    const data = new FormData();
+    data.append("package_id", `${dataset}`);
+    data.append("name", `${file}`);
+    data.append("format", `${format}`);
+    data.append(
+      "description",
+      "Lorem Ipsum is simply dummy text of the printing and type"
+    );
+    data.append("upload", blob, `${file}`);
+    return cy.window().then(
+      () =>
+        new Cypress.Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.withCredentials = true;
+          xhr.open("POST", apiUrl("resource_create"));
+          xhr.setRequestHeader("Authorization", headers.Authorization);
+          xhr.onload = () => {
+            let body = {};
+            try {
+              body = JSON.parse(xhr.responseText || "{}");
+            } catch (e) {
+              /* ignore */
+            }
+            if (xhr.status >= 200 && xhr.status < 300 && body.success !== false) {
+              resolve(body);
+            } else {
+              reject(
+                new Error(
+                  `resource_create failed: ${xhr.status} ${xhr.responseText}`
+                )
+              );
+            }
+          };
+          xhr.onerror = () =>
+            reject(new Error("resource_create network error"));
+          xhr.send(data);
+        })
+    );
+  });
 });
+
 
 Cypress.Commands.add("datasetMetadata", (dataset) => {
   return cy

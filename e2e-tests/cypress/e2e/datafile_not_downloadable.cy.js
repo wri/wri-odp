@@ -1,11 +1,8 @@
 const ckanUserName = Cypress.env("CKAN_USERNAME");
 const ckanUserPassword = Cypress.env("CKAN_PASSWORD");
-const orgSuffix = Cypress.env("ORG_NAME_SUFFIX");
-const datasetSuffix = Cypress.env("DATASET_NAME_SUFFIX");
 
 const uuid = () => Math.random().toString(36).slice(2) + "-test";
 
-const parentOrg = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const datasetName = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
@@ -19,10 +16,10 @@ describe("Data File not downloadable", () => {
   });
 
   it(
-    "can be specified when creating a new data file",
+    "can be specified when creating a new data file and viewed on the dataset",
     {
       retries: {
-        runMode: 5,
+        runMode: 2,
         openMode: 0,
       },
     },
@@ -77,18 +74,7 @@ describe("Data File not downloadable", () => {
       cy.contains(`Successfully created the "${datasetName}" Dataset`, {
         timeout: 20000,
       });
-    },
-  );
 
-  it(
-    "can be viewed on the data files section for a dataset",
-    {
-      retries: {
-        runMode: 5,
-        openMode: 0,
-      },
-    },
-    () => {
       cy.visit(`/datasets/${datasetName}`);
       cy.contains("Not downloadable file").click();
       cy.contains("Access the Data");
@@ -96,4 +82,23 @@ describe("Data File not downloadable", () => {
       cy.contains("Download");
     },
   );
+
+  after(() => {
+    const api = `${Cypress.config().apiUrl}/api/3/action`;
+    const headers = { Authorization: Cypress.env("API_KEY") };
+    cy.request({
+      method: "POST",
+      url: `${api}/package_delete`,
+      headers,
+      body: { id: datasetName },
+      failOnStatusCode: false,
+    });
+    cy.request({
+      method: "POST",
+      url: `${api}/organization_delete`,
+      headers,
+      body: { id: org },
+      failOnStatusCode: false,
+    });
+  });
 });
