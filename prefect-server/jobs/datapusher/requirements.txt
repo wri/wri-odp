@@ -1,4 +1,4 @@
-prefect>=3.8.0,<4
+prefect>=3.8.1,<4
 pathlib==1.0.1
 semver==3.0.4
 pydantic==2.13.4
