@@ -6,36 +6,26 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { AddLayer } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection';
 import SortableList, { SortableItem } from 'react-easy-sort';
+import {
+    isLayerResource,
+    reorderResourceSubset,
+} from '@/utils/datasetResources';
 
 export function EditRwSection({
     formObj,
 }: {
     formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { control, watch } = formObj;
-    const { fields, append, remove, swap } =
+    const { control, watch, getValues } = formObj;
+    const { fields, append, remove, replace } =
         useFieldArray({
-            control, // control props comes from useForm (optional: if you are using FormContext)
+            control,
             name: 'resources',
         });
 
-    const layers = fields.filter(
-        (r) =>
-            r.type !== 'upload' &&
-            r.type !== 'link' &&
-            r.type !== 'empty-file' &&
-            r.type !== 'tile-cache' &&
-            r.type !== 'gee-asset'
-    );
-
-    const notLayers = fields.filter(
-        (r) =>
-            r.type === 'upload' ||
-            r.type === 'link' ||
-            r.type === 'empty-file' ||
-            r.type === 'tile-cache' ||
-            r.type === 'gee-asset'
-    );
+    const layers = fields
+        .map((field, absoluteIndex) => ({ field, absoluteIndex }))
+        .filter(({ field }) => isLayerResource(field));
 
     return (
         <>
@@ -56,27 +46,31 @@ export function EditRwSection({
             </div>
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
-                    swap(oldIdx, newIdx);
+                    replace(
+                        reorderResourceSubset(
+                            getValues('resources'),
+                            isLayerResource,
+                            oldIdx,
+                            newIdx
+                        )
+                    );
                 }}
                 className="list"
                 lockAxis="y"
                 draggedItemClassName="dragged"
             >
-                {layers.map((field, index) => {
-                    index += notLayers.length;
-                    return (
-                        <SortableItem key={field.id}>
-                            <div>
-                                <AddLayer
-                                    index={index}
-                                    field={field}
-                                    remove={() => remove(index)}
-                                    formObj={formObj}
-                                />
-                            </div>
-                        </SortableItem>
-                    );
-                })}
+                {layers.map(({ field, absoluteIndex }) => (
+                    <SortableItem key={field.id}>
+                        <div>
+                            <AddLayer
+                                index={absoluteIndex}
+                                field={field}
+                                remove={() => remove(absoluteIndex)}
+                                formObj={formObj}
+                            />
+                        </div>
+                    </SortableItem>
+                ))}
             </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button

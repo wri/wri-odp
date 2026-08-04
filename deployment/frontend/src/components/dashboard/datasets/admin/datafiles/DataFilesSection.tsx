@@ -8,6 +8,11 @@ import { AddDataFile } from './AddDataFile';
 import { EditDataFile } from './EditDataFile';
 import { type WriDataset } from '@/schema/ckan.schema';
 import SortableList, { SortableItem } from 'react-easy-sort';
+import {
+    getResourceIndices,
+    isDataFileResource,
+    reorderResourceSubset,
+} from '@/utils/datasetResources';
 
 export function DataFilesSection({
     formObj,
@@ -16,19 +21,16 @@ export function DataFilesSection({
     formObj: UseFormReturn<DatasetFormType>;
     dataset?: WriDataset;
 }) {
-    const { control, watch } = formObj;
-    const { fields, remove, swap, insert } =
+    const { control, watch, getValues } = formObj;
+    const { fields, remove, replace, insert } =
         useFieldArray({
             control,
             name: 'resources',
         });
 
-    const datafiles = fields.filter(
-        (r) =>
-            r.type !== 'layer' &&
-            r.type !== 'layer-raw' &&
-            r.type !== 'empty-layer'
-    );
+    const datafiles = fields
+        .map((field, absoluteIndex) => ({ field, absoluteIndex }))
+        .filter(({ field }) => isDataFileResource(field));
 
     const isEditMode = !!dataset;
 
@@ -36,31 +38,38 @@ export function DataFilesSection({
         <>
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
-                    swap(oldIdx, newIdx);
+                    replace(
+                        reorderResourceSubset(
+                            getValues('resources'),
+                            isDataFileResource,
+                            oldIdx,
+                            newIdx
+                        )
+                    );
                 }}
                 className="list"
                 lockAxis="y"
                 draggedItemClassName="dragged"
             >
-                {datafiles.map((field, index) => {
+                {datafiles.map(({ field, absoluteIndex }) => {
                     const isNew = !isEditMode || field.new;
                     return (
                         <SortableItem key={field.id}>
                             <div>
                                 {isNew ? (
                                     <AddDataFile
-                                        key={index}
-                                        index={index}
+                                        key={absoluteIndex}
+                                        index={absoluteIndex}
                                         field={field}
-                                        remove={() => remove(index)}
+                                        remove={() => remove(absoluteIndex)}
                                         formObj={formObj}
                                     />
                                 ) : (
                                     <EditDataFile
-                                        key={index}
-                                        index={index}
+                                        key={absoluteIndex}
+                                        index={absoluteIndex}
                                         field={field}
-                                        remove={() => remove(index)}
+                                        remove={() => remove(absoluteIndex)}
                                         formObj={formObj}
                                         dataset={dataset}
                                     />
@@ -72,8 +81,15 @@ export function DataFilesSection({
             </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
-                    onClick={() =>
-                        insert(datafiles.length, {
+                    onClick={() => {
+                        const datafileIndices = getResourceIndices(
+                            fields,
+                            isDataFileResource
+                        );
+                        const insertAt = datafileIndices.length
+                            ? datafileIndices[datafileIndices.length - 1]! + 1
+                            : 0;
+                        insert(insertAt, {
                             resourceId: uuidv4(),
                             ...(isEditMode
                                 ? { package_id: watch('id'), new: true }
@@ -83,8 +99,8 @@ export function DataFilesSection({
                             format: '',
                             not_downloadable: false,
                             schema: [],
-                        })
-                    }
+                        });
+                    }}
                     className="ml-auto flex items-center justify-end gap-x-1"
                 >
                     <PlusCircleIcon className="h-5 w-5 text-amber-400" />
@@ -96,4 +112,3 @@ export function DataFilesSection({
         </>
     );
 }
-

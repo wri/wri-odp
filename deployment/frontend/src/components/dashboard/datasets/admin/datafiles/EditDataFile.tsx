@@ -37,6 +37,11 @@ import { TileCacheForm } from './sections/TileCacheForm';
 import { GeeAssetForm } from './sections/GeeAssetForm';
 import { DataApiDatasetForm } from './sections/DataApiDatasetForm';
 import { RectangleGroupIcon } from '@heroicons/react/24/outline';
+import {
+    getResourceOrdinal,
+    isDataFileResource,
+    isLayerResource,
+} from '@/utils/datasetResources';
 
 export function EditDataFile({
     remove,
@@ -58,30 +63,11 @@ export function EditDataFile({
     } = formObj;
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const allDataFiles = watch('resources');
-    const notLayers = allDataFiles.filter(
-        (datafile) =>
-            datafile.type === 'upload' ||
-            datafile.type === 'link' ||
-            datafile.type === 'empty-file' ||
-            datafile.type === 'tile-cache' ||
-            datafile.type === 'gee-asset' ||
-            datafile.type === 'data-api-dataset'
-    );
-    const notLayersCount = notLayers.length ?? 0;
-
     const datafile = watch(`resources.${index}`);
 
-    const isLayer =
-        datafile.type !== 'upload' &&
-        datafile.type !== 'link' &&
-        datafile.type !== 'empty-file' &&
-        datafile.type !== 'tile-cache' &&
-        datafile.type !== 'gee-asset' &&
-        datafile.type !== 'data-api-dataset';
-
-    const heading = isLayer
-        ? `Layer ${index + 1 - notLayersCount}`
-        : `Data File ${index + 1}`;
+    const heading = isLayerResource(datafile)
+        ? `Layer ${getResourceOrdinal(allDataFiles, index, isLayerResource)}`
+        : `Data File ${getResourceOrdinal(allDataFiles, index, isDataFileResource)}`;
 
     return (
         <>
