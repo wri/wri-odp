@@ -61,9 +61,6 @@ describe("Datapusher", () => {
       cy.contains(/Finished in state Completed\(\)|COMPLETED|DATAPUSHER\+ JOB DONE!/, {
         timeout: 120000,
       });
-      // Promote the pending revision (resource + datastore) so the public
-      // dataset page shows the tabular preview without needing the version toggle.
-      cy.approvePendingDatasetAPI(dataset);
     },
   );
 
