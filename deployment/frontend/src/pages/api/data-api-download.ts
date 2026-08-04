@@ -1,5 +1,6 @@
 import { type NextApiRequest, type NextApiResponse } from 'next';
 import { env } from '@/env.mjs';
+import { Readable } from 'stream';
 
 export default async function handler(
     req: NextApiRequest,
@@ -37,7 +38,20 @@ export default async function handler(
     const upstream = `https://data-api.globalforestwatch.org/dataset/${encodeURIComponent(String(dataset))}/${encodeURIComponent(String(version))}/download/${encodeURIComponent(String(format))}?${params.toString()}`;
 
     try {
-        const upstreamRes = await fetch(upstream, { redirect: 'follow' });
+        // GFW returns 307 to a signed S3/CDN URL. Do not follow it here —
+        // buffering the GeoTIFF through Next idle-times out (~60s) with 502.
+        // Pass the Location through so the browser downloads directly.
+        const upstreamRes = await fetch(upstream, { redirect: 'manual' });
+
+        if (upstreamRes.status >= 300 && upstreamRes.status < 400) {
+            const location = upstreamRes.headers.get('location');
+            if (!location) {
+                return res
+                    .status(502)
+                    .json({ error: 'Upstream redirect missing Location' });
+            }
+            return res.redirect(307, location);
+        }
 
         if (!upstreamRes.ok) {
             const text = await upstreamRes.text().catch(() => '');
@@ -46,6 +60,7 @@ export default async function handler(
                 .json({ error: text || upstreamRes.statusText });
         }
 
+        // Rare non-redirect success: stream instead of buffering the whole file.
         const contentType = upstreamRes.headers.get('content-type');
         const contentDisposition = upstreamRes.headers.get(
             'content-disposition'
@@ -61,8 +76,12 @@ export default async function handler(
             contentDisposition ?? `attachment; filename="${filename}"`
         );
 
-        const buffer = Buffer.from(await upstreamRes.arrayBuffer());
-        return res.send(buffer);
+        if (!upstreamRes.body) {
+            return res.status(502).json({ error: 'Upstream returned empty body' });
+        }
+
+        // @ts-expect-error Node Readable.fromWeb accepts the fetch body stream
+        Readable.fromWeb(upstreamRes.body).pipe(res);
     } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
         return res.status(502).json({ error: `Upstream error: ${message}` });
