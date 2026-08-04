@@ -27,6 +27,10 @@ import { type Field } from 'tableschema';
 import { TileCacheForm } from './sections/TileCacheForm';
 import { GeeAssetForm } from './sections/GeeAssetForm';
 import { DataApiDatasetForm } from './sections/DataApiDatasetForm';
+import {
+    getResourceOrdinal,
+    isDataFileResource,
+} from '@/utils/datasetResources';
 
 export function AddDataFile({
     remove,
@@ -41,6 +45,11 @@ export function AddDataFile({
 }) {
     const { setValue, watch } = formObj;
     const datafile = watch(`resources.${index}`);
+    const dataFileNumber = getResourceOrdinal(
+        watch('resources') ?? [],
+        index,
+        isDataFileResource
+    );
     const canRemove = !datafile?.isUploading;
     const uploadInputRef = useRef<HTMLInputElement>(null);
     // Stores the S3 key returned by sign-s3 BEFORE the upload completes.
@@ -213,7 +222,7 @@ export function AddDataFile({
             <DataFileAccordion
                 remove={canRemove ? handleRemove : () => undefined}
                 icon={<FolderPlusIcon className="h-7 w-7" />}
-                title={`Data File ${index + 1}`}
+                title={`Data File ${dataFileNumber}`}
                 id={`datafile-accordion-${datafile.id}`}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">

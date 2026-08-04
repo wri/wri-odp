@@ -36,6 +36,7 @@ import { LocationForm } from './metadata/LocationForm';
 import { EditRwSection } from './datafiles/EditRwSection';
 import { VersioningForm } from './metadata/VersioningForm';
 import { ErrorMessage } from '@hookform/error-message';
+import { isLayerResource } from '@/utils/datasetResources';
 
 function getDiff<T>(dirtyObject: T, changedFields: string[]) {
     for (const key in dirtyObject) {
@@ -116,27 +117,14 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         .otherwise(() => false);
 
     const resourceForm = dataset.resources.sort((a, b) => {
-        const isLayer = (r: any) =>
-            r.type === 'layer' ||
-            r.type === 'layer-raw' ||
-            r.type === 'empty-layer';
+        const isALayer = isLayerResource(a);
+        const isBLayer = isLayerResource(b);
 
-        const isALayer = isLayer(a);
-        const isBLayer = isLayer(b);
-
-        if (isALayer && isBLayer) {
+        if (isALayer === isBLayer) {
             return 0;
         }
 
-        if (!isALayer && isBLayer) {
-            return -1;
-        }
-
-        if (isALayer && !isBLayer) {
-            return 1;
-        }
-
-        return 0;
+        return isALayer ? 1 : -1;
     }) as unknown as ResourceFormType[];
 
     const formObj = useForm<DatasetFormType>({

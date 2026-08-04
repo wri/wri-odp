@@ -20,36 +20,27 @@ import { BuildALayerRaw } from './sections/BuildALayer/BuildALayerRawSection';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import SortableList, { SortableItem } from 'react-easy-sort';
 import DerivedLayerForm from './sections/BuildALayer/forms/DerivedLayerForm';
+import {
+    getResourceOrdinal,
+    isLayerResource,
+    reorderResourceSubset,
+} from '@/utils/datasetResources';
 
 export function CreateLayersSection({
     formObj,
 }: {
     formObj: UseFormReturn<DatasetFormType>;
 }) {
-    const { control } = formObj;
-    const { fields, append, remove, swap } =
+    const { control, getValues } = formObj;
+    const { fields, append, remove, replace } =
         useFieldArray({
             control, // control props comes from useForm (optional: if you are using FormContext)
             name: 'resources',
         });
 
-    const layers = fields.filter(
-        (r) =>
-            r.type !== 'upload' &&
-            r.type !== 'link' &&
-            r.type !== 'empty-file' &&
-            r.type !== 'tile-cache' &&
-            r.type !== 'gee-asset'
-    );
-
-    const notLayers = fields.filter(
-        (r) =>
-            r.type === 'upload' ||
-            r.type === 'link' ||
-            r.type === 'empty-file' ||
-            r.type === 'tile-cache' ||
-            r.type === 'gee-asset'
-    );
+    const layers = fields
+        .map((field, absoluteIndex) => ({ field, absoluteIndex }))
+        .filter(({ field }) => isLayerResource(field));
 
     return (
         <>
@@ -70,27 +61,31 @@ export function CreateLayersSection({
             </div>
             <SortableList
                 onSortEnd={(oldIdx, newIdx) => {
-                    swap(oldIdx, newIdx);
+                    replace(
+                        reorderResourceSubset(
+                            getValues('resources'),
+                            isLayerResource,
+                            oldIdx,
+                            newIdx
+                        )
+                    );
                 }}
                 className="list"
                 lockAxis="y"
                 draggedItemClassName="dragged"
             >
-                {layers.map((field, index) => {
-                    index += notLayers.length;
-                    return (
-                        <SortableItem key={field.id}>
-                            <div>
-                                <AddLayer
-                                    index={index}
-                                    field={field}
-                                    remove={() => remove(index)}
-                                    formObj={formObj}
-                                />
-                            </div>
-                        </SortableItem>
-                    );
-                })}
+                {layers.map(({ field, absoluteIndex }) => (
+                    <SortableItem key={field.id}>
+                        <div>
+                            <AddLayer
+                                index={absoluteIndex}
+                                field={field}
+                                remove={() => remove(absoluteIndex)}
+                                formObj={formObj}
+                            />
+                        </div>
+                    </SortableItem>
+                ))}
             </SortableList>
             <div className="mx-auto w-full max-w-[1380px] px-4 sm:px-6 xxl:px-0">
                 <button
@@ -130,18 +125,17 @@ export function AddLayer({
 }) {
     const { setValue, watch } = formObj;
     const datafile = watch(`resources.${index}`);
-    const notLayers = watch('resources')?.filter(
-        (r) =>
-            r.type === 'upload' || r.type === 'link' || r.type === 'empty-file'
+    const layerNumber = getResourceOrdinal(
+        watch('resources') ?? [],
+        index,
+        isLayerResource
     );
-
-    const notLayersCount = notLayers?.length ?? 0;
 
     return (
         <>
             <DataFileAccordion
                 icon={<FolderPlusIcon className="h-7 w-7" />}
-                title={`Layer ${index - notLayersCount + 1}`}
+                title={`Layer ${layerNumber}`}
                 remove={remove}
                 preview={
                     <div className="flex items-center justify-between bg-stone-50 px-8 py-3">
