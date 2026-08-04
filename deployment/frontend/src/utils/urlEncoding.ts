@@ -2,9 +2,14 @@ import { type State } from '@/interfaces/state.interface';
 
 export function decodeMapParam(map?: string): State['mapView'] | null {
     if (!map) return null;
-    const decoded = atob(map);
-    const parsed = JSON.parse(decoded) as State['mapView'];
-    return parsed;
+    try {
+        const decoded = atob(map);
+        const parsed = JSON.parse(decoded) as State['mapView'];
+        return parsed;
+    } catch {
+        // Invalid base64 / non-JSON map blobs (bots, corrupted share links)
+        return null;
+    }
 }
 
 export function encodeMapParam(state: Omit<State, 'isDrawing'>): string {
