@@ -61,6 +61,9 @@ describe("Datapusher", () => {
       cy.contains(/Finished in state Completed\(\)|COMPLETED|DATAPUSHER\+ JOB DONE!/, {
         timeout: 120000,
       });
+      // Promote the pending revision (resource + datastore) so the public
+      // dataset page shows the tabular preview without needing the version toggle.
+      cy.approvePendingDatasetAPI(dataset);
     },
   );
 
@@ -75,11 +78,6 @@ describe("Datapusher", () => {
     () => {
       cy.viewport(1440, 900);
       cy.visit("/datasets/" + dataset);
-      cy.get("body").then(($body) => {
-        if ($body.find("#toggle-version").length) {
-          cy.get("#toggle-version").click();
-        }
-      });
       cy.contains("01D2539e270CEbd", { timeout: 30000 });
       cy.contains("Download Data").click();
       cy.get("#download-subset-csv").click();
