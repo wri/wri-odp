@@ -24,6 +24,8 @@ describe("Data File location", () => {
       },
     },
     () => {
+      cy.intercept("**/geocoding/**").as("geocode");
+
       cy.visit("/dashboard/datasets/new");
       cy.get("input[name=title]").type(datasetName);
       cy.get("input[name=name]").should("have.value", datasetName);
@@ -56,13 +58,22 @@ describe("Data File location", () => {
         force: true,
       });
       cy.contains("Choose location").click({ force: true });
+
+      // Mapbox Geocoder is debounce + suggestion list; assert selection via input
+      // value (dropdown text disappears after pick — cy.contains("Brazil") flakes).
       cy.get(".mapboxgl-ctrl-geocoder--input", { timeout: 30000 })
         .should("be.visible")
-        .type("Brazil");
+        .clear()
+        .type("Brazil", { delay: 80 });
+      cy.wait("@geocode", { timeout: 30000 });
       cy.get(".mapboxgl-ctrl-geocoder--suggestion-title", { timeout: 15000 })
+        .contains(/Brazil/i)
         .first()
-        .click();
-      cy.contains("Brazil", { timeout: 15000 }).should("be.visible");
+        .click({ force: true });
+      cy.get(".mapboxgl-ctrl-geocoder--input", { timeout: 15000 })
+        .invoke("val")
+        .should("match", /Brazil/i);
+
       cy.contains("Next: Map Visualizations").click();
       cy.contains("Next: Preview").click();
       cy.get('button[type="submit"]').click();
@@ -71,7 +82,7 @@ describe("Data File location", () => {
       });
 
       cy.visit(`/datasets/${datasetName}`);
-      cy.contains("Brazil");
+      cy.contains(/Brazil/i, { timeout: 20000 });
     },
   );
 

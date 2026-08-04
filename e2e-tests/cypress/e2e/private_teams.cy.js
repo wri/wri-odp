@@ -115,8 +115,15 @@ describe("Create and edit team", () => {
   });
 
   it("should not be possible to view parent", () => {
-    cy.login(ckanUserName, ckanUserPassword);
+    // Private teams remain visible to sysadmins / members. Assert the public catalog.
+    cy.clearCookies();
+    cy.clearLocalStorage();
+    Cypress.session.clearAllSavedSessions();
     cy.visit("/teams");
+    cy.get('input[name="search"]', { timeout: 15000 })
+      .should("be.visible")
+      .clear()
+      .type(parentOrg);
     cy.contains(parentOrg).should("not.exist");
     cy.contains(org).should("not.exist");
   });

@@ -55,17 +55,29 @@ describe("Can add and remove members from teams and topics", () => {
       .type(role.charAt(0) + "{enter}");
   }
 
-  function verifyUserNotified(user, role, userPassword, team) {
+  function verifyUserNotified(user, role, userPassword, entity, entityLabel = "Team") {
     cy.logout();
     cy.login(user, userPassword);
     cy.visit("/dashboard/notifications");
-    cy.contains(ckanUserName);
+    cy.contains(ckanUserName, { timeout: 15000 });
     if (role === "member") {
-      cy.contains(` added you as a member in the Team`);
+      cy.contains(` added you as a member in the ${entityLabel}`);
     } else {
-      cy.contains(` added you as a member (${role}) in the Team`);
+      cy.contains(` added you as a member (${role}) in the ${entityLabel}`);
     }
-    cy.contains(team);
+    cy.contains(entity);
+  }
+
+  function saveTeamEdits(team) {
+    cy.contains("button", "Save").click();
+    cy.contains(`Successfully edited the ${team} Team`, { timeout: 15000 });
+  }
+
+  function saveTopicEdits(topic) {
+    cy.contains("button", "Save").click();
+    cy.contains(`Successfully edited the ${topic} Topic`, {
+      timeout: 15000,
+    });
   }
 
   it("Add admin user to a team", () => {
@@ -74,9 +86,7 @@ describe("Can add and remove members from teams and topics", () => {
 
     addUser(adminUser, "Admin");
 
-    cy.contains("button", "Save").click();
-
-    cy.wait(1000);
+    saveTeamEdits(teamOne);
 
     verifyUserNotified(adminUser, "admin", adminUserPassword, teamOne);
   });
@@ -87,9 +97,7 @@ describe("Can add and remove members from teams and topics", () => {
 
     addUser(editorUser, "Editor");
 
-    cy.contains("button", "Save").click();
-
-    cy.wait(1000);
+    saveTeamEdits(teamOne);
 
     verifyUserNotified(editorUser, "editor", editorUserPassword, teamOne);
   });
@@ -100,9 +108,7 @@ describe("Can add and remove members from teams and topics", () => {
 
     addUser(normalUser, "Member");
 
-    cy.contains("button", "Save").click();
-
-    cy.wait(1000);
+    saveTeamEdits(teamOne);
 
     verifyUserNotified(normalUser, "member", normalUserPassword, teamOne);
   });
@@ -122,7 +128,7 @@ describe("Can add and remove members from teams and topics", () => {
       .focused()
       .type(switchUser + "{enter}");
     cy.get(roleField).last().click().focused().type("M{enter}");
-    cy.contains("button", "Save").click();
+    saveTeamEdits(teamTwo);
 
     cy.visit(`/dashboard/teams/${teamTwo}/edit`);
     cy.contains("Members").click();
@@ -153,14 +159,12 @@ describe("Can add and remove members from teams and topics", () => {
         });
       });
 
-    cy.contains("button", "Save").click();
-
-    cy.wait(1000);
+    saveTeamEdits(teamTwo);
 
     cy.logout();
     cy.login(switchUser, switchUserPassword);
     cy.visit("/dashboard/notifications");
-    cy.contains(ckanUserName);
+    cy.contains(ckanUserName, { timeout: 15000 });
     cy.contains(' updated your member status to "admin" in the Team');
   });
 
@@ -187,7 +191,7 @@ describe("Can add and remove members from teams and topics", () => {
         });
       });
 
-    cy.contains("button", "Save").click();
+    saveTeamEdits(teamTwo);
 
     cy.visit(`/dashboard/teams/${teamTwo}/edit`);
     cy.contains("Members").click();
@@ -213,11 +217,15 @@ describe("Can add and remove members from teams and topics", () => {
 
     addUser(adminUser, "Admin");
 
-    cy.contains("button", "Save").click();
+    saveTopicEdits(topicTwo);
 
-    cy.wait(1000);
-
-    verifyUserNotified(adminUser, "admin", adminUserPassword, topicTwo);
+    verifyUserNotified(
+      adminUser,
+      "admin",
+      adminUserPassword,
+      topicTwo,
+      "Topic",
+    );
   });
 
   it("Add editor user to a topic", () => {
@@ -226,11 +234,15 @@ describe("Can add and remove members from teams and topics", () => {
 
     addUser(editorUser, "Editor");
 
-    cy.contains("button", "Save").click();
+    saveTopicEdits(topicTwo);
 
-    cy.wait(1000);
-
-    verifyUserNotified(editorUser, "editor", editorUserPassword, topicTwo);
+    verifyUserNotified(
+      editorUser,
+      "editor",
+      editorUserPassword,
+      topicTwo,
+      "Topic",
+    );
   });
 
   it("Add normal user to a topic", () => {
@@ -239,11 +251,15 @@ describe("Can add and remove members from teams and topics", () => {
 
     addUser(normalUser, "Member");
 
-    cy.contains("button", "Save").click();
+    saveTopicEdits(topicTwo);
 
-    cy.wait(1000);
-
-    verifyUserNotified(normalUser, "member", normalUserPassword, topicTwo);
+    verifyUserNotified(
+      normalUser,
+      "member",
+      normalUserPassword,
+      topicTwo,
+      "Topic",
+    );
   });
 
   it("Switch topic member roles", () => {
@@ -261,7 +277,7 @@ describe("Can add and remove members from teams and topics", () => {
       .focused()
       .type(switchUser + "{enter}");
     cy.get(roleField).last().click().focused().type("M{enter}");
-    cy.contains("button", "Save").click();
+    saveTopicEdits(topicTwo);
 
     cy.visit(`/dashboard/topics/${topicTwo}/edit`);
     cy.contains("Members").click();
@@ -292,14 +308,12 @@ describe("Can add and remove members from teams and topics", () => {
         });
       });
 
-    cy.contains("button", "Save").click();
-
-    cy.wait(1000);
+    saveTopicEdits(topicTwo);
 
     cy.logout();
     cy.login(switchUser, switchUserPassword);
     cy.visit("/dashboard/notifications");
-    cy.contains(ckanUserName);
+    cy.contains(ckanUserName, { timeout: 15000 });
     cy.contains(' updated your member status to "admin" in the Topic');
   });
 
@@ -326,7 +340,7 @@ describe("Can add and remove members from teams and topics", () => {
         });
       });
 
-    cy.contains("button", "Save").click();
+    saveTopicEdits(topicTwo);
 
     cy.visit(`/dashboard/topics/${topicTwo}/edit`);
     cy.contains("Members").click();
@@ -348,7 +362,7 @@ describe("Can add and remove members from teams and topics", () => {
     cy.logout();
     cy.login(switchUser, switchUserPassword);
     cy.visit("/dashboard/notifications");
-    cy.contains(ckanUserName);
+    cy.contains(ckanUserName, { timeout: 15000 });
     cy.contains(" removed you as a member (admin) from the Topic");
   });
 

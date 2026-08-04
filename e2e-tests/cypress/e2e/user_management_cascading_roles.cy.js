@@ -34,24 +34,35 @@ describe("Assigning Team User Roles", () => {
     cy.createOrganizationMemberAPI(parentOrg, adminUser, "admin");
   });
 
-  beforeEach(function () {
-    cy.login(ckanUserName, ckanUserPassword);
-  });
+  const assertNoEdit = (teamName) => {
+    cy.contains("h2", teamName, { timeout: 15000 });
+    cy.get("#team-header-card", { timeout: 15000 }).should("exist");
+    // Wait for team query to settle, then assert no edit link
+    cy.get("#team-header-card a[href*='/dashboard/teams/'][href$='/edit']", {
+      timeout: 10000,
+    }).should("not.exist");
+  };
+
+  const clickEdit = () =>
+    cy
+      .get("#team-header-card a[href*='/dashboard/teams/'][href$='/edit']", {
+        timeout: 20000,
+      })
+      .first()
+      .click();
 
   it("Should have cascading roles from parent team", () => {
-    cy.logout();
-
     cy.login(memberUser, memberUserPassword);
 
     // Members should not have the edit buttons
     cy.visit(`/teams/${childOrg}`);
-    cy.contains("div", "Edit").should("not.exist");
+    assertNoEdit(childOrg);
 
     cy.visit(`/teams/${grandchildOrg}`);
-    cy.contains("div", "Edit").should("not.exist");
+    assertNoEdit(grandchildOrg);
 
     cy.visit(`/teams/${parentOrg}`);
-    cy.contains("div", "Edit").should("not.exist");
+    assertNoEdit(parentOrg);
 
     cy.logout();
 
@@ -59,78 +70,88 @@ describe("Assigning Team User Roles", () => {
 
     // Editors should not see the edit buttons
     cy.visit(`/teams/${childOrg}`);
-    cy.contains("div", "Edit").should("not.exist");
+    assertNoEdit(childOrg);
 
     cy.visit(`/teams/${grandchildOrg}`);
-    cy.contains("div", "Edit").should("not.exist");
+    assertNoEdit(grandchildOrg);
 
     cy.visit(`/teams/${parentOrg}`);
-    cy.contains("div", "Edit").should("not.exist");
+    assertNoEdit(parentOrg);
 
     cy.logout();
 
     cy.login(adminUser, adminUserPassword);
 
-    // Admins should have the edit buttons
+    // Admins should have the edit buttons (capacity may resolve via parent walk)
     cy.visit(`/teams/${childOrg}`);
-    cy.contains("div", "Edit").should("exist");
-    cy.contains("div", "Edit").click();
-    cy.get("input[name=title]").should("have.value", childOrg);
+    clickEdit();
+    cy.get("input[name=title]", { timeout: 15000 }).should(
+      "have.value",
+      childOrg,
+    );
     cy.get("input[name=title]")
       .clear()
       .type(childOrg + " edited")
       .blur();
     cy.get("button[type=submit]").click();
+    cy.contains(`Successfully edited the ${childOrg} edited Team`, {
+      timeout: 15000,
+    });
 
     cy.visit(`/teams/${childOrg}`);
-    cy.contains("div", "Edit").should("exist");
-    cy.contains("div", "Edit")
-      .click()
-      .then(() => {
-        cy.get("input[name=title]").should("have.value", childOrg + " edited");
-      });
+    clickEdit();
+    cy.get("input[name=title]", { timeout: 15000 }).should(
+      "have.value",
+      childOrg + " edited",
+    );
 
     cy.visit(`/teams/${grandchildOrg}`);
-    cy.contains("div", "Edit").should("exist");
-    cy.contains("div", "Edit").click();
-    cy.get("input[name=title]").should("have.value", grandchildOrg);
+    clickEdit();
+    cy.get("input[name=title]", { timeout: 15000 }).should(
+      "have.value",
+      grandchildOrg,
+    );
     cy.get("input[name=title]")
       .clear()
       .type(grandchildOrg + " edited")
       .blur();
     cy.get("button[type=submit]").click();
+    cy.contains(`Successfully edited the ${grandchildOrg} edited Team`, {
+      timeout: 15000,
+    });
 
     cy.visit(`/teams/${grandchildOrg}`);
-    cy.contains("div", "Edit").should("exist");
-    cy.contains("div", "Edit")
-      .click()
-      .then(() => {
-        cy.get("input[name=title]").should(
-          "have.value",
-          grandchildOrg + " edited"
-        );
-      });
+    clickEdit();
+    cy.get("input[name=title]", { timeout: 15000 }).should(
+      "have.value",
+      grandchildOrg + " edited",
+    );
 
     cy.visit(`/teams/${parentOrg}`);
-    cy.contains("div", "Edit").should("exist");
-    cy.contains("div", "Edit").click();
-    cy.get("input[name=title]").should("have.value", parentOrg);
+    clickEdit();
+    cy.get("input[name=title]", { timeout: 15000 }).should(
+      "have.value",
+      parentOrg,
+    );
     cy.get("input[name=title]")
       .clear()
       .type(parentOrg + " edited")
       .blur();
     cy.get("button[type=submit]").click();
+    cy.contains(`Successfully edited the ${parentOrg} edited Team`, {
+      timeout: 15000,
+    });
 
     cy.visit(`/teams/${parentOrg}`);
-    cy.contains("div", "Edit").should("exist");
-    cy.contains("div", "Edit")
-      .click()
-      .then(() => {
-        cy.get("input[name=title]").should("have.value", parentOrg + " edited");
-      });
+    clickEdit();
+    cy.get("input[name=title]", { timeout: 15000 }).should(
+      "have.value",
+      parentOrg + " edited",
+    );
   });
 
   it("Should have specified roles from Member Management", () => {
+    cy.login(ckanUserName, ckanUserPassword);
     cy.createOrganizationMemberAPI(parentOrg, memberUser, "admin");
     cy.createOrganizationMemberAPI(childOrg, memberUser, "editor");
 
@@ -138,7 +159,7 @@ describe("Assigning Team User Roles", () => {
     cy.contains("div", "Members").click();
     cy.get("span.hidden")
       .filter(
-        (_, el) => el.id.startsWith("members-") && el.id.endsWith("-user")
+        (_, el) => el.id.startsWith("members-") && el.id.endsWith("-user"),
       )
       .filter((_, el) => el.getAttribute("data-value") === memberUser)
       .invoke("attr", "id")
@@ -153,7 +174,7 @@ describe("Assigning Team User Roles", () => {
     cy.contains("div", "Members").click();
     cy.get("span.hidden")
       .filter(
-        (_, el) => el.id.startsWith("members-") && el.id.endsWith("-user")
+        (_, el) => el.id.startsWith("members-") && el.id.endsWith("-user"),
       )
       .filter((_, el) => el.getAttribute("data-value") === memberUser)
       .invoke("attr", "id")
@@ -168,7 +189,7 @@ describe("Assigning Team User Roles", () => {
     cy.contains("div", "Members").click();
     cy.get("span.hidden")
       .filter(
-        (_, el) => el.id.startsWith("members-") && el.id.endsWith("-user")
+        (_, el) => el.id.startsWith("members-") && el.id.endsWith("-user"),
       )
       .contains(memberUser)
       .should("not.exist");
@@ -177,28 +198,33 @@ describe("Assigning Team User Roles", () => {
     cy.login(memberUser, memberUserPassword);
 
     cy.visit(`/teams/${parentOrg}`);
-    cy.contains("div", "Edit").should("exist");
-    cy.contains("div", "Edit").click();
-    cy.get("input[name=title]").should("have.value", parentOrg + " edited");
+    clickEdit();
+    cy.get("input[name=title]", { timeout: 15000 }).should(
+      "have.value",
+      parentOrg + " edited",
+    );
     cy.get("input[name=title]")
       .clear()
       .type(parentOrg + " edited again")
       .blur();
     cy.get("button[type=submit]").click();
+    cy.contains(`Successfully edited the ${parentOrg} edited again Team`, {
+      timeout: 15000,
+    });
 
     cy.visit(`/teams/${parentOrg}`);
-    cy.contains("div", "Edit").should("exist");
-    cy.contains("div", "Edit")
-      .click()
-      .then(() => {
-        cy.get("input[name=title]").should("have.value", parentOrg + " edited again");
-      });
+    clickEdit();
+    cy.get("input[name=title]", { timeout: 15000 }).should(
+      "have.value",
+      parentOrg + " edited again",
+    );
 
     cy.visit(`/teams/${childOrg}`);
-    cy.contains("div", "Edit").should("not.exist");
+    // Editor on child cannot edit the team itself (admin-only)
+    assertNoEdit(childOrg);
 
     cy.visit(`/teams/${grandchildOrg}`);
-    cy.contains("div", "Edit").should("not.exist");
+    assertNoEdit(grandchildOrg);
   });
 
   after(() => {
