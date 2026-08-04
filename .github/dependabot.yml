@@ -55,124 +55,124 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       pip-minor-patch:
         update-types:
           - "minor"
           - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-major"
 
   - package-ecosystem: "pip"
     directory: "/ckan-backend-dev"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       pip-minor-patch:
         update-types:
           - "minor"
           - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-major"
 
   - package-ecosystem: "pip"
     directory: "/migration"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       pip-minor-patch:
         update-types:
           - "minor"
           - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-major"
 
   - package-ecosystem: "pip"
     directory: "/load-testing"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       pip-minor-patch:
         update-types:
           - "minor"
           - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-major"
 
   - package-ecosystem: "pip"
     directory: "/prefect-server/jobs/datapusher"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       pip-minor-patch:
         update-types:
           - "minor"
           - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-major"
 
   - package-ecosystem: "pip"
     directory: "/ckan-backend-dev/src/ckanext-wri"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
-    groups:
-      pip-minor-patch:
-        update-types:
-          - "minor"
-          - "patch"
     ignore:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
       - dependency-name: "numpy"
         versions: [">=2.0.0"]
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "pip"
     directory: "/ckanext-wri"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
-    groups:
-      pip-minor-patch:
-        update-types:
-          - "minor"
-          - "patch"
     ignore:
       - dependency-name: "*"
         update-types:
           - "version-update:semver-major"
       - dependency-name: "numpy"
         versions: [">=2.0.0"]
+    groups:
+      pip-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "pip"
     directory: "/scripts/cost-splitting"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     groups:
       pip-minor-patch:
         update-types:
           - "minor"
           - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-major"
 
   # Docker
   - package-ecosystem: "docker"
