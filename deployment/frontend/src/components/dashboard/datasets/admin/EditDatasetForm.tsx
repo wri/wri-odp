@@ -116,7 +116,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         })
         .otherwise(() => false);
 
-    const resourceForm = dataset.resources.sort((a, b) => {
+    const resourceForm = [...dataset.resources].sort((a, b) => {
         const isALayer = isLayerResource(a);
         const isBLayer = isLayerResource(b);
 
