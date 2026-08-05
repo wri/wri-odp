@@ -88,6 +88,7 @@
         "flexsearch": "0.8.212",
         "highlight.js": "^11.9.0",
         "js-deep-equals": "^2.1.1",
+        "jszip": "^3.10.1",
         "jwks-rsa": "^3.1.0",
         "lodash": "^4.17.23",
         "lowlight": "^3.1.0",

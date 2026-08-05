@@ -14,63 +14,94 @@ import {
     DocumentTextIcon,
 } from '@heroicons/react/24/solid';
 import { type Resource } from '@/interfaces/dataset.interface';
+import { useEffect } from 'react';
 import DownloadStartedBanner from './DownloadStartedBanner';
+import ExternallyHostedResourcesSection from './ExternallyHostedResourcesSection';
 import FileCard from './FileCard';
 import { formatDate, formatFileSize, getResourceFormatLabel } from '../download-utils';
-
-const whatsNextItems = [
-    {
-        icon: <DocumentIcon width={16} height={16} />,
-        title: 'View this dataset',
-        description: 'Return to the dataset to explore more details.',
-        action: 'View dataset',
-    },
-    {
-        icon: <CodeBracketSquareIcon width={16} height={16} />,
-        title: 'Access via API',
-        description: 'Integrate this data into your tools and workflows.',
-        action: 'View API options',
-    },
-    {
-        icon: <ChatBubbleLeftEllipsisIcon width={16} height={16} />,
-        title: 'Share your feedback',
-        description: 'Help us improve our datasets and platform.',
-        action: 'Leave feedback',
-        onClick: () =>
-            window.open(
-                'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
-                '_blank',
-                'noopener,noreferrer'
-            ),
-    },
-    {
-        icon: <UserIcon width={16} height={16} />,
-        title: 'Take part in research',
-        description: 'Sign up to take part in upcoming research to improve the Data Explorer.',
-        action: 'Sign up',
-        onClick: () =>
-            window.open(
-                'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
-                '_blank',
-                'noopener,noreferrer'
-            ),
-    },
-];
+import { useDirectDownload } from './useDirectDownload';
 
 type ConfirmationStepProps = {
     selectedResources: Resource[];
     totalSelectedBytes: number;
+    datasetName: string;
     onBack: () => void;
     onClose: () => void;
 };
 
 function ConfirmationStep({
     selectedResources,
-    totalSelectedBytes,
+    totalSelectedBytes: _totalSelectedBytes,
+    datasetName,
     onBack,
     onClose,
 }: ConfirmationStepProps) {
-    const selectedCount = selectedResources.length;
+    const directResources = selectedResources.filter(
+        (resource) => !resource.not_downloadable && (Boolean(resource.key) || Boolean(resource.url))
+    );
+    const selectedCount = directResources.length;
+    const totalDirectBytes = directResources.reduce(
+        (acc, resource) => acc + Number(resource.size ?? 0),
+        0
+    );
+    const { download } = useDirectDownload(datasetName);
+    const externallyHostedResources = selectedResources.filter(
+        (resource) => Boolean(resource.not_downloadable) && Boolean(resource.url)
+    );
+
+    useEffect(() => {
+        if (directResources.length === 0) {
+            return;
+        }
+
+        void download(directResources);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const whatsNextItems = [
+        {
+            icon: <DocumentIcon width={16} height={16} />,
+            title: 'View this dataset',
+            description: 'Return to the dataset to explore more details.',
+            action: 'View dataset',
+            onClick: onClose,
+        },
+        {
+            icon: <CodeBracketSquareIcon width={16} height={16} />,
+            title: 'Access via API',
+            description: 'Integrate this data into your tools and workflows.',
+            action: 'View API options',
+            onClick: () => {
+                onClose();
+                window.dispatchEvent(new Event('open-access-api-modal'));
+            },
+        },
+        {
+            icon: <ChatBubbleLeftEllipsisIcon width={16} height={16} />,
+            title: 'Share your feedback',
+            description: 'Help us improve our datasets and platform.',
+            action: 'Leave feedback',
+            onClick: () =>
+                window.open(
+                    'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
+                    '_blank',
+                    'noopener,noreferrer'
+                ),
+        },
+        {
+            icon: <UserIcon width={16} height={16} />,
+            title: 'Take part in research',
+            description: 'Sign up to take part in upcoming research to improve the Data Explorer.',
+            action: 'Sign up',
+            onClick: () =>
+                window.open(
+                    'https://surveys.hotjar.com/4d284b81-6916-49cc-9f2a-811becdebd6b',
+                    '_blank',
+                    'noopener,noreferrer'
+                ),
+        },
+    ];
+
     const getResourceDescription = (resource: Resource) => {
         const description = resource.description?.trim() ?? '';
         if (description) {
@@ -82,91 +113,106 @@ function ConfirmationStep({
 
     return (
         <div>
-            <DownloadStartedBanner
-                variant="direct"
-                fileCount={selectedCount}
-                fileSize={formatFileSize(totalSelectedBytes)}
-            />
+            {selectedCount > 0 && (
+                <DownloadStartedBanner
+                    variant="direct"
+                    fileCount={selectedCount}
+                    fileSize={formatFileSize(totalDirectBytes)}
+                    onRetry={() => void download(directResources)}
+                />
+            )}
 
-            {/* What's included */}
-            <h3
-                style={{
-                    fontSize: getThemedFontSize(600),
-                    fontWeight: 700,
-                    color: getThemedColor('neutral', 900),
-                    marginBottom: getThemedSpacing(400),
-                }}
-            >
-                {"What's included"}
-            </h3>
+            {selectedCount > 0 && (
+                <>
+                    {/* What's included */}
+                    <h3
+                        style={{
+                            fontSize: getThemedFontSize(600),
+                            fontWeight: 700,
+                            color: getThemedColor('neutral', 900),
+                            marginBottom: getThemedSpacing(400),
+                        }}
+                    >
+                        {"What's included"}
+                    </h3>
 
-            {selectedResources.map((resource) => (
-                <div key={resource.id} style={{ marginBottom: getThemedSpacing(200) }}>
-                    <FileCard
-                        title={resource.title ?? resource.name ?? 'Selected file'}
-                        badge={getResourceFormatLabel(resource)}
-                        description={getResourceDescription(resource)}
-                        createdAt={formatDate(resource.created)}
-                        updatedAt={formatDate(resource.last_modified)}
-                        rightContent={
+                    {directResources.map((resource) => (
+                        <div key={resource.id} style={{ marginBottom: getThemedSpacing(200) }}>
+                            <FileCard
+                                title={resource.title ?? resource.name ?? 'Selected file'}
+                                badge={getResourceFormatLabel(resource)}
+                                description={getResourceDescription(resource)}
+                                createdAt={formatDate(resource.created)}
+                                updatedAt={formatDate(resource.last_modified)}
+                                rightContent={
+                                    <span
+                                        style={{
+                                            fontSize: getThemedFontSize(400),
+                                            color: getThemedColor('neutral', 800),
+                                            flexShrink: 0,
+                                            marginLeft: getThemedSpacing(400),
+                                        }}
+                                    >
+                                        {formatFileSize(Number(resource.size ?? 0))}
+                                    </span>
+                                }
+                            />
+                        </div>
+                    ))}
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: `${getThemedSpacing(300)} 0`,
+                            marginBottom: getThemedSpacing(600),
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: getThemedSpacing(200),
+                            }}
+                        >
+                            <DocumentTextIcon
+                                width={16}
+                                height={16}
+                                color={getThemedColor('neutral', 800)}
+                            />
+                            <span
+                                style={{
+                                    fontSize: getThemedFontSize(400),
+                                    fontWeight: 700,
+                                    color: getThemedColor('neutral', 900),
+                                }}
+                            >
+                                Total size
+                            </span>
                             <span
                                 style={{
                                     fontSize: getThemedFontSize(400),
                                     color: getThemedColor('neutral', 800),
-                                    flexShrink: 0,
-                                    marginLeft: getThemedSpacing(400),
                                 }}
                             >
-                                {formatFileSize(Number(resource.size ?? 0))}
+                                (estimated)
                             </span>
-                        }
-                    />
-                </div>
-            ))}
+                        </div>
+                        <span
+                            style={{
+                                fontSize: getThemedFontSize(400),
+                                fontWeight: 700,
+                                color: getThemedColor('neutral', 900),
+                            }}
+                        >
+                            {formatFileSize(totalDirectBytes)}
+                        </span>
+                    </div>
+                </>
+            )}
+            <ExternallyHostedResourcesSection resources={externallyHostedResources} />
 
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: `${getThemedSpacing(300)} 0`,
-                    marginBottom: getThemedSpacing(600),
-                }}
-            >
-                <div style={{ display: 'flex', alignItems: 'center', gap: getThemedSpacing(200) }}>
-                    <DocumentTextIcon
-                        width={16}
-                        height={16}
-                        color={getThemedColor('neutral', 800)}
-                    />
-                    <span
-                        style={{
-                            fontSize: getThemedFontSize(400),
-                            fontWeight: 700,
-                            color: getThemedColor('neutral', 900),
-                        }}
-                    >
-                        Total size
-                    </span>
-                    <span
-                        style={{
-                            fontSize: getThemedFontSize(400),
-                            color: getThemedColor('neutral', 800),
-                        }}
-                    >
-                        (estimated)
-                    </span>
-                </div>
-                <span
-                    style={{
-                        fontSize: getThemedFontSize(400),
-                        fontWeight: 700,
-                        color: getThemedColor('neutral', 900),
-                    }}
-                >
-                    {formatFileSize(totalSelectedBytes)}
-                </span>
-            </div>
             <hr
                 style={{
                     border: 'none',

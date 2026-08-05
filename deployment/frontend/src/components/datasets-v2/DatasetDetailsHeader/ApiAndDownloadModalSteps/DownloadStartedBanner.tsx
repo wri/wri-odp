@@ -14,9 +14,16 @@ type DownloadStartedBannerProps = {
     fileCount: number;
     fileSize: string;
     email?: string;
+    onRetry?: () => void;
 };
 
-function DownloadStartedBanner({ variant, fileCount, fileSize, email }: DownloadStartedBannerProps) {
+function DownloadStartedBanner({
+    variant,
+    fileCount,
+    fileSize,
+    email,
+    onRetry,
+}: DownloadStartedBannerProps) {
     const sharedContainerStyle = {
         border: `1px solid ${getThemedColor('secondary', 200)}`,
         borderRadius: getThemedRadius(300),
@@ -169,15 +176,17 @@ function DownloadStartedBanner({ variant, fileCount, fileSize, email }: Download
                     Your {fileCount} files ({fileSize}) should begin downloading automatically.{' '}
                     <br /> If nothing happens after a few seconds, retry your download below.
                 </p>
-                <Button
-                    variant="secondary"
-                    size="small"
-                    leftIcon={<ArrowPathIcon />}
-                    style={{ marginTop: getThemedSpacing(400) }}
-                    onClick={() => console.log('retry')}
-                >
-                    Retry download
-                </Button>
+                {onRetry && (
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        leftIcon={<ArrowPathIcon />}
+                        style={{ marginTop: getThemedSpacing(400) }}
+                        onClick={onRetry}
+                    >
+                        Retry download
+                    </Button>
+                )}
             </div>
         </div>
     );

@@ -4,7 +4,6 @@ import {
     getThemedFontSize,
     getThemedRadius,
     getThemedSpacing,
-    Tag,
 } from '@worldresources/wri-design-systems';
 import { type WriDataset } from '@/schema/ckan.schema';
 import { type Resource } from '@/interfaces/dataset.interface';
@@ -15,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import { api } from '@/utils/api';
 import FileCard from './FileCard';
 import { formatDate, formatFileSize, getResourceFormatLabel } from '../download-utils';
-import { type LocationSearchFormType } from './SelectFilesMap';
+import { type LocationSearchFormType, type TileGeojson } from './SelectFilesMap';
 
 const SelectFilesMap = dynamic(() => import('./SelectFilesMap'), {
     ssr: false,
@@ -37,7 +36,10 @@ function SelectFilesStep({
     onContinue,
 }: SelectFilesStepProps) {
     const datafiles = dataset?.resources;
-    const geoSpatialResources = (datafiles ?? [])
+    const selectableResources = (datafiles ?? []).filter(
+        (resource) => Boolean(resource.key) || Boolean(resource.url)
+    );
+    const geoSpatialResources = selectableResources
         .filter((resource) => resource.spatial_type !== 'global')
         .filter((resource) => (resource.spatial_address ?? resource.spatial_geom) != null);
     const datasetDisplayName = dataset.title ?? dataset.name;
@@ -87,9 +89,12 @@ function SelectFilesStep({
         }
     );
 
-    const geojsons = useMemo<Array<Record<string, unknown>>>(() => {
+    const geojsons = useMemo<TileGeojson[]>(() => {
         return geoSpatialResources.map((resource) => {
-            const spatialGeom = (resource.spatial_geom ?? {}) as Record<string, unknown>;
+            const spatialGeom = (resource.spatial_geom ?? {}) as Omit<
+                TileGeojson,
+                'id' | 'datafile' | 'address' | 'selected'
+            >;
 
             return {
                 ...spatialGeom,
@@ -169,66 +174,30 @@ function SelectFilesStep({
                     <div
                         style={{
                             padding: getThemedSpacing(400),
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start',
-                            gap: getThemedSpacing(300),
                             borderBottom: isMapOpen
                                 ? `1px solid ${getThemedColor('neutral', 300)}`
                                 : undefined,
                         }}
                     >
-                        <div>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: getThemedSpacing(200),
-                                    flexWrap: 'wrap',
-                                }}
-                            >
-                                <span
-                                    style={{
-                                        fontSize: getThemedFontSize(500),
-                                        fontWeight: 700,
-                                        color: getThemedColor('neutral', 900),
-                                    }}
+                        <FileCard
+                            title={`${datasetDisplayName} GeoTIFF tiles`}
+                            titleFontSize={getThemedFontSize(500)}
+                            badge="GeoTIFF tile set"
+                            description={mapCardDescription}
+                            createdAt={formatDate(dataset.metadata_modified)}
+                            updatedAt={formatDate(dataset.metadata_modified)}
+                            borderless
+                            rightContent={
+                                <Button
+                                    variant={!isMapOpen ? 'secondary' : 'negative'}
+                                    size="default"
+                                    leftIcon={!isMapOpen ? <PlusIcon /> : <TrashIcon />}
+                                    onClick={handleMapCardButton}
                                 >
-                                    {`${datasetDisplayName} GeoTIFF tiles`}
-                                </span>
-                                <Tag label="GeoTIFF tile set" variant="success" />
-                            </div>
-                            <p
-                                style={{
-                                    fontSize: getThemedFontSize(400),
-                                    color: getThemedColor('neutral', 800),
-                                    marginTop: getThemedSpacing(100),
-                                }}
-                            >
-                                {mapCardDescription}
-                            </p>
-                            <div
-                                style={{
-                                    fontSize: getThemedFontSize(300),
-                                    color: getThemedColor('neutral', 700),
-                                    marginTop: getThemedSpacing(100),
-                                    display: 'flex',
-                                    gap: getThemedSpacing(400),
-                                }}
-                            >
-                                <span>Created: {formatDate(dataset.metadata_modified)}</span>
-                                <span>Last updated: {formatDate(dataset.metadata_modified)}</span>
-                            </div>
-                        </div>
-
-                        <Button
-                            variant={!isMapOpen ? 'secondary' : 'negative'}
-                            size="default"
-                            leftIcon={!isMapOpen ? <PlusIcon /> : <TrashIcon />}
-                            onClick={handleMapCardButton}
-                        >
-                            {isMapOpen ? 'Remove' : 'Add and configure'}
-                        </Button>
+                                    {isMapOpen ? 'Remove' : 'Add and configure'}
+                                </Button>
+                            }
+                        />
                     </div>
 
                     {isMapOpen && (
@@ -250,41 +219,58 @@ function SelectFilesStep({
                 }}
             >
                 {!showMapCard &&
-                    datafiles?.map((resource) => (
-                        <FileCard
-                            key={resource.id}
-                            title={resource.title}
-                            badge={getResourceFormatLabel(resource)}
-                            description={resource.description ?? resource.name ?? ''}
-                            extraInfo={
-                                resource.size ? `Size: ${formatFileSize(resource.size)}` : undefined
-                            }
-                            createdAt={formatDate(resource.created)}
-                            updatedAt={formatDate(
-                                resource.metadata_modified ?? resource.last_modified
-                            )}
-                            rightContent={
-                                <Button
-                                    variant={
-                                        selectedResourceIds.includes(resource.id)
-                                            ? 'negative'
-                                            : 'secondary'
-                                    }
-                                    size="default"
-                                    leftIcon={
-                                        selectedResourceIds.includes(resource.id) ? (
-                                            <TrashIcon />
-                                        ) : (
-                                            <PlusIcon />
-                                        )
-                                    }
-                                    onClick={() => onToggleResource(resource.id)}
-                                >
-                                    {selectedResourceIds.includes(resource.id) ? 'Remove' : 'Add'}
-                                </Button>
-                            }
-                        />
-                    ))}
+                    selectableResources.map((resource) => {
+                        const isExternallyHosted = Boolean(resource.not_downloadable);
+
+                        return (
+                            <FileCard
+                                key={resource.id}
+                                title={resource.title ?? resource.name ?? 'Selected file'}
+                                badge={
+                                    isExternallyHosted
+                                        ? 'Hosted Externally'
+                                        : getResourceFormatLabel(resource)
+                                }
+                                description={resource.description ?? resource.name ?? ''}
+                                extraInfo={
+                                    resource.size
+                                        ? `Size: ${formatFileSize(resource.size)}`
+                                        : undefined
+                                }
+                                createdAt={formatDate(resource.created)}
+                                updatedAt={formatDate(
+                                    resource.metadata_modified ?? resource.last_modified
+                                )}
+                                warningMessage={
+                                    isExternallyHosted
+                                        ? 'This resource is hosted externally. A link to the file will be included in your download bundle.'
+                                        : undefined
+                                }
+                                rightContent={
+                                    <Button
+                                        variant={
+                                            selectedResourceIds.includes(resource.id)
+                                                ? 'negative'
+                                                : 'secondary'
+                                        }
+                                        size="default"
+                                        leftIcon={
+                                            selectedResourceIds.includes(resource.id) ? (
+                                                <TrashIcon />
+                                            ) : (
+                                                <PlusIcon />
+                                            )
+                                        }
+                                        onClick={() => onToggleResource(resource.id)}
+                                    >
+                                        {selectedResourceIds.includes(resource.id)
+                                            ? 'Remove'
+                                            : 'Add'}
+                                    </Button>
+                                }
+                            />
+                        );
+                    })}
             </div>
 
             {/* Button group */}
