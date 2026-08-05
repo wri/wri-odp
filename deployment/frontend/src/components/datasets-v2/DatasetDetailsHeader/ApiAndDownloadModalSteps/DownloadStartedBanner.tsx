@@ -176,15 +176,17 @@ function DownloadStartedBanner({
                     Your {fileCount} files ({fileSize}) should begin downloading automatically.{' '}
                     <br /> If nothing happens after a few seconds, retry your download below.
                 </p>
-                <Button
-                    variant="secondary"
-                    size="small"
-                    leftIcon={<ArrowPathIcon />}
-                    style={{ marginTop: getThemedSpacing(400) }}
-                    onClick={onRetry}
-                >
-                    Retry download
-                </Button>
+                {onRetry && (
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        leftIcon={<ArrowPathIcon />}
+                        style={{ marginTop: getThemedSpacing(400) }}
+                        onClick={onRetry}
+                    >
+                        Retry download
+                    </Button>
+                )}
             </div>
         </div>
     );

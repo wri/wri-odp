@@ -3,11 +3,36 @@ import { api } from '@/utils/api';
 import JSZip from 'jszip';
 import { useState } from 'react';
 
+const CONTROL_CHARS_RE = /[\x00-\x1F\x7F]/g;
+const PATH_SEPARATORS_RE = /[\\/]/g;
+const WINDOWS_RESERVED_RE = /[<>:"|?*]/g;
+const MULTI_DOTS_RE = /\.\.+/g;
+
+function sanitizeFilenamePart(value: string): string {
+    return value
+        .replace(CONTROL_CHARS_RE, '')
+        .replace(PATH_SEPARATORS_RE, '_')
+        .replace(WINDOWS_RESERVED_RE, '_')
+        .replace(MULTI_DOTS_RE, '_')
+        .trim()
+        .replace(/^\.+/, '')
+        .replace(/[.\s]+$/, '');
+}
+
 function getResourceFilename(resource: Resource, index: number): string {
-    const base = resource.name ?? resource.title ?? `file-${index + 1}`;
-    const ext = resource.format ? `.${resource.format.toLowerCase()}` : '';
-    if (base.includes('.')) return base;
-    return `${base}${ext}`;
+    const fallbackBase = `file-${index + 1}`;
+    const rawBase = resource.name?.trim() ?? resource.title?.trim() ?? fallbackBase;
+    const sanitizedBase = sanitizeFilenamePart(rawBase) || fallbackBase;
+
+    // Keep an existing extension from the source filename when available.
+    const hasExtension = /\.[A-Za-z0-9]{1,16}$/.test(sanitizedBase);
+    if (hasExtension) {
+        return sanitizedBase;
+    }
+
+    const sanitizedFormat = sanitizeFilenamePart(resource.format?.toLowerCase() ?? '');
+    const ext = sanitizedFormat ? `.${sanitizedFormat}` : '';
+    return `${sanitizedBase}${ext}`;
 }
 
 function triggerAnchorDownload(url: string, filename: string) {

@@ -220,7 +220,7 @@ function SelectFilesStep({
             >
                 {!showMapCard &&
                     selectableResources.map((resource) => {
-                        const isExternallyHosted = !resource.key && Boolean(resource.url);
+                        const isExternallyHosted = Boolean(resource.not_downloadable);
 
                         return (
                             <FileCard

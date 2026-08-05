@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CheckIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import { Button, getThemedSpacing, List, Modal } from '@worldresources/wri-design-systems';
 import { NumberIcon } from './NumberIcon';
@@ -10,6 +10,7 @@ import type { AccessApiButtonProps } from './types';
 import { useScrollTopOnStepChange } from './useScrollTopOnStepChange';
 
 type ApiStep = 'caution' | 'terms' | 'endpoints';
+const OPEN_ACCESS_API_MODAL_EVENT = 'open-access-api-modal';
 
 export default function AccessApiButton({
     dataset,
@@ -25,6 +26,19 @@ export default function AccessApiButton({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeStep, setActiveStep] = useState<ApiStep>(firstStep);
     useScrollTopOnStepChange(activeStep);
+
+    useEffect(() => {
+        const handleOpenAccessApiModal = () => {
+            setActiveStep(firstStep);
+            setIsModalOpen(true);
+        };
+
+        window.addEventListener(OPEN_ACCESS_API_MODAL_EVENT, handleOpenAccessApiModal);
+
+        return () => {
+            window.removeEventListener(OPEN_ACCESS_API_MODAL_EVENT, handleOpenAccessApiModal);
+        };
+    }, [firstStep]);
 
     const closeModal = () => {
         setIsModalOpen(false);

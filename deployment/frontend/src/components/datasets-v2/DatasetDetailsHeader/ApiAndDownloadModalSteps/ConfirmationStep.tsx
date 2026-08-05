@@ -14,6 +14,7 @@ import {
     DocumentTextIcon,
 } from '@heroicons/react/24/solid';
 import { type Resource } from '@/interfaces/dataset.interface';
+import { useEffect } from 'react';
 import DownloadStartedBanner from './DownloadStartedBanner';
 import ExternallyHostedResourcesSection from './ExternallyHostedResourcesSection';
 import FileCard from './FileCard';
@@ -35,7 +36,9 @@ function ConfirmationStep({
     onBack,
     onClose,
 }: ConfirmationStepProps) {
-    const directResources = selectedResources.filter((resource) => Boolean(resource.key));
+    const directResources = selectedResources.filter(
+        (resource) => !resource.not_downloadable && (Boolean(resource.key) || Boolean(resource.url))
+    );
     const selectedCount = directResources.length;
     const totalDirectBytes = directResources.reduce(
         (acc, resource) => acc + Number(resource.size ?? 0),
@@ -43,8 +46,17 @@ function ConfirmationStep({
     );
     const { download } = useDirectDownload(datasetName);
     const externallyHostedResources = selectedResources.filter(
-        (resource) => !resource.key && Boolean(resource.url)
+        (resource) => Boolean(resource.not_downloadable) && Boolean(resource.url)
     );
+
+    useEffect(() => {
+        if (directResources.length === 0) {
+            return;
+        }
+
+        void download(directResources);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const whatsNextItems = [
         {
@@ -59,6 +71,10 @@ function ConfirmationStep({
             title: 'Access via API',
             description: 'Integrate this data into your tools and workflows.',
             action: 'View API options',
+            onClick: () => {
+                onClose();
+                window.dispatchEvent(new Event('open-access-api-modal'));
+            },
         },
         {
             icon: <ChatBubbleLeftEllipsisIcon width={16} height={16} />,
