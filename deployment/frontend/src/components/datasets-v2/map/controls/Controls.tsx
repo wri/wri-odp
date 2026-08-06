@@ -19,14 +19,14 @@ export default function Controls({
     const mapControlItems = [
         {
             icon: <PlusIcon />,
-            label: 'l.zoomInLabel',
-            ariaLabel: 'l.zoomInAriaLabel',
+            label: 'Zoom in',
+            ariaLabel: 'Zoom in',
             onClick: () => mapRef?.current?.zoomIn({ duration: 500 }),
         },
         {
             icon: <MinusIcon />,
-            label: 'l.zoomOutLabel',
-            ariaLabel: 'l.zoomOutAriaLabel',
+            label: 'Zoom out',
+            ariaLabel: 'Zoom out',
             onClick: () => mapRef?.current?.zoomOut({ duration: 500 }),
         },
         {
