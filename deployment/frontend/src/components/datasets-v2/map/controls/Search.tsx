@@ -25,6 +25,11 @@ export default function Search({
     const viewStateRef = useRef(viewState);
     viewStateRef.current = viewState;
 
+    useEffect(() => {
+        return () => {
+            if (debounceTimer.current) clearTimeout(debounceTimer.current);
+        };
+    }, []);
     const fetchSuggestions = useCallback(async (query: string) => {
         if (!query) {
             setOptions([]);
