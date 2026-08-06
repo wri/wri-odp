@@ -96,7 +96,7 @@ export default function Map({
                         {showControls && (
                             <>
                                 <Controls mapRef={mapRef} mapContainerRef={mapContainerRef} />
-                                {!isEmbedding && (
+                                {!isEmbedding && false && (
                                     <button
                                         onClick={() => {
                                             setIsAddingLayers(!isAddingLayers);

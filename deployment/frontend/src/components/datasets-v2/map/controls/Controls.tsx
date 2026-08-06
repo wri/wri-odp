@@ -1,9 +1,10 @@
-import type { MutableRefObject } from 'react';
+import { useState, type MutableRefObject } from 'react';
 import type { MapRef } from 'react-map-gl';
-import Zoom from '../../../icons/Zoom';
-import Search from '../../../icons/Search';
-import Settings from '../../../icons/Settings';
-import Export from '../../../icons/Export';
+import { getThemedSpacing, Toolbar } from '@worldresources/wri-design-systems';
+import Search from './Search';
+import { PlusIcon, MinusIcon, Cog6ToothIcon, ShareIcon } from '@heroicons/react/24/solid';
+import ExportModal from './ExportModal';
+import SettingsModal from './SettingsModal';
 
 export default function Controls({
     mapRef,
@@ -12,12 +13,55 @@ export default function Controls({
     mapRef: MutableRefObject<MapRef | null>;
     mapContainerRef: MutableRefObject<HTMLDivElement | null>;
 }) {
+    const [openSettingsModal, setOpenSettingsModal] = useState(false);
+    const [openExportModal, setOpenExportModal] = useState(false);
+
+    const mapControlItems = [
+        {
+            icon: <PlusIcon />,
+            label: 'l.zoomInLabel',
+            ariaLabel: 'l.zoomInAriaLabel',
+            onClick: () => mapRef?.current?.zoomIn({ duration: 500 }),
+        },
+        {
+            icon: <MinusIcon />,
+            label: 'l.zoomOutLabel',
+            ariaLabel: 'l.zoomOutAriaLabel',
+            onClick: () => mapRef?.current?.zoomOut({ duration: 500 }),
+        },
+        {
+            icon: <ShareIcon />,
+            label: 'l.exportLabel',
+            ariaLabel: 'l.exportAriaLabel',
+            onClick: () => setOpenExportModal(true),
+        },
+        {
+            icon: <Cog6ToothIcon />,
+            label: 'l.mapSettingsLabel',
+            ariaLabel: 'l.mapSettingsAriaLabel',
+            onClick: () => setOpenSettingsModal(true),
+        },
+    ];
+
     return (
-        <div className="absolute top-5 right-6 flex flex-col gap-y-1.5 rounded">
-            <Zoom mapRef={mapRef} />
-            <Search mapContainerRef={mapContainerRef} />
-            <Settings mapRef={mapRef} />
-            <Export />
-        </div>
+        <>
+            <ExportModal isOpen={openExportModal} setIsOpen={setOpenExportModal} />
+            <SettingsModal
+                openSettingsModal={openSettingsModal}
+                setOpenSettingsModal={setOpenSettingsModal}
+            />
+            <div
+                style={{
+                    display: 'flex',
+                    padding: getThemedSpacing(400),
+                    gap: getThemedSpacing(400),
+                    width: '50%',
+                    float: 'right',
+                }}
+            >
+                <Search mapContainerRef={mapContainerRef} />
+                <Toolbar items={mapControlItems} vertical showExpandedToggle={false} />
+            </div>
+        </>
     );
 }
