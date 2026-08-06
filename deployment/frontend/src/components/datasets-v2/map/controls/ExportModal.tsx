@@ -19,7 +19,10 @@ export default function ExportModal({
     const router = useRouter();
     const { dataset } = useDataset();
 
-    const searchParams = new URLSearchParams(window.location.search);
+    const searchParams =
+        typeof window !== 'undefined'
+            ? new URLSearchParams(window.location.search)
+            : new URLSearchParams();
     const map = searchParams.get('map');
 
     const queryDatasetName = router.query.datasetName;
@@ -28,7 +31,8 @@ export default function ExportModal({
         (typeof queryDatasetName === 'string' ? queryDatasetName : undefined) ||
         '';
 
-    const embedUrl = `${window.location.origin}/datasets/${datasetName}/embed/map?map=${map}`;
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const embedUrl = `${origin}/datasets/${encodeURIComponent(datasetName)}/embed/map?map=${encodeURIComponent(map ?? '')}`;
 
     const iFrameHtml = `<iframe src="${embedUrl}" width="1000" height="800"></iframe>`;
 

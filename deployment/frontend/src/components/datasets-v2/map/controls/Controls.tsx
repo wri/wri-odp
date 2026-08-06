@@ -31,14 +31,14 @@ export default function Controls({
         },
         {
             icon: <ShareIcon />,
-            label: 'l.exportLabel',
-            ariaLabel: 'l.exportAriaLabel',
+            label: 'Export',
+            ariaLabel: 'Export',
             onClick: () => setOpenExportModal(true),
         },
         {
             icon: <Cog6ToothIcon />,
-            label: 'l.mapSettingsLabel',
-            ariaLabel: 'l.mapSettingsAriaLabel',
+            label: 'Map settings',
+            ariaLabel: 'Map settings',
             onClick: () => setOpenSettingsModal(true),
         },
     ];

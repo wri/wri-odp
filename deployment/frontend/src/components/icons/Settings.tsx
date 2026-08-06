@@ -1,7 +1,7 @@
 import { type MutableRefObject, useState } from 'react';
 import IconButton from './IconButton';
-import BasemapSelector from '../datasets-v2/map/controls/BaseMapSelector';
-import LabelSelector from '../datasets-v2/map/controls/LabelSelector';
+import BasemapSelector from '@/components/_shared/map/controls/BaseMapSelector';
+import LabelSelector from '@/components/_shared/map/controls/LabelSelector';
 import { type MapRef } from 'react-map-gl';
 import { SettingsIcon } from '@/components/_shared/icons/SettingsIcon';
 
