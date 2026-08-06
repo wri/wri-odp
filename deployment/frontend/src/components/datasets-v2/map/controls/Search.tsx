@@ -79,19 +79,21 @@ export default function Search({
     );
 
     const handleFitBounds = useCallback(() => {
-        const bbox = bounds.bbox!;
+        const bbox = bounds.bbox;
         const options = bounds.options;
-        const mapContainer = mapContainerRef.current!;
+        const mapContainer = mapContainerRef.current;
+
+        if (!bbox || bbox.length < 4 || !mapContainer) return;
         if (mapContainer.offsetWidth <= 0 || mapContainer.offsetHeight <= 0) return;
+
+        const [west, south, east, north] = bbox as [number, number, number, number];
 
         const { longitude, latitude, zoom } = fitBounds({
             width: mapContainer.offsetWidth,
             height: mapContainer.offsetHeight,
             bounds: [
-                // @ts-expect-error bbox is number[]
-                [bbox[0], bbox[1]],
-                // @ts-expect-error bbox is number[]
-                [bbox[2], bbox[3]],
+                [west, south],
+                [east, north],
             ],
             ...options,
         });
