@@ -1,9 +1,4 @@
-import {
-    useIsAddingLayers,
-    useIsDrawing,
-    useIsEmbeddingMap,
-    useMapState,
-} from '@/utils/storeHooks';
+import { useIsDrawing, useMapState } from '@/utils/storeHooks';
 import { getThemedColor } from '@worldresources/wri-design-systems';
 import { useEffect, useRef, useState } from 'react';
 import ReactMapGL, { type MapRef } from 'react-map-gl';
@@ -15,6 +10,7 @@ import Controls from './controls/Controls';
 import Basemap from './Basemap';
 import Labels from './Labels';
 import dynamic from 'next/dynamic';
+import YourLocationButton from './YourLocationButton';
 
 const DynamicLayerManger = dynamic(() => import('./LayerManager'), {
     ssr: false,
@@ -35,8 +31,6 @@ export default function Map({
     datasetId?: string;
     layerRwId?: string | null;
 }) {
-    const { isAddingLayers, setIsAddingLayers } = useIsAddingLayers();
-    const { isEmbedding } = useIsEmbeddingMap();
     const { setViewState, viewState } = useMapState();
     const mapRef = useRef<MapRef | null>(null);
     const mapTooltipRef = useRef<TooltipRef | null>(null);
@@ -94,26 +88,13 @@ export default function Map({
                         <Basemap mapRef={mapRef} />
                         <Labels mapRef={mapRef} />
                         {showControls && (
-                            <>
-                                <Controls mapRef={mapRef} mapContainerRef={mapContainerRef} />
-                                {!isEmbedding && (
-                                    <button
-                                        onClick={() => {
-                                            setIsAddingLayers(!isAddingLayers);
-                                        }}
-                                        className="absolute bg-[#FFD271] hover:bg-opacity-90 transition-all px-6 py-3 text-base font-semibold top-5 z-20 left-1/2 -translate-x-[50%]"
-                                    >
-                                        {!isAddingLayers
-                                            ? '+ Add layers'
-                                            : 'Go back to dataset metadata'}
-                                    </button>
-                                )}
-                            </>
+                            <Controls mapRef={mapRef} mapContainerRef={mapContainerRef} />
                         )}
 
                         {!isDrawing && <Tooltip ref={mapTooltipRef} />}
 
                         {showLegends && <Legends />}
+                        <YourLocationButton mapRef={mapRef} />
                     </>
                 )}
             </ReactMapGL>

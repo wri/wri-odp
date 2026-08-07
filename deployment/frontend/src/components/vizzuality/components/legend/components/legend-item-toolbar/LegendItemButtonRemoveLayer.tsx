@@ -7,7 +7,7 @@ export default function LegendItemButtonRemoveLayer(props: any) {
         useActiveLayerGroups();
     const { dataset } = useDataset();
 
-    return dataset.id != props.dataset ? (
+    return dataset?.id != props.dataset ? (
         <DefaultTooltip content="Remove layer">
             <button
                 className="text-gray-600 hover:text-gray-900"

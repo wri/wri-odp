@@ -1,4 +1,5 @@
 import { useLayerGroupsFromRW } from '@/utils/queryHooks';
+import { getThemedSpacing } from '@worldresources/wri-design-systems';
 import { useActiveLayerGroups, useLayerStates } from '@/utils/storeHooks';
 import { type APILayerSpec } from '@/interfaces/layer.interface';
 import {
@@ -51,7 +52,7 @@ export function Legends() {
 
     if (!layerGroups) return <span>Loading...</span>;
     return (
-        <div className="c-legend-map">
+        <div style={{ position: 'absolute', bottom: 0, left: 0, padding: getThemedSpacing(400) }}>
             <Icons />
             <Legend
                 maxHeight={300}
