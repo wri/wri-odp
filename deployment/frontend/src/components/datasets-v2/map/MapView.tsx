@@ -15,7 +15,6 @@ export default function MapView({
     return (
         <Map
             layers={activeLayers}
-            showLegends={false}
             mapHeight={isEmbedding ? '100vh' : 'calc(100vh - 48px)'}
             datasetId={datasetId}
             layerRwId={layerRwId}

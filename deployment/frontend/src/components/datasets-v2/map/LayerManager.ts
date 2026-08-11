@@ -14,14 +14,11 @@ import { VectorTileProvider } from '@/utils/providers/vectorProvider';
 import { type APILayerSpec } from '@/interfaces/layer.interface';
 import { useActiveLayerGroups, useLayerStates } from '@/utils/storeHooks';
 import { type LayerState } from '@/interfaces/state.interface';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { createDeckLayer } from '@/utils/decodeFunctions';
 import React from 'react';
 
-const parseLayers = (
-    layers: APILayerSpec[],
-    layerStates: Map<string, LayerState>
-): any[] => {
+const parseLayers = (layers: APILayerSpec[], layerStates: Map<string, LayerState>): any[] => {
     return layers.map((layer: APILayerSpec) => {
         const { id, layerConfig } = layer;
         const layerState = layerStates.get(id);
@@ -72,68 +69,6 @@ const providers: Record<string, any['handleData']> = {
     [tileProvider.name]: tileProvider.handleData,
 };
 
-class SafePluginMapboxGl extends (PluginMapboxGl as any) {
-    getLayersOnMap() {
-        const style = this.map?.getStyle?.();
-        return style?.layers ?? [];
-    }
-
-    setOpacity(layerModel: any, opacity: number) {
-        const PAINT_STYLE_NAMES: Record<string, string[]> = {
-            symbol: ['icon', 'text'],
-            circle: ['circle', 'circle-stroke'],
-        };
-
-        const mapLayer = layerModel?.mapLayer;
-        const decodeFunction = layerModel?.decodeFunction;
-
-        if (!this.map?.style || !mapLayer?.layers) {
-            return;
-        }
-
-        if (!decodeFunction) {
-            mapLayer.layers.forEach((l: any) => {
-                if (!l?.id || !this.map?.getLayer?.(l.id)) return;
-
-                const paintStyleNames = PAINT_STYLE_NAMES[l.type] || [l.type];
-                paintStyleNames.forEach((name) => {
-                    const propertyName = `${name}-opacity`;
-                    const propertyValue = this.computePaintPropertyValue(
-                        layerModel,
-                        l.id,
-                        propertyName,
-                        opacity
-                    );
-
-                    try {
-                        this.map.setPaintProperty(l.id, propertyName, propertyValue);
-                    } catch {
-                        // The map style can still be rebuilding between checks.
-                    }
-                });
-            });
-            return;
-        }
-
-        const layer = mapLayer.layers[1];
-        if (layer && typeof layer.setProps === 'function') {
-            layer.setProps({ opacity });
-        }
-    }
-}
-
-const isMapUsable = (mapInstance: any) => {
-    if (!mapInstance) return false;
-    if (mapInstance._removed) return false;
-    if (typeof mapInstance.getStyle !== 'function') return false;
-
-    try {
-        return !!mapInstance.getStyle();
-    } catch {
-        return false;
-    }
-};
-
 const LayerManager = ({
     layers,
     datasetId,
@@ -146,70 +81,15 @@ const LayerManager = ({
     const { current: map } = useMap();
     const { currentLayers } = useLayerStates();
     const { addLayerToLayerGroup, removeLayerFromLayerGroup } = useActiveLayerGroups();
-    const [mapInstance, setMapInstance] = useState<any | null>(null);
-    const [isStyleReady, setIsStyleReady] = useState(false);
-    const [isManagerReady, setIsManagerReady] = useState(false);
-
-    useEffect(() => {
-        if (!map) {
-            setMapInstance(null);
-            setIsStyleReady(false);
-            return;
-        }
-
-        if (!mapInstance && map?.getMap) {
-            const instance = map.getMap();
-            if (instance) {
-                setMapInstance(instance);
-            }
-        }
-    }, [map, mapInstance]);
-
-    useEffect(() => {
-        if (!isMapUsable(mapInstance)) return;
-
-        const onStyleReady = () => setIsStyleReady(true);
-
-        if (mapInstance.isStyleLoaded?.()) {
-            setIsStyleReady(true);
-            return;
-        }
-
-        mapInstance.once?.('load', onStyleReady);
-        mapInstance.once?.('style.load', onStyleReady);
-
-        return () => {
-            mapInstance.off?.('load', onStyleReady);
-            mapInstance.off?.('style.load', onStyleReady);
-        };
-    }, [mapInstance]);
+    const mapInstance = map?.getMap();
 
     const parsedLayers = useMemo(() => {
         const parsedLayers = parseLayers(layers, currentLayers);
         return parsedLayers;
     }, [layers, currentLayers]);
 
-    const visibleLayers = parsedLayers?.filter((l) => l.visibility) ?? [];
-
     useEffect(() => {
-        if (!isMapUsable(mapInstance) || !isStyleReady) {
-            setIsManagerReady(false);
-            return;
-        }
-
-        let raf = 0;
-        raf = window.requestAnimationFrame(() => {
-            setIsManagerReady(true);
-        });
-
-        return () => {
-            window.cancelAnimationFrame(raf);
-            setIsManagerReady(false);
-        };
-    }, [isStyleReady, mapInstance]);
-
-    useEffect(() => {
-        if (!isMapUsable(mapInstance) || !isStyleReady || !datasetId || !layerRwId) return;
+        if (!mapInstance || !datasetId || !layerRwId) return;
 
         removeLayerFromLayerGroup(layerRwId, datasetId);
         addLayerToLayerGroup(layerRwId, datasetId, undefined, true);
@@ -217,23 +97,21 @@ const LayerManager = ({
         return () => {
             removeLayerFromLayerGroup(layerRwId, datasetId);
         };
-    }, [addLayerToLayerGroup, datasetId, isStyleReady, layerRwId, mapInstance, removeLayerFromLayerGroup]);
+    }, [addLayerToLayerGroup, datasetId, layerRwId, mapInstance, removeLayerFromLayerGroup]);
 
-    if (!isMapUsable(mapInstance) || !isStyleReady) {
-        return null;
-    }
-
-    return React.createElement(
-        VizzLayerManager,
-        {
-            map: mapInstance,
-            plugin: SafePluginMapboxGl,
-            providers,
-        },
-        (isManagerReady ? visibleLayers : []).map((_layer: any) =>
-            React.createElement(Layer, { key: _layer.id, ..._layer })
-        )
-    );
+    return mapInstance
+        ? React.createElement(
+              VizzLayerManager,
+              {
+                  map: mapInstance,
+                  plugin: PluginMapboxGl,
+                  providers,
+              },
+              parsedLayers
+                  .filter((l) => l.visibility)
+                  .map((_layer: any) => React.createElement(Layer, { key: _layer.id, ..._layer }))
+          )
+        : React.createElement(React.Fragment, null);
 };
 
 export default LayerManager;
