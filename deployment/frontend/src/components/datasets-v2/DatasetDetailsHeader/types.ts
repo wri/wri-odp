@@ -6,15 +6,21 @@ export type DatasetDetailsHeaderProps = {
     datasetDescription: string;
     datasetName: string;
     dataset?: WriDataset;
+    sectionItems: DatasetSectionItem[];
 };
 
 export type DatasetDetailsHeaderMenuItem = Pick<MenuItemProps, 'label' | 'value' | 'startIcon'>;
+
+export type DatasetSectionItem = {
+    label: string;
+    value: string;
+};
 
 export type DatasetDetailsHeaderActionsProps = {
     variant: 'default' | 'sticky';
     openInItems: DatasetDetailsHeaderMenuItem[];
     openInItemsAndAccessApi: DatasetDetailsHeaderMenuItem[];
-    sectionItems: DatasetDetailsHeaderMenuItem[];
+    sectionItems: DatasetSectionItem[];
     onOpenInSelect: NonNullable<MenuProps['onSelect']>;
     onSectionSelect?: NonNullable<MenuProps['onSelect']>;
 };
@@ -30,6 +36,7 @@ export type DatasetDetailsHeaderStickyProps = {
     dataset: WriDataset;
     datasetTitle: string;
     openInItems: DatasetDetailsHeaderMenuItem[];
+    sectionItems: DatasetSectionItem[];
 };
 
 export type DatasetDownloadButtonProps = {

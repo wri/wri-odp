@@ -17,6 +17,7 @@ function DatasetDetailsHeader({
     datasetDescription,
     datasetName,
     dataset,
+    sectionItems,
 }: DatasetDetailsHeaderProps) {
     const router = useRouter();
     const { headerRef, isSticky } = useStickyHeader();
@@ -90,6 +91,7 @@ function DatasetDetailsHeader({
                     dataset={dataset}
                     datasetTitle={datasetTitle}
                     openInItems={openInItems}
+                    sectionItems={sectionItems}
                 />
             )}
         </>
