@@ -24,6 +24,7 @@ import {
     Square3Stack3DIcon,
 } from '@heroicons/react/24/solid';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import LegendItemTypesList from '@/components/vizzuality/components/legend/components/legend-item-types/LegendItemTypesList';
 
 type ThresholdOption = {
     label: string;
@@ -50,7 +51,10 @@ type LegendRow = {
     activeLayer: APILayerSpec;
     thresholdOptions: ThresholdOption[];
     selectedThreshold: number;
+    showLegendTypes: boolean;
     showScale: boolean;
+    scaleColors: string[];
+    scaleValues: string[];
     showLayerParameters: boolean;
 };
 
@@ -139,6 +143,37 @@ function LegendsWri() {
             });
 
             const thresholdData = getThresholdData(titleLayer);
+            const rawLegendConfig = titleLayer?.legendConfig as {
+                type?: string;
+                colors?: unknown;
+                values?: unknown;
+            };
+
+            const supportedLegendTypes = [
+                'multiple',
+                'basic',
+                'choropleth',
+                'gradient',
+                'proportional',
+            ];
+            const showLegendTypes =
+                typeof rawLegendConfig?.type === 'string' &&
+                supportedLegendTypes.includes(rawLegendConfig.type);
+
+            const scaleColors = Array.isArray(rawLegendConfig?.colors)
+                ? rawLegendConfig.colors.filter(
+                      (color): color is string => typeof color === 'string' && color.length > 0
+                  )
+                : [];
+
+            const scaleValues = Array.isArray(rawLegendConfig?.values)
+                ? rawLegendConfig.values
+                      .map((value) => String(value ?? '').trim())
+                      .filter((value) => value.length > 0)
+                : [];
+
+            // Use ScaleBar only as fallback when no supported legend type exists.
+            const showScale = !showLegendTypes && scaleColors.length > 1 && scaleValues.length > 1;
 
             return {
                 id: group.dataset,
@@ -149,7 +184,10 @@ function LegendsWri() {
                 activeLayer: titleLayer,
                 thresholdOptions: thresholdData.options,
                 selectedThreshold: thresholdData.selected,
-                showScale: Boolean(titleLayer?.legendConfig),
+                showLegendTypes,
+                showScale,
+                scaleColors,
+                scaleValues,
                 showLayerParameters: thresholdData.options.length > 0,
             };
         })
@@ -491,11 +529,15 @@ function LegendsWri() {
                                             </Button>
                                         </div>
 
+                                        {legend.showLegendTypes && (
+                                            <LegendItemTypesList activeLayer={legend.activeLayer} />
+                                        )}
+
                                         {legend.showScale && (
                                             <ScaleBar
                                                 isGradient
-                                                colors={['#E5F5F9', '#99D8C9', '#2CA25F']}
-                                                values={['0', '>1500']}
+                                                colors={legend.scaleColors}
+                                                values={legend.scaleValues}
                                             />
                                         )}
 

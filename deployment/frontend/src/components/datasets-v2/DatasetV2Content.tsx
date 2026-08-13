@@ -9,6 +9,11 @@ import Navigation from './Navigation';
 import DatasetV2Map from './DatasetMap';
 import DatasetDetailsHeader from './DatasetDetailsHeader';
 import { stripHtmlToText } from '@/utils/datasetJsonLd';
+import CitationSection from './sections/CitationSection';
+import MethodologySection from './sections/MethodologySection';
+import ContactDetailsSection from './sections/ContactDetailsSection';
+import AdditionalMetadataSection from './sections/AdditionalMetadataSection';
+import { hasValue } from './utils/text';
 
 type Props = {
     dataset: WriDataset;
@@ -17,10 +22,6 @@ type Props = {
 const proseClassName =
     'prose max-w-none prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base';
 const cmsContentClassName = `${proseClassName} dataset-v2-cms-content`;
-
-function hasValue(value: string | null | undefined): value is string {
-    return Boolean(value?.trim());
-}
 
 function parseRelatedDatasets(value: string | undefined): string[] {
     if (!value?.trim()) {
@@ -59,7 +60,9 @@ function stripCmsTypography(html: string): string {
                 .filter(Boolean)
                 .filter((rule) => {
                     const property = (rule.split(':')[0] ?? '').trim().toLowerCase();
-                    return Boolean(property) && property !== 'font' && !property.startsWith('font-');
+                    return (
+                        Boolean(property) && property !== 'font' && !property.startsWith('font-')
+                    );
                 })
                 .join('; ');
 
@@ -68,6 +71,7 @@ function stripCmsTypography(html: string): string {
 }
 
 export default function DatasetV2Content({ dataset }: Props) {
+    console.log(dataset);
     const datasetTitle = dataset.title ?? dataset.name;
     const datasetDescription = dataset.short_description ?? '';
     const datasetId = dataset.id;
@@ -83,7 +87,9 @@ export default function DatasetV2Content({ dataset }: Props) {
         if (!dataset.extras?.length) return undefined;
 
         const normalizedKeys = keys.map((k) => k.toLowerCase());
-        const extra = dataset.extras.find((item) => normalizedKeys.includes(item.key.toLowerCase()));
+        const extra = dataset.extras.find((item) =>
+            normalizedKeys.includes(item.key.toLowerCase())
+        );
 
         return extra?.value;
     };
@@ -138,7 +144,7 @@ export default function DatasetV2Content({ dataset }: Props) {
             : []),
     ].filter((entry) => hasValue(entry.name) || hasValue(entry.email));
 
-    const additionalMetadataItems = [
+    const additionalMetadataItems: Array<{ label: string; value: string }> = [
         { label: 'Project', value: dataset.project },
         {
             label: 'Update frequency',
@@ -151,7 +157,16 @@ export default function DatasetV2Content({ dataset }: Props) {
         { label: 'Provider', value: dataset.provider },
         { label: 'Connector type', value: dataset.connectorType },
         { label: 'Table name', value: dataset.tableName },
-    ].filter((item) => hasValue(item.value));
+    ].filter((item): item is { label: string; value: string } => hasValue(item.value));
+
+    const topicCount = (dataset.groups ?? []).filter((group) => group.type === 'group').length;
+    const applicationCount =
+        (dataset.applications ?? []).length +
+        (dataset.groups ?? []).filter((group) => group.type === 'application').length;
+    const keywordCount = (dataset.tags ?? []).length;
+    const authorNames = authorEntries
+        .map((entry) => entry.name)
+        .filter((name): name is string => hasValue(name));
 
     const hasContactDetails = authorEntries.length > 0 || maintainerEntries.length > 0;
     const hasDescription = hasValue(descriptionHtml);
@@ -165,7 +180,13 @@ export default function DatasetV2Content({ dataset }: Props) {
         hasValue(dataset.technical_notes);
     const hasRelatedDatasets = relatedDatasets.length > 0;
     const hasReleaseNotes = hasValue(releaseNotesHtml);
-    const hasAdditionalMetadata = additionalMetadataItems.length > 0 || hasValue(restrictionsHtml);
+    const hasAdditionalMetadata =
+        additionalMetadataItems.length > 0 ||
+        hasValue(restrictionsHtml) ||
+        topicCount > 0 ||
+        applicationCount > 0 ||
+        keywordCount > 0 ||
+        authorNames.length > 0;
 
     const sectionItems = [
         {
@@ -336,18 +357,7 @@ export default function DatasetV2Content({ dataset }: Props) {
                                                 </a>
                                             </li>
                                         )}
-                                        {hasValue(dataset.technical_notes) && (
-                                            <li>
-                                                <a
-                                                    className="text-wri-green underline"
-                                                    href={dataset.technical_notes}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    Technical notes
-                                                </a>
-                                            </li>
-                                        )}
+
                                         {hasValue(dataset.url) && (
                                             <li>
                                                 <a
@@ -365,118 +375,28 @@ export default function DatasetV2Content({ dataset }: Props) {
                             )}
 
                             {hasCitation && (
-                                <section id="citation">
-                                    <h2
-                                        style={{
-                                            fontSize: getThemedFontSize(700),
-                                            fontWeight: 700,
-                                        }}
-                                    >
-                                        Citation
-                                    </h2>
-                                    <div
-                                        className={cmsContentClassName}
-                                        dangerouslySetInnerHTML={{
-                                            __html: citationContentHtml,
-                                        }}
-                                    ></div>
-                                </section>
+                                <CitationSection
+                                    citationHtml={citationContentHtml}
+                                    citationText={stripHtmlToText(citationHtml)}
+                                    cmsContentClassName={cmsContentClassName}
+                                />
                             )}
 
                             {hasMethodology && (
-                                <section id="methodology">
-                                    <h2
-                                        style={{
-                                            fontSize: getThemedFontSize(700),
-                                            fontWeight: 700,
-                                        }}
-                                    >
-                                        Methodology
-                                    </h2>
-
-                                    {hasValue(dataset.technical_notes) && (
-                                        <p>
-                                            <a
-                                                className="text-wri-green underline"
-                                                href={dataset.technical_notes}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                Technical notes
-                                            </a>
-                                        </p>
-                                    )}
-
-                                    {hasValue(methodologyHtml) && (
-                                        <div
-                                            className={cmsContentClassName}
-                                            dangerouslySetInnerHTML={{ __html: methodologyContentHtml }}
-                                        ></div>
-                                    )}
-
-                                    {hasValue(useCasesHtml) && (
-                                        <>
-                                            <h3 className="font-semibold">Use cases</h3>
-                                            <div
-                                                className={cmsContentClassName}
-                                                dangerouslySetInnerHTML={{ __html: useCasesContentHtml }}
-                                            ></div>
-                                        </>
-                                    )}
-
-                                    {hasValue(functionHtml) && (
-                                        <>
-                                            <h3 className="font-semibold">Function</h3>
-                                            <div
-                                                className={cmsContentClassName}
-                                                dangerouslySetInnerHTML={{ __html: functionContentHtml }}
-                                            ></div>
-                                        </>
-                                    )}
-                                </section>
+                                <MethodologySection
+                                    methodologyHtml={methodologyContentHtml}
+                                    useCasesHtml={useCasesContentHtml}
+                                    functionHtml={functionContentHtml}
+                                    technicalNotesUrl={dataset.technical_notes}
+                                    cmsContentClassName={cmsContentClassName}
+                                />
                             )}
 
                             {hasContactDetails && (
-                                <section id="contact-details">
-                                    <h2
-                                        style={{
-                                            fontSize: getThemedFontSize(700),
-                                            fontWeight: 700,
-                                        }}
-                                    >
-                                        Contact details
-                                    </h2>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {authorEntries.length > 0 && (
-                                            <div>
-                                                <h3 className="font-semibold">Authors</h3>
-                                                <div className="space-y-3 pt-2">
-                                                    {authorEntries.map((entry, index) => (
-                                                        <div key={`author-${index}`}>
-                                                            {hasValue(entry.name) && <p>{entry.name}</p>}
-                                                            {hasValue(entry.email) && <p>{entry.email}</p>}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {maintainerEntries.length > 0 && (
-                                            <div>
-                                                <h3 className="font-semibold">Maintainers</h3>
-                                                <div className="space-y-3 pt-2">
-                                                    {maintainerEntries.map((entry, index) => (
-                                                        <div key={`maintainer-${index}`}>
-                                                            {hasValue(entry.name) && <p>{entry.name}</p>}
-                                                            {hasValue(entry.email) && <p>{entry.email}</p>}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </section>
+                                <ContactDetailsSection
+                                    authors={authorEntries}
+                                    maintainers={maintainerEntries}
+                                />
                             )}
 
                             {hasRelatedDatasets && (
@@ -517,37 +437,13 @@ export default function DatasetV2Content({ dataset }: Props) {
                             )}
 
                             {hasAdditionalMetadata && (
-                                <section id="additional-metadata">
-                                    <h2
-                                        style={{
-                                            fontSize: getThemedFontSize(700),
-                                            fontWeight: 700,
-                                        }}
-                                    >
-                                        Additional metadata
-                                    </h2>
-
-                                    {additionalMetadataItems.length > 0 && (
-                                        <dl className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6">
-                                            {additionalMetadataItems.map((item) => (
-                                                <div key={item.label}>
-                                                    <dt className="font-semibold">{item.label}</dt>
-                                                    <dd>{item.value}</dd>
-                                                </div>
-                                            ))}
-                                        </dl>
-                                    )}
-
-                                    {hasValue(restrictionsHtml) && (
-                                        <>
-                                            <h3 className="font-semibold pt-4">Restrictions</h3>
-                                            <div
-                                                className={cmsContentClassName}
-                                                dangerouslySetInnerHTML={{ __html: restrictionsContentHtml }}
-                                            ></div>
-                                        </>
-                                    )}
-                                </section>
+                                <AdditionalMetadataSection
+                                    dataset={dataset}
+                                    authorNames={authorNames}
+                                    additionalMetadataItems={additionalMetadataItems}
+                                    restrictionsHtml={restrictionsContentHtml}
+                                    cmsContentClassName={cmsContentClassName}
+                                />
                             )}
                         </div>
                     </section>
