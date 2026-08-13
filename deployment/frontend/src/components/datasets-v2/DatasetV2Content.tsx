@@ -70,6 +70,28 @@ function stripCmsTypography(html: string): string {
         });
 }
 
+function getSafeExternalUrl(value: string | null | undefined): string | null {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+        return null;
+    }
+
+    try {
+        if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
+            return trimmed;
+        }
+
+        const parsedUrl = new URL(trimmed);
+        if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+            return trimmed;
+        }
+    } catch {
+        return null;
+    }
+
+    return null;
+}
+
 export default function DatasetV2Content({ dataset }: Props) {
     console.log(dataset);
     const datasetTitle = dataset.title ?? dataset.name;
@@ -108,6 +130,7 @@ export default function DatasetV2Content({ dataset }: Props) {
     const functionContentHtml = stripCmsTypography(functionHtml);
     const releaseNotesContentHtml = stripCmsTypography(releaseNotesHtml);
     const restrictionsContentHtml = stripCmsTypography(restrictionsHtml);
+    const safeLearnMoreUrl = getSafeExternalUrl(dataset.learn_more);
 
     const cautionsText = stripHtmlToText(dataset.cautions);
     const relatedDatasets = parseRelatedDatasets(
@@ -291,15 +314,11 @@ export default function DatasetV2Content({ dataset }: Props) {
                                 variant="warning"
                                 label="Caution for using this dataset"
                                 caption={cautionsText}
-                                actionLabel={hasValue(dataset.learn_more) ? 'Read more' : undefined}
+                                actionLabel={safeLearnMoreUrl ? 'Read more' : undefined}
                                 onActionClick={
-                                    hasValue(dataset.learn_more)
+                                    safeLearnMoreUrl
                                         ? () => {
-                                              window.open(
-                                                  dataset.learn_more,
-                                                  '_blank',
-                                                  'noopener,noreferrer'
-                                              );
+                                              window.open(safeLearnMoreUrl, '_blank', 'noopener,noreferrer');
                                           }
                                         : undefined
                                 }
