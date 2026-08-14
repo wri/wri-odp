@@ -37,7 +37,7 @@ function DatasetDetailsHeader({
                 <Button
                     variant="borderless"
                     size="default"
-                    onClick={() => router.back()}
+                    onClick={() => void router.push('/search')}
                     leftIcon={<ChevronLeftIcon />}
                 >
                     <div

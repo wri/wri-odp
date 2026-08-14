@@ -18,12 +18,8 @@ import ContactDetailsSection, {
     hasContactDetails as hasContactDetailsFromSection,
 } from './sections/ContactDetailsSection';
 import AdditionalMetadataSection from './sections/AdditionalMetadataSection';
-import {
-    hasValue,
-    parseRelatedDatasets,
-    stripCmsTypography,
-    getSafeExternalUrl,
-} from './utils/text';
+import RelatedDatasetsSection, { hasDatasetKeywords } from './sections/RelatedDatasetsSection';
+import { hasValue, stripCmsTypography, getSafeExternalUrl } from './utils/text';
 
 type Props = {
     dataset: WriDataset;
@@ -71,9 +67,11 @@ export default function DatasetV2Content({ dataset }: Props) {
     const safeLearnMoreUrl = getSafeExternalUrl(dataset.learn_more);
 
     const cautionsText = stripHtmlToText(dataset.cautions);
-    const relatedDatasets = parseRelatedDatasets(
-        getExtraValue(['related_datasets', 'related datasets', 'related-datasets'])
-    );
+    const relatedDatasets = getExtraValue([
+        'related_datasets',
+        'related datasets',
+        'related-datasets',
+    ]);
 
     const hasContactDetailsSection = hasContactDetailsFromSection(dataset);
     const hasDescription = hasValue(descriptionHtml);
@@ -85,7 +83,7 @@ export default function DatasetV2Content({ dataset }: Props) {
         hasValue(useCasesHtml) ||
         hasValue(functionHtml) ||
         hasValue(dataset.technical_notes);
-    const hasRelatedDatasets = relatedDatasets.length > 0;
+    const hasRelatedDatasets = hasDatasetKeywords(dataset) || hasValue(relatedDatasets);
     const hasReleaseNotes = hasValue(releaseNotesHtml);
     const hasAdditionalMetadataSection =
         hasValue(dataset.project) ||
@@ -175,8 +173,6 @@ export default function DatasetV2Content({ dataset }: Props) {
               ]
             : []),
     ];
-
-    console.log({ dataset });
 
     return (
         <>
@@ -333,24 +329,7 @@ export default function DatasetV2Content({ dataset }: Props) {
                                 <ContactDetailsSection dataset={dataset} />
                             )}
 
-                            {hasRelatedDatasets && (
-                                <section id="related-datasets">
-                                    <h2
-                                        style={{
-                                            fontSize: getThemedFontSize(700),
-                                            fontWeight: 700,
-                                            paddingBottom: getThemedSpacing(300),
-                                        }}
-                                    >
-                                        Related datasets
-                                    </h2>
-                                    <ul className="list-disc pl-5">
-                                        {relatedDatasets.map((item) => (
-                                            <li key={item}>{item}</li>
-                                        ))}
-                                    </ul>
-                                </section>
-                            )}
+                            {hasRelatedDatasets && <RelatedDatasetsSection dataset={dataset} />}
 
                             {hasReleaseNotes && (
                                 <section id="release-notes">
