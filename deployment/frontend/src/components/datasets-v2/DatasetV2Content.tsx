@@ -19,7 +19,7 @@ import ContactDetailsSection, {
 } from './sections/ContactDetailsSection';
 import AdditionalMetadataSection from './sections/AdditionalMetadataSection';
 import RelatedDatasetsSection, { hasDatasetKeywords } from './sections/RelatedDatasetsSection';
-import { hasValue, stripCmsTypography, getSafeExternalUrl } from './utils/text';
+import { hasValue, stripCmsTypography } from './utils/text';
 
 type Props = {
     dataset: WriDataset;
@@ -64,7 +64,7 @@ export default function DatasetV2Content({ dataset }: Props) {
     const useCasesContentHtml = stripCmsTypography(useCasesHtml);
     const functionContentHtml = stripCmsTypography(functionHtml);
     const releaseNotesContentHtml = stripCmsTypography(releaseNotesHtml);
-    const safeLearnMoreUrl = getSafeExternalUrl(dataset.learn_more);
+    const safeLearnMoreUrl = dataset.learn_more;
 
     const cautionsText = stripHtmlToText(dataset.cautions);
     const relatedDatasets = getExtraValue([

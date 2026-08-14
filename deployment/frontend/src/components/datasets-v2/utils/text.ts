@@ -56,25 +56,3 @@ export function stripCmsTypography(html: string): string {
             return cleanedStyle ? ` style=${quote}${cleanedStyle}${quote}` : '';
         });
 }
-
-export function getSafeExternalUrl(value: string | null | undefined): string | null {
-    const trimmed = value?.trim();
-    if (!trimmed) {
-        return null;
-    }
-
-    try {
-        if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
-            return trimmed;
-        }
-
-        const parsedUrl = new URL(trimmed);
-        if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-            return trimmed;
-        }
-    } catch {
-        return null;
-    }
-
-    return null;
-}
