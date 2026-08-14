@@ -1,6 +1,9 @@
 import {
     getThemedFontSize,
     getThemedSpacing,
+    getThemedRadius,
+    getThemedBorderWidth,
+    getThemedColor,
     InlineMessage,
 } from '@worldresources/wri-design-systems';
 import DatasetTable from './DatasetTable';
@@ -11,89 +14,26 @@ import DatasetDetailsHeader from './DatasetDetailsHeader';
 import { stripHtmlToText } from '@/utils/datasetJsonLd';
 import CitationSection from './sections/CitationSection';
 import MethodologySection from './sections/MethodologySection';
-import ContactDetailsSection from './sections/ContactDetailsSection';
+import ContactDetailsSection, {
+    hasContactDetails as hasContactDetailsFromSection,
+} from './sections/ContactDetailsSection';
 import AdditionalMetadataSection from './sections/AdditionalMetadataSection';
-import { hasValue } from './utils/text';
+import {
+    hasValue,
+    parseRelatedDatasets,
+    stripCmsTypography,
+    getSafeExternalUrl,
+} from './utils/text';
 
 type Props = {
     dataset: WriDataset;
 };
 
-const proseClassName =
+export const proseClassName =
     'prose max-w-none prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base';
-const cmsContentClassName = `${proseClassName} dataset-v2-cms-content`;
-
-function parseRelatedDatasets(value: string | undefined): string[] {
-    if (!value?.trim()) {
-        return [];
-    }
-
-    try {
-        const parsed = JSON.parse(value) as unknown;
-        if (Array.isArray(parsed)) {
-            return parsed.map((item) => String(item).trim()).filter(Boolean);
-        }
-    } catch {
-        // Fallback to comma/new-line format when extras are not JSON.
-    }
-
-    return value
-        .split(/\n|,/)
-        .map((item) => item.trim())
-        .filter(Boolean);
-}
-
-function stripCmsTypography(html: string): string {
-    if (!html.trim()) {
-        return '';
-    }
-
-    return html
-        .replace(/<font\b[^>]*>/gi, '')
-        .replace(/<\/font>/gi, '')
-        .replace(/<small\b[^>]*>/gi, '')
-        .replace(/<\/small>/gi, '')
-        .replace(/\sstyle=(['"])(.*?)\1/gi, (_, quote: string, styleValue: string) => {
-            const cleanedStyle = styleValue
-                .split(';')
-                .map((rule) => rule.trim())
-                .filter(Boolean)
-                .filter((rule) => {
-                    const property = (rule.split(':')[0] ?? '').trim().toLowerCase();
-                    return (
-                        Boolean(property) && property !== 'font' && !property.startsWith('font-')
-                    );
-                })
-                .join('; ');
-
-            return cleanedStyle ? ` style=${quote}${cleanedStyle}${quote}` : '';
-        });
-}
-
-function getSafeExternalUrl(value: string | null | undefined): string | null {
-    const trimmed = value?.trim();
-    if (!trimmed) {
-        return null;
-    }
-
-    try {
-        if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
-            return trimmed;
-        }
-
-        const parsedUrl = new URL(trimmed);
-        if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
-            return trimmed;
-        }
-    } catch {
-        return null;
-    }
-
-    return null;
-}
+export const cmsContentClassName = proseClassName;
 
 export default function DatasetV2Content({ dataset }: Props) {
-    console.log(dataset);
     const datasetTitle = dataset.title ?? dataset.name;
     const datasetDescription = dataset.short_description ?? '';
     const datasetId = dataset.id;
@@ -122,14 +62,12 @@ export default function DatasetV2Content({ dataset }: Props) {
     const releaseNotesHtml = dataset.release_notes ?? '';
     const useCasesHtml = dataset.usecases ?? '';
     const functionHtml = dataset.function ?? '';
-    const restrictionsHtml = dataset.restrictions ?? '';
     const descriptionContentHtml = stripCmsTypography(descriptionHtml);
     const methodologyContentHtml = stripCmsTypography(methodologyHtml);
     const citationContentHtml = stripCmsTypography(citationHtml);
     const useCasesContentHtml = stripCmsTypography(useCasesHtml);
     const functionContentHtml = stripCmsTypography(functionHtml);
     const releaseNotesContentHtml = stripCmsTypography(releaseNotesHtml);
-    const restrictionsContentHtml = stripCmsTypography(restrictionsHtml);
     const safeLearnMoreUrl = getSafeExternalUrl(dataset.learn_more);
 
     const cautionsText = stripHtmlToText(dataset.cautions);
@@ -137,61 +75,7 @@ export default function DatasetV2Content({ dataset }: Props) {
         getExtraValue(['related_datasets', 'related datasets', 'related-datasets'])
     );
 
-    const authorEntries = [
-        ...(dataset.authors ?? []).map((author) => ({
-            name: author.name,
-            email: author.email,
-        })),
-        ...(dataset.author || dataset.author_email
-            ? [
-                  {
-                      name: dataset.author,
-                      email: dataset.author_email,
-                  },
-              ]
-            : []),
-    ].filter((entry) => hasValue(entry.name) || hasValue(entry.email));
-
-    const maintainerEntries = [
-        ...(dataset.maintainers ?? []).map((maintainer) => ({
-            name: maintainer.name,
-            email: maintainer.email,
-        })),
-        ...(dataset.maintainer || dataset.maintainer_email
-            ? [
-                  {
-                      name: dataset.maintainer,
-                      email: dataset.maintainer_email,
-                  },
-              ]
-            : []),
-    ].filter((entry) => hasValue(entry.name) || hasValue(entry.email));
-
-    const additionalMetadataItems: Array<{ label: string; value: string }> = [
-        { label: 'Project', value: dataset.project },
-        {
-            label: 'Update frequency',
-            value: dataset.update_frequency?.replace(/_/g, ' '),
-        },
-        { label: 'Visibility', value: dataset.visibility_type },
-        { label: 'Language', value: dataset.language },
-        { label: 'Spatial type', value: dataset.spatial_type },
-        { label: 'Spatial address', value: dataset.spatial_address },
-        { label: 'Provider', value: dataset.provider },
-        { label: 'Connector type', value: dataset.connectorType },
-        { label: 'Table name', value: dataset.tableName },
-    ].filter((item): item is { label: string; value: string } => hasValue(item.value));
-
-    const topicCount = (dataset.groups ?? []).filter((group) => group.type === 'group').length;
-    const applicationCount =
-        (dataset.applications ?? []).length +
-        (dataset.groups ?? []).filter((group) => group.type === 'application').length;
-    const keywordCount = (dataset.tags ?? []).length;
-    const authorNames = authorEntries
-        .map((entry) => entry.name)
-        .filter((name): name is string => hasValue(name));
-
-    const hasContactDetails = authorEntries.length > 0 || maintainerEntries.length > 0;
+    const hasContactDetailsSection = hasContactDetailsFromSection(dataset);
     const hasDescription = hasValue(descriptionHtml);
     const hasAdditionalReading =
         hasValue(dataset.learn_more) || hasValue(dataset.technical_notes) || hasValue(dataset.url);
@@ -203,13 +87,23 @@ export default function DatasetV2Content({ dataset }: Props) {
         hasValue(dataset.technical_notes);
     const hasRelatedDatasets = relatedDatasets.length > 0;
     const hasReleaseNotes = hasValue(releaseNotesHtml);
-    const hasAdditionalMetadata =
-        additionalMetadataItems.length > 0 ||
-        hasValue(restrictionsHtml) ||
-        topicCount > 0 ||
-        applicationCount > 0 ||
-        keywordCount > 0 ||
-        authorNames.length > 0;
+    const hasAdditionalMetadataSection =
+        hasValue(dataset.project) ||
+        hasValue(dataset.update_frequency) ||
+        hasValue(dataset.visibility_type) ||
+        hasValue(dataset.language) ||
+        hasValue(dataset.spatial_type) ||
+        hasValue(dataset.spatial_address) ||
+        hasValue(dataset.provider) ||
+        hasValue(dataset.connectorType) ||
+        hasValue(dataset.tableName) ||
+        hasValue(dataset.restrictions) ||
+        (dataset.groups ?? []).length > 0 ||
+        (dataset.applications ?? []).length > 0 ||
+        (dataset.tags ?? []).length > 0 ||
+        hasValue(dataset.author) ||
+        hasValue(dataset.author_email) ||
+        (dataset.authors ?? []).length > 0;
 
     const sectionItems = [
         {
@@ -248,7 +142,7 @@ export default function DatasetV2Content({ dataset }: Props) {
                   },
               ]
             : []),
-        ...(hasContactDetails
+        ...(hasContactDetailsSection
             ? [
                   {
                       label: 'Contact details',
@@ -272,7 +166,7 @@ export default function DatasetV2Content({ dataset }: Props) {
                   },
               ]
             : []),
-        ...(hasAdditionalMetadata
+        ...(hasAdditionalMetadataSection
             ? [
                   {
                       label: 'Additional metadata',
@@ -281,6 +175,8 @@ export default function DatasetV2Content({ dataset }: Props) {
               ]
             : []),
     ];
+
+    console.log({ dataset });
 
     return (
         <>
@@ -318,7 +214,11 @@ export default function DatasetV2Content({ dataset }: Props) {
                                 onActionClick={
                                     safeLearnMoreUrl
                                         ? () => {
-                                              window.open(safeLearnMoreUrl, '_blank', 'noopener,noreferrer');
+                                              window.open(
+                                                  safeLearnMoreUrl,
+                                                  '_blank',
+                                                  'noopener,noreferrer'
+                                              );
                                           }
                                         : undefined
                                 }
@@ -339,12 +239,18 @@ export default function DatasetV2Content({ dataset }: Props) {
                                         style={{
                                             fontSize: getThemedFontSize(700),
                                             fontWeight: 700,
+                                            paddingBottom: getThemedSpacing(300),
                                         }}
                                     >
                                         Description
                                     </h2>
                                     <div
                                         className={cmsContentClassName}
+                                        style={{
+                                            fontFamily: 'inherit',
+                                            fontSize: 'inherit',
+                                            lineHeight: 'inherit',
+                                        }}
                                         dangerouslySetInnerHTML={{
                                             __html: descriptionContentHtml,
                                         }}
@@ -358,38 +264,50 @@ export default function DatasetV2Content({ dataset }: Props) {
                                         style={{
                                             fontSize: getThemedFontSize(700),
                                             fontWeight: 700,
+                                            paddingBottom: getThemedSpacing(300),
                                         }}
                                     >
                                         Additional Reading
                                     </h2>
 
-                                    <ul className="list-disc pl-5">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {hasValue(dataset.learn_more) && (
-                                            <li>
-                                                <a
-                                                    className="text-wri-green underline"
-                                                    href={dataset.learn_more}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
+                                            <a
+                                                href={dataset.learn_more}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <div
+                                                    style={{
+                                                        padding: getThemedSpacing(400),
+                                                        borderRadius: getThemedRadius(300),
+                                                        border: `${getThemedBorderWidth(100)} solid ${getThemedColor('neutral', 300)}`,
+                                                    }}
                                                 >
                                                     Learn more
-                                                </a>
-                                            </li>
+                                                </div>
+                                            </a>
                                         )}
 
                                         {hasValue(dataset.url) && (
-                                            <li>
-                                                <a
-                                                    className="text-wri-green underline"
-                                                    href={dataset.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
+                                            <a
+                                                className="text-wri-green underline"
+                                                href={dataset.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <div
+                                                    style={{
+                                                        padding: getThemedSpacing(400),
+                                                        borderRadius: getThemedRadius(300),
+                                                        border: `${getThemedBorderWidth(100)} solid ${getThemedColor('neutral', 300)}`,
+                                                    }}
                                                 >
                                                     Source
-                                                </a>
-                                            </li>
+                                                </div>
+                                            </a>
                                         )}
-                                    </ul>
+                                    </div>
                                 </section>
                             )}
 
@@ -411,11 +329,8 @@ export default function DatasetV2Content({ dataset }: Props) {
                                 />
                             )}
 
-                            {hasContactDetails && (
-                                <ContactDetailsSection
-                                    authors={authorEntries}
-                                    maintainers={maintainerEntries}
-                                />
+                            {hasContactDetailsSection && (
+                                <ContactDetailsSection dataset={dataset} />
                             )}
 
                             {hasRelatedDatasets && (
@@ -424,6 +339,7 @@ export default function DatasetV2Content({ dataset }: Props) {
                                         style={{
                                             fontSize: getThemedFontSize(700),
                                             fontWeight: 700,
+                                            paddingBottom: getThemedSpacing(300),
                                         }}
                                     >
                                         Related datasets
@@ -442,12 +358,18 @@ export default function DatasetV2Content({ dataset }: Props) {
                                         style={{
                                             fontSize: getThemedFontSize(700),
                                             fontWeight: 700,
+                                            paddingBottom: getThemedSpacing(300),
                                         }}
                                     >
                                         Release notes
                                     </h2>
                                     <div
                                         className={cmsContentClassName}
+                                        style={{
+                                            fontFamily: 'inherit',
+                                            fontSize: 'inherit',
+                                            lineHeight: 'inherit',
+                                        }}
                                         dangerouslySetInnerHTML={{
                                             __html: releaseNotesContentHtml,
                                         }}
@@ -455,12 +377,9 @@ export default function DatasetV2Content({ dataset }: Props) {
                                 </section>
                             )}
 
-                            {hasAdditionalMetadata && (
+                            {hasAdditionalMetadataSection && (
                                 <AdditionalMetadataSection
                                     dataset={dataset}
-                                    authorNames={authorNames}
-                                    additionalMetadataItems={additionalMetadataItems}
-                                    restrictionsHtml={restrictionsContentHtml}
                                     cmsContentClassName={cmsContentClassName}
                                 />
                             )}
@@ -476,14 +395,6 @@ export default function DatasetV2Content({ dataset }: Props) {
                     </section>
                 ) : null}
             </div>
-
-            <style jsx global>{`
-                .dataset-v2-cms-content * {
-                    font-family: inherit !important;
-                    font-size: inherit !important;
-                    line-height: inherit;
-                }
-            `}</style>
         </>
     );
 }

@@ -8,21 +8,24 @@ import {
 } from '@worldresources/wri-design-systems';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid';
-import type { WriDataset } from '@/schema/ckan.schema';
+import { type WriDataset } from '@/schema/ckan.schema';
 import DatasetDownloadButton from './DatasetDownloadButton';
 import AccessApiButton from './AccessApiButton';
+import type { DatasetDetailsHeaderMenuItem } from './types';
 
-function DatasetDetailsHeaderSticky({
-    dataset,
-    datasetTitle,
-    openInItems,
-    sectionItems,
-}: {
+type SectionItem = {
+    label: string;
+    value: string;
+};
+
+type Props = {
     dataset: WriDataset;
     datasetTitle: string;
-    openInItems: Array<{ label: string; value: string }>;
-    sectionItems: Array<{ label: string; value: string }>;
-}) {
+    openInItems: DatasetDetailsHeaderMenuItem[];
+    sectionItems: SectionItem[];
+};
+
+function DatasetDetailsHeaderSticky({ dataset, datasetTitle, openInItems, sectionItems }: Props) {
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
     const [isAccessApiModalOpen, setIsAccessApiModalOpen] = useState(false);
     const [selectedSectionLabel, setSelectedSectionLabel] = useState(
@@ -42,6 +45,7 @@ function DatasetDetailsHeaderSticky({
 
         window.open(value, '_blank', 'noopener,noreferrer');
     };
+
     const openInItemsAndAccessApi = [
         {
             label: 'Access API',

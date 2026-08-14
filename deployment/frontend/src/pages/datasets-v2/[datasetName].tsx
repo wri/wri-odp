@@ -16,13 +16,7 @@ const DatasetV2Content = dynamic(() => import('@/components/datasets-v2/DatasetV
 // causes this error: useContext returned `undefined`. Seems you forgot to wrap component within <ChakraProvider />
 
 type PageProps = {
-    datasetName: string;
-    datasetTitle: string;
-    datasetDescription: string;
-    datasetId: string;
-    licenseTitle: string;
-    layerRwId: string | null;
-    dataset?: WriDataset;
+    dataset: WriDataset;
 };
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async (context) => {
@@ -44,20 +38,11 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (context)
 
     try {
         const dataset = await getOneDataset(datasetName, session, true);
-        const layerResource = dataset.resources?.find(
-            (resource: { format?: string; rw_id?: string | null }) =>
-                resource?.format === 'Layer' || !!resource?.rw_id
-        );
+        const serializableDataset = JSON.parse(JSON.stringify(dataset)) as WriDataset;
 
         return {
             props: {
-                datasetName,
-                datasetTitle: dataset.title ?? dataset.name,
-                datasetDescription: dataset.short_description ?? '',
-                datasetId: dataset.id,
-                licenseTitle: dataset.license_title ?? '',
-                layerRwId: layerResource?.rw_id ?? null,
-                dataset: dataset as WriDataset,
+                dataset: serializableDataset,
             },
         };
     } catch {
@@ -68,30 +53,16 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (context)
 };
 
 export default function DatasetV2Page({
-    datasetName,
-    datasetTitle,
-    datasetDescription,
-    datasetId,
-    licenseTitle,
-    layerRwId,
     dataset,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const datasetTitle = dataset.title ?? dataset.name;
+
     return (
         <>
             <Head>
                 <title>Datasets V2 | {datasetTitle}</title>
             </Head>
-            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
-
-            <DatasetV2Content
-                datasetName={datasetName}
-                datasetTitle={datasetTitle}
-                datasetDescription={datasetDescription}
-                datasetId={datasetId}
-                licenseTitle={licenseTitle}
-                layerRwId={layerRwId}
-                dataset={dataset}
-            />
+            <DatasetV2Content dataset={dataset} />
         </>
     );
 }

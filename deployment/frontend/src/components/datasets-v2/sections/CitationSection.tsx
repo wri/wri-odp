@@ -24,12 +24,14 @@ export default function CitationSection({
                     display: 'flex',
                     gap: getThemedSpacing(400),
                     alignItems: 'center',
+                    paddingBottom: getThemedSpacing(300),
                 }}
             >
                 <h2
                     style={{
                         fontSize: getThemedFontSize(700),
                         fontWeight: 700,
+                        margin: 0,
                     }}
                 >
                     Citation
@@ -47,6 +49,11 @@ export default function CitationSection({
             </div>
             <div
                 className={cmsContentClassName}
+                style={{
+                    fontFamily: 'inherit',
+                    fontSize: 'inherit',
+                    lineHeight: 'inherit',
+                }}
                 dangerouslySetInnerHTML={{
                     __html: citationHtml,
                 }}

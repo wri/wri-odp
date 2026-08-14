@@ -22,6 +22,7 @@ export default function MethodologySection({
                 style={{
                     fontSize: getThemedFontSize(700),
                     fontWeight: 700,
+                    paddingBottom: getThemedSpacing(300),
                 }}
             >
                 Methodology
@@ -37,6 +38,11 @@ export default function MethodologySection({
                 {hasValue(methodologyHtml) && (
                     <div
                         className={cmsContentClassName}
+                        style={{
+                            fontFamily: 'inherit',
+                            fontSize: 'inherit',
+                            lineHeight: 'inherit',
+                        }}
                         dangerouslySetInnerHTML={{
                             __html: methodologyHtml,
                         }}
@@ -48,6 +54,11 @@ export default function MethodologySection({
                         <h3 className="font-semibold">Use cases</h3>
                         <div
                             className={cmsContentClassName}
+                            style={{
+                                fontFamily: 'inherit',
+                                fontSize: 'inherit',
+                                lineHeight: 'inherit',
+                            }}
                             dangerouslySetInnerHTML={{
                                 __html: useCasesHtml,
                             }}
@@ -60,6 +71,11 @@ export default function MethodologySection({
                         <h3 className="font-semibold">Function</h3>
                         <div
                             className={cmsContentClassName}
+                            style={{
+                                fontFamily: 'inherit',
+                                fontSize: 'inherit',
+                                lineHeight: 'inherit',
+                            }}
                             dangerouslySetInnerHTML={{
                                 __html: functionHtml,
                             }}

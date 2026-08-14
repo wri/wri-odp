@@ -458,16 +458,6 @@ export default function SelectFilesMap({
                     onClearAll={handleClearAll}
                 />
             </div>
-
-            <style jsx global>{`
-                [data-scope='popover'][data-part='positioner'] {
-                    z-index: 1800 !important;
-                }
-
-                [data-scope='popover'][data-part='content'] {
-                    z-index: 1801 !important;
-                }
-            `}</style>
         </>
     );
 }

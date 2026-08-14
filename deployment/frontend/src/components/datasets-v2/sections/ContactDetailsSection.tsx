@@ -5,6 +5,7 @@ import {
     getThemedRadius,
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
+import { type WriDataset } from '@/schema/ckan.schema';
 import { hasValue } from '../utils/text';
 
 export type ContactEntry = {
@@ -13,9 +14,51 @@ export type ContactEntry = {
 };
 
 type Props = {
+    dataset: WriDataset;
+};
+
+export function getContactEntries(dataset: WriDataset): {
     authors: ContactEntry[];
     maintainers: ContactEntry[];
-};
+} {
+    const authors = [
+        ...(dataset.authors ?? []).map((author) => ({
+            name: author.name,
+            email: author.email,
+        })),
+        ...(dataset.author || dataset.author_email
+            ? [
+                  {
+                      name: dataset.author,
+                      email: dataset.author_email,
+                  },
+              ]
+            : []),
+    ].filter((entry) => hasValue(entry.name) || hasValue(entry.email));
+
+    const maintainers = [
+        ...(dataset.maintainers ?? []).map((maintainer) => ({
+            name: maintainer.name,
+            email: maintainer.email,
+        })),
+        ...(dataset.maintainer || dataset.maintainer_email
+            ? [
+                  {
+                      name: dataset.maintainer,
+                      email: dataset.maintainer_email,
+                  },
+              ]
+            : []),
+    ].filter((entry) => hasValue(entry.name) || hasValue(entry.email));
+
+    return { authors, maintainers };
+}
+
+export function hasContactDetails(dataset: WriDataset): boolean {
+    const { authors, maintainers } = getContactEntries(dataset);
+
+    return authors.length > 0 || maintainers.length > 0;
+}
 
 function ContactCard({ entry, role }: { entry: ContactEntry; role: string }) {
     if (!hasValue(entry.name) && !hasValue(entry.email)) {
@@ -54,7 +97,9 @@ function ContactCard({ entry, role }: { entry: ContactEntry; role: string }) {
     );
 }
 
-export default function ContactDetailsSection({ authors, maintainers }: Props) {
+export default function ContactDetailsSection({ dataset }: Props) {
+    const { authors, maintainers } = getContactEntries(dataset);
+
     const cards = [
         ...authors.map((entry, index) => ({
             key: `author-${index}`,
@@ -74,12 +119,13 @@ export default function ContactDetailsSection({ authors, maintainers }: Props) {
                 style={{
                     fontSize: getThemedFontSize(700),
                     fontWeight: 700,
+                    paddingBottom: getThemedSpacing(300),
                 }}
             >
                 Contact details
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {cards.map((card) => (
                     <ContactCard key={card.key} entry={card.entry} role={card.role} />
                 ))}
