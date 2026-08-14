@@ -42,7 +42,7 @@ export default function SelectFilesMapHeader({
                 flexDirection: 'column',
                 gap: getThemedSpacing(200),
                 position: 'relative',
-                zIndex: 4,
+                zIndex: 1800,
             }}
         >
             <div
@@ -77,7 +77,7 @@ export default function SelectFilesMapHeader({
                             width: 264,
                             flexShrink: 0,
                             position: 'relative',
-                            zIndex: 30,
+                            zIndex: 1801,
                             overflow: 'visible',
                         }}
                     >

@@ -17,6 +17,7 @@ function DatasetDetailsHeader({
     datasetDescription,
     datasetName,
     dataset,
+    sectionItems,
 }: DatasetDetailsHeaderProps) {
     const router = useRouter();
     const { headerRef, isSticky } = useStickyHeader();
@@ -36,7 +37,7 @@ function DatasetDetailsHeader({
                 <Button
                     variant="borderless"
                     size="default"
-                    onClick={() => router.back()}
+                    onClick={() => void router.push('/search')}
                     leftIcon={<ChevronLeftIcon />}
                 >
                     <div
@@ -90,6 +91,7 @@ function DatasetDetailsHeader({
                     dataset={dataset}
                     datasetTitle={datasetTitle}
                     openInItems={openInItems}
+                    sectionItems={sectionItems}
                 />
             )}
         </>

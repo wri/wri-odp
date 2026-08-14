@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     Button,
     getThemedColor,
@@ -8,58 +8,29 @@ import {
 } from '@worldresources/wri-design-systems';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { ChevronDownIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid';
-import type { DatasetDetailsHeaderStickyProps } from './types';
+import { type WriDataset } from '@/schema/ckan.schema';
 import DatasetDownloadButton from './DatasetDownloadButton';
 import AccessApiButton from './AccessApiButton';
+import type { DatasetDetailsHeaderMenuItem } from './types';
 
-const sectionItems = [
-    {
-        label: 'Key details',
-        value: 'key-details',
-    },
-    {
-        label: 'Description',
-        value: 'description',
-    },
-    {
-        label: 'Additional Reading',
-        value: 'additional-reading',
-    },
-    {
-        label: 'Citation',
-        value: 'citation',
-    },
-    {
-        label: 'Methodology',
-        value: 'methodology',
-    },
-    {
-        label: 'Contact details',
-        value: 'contact-details',
-    },
-    {
-        label: 'Related datasets',
-        value: 'related-datasets',
-    },
+type SectionItem = {
+    label: string;
+    value: string;
+};
 
-    {
-        label: 'Release notes',
-        value: 'release-notes',
-    },
-    {
-        label: 'Additional metadata',
-        value: 'additional-metadata',
-    },
-];
+type Props = {
+    dataset: WriDataset;
+    datasetTitle: string;
+    openInItems: DatasetDetailsHeaderMenuItem[];
+    sectionItems: SectionItem[];
+};
 
-function DatasetDetailsHeaderSticky({
-    dataset,
-    datasetTitle,
-    openInItems,
-}: DatasetDetailsHeaderStickyProps) {
+function DatasetDetailsHeaderSticky({ dataset, datasetTitle, openInItems, sectionItems }: Props) {
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
     const [isAccessApiModalOpen, setIsAccessApiModalOpen] = useState(false);
-    const [selectedSectionLabel, setSelectedSectionLabel] = useState('Key details');
+    const [selectedSectionLabel, setSelectedSectionLabel] = useState(
+        sectionItems[0]?.label ?? 'Section'
+    );
     const stickyOpenInItems = openInItems.map((item) => ({
         label: `Open in (${item.label})`,
         value: item.value,
@@ -74,6 +45,7 @@ function DatasetDetailsHeaderSticky({
 
         window.open(value, '_blank', 'noopener,noreferrer');
     };
+
     const openInItemsAndAccessApi = [
         {
             label: 'Access API',
@@ -81,6 +53,21 @@ function DatasetDetailsHeaderSticky({
         },
         ...stickyOpenInItems,
     ];
+
+    useEffect(() => {
+        if (!sectionItems.length) {
+            setSelectedSectionLabel('Section');
+            return;
+        }
+
+        const selectedStillExists = sectionItems.some(
+            (item) => item.label === selectedSectionLabel
+        );
+
+        if (!selectedStillExists) {
+            setSelectedSectionLabel(sectionItems[0]?.label ?? 'Section');
+        }
+    }, [sectionItems, selectedSectionLabel]);
 
     const onSectionSelect = (sectionId: string) => {
         const selectedSection = sectionItems.find((item) => item.value === sectionId);

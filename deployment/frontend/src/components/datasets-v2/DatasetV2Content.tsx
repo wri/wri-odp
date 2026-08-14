@@ -1,6 +1,9 @@
 import {
     getThemedFontSize,
     getThemedSpacing,
+    getThemedRadius,
+    getThemedBorderWidth,
+    getThemedColor,
     InlineMessage,
 } from '@worldresources/wri-design-systems';
 import DatasetTable from './DatasetTable';
@@ -8,26 +11,169 @@ import { type WriDataset } from '@/schema/ckan.schema';
 import Navigation from './Navigation';
 import DatasetV2Map from './DatasetMap';
 import DatasetDetailsHeader from './DatasetDetailsHeader';
+import { stripHtmlToText } from '@/utils/datasetJsonLd';
+import CitationSection from './sections/CitationSection';
+import MethodologySection from './sections/MethodologySection';
+import ContactDetailsSection, {
+    hasContactDetails as hasContactDetailsFromSection,
+} from './sections/ContactDetailsSection';
+import AdditionalMetadataSection from './sections/AdditionalMetadataSection';
+import RelatedDatasetsSection, { hasDatasetKeywords } from './sections/RelatedDatasetsSection';
+import { hasValue, stripCmsTypography } from './utils/text';
 
 type Props = {
-    datasetName: string;
-    datasetTitle: string;
-    datasetDescription: string;
-    datasetId: string;
-    licenseTitle: string;
-    layerRwId: string | null;
-    dataset?: WriDataset;
+    dataset: WriDataset;
 };
 
-export default function DatasetV2Content({
-    datasetName,
-    datasetTitle,
-    datasetDescription,
-    datasetId,
-    licenseTitle,
-    layerRwId,
-    dataset,
-}: Props) {
+export const proseClassName =
+    'prose max-w-none prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base';
+export const cmsContentClassName = proseClassName;
+
+export default function DatasetV2Content({ dataset }: Props) {
+    const datasetTitle = dataset.title ?? dataset.name;
+    const datasetDescription = dataset.short_description ?? '';
+    const datasetId = dataset.id;
+    const datasetName = dataset.name;
+    const licenseTitle = dataset.license_title ?? '';
+    const layerResource = dataset.resources?.find(
+        (resource: { format?: string; rw_id?: string | null }) =>
+            resource?.format === 'Layer' || !!resource?.rw_id
+    );
+    const layerRwId = layerResource?.rw_id ?? null;
+
+    const getExtraValue = (keys: string[]) => {
+        if (!dataset.extras?.length) return undefined;
+
+        const normalizedKeys = keys.map((k) => k.toLowerCase());
+        const extra = dataset.extras.find((item) =>
+            normalizedKeys.includes(item.key.toLowerCase())
+        );
+
+        return extra?.value;
+    };
+
+    const methodologyHtml = dataset.methodology ?? '';
+    const descriptionHtml = dataset.notes ?? '';
+    const citationHtml = dataset.citation ?? '';
+    const releaseNotesHtml = dataset.release_notes ?? '';
+    const useCasesHtml = dataset.usecases ?? '';
+    const functionHtml = dataset.function ?? '';
+    const descriptionContentHtml = stripCmsTypography(descriptionHtml);
+    const methodologyContentHtml = stripCmsTypography(methodologyHtml);
+    const citationContentHtml = stripCmsTypography(citationHtml);
+    const useCasesContentHtml = stripCmsTypography(useCasesHtml);
+    const functionContentHtml = stripCmsTypography(functionHtml);
+    const releaseNotesContentHtml = stripCmsTypography(releaseNotesHtml);
+    const safeLearnMoreUrl = dataset.learn_more;
+
+    const cautionsText = stripHtmlToText(dataset.cautions);
+    const relatedDatasets = getExtraValue([
+        'related_datasets',
+        'related datasets',
+        'related-datasets',
+    ]);
+
+    const hasContactDetailsSection = hasContactDetailsFromSection(dataset);
+    const hasDescription = hasValue(descriptionHtml);
+    const hasAdditionalReading =
+        hasValue(dataset.learn_more) || hasValue(dataset.technical_notes) || hasValue(dataset.url);
+    const hasCitation = hasValue(citationHtml);
+    const hasMethodology =
+        hasValue(methodologyHtml) ||
+        hasValue(useCasesHtml) ||
+        hasValue(functionHtml) ||
+        hasValue(dataset.technical_notes);
+    const hasRelatedDatasets = hasDatasetKeywords(dataset) || hasValue(relatedDatasets);
+    const hasReleaseNotes = hasValue(releaseNotesHtml);
+    const hasAdditionalMetadataSection =
+        hasValue(dataset.project) ||
+        hasValue(dataset.update_frequency) ||
+        hasValue(dataset.visibility_type) ||
+        hasValue(dataset.language) ||
+        hasValue(dataset.spatial_type) ||
+        hasValue(dataset.spatial_address) ||
+        hasValue(dataset.provider) ||
+        hasValue(dataset.connectorType) ||
+        hasValue(dataset.tableName) ||
+        hasValue(dataset.restrictions) ||
+        (dataset.groups ?? []).length > 0 ||
+        (dataset.applications ?? []).length > 0 ||
+        (dataset.tags ?? []).length > 0 ||
+        hasValue(dataset.author) ||
+        hasValue(dataset.author_email) ||
+        (dataset.authors ?? []).length > 0;
+
+    const sectionItems = [
+        {
+            label: 'Key details',
+            value: 'key-details',
+        },
+        ...(hasDescription
+            ? [
+                  {
+                      label: 'Description',
+                      value: 'description',
+                  },
+              ]
+            : []),
+        ...(hasAdditionalReading
+            ? [
+                  {
+                      label: 'Additional Reading',
+                      value: 'additional-reading',
+                  },
+              ]
+            : []),
+        ...(hasCitation
+            ? [
+                  {
+                      label: 'Citation',
+                      value: 'citation',
+                  },
+              ]
+            : []),
+        ...(hasMethodology
+            ? [
+                  {
+                      label: 'Methodology',
+                      value: 'methodology',
+                  },
+              ]
+            : []),
+        ...(hasContactDetailsSection
+            ? [
+                  {
+                      label: 'Contact details',
+                      value: 'contact-details',
+                  },
+              ]
+            : []),
+        ...(hasRelatedDatasets
+            ? [
+                  {
+                      label: 'Related datasets',
+                      value: 'related-datasets',
+                  },
+              ]
+            : []),
+        ...(hasReleaseNotes
+            ? [
+                  {
+                      label: 'Release notes',
+                      value: 'release-notes',
+                  },
+              ]
+            : []),
+        ...(hasAdditionalMetadataSection
+            ? [
+                  {
+                      label: 'Additional metadata',
+                      value: 'additional-metadata',
+                  },
+              ]
+            : []),
+    ];
+
     return (
         <>
             <Navigation />
@@ -38,6 +184,7 @@ export default function DatasetV2Content({
                         datasetDescription={datasetDescription}
                         datasetName={datasetName}
                         dataset={dataset}
+                        sectionItems={sectionItems}
                     />
 
                     <section id="key-details" style={{ scrollMarginTop: getThemedSpacing(700) }}>
@@ -50,64 +197,172 @@ export default function DatasetV2Content({
 
                     <section
                         style={{
-                            padding: getThemedSpacing(700),
-                            scrollMarginTop: getThemedSpacing(700),
+                            padding: `0 ${getThemedSpacing(700)}`,
                         }}
                     >
-                        <InlineMessage
-                            size="full-width"
-                            variant="warning"
-                            label="Caution for using this dataset"
-                            caption="This dataset uses a different definition of a tree and a different definition of tree cover than does Hansen et al. (2013). This dataset defines a tree according to both the height and crown diameter. Woody..."
-                            actionLabel="Read more"
-                            onActionClick={() => {
-                                console.log('Read more clicked');
+                        {hasValue(cautionsText) && (
+                            <InlineMessage
+                                size="full-width"
+                                variant="warning"
+                                label="Caution for using this dataset"
+                                caption={cautionsText}
+                                actionLabel={safeLearnMoreUrl ? 'Read more' : undefined}
+                                onActionClick={
+                                    safeLearnMoreUrl
+                                        ? () => {
+                                              window.open(
+                                                  safeLearnMoreUrl,
+                                                  '_blank',
+                                                  'noopener,noreferrer'
+                                              );
+                                          }
+                                        : undefined
+                                }
+                            />
+                        )}
+
+                        <div
+                            style={{
+                                gap: getThemedSpacing(1200),
+                                display: 'flex',
+                                flexDirection: 'column',
+                                paddingTop: getThemedSpacing(1200),
                             }}
-                        />
-                        <section id="description">
-                            <h2
-                                style={{
-                                    fontSize: getThemedFontSize(700),
-                                    fontWeight: 700,
-                                }}
-                            >
-                                Description
-                            </h2>
-                            <div
-                                className="prose max-w-none prose-sm prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base"
-                                dangerouslySetInnerHTML={{
-                                    __html: dataset?.notes ?? '',
-                                }}
-                            ></div>
-                        </section>
-
-                        <section id="additional-reading">{/* Additional Reading */}</section>
-
-                        <section id="citation">
-                            {dataset?.citation && (
-                                <>
+                        >
+                            {hasDescription && (
+                                <section id="description">
                                     <h2
                                         style={{
                                             fontSize: getThemedFontSize(700),
                                             fontWeight: 700,
+                                            paddingBottom: getThemedSpacing(300),
                                         }}
                                     >
-                                        Citation
+                                        Description
                                     </h2>
-                                    <p>{dataset?.citation ?? ' - '}</p>
-                                </>
+                                    <div
+                                        className={cmsContentClassName}
+                                        style={{
+                                            fontFamily: 'inherit',
+                                            fontSize: 'inherit',
+                                            lineHeight: 'inherit',
+                                        }}
+                                        dangerouslySetInnerHTML={{
+                                            __html: descriptionContentHtml,
+                                        }}
+                                    ></div>
+                                </section>
                             )}
-                        </section>
 
-                        <section id="methodology">{/* Methodology */}</section>
+                            {hasAdditionalReading && (
+                                <section id="additional-reading">
+                                    <h2
+                                        style={{
+                                            fontSize: getThemedFontSize(700),
+                                            fontWeight: 700,
+                                            paddingBottom: getThemedSpacing(300),
+                                        }}
+                                    >
+                                        Additional Reading
+                                    </h2>
 
-                        <section id="contact-details">{/* Contact details */}</section>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {hasValue(dataset.learn_more) && (
+                                            <a
+                                                href={dataset.learn_more}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <div
+                                                    style={{
+                                                        padding: getThemedSpacing(400),
+                                                        borderRadius: getThemedRadius(300),
+                                                        border: `${getThemedBorderWidth(100)} solid ${getThemedColor('neutral', 300)}`,
+                                                    }}
+                                                >
+                                                    Learn more
+                                                </div>
+                                            </a>
+                                        )}
 
-                        <section id="related-datasets">{/* Related datasets */}</section>
+                                        {hasValue(dataset.url) && (
+                                            <a
+                                                className="text-wri-green underline"
+                                                href={dataset.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <div
+                                                    style={{
+                                                        padding: getThemedSpacing(400),
+                                                        borderRadius: getThemedRadius(300),
+                                                        border: `${getThemedBorderWidth(100)} solid ${getThemedColor('neutral', 300)}`,
+                                                    }}
+                                                >
+                                                    Source
+                                                </div>
+                                            </a>
+                                        )}
+                                    </div>
+                                </section>
+                            )}
 
-                        <section id="release-notes">{/* Release notes */}</section>
+                            {hasCitation && (
+                                <CitationSection
+                                    citationHtml={citationContentHtml}
+                                    citationText={stripHtmlToText(citationHtml)}
+                                    cmsContentClassName={cmsContentClassName}
+                                />
+                            )}
 
-                        <section id="additional-metadata">{/* Additional metadata */}</section>
+                            {hasMethodology && (
+                                <MethodologySection
+                                    methodologyHtml={methodologyContentHtml}
+                                    useCasesHtml={useCasesContentHtml}
+                                    functionHtml={functionContentHtml}
+                                    technicalNotesUrl={dataset.technical_notes}
+                                    cmsContentClassName={cmsContentClassName}
+                                />
+                            )}
+
+                            {hasContactDetailsSection && (
+                                <ContactDetailsSection dataset={dataset} />
+                            )}
+
+                            {hasRelatedDatasets && <RelatedDatasetsSection dataset={dataset} />}
+
+                            {hasReleaseNotes && (
+                                <section id="release-notes">
+                                    <h2
+                                        style={{
+                                            fontSize: getThemedFontSize(700),
+                                            fontWeight: 700,
+                                            paddingBottom: getThemedSpacing(300),
+                                        }}
+                                    >
+                                        Release notes
+                                    </h2>
+                                    <div
+                                        className={cmsContentClassName}
+                                        style={{
+                                            fontFamily: 'inherit',
+                                            fontSize: 'inherit',
+                                            lineHeight: 'inherit',
+                                        }}
+                                        dangerouslySetInnerHTML={{
+                                            __html: releaseNotesContentHtml,
+                                        }}
+                                    ></div>
+                                </section>
+                            )}
+
+                            {hasAdditionalMetadataSection && (
+                                <AdditionalMetadataSection
+                                    dataset={dataset}
+                                    cmsContentClassName={cmsContentClassName}
+                                />
+                            )}
+                        </div>
                     </section>
                 </section>
                 {layerRwId ? (
