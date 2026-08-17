@@ -336,13 +336,16 @@ export async function getAllDatasetFq({
         params.set('q', query.search ?? '');
 
         if (fq) {
-            params.set('fq', `(${fq})`);
+            // Callers join Solr clauses with "+". URLSearchParams would encode
+            // those as "%2B" (literal "+"), which breaks fq parsing. Normalize to
+            // spaces so toString() emits "+" again (form-urlencoded space).
+            params.set('fq', `(${fq.replace(/\+/g, ' ')})`);
         }
 
-        if (facetFields) {
-            const _facetFields = facetFields.filter(
-                (f) => f !== 'metadata_modified'
-            );
+        const _facetFields = (facetFields ?? []).filter(
+            (f) => f !== 'metadata_modified'
+        );
+        if (_facetFields.length > 0) {
             params.set('facet.field', `["${_facetFields.join('","')}"]`);
         }
 
