@@ -332,41 +332,53 @@ export async function getAllDatasetFq({
     facets: FacetsCount;
 }> {
     try {
-        let url = `${env.CKAN_URL}/api/3/action/package_search?q=${query.search}`;
+        const params = new URLSearchParams();
+        params.set('q', query.search ?? '');
 
         if (fq) {
-            url += `&fq=(${fq})`;
+            // Callers join Solr clauses with "+". URLSearchParams would encode
+            // those as "%2B" (literal "+"), which breaks fq parsing. Normalize to
+            // spaces so toString() emits "+" again (form-urlencoded space).
+            params.set('fq', `(${fq.replace(/\+/g, ' ')})`);
         }
 
-        if (facetFields) {
-            const _facetFields = facetFields.filter(
-                (f) => f !== 'metadata_modified'
-            );
-            url += `&facet.field=["${_facetFields.join('","')}"]`;
+        const _facetFields = (facetFields ?? []).filter(
+            (f) => f !== 'metadata_modified'
+        );
+        if (_facetFields.length > 0) {
+            params.set('facet.field', `["${_facetFields.join('","')}"]`);
         }
 
         if (sortBy) {
-            url += `&sort=${sortBy}`;
+            params.set('sort', sortBy);
         }
 
         if (extAddressQ) {
-            url += `&ext_address_q=${extAddressQ}`;
+            params.set('ext_address_q', extAddressQ);
         }
 
         if (extLocationQ) {
-            url += `&ext_location_q=${extLocationQ}`;
+            params.set('ext_location_q', extLocationQ);
         }
 
         if (extGlobalQ) {
-            url += `&ext_global_q=${extGlobalQ}`;
+            params.set('ext_global_q', extGlobalQ);
         }
 
         if (user) {
-            url += `&user=true`;
+            params.set('user', 'true');
+        }
+
+        if (query.page?.start !== undefined) {
+            params.set('start', String(query.page.start));
+        }
+
+        if (query.page?.rows !== undefined) {
+            params.set('rows', String(query.page.rows));
         }
 
         const response = await fetch(
-            `${url}&start=${query.page?.start}&rows=${query.page?.rows}`,
+            `${env.CKAN_URL}/api/3/action/package_search?${params.toString()}`,
             {
                 headers: {
                     Authorization: apiKey,
