@@ -1,6 +1,20 @@
 import { type NextApiRequest, type NextApiResponse } from 'next';
 import { env } from '@/env.mjs';
 import { Readable } from 'stream';
+import type { ReadableStream as NodeWebReadableStream } from 'stream/web';
+
+const GFW_DATA_API_ORIGIN = 'https://data-api.globalforestwatch.org';
+
+function isSafeDownloadRedirect(location: string): boolean {
+    try {
+        const url = new URL(location, GFW_DATA_API_ORIGIN);
+        if (url.protocol !== 'https:') return false;
+        if (url.searchParams.has('x-api-key')) return false;
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 export default async function handler(
     req: NextApiRequest,
@@ -35,7 +49,7 @@ export default async function handler(
         'x-api-key': apiKey,
     });
 
-    const upstream = `https://data-api.globalforestwatch.org/dataset/${encodeURIComponent(String(dataset))}/${encodeURIComponent(String(version))}/download/${encodeURIComponent(String(format))}?${params.toString()}`;
+    const upstream = `${GFW_DATA_API_ORIGIN}/dataset/${encodeURIComponent(String(dataset))}/${encodeURIComponent(String(version))}/download/${encodeURIComponent(String(format))}?${params.toString()}`;
 
     try {
         // GFW returns 307 to a signed S3/CDN URL. Do not follow it here —
@@ -50,7 +64,18 @@ export default async function handler(
                     .status(502)
                     .json({ error: 'Upstream redirect missing Location' });
             }
-            return res.redirect(307, location);
+            if (!isSafeDownloadRedirect(location)) {
+                return res.status(502).json({
+                    error: 'Upstream redirect Location rejected',
+                });
+            }
+            const absoluteLocation = new URL(
+                location,
+                GFW_DATA_API_ORIGIN
+            ).toString();
+            // Signed URLs are short-lived; do not let intermediaries cache them.
+            res.setHeader('Cache-Control', 'no-store');
+            return res.redirect(307, absoluteLocation);
         }
 
         if (!upstreamRes.ok) {
@@ -80,11 +105,27 @@ export default async function handler(
             return res.status(502).json({ error: 'Upstream returned empty body' });
         }
 
-        // @ts-expect-error Node Readable.fromWeb accepts the fetch body stream
-        Readable.fromWeb(upstreamRes.body).pipe(res);
+        await new Promise<void>((resolve, reject) => {
+            const nodeStream = Readable.fromWeb(
+                upstreamRes.body as NodeWebReadableStream
+            );
+            const onError = (err: Error) => {
+                nodeStream.destroy();
+                reject(err);
+            };
+            nodeStream.on('error', onError);
+            res.on('error', onError);
+            res.on('close', () => nodeStream.destroy());
+            res.on('finish', resolve);
+            nodeStream.pipe(res);
+        });
+        return;
     } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
-        return res.status(502).json({ error: `Upstream error: ${message}` });
+        if (!res.headersSent) {
+            return res.status(502).json({ error: `Upstream error: ${message}` });
+        }
+        res.end();
     }
 }
 
