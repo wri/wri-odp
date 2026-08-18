@@ -19,6 +19,7 @@ import { OpenInForm } from './metadata/OpenIn';
 import { CustomFieldsForm } from './metadata/CustomFields';
 import {
     capacityOptions,
+    datasetTypeInfoOptions,
     languageOptions,
     updateFrequencyOptions,
     visibilityOptions,
@@ -173,6 +174,9 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             license_id: license
                 ? { value: license.id, label: license.title }
                 : undefined,
+            dataset_type_info: datasetTypeInfoOptions.find(
+                (option) => option.value === dataset.dataset_type_info
+            ),
             visibility_type: visibilityOptions.find(
                 (option) => option.value === dataset.visibility_type
             ),

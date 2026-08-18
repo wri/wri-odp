@@ -25,6 +25,7 @@ export interface Dataset {
     num_tags: number;
     owner_org?: string;
     private?: boolean;
+    dataset_type_info?: string;
     state?: 'active' | 'inactive' | 'deleted';
     title?: string;
     type?: 'dataset';

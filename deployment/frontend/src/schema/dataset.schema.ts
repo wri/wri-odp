@@ -16,6 +16,20 @@ const updateFrequencySchema = z.enum([
     'daily',
 ]);
 
+const datasetTypeInfoSchema = z.enum([
+    'raster_data',
+    'tiled_raster_data',
+    'vector_data',
+    'tiled_vector_data',
+    'tabular_data',
+    'versioned_tabular_data',
+    'packaged_dataset',
+    'mixed_dataset',
+    'documentation',
+    'model_output',
+    'api_dataset',
+]);
+
 const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal']);
 
 const capacitySchema = z.enum(['admin', 'editor', 'member']);
@@ -192,6 +206,13 @@ const DatasetSchemaObject = z.object({
         visibility: z.string(),
     }),
     project: z.string().optional().nullable().or(emptyStringToUndefined),
+    dataset_type_info: z
+        .object({
+            value: datasetTypeInfoSchema,
+            label: z.string(),
+        })
+        .optional()
+        .nullable(),
     applications: z.array(z.string()).default([]),
     technical_notes: z
         .string()
@@ -431,6 +452,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
 export const DatasetSchemaForEdit = DatasetSchemaObject.partial();
 export type VisibilityTypeUnion = z.infer<typeof visibilityTypeSchema>;
 export type UpdateFrequencyUnion = z.infer<typeof updateFrequencySchema>;
+export type DatasetTypeInfoUnion = z.infer<typeof datasetTypeInfoSchema>;
 export type CapacityUnion = z.infer<typeof capacitySchema>;
 
 export type DataDictionaryFormType = z.infer<typeof DataDictionarySchema>;

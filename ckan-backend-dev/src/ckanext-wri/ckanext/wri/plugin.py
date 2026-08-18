@@ -235,6 +235,7 @@ class WriPlugin(plugins.SingletonPlugin):
     def dataset_facets(self, facets_dict, package_type):
         facets_dict["language"] = toolkit._("Language")
         facets_dict["project"] = toolkit._("Project")
+        facets_dict["dataset_type_info"] = toolkit._("Dataset Type")
         facets_dict["temporal_coverage_start"] = toolkit._("Temporal Coverage Start")
         facets_dict["temporal_coverage_end"] = toolkit._("Temporal Coverage End")
         facets_dict["update_frequency"] = toolkit._("Update Frequency")

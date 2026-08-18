@@ -18,6 +18,7 @@ import Spinner from '@/components/_shared/Spinner';
 import classNames from '@/utils/classnames';
 import MulText from '../MulText';
 import {
+    datasetTypeInfoOptions,
     languageOptions,
     updateFrequencyOptions,
     visibilityOptions,
@@ -165,6 +166,15 @@ export function OverviewForm({
                             {...register('project')}
                             placeholder="ex. Climate Initiative"
                             type="text"
+                        />
+                    </InputGroup>
+                    <InputGroup label="Dataset Type">
+                        <SimpleSelect
+                            id="dataset_type_info"
+                            formObj={formObj}
+                            name="dataset_type_info"
+                            placeholder="Select dataset type"
+                            options={datasetTypeInfoOptions}
                         />
                     </InputGroup>
                     <InputGroup label="Applications">

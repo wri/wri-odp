@@ -179,6 +179,7 @@ export const DatasetRouter = createTRPCRouter({
           collaborators: null,
           rw_id: '',
           update_frequency: input.update_frequency?.value ?? '',
+          dataset_type_info: input.dataset_type_info?.value ?? '',
           featured_image:
             input.featured_image && input.featured_dataset
               ? !isValidUrl(cleanUrl(input.featured_image))
@@ -494,6 +495,7 @@ export const DatasetRouter = createTRPCRouter({
             organization: org,
             collaborators: null,
             update_frequency: input.update_frequency?.value ?? '',
+            dataset_type_info: input.dataset_type_info?.value ?? '',
             featured_image:
               input.featured_image && input.featured_dataset
                 ? !isValidUrl(cleanUrl(input.featured_image))

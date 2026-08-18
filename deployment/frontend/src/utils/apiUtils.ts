@@ -2549,6 +2549,7 @@ const datasetFields = [
     'owner_org',
     'private',
     'project',
+    'dataset_type_info',
     'rw_dataset',
     'rw_id',
     'short_description',
