@@ -60,7 +60,10 @@ function isFilterArray(value: unknown): value is Filter[] {
             (item) =>
                 item !== null &&
                 typeof item === 'object' &&
+                !Array.isArray(item) &&
+                typeof (item as Filter).title === 'string' &&
                 typeof (item as Filter).key === 'string' &&
+                typeof (item as Filter).label === 'string' &&
                 typeof (item as Filter).value === 'string'
         )
     );
