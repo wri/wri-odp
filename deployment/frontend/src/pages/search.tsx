@@ -40,19 +40,94 @@ function defaultSelectedTagOptions(filters: Filter[]): string[] {
     return f;
 }
 
-export async function getServerSideProps(
-    context: GetServerSidePropsContext<{ query: any }>
-) {
-    const { query } = context;
-    const initialFilters = query.search
-        ? JSON.parse(query.search as string)
-        : [];
-    const initialPage = query.page
-        ? JSON.parse(query.page as string)
-        : { start: 0, rows: 10 };
-    const initialSortBy = query.sort_by
-        ? JSON.parse(query.sort_by as string)
-        : 'score desc';
+function queryParamString(
+    value: string | string[] | undefined
+): string | undefined {
+    if (typeof value === 'string') return value;
+    if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+    return undefined;
+}
+
+function parseJsonParam<T>(raw: string | undefined, fallback: T): T {
+    if (raw === undefined || raw === '') return fallback;
+    return JSON.parse(raw) as T;
+}
+
+function isFilterArray(value: unknown): value is Filter[] {
+    return (
+        Array.isArray(value) &&
+        value.every(
+            (item) =>
+                item !== null &&
+                typeof item === 'object' &&
+                !Array.isArray(item) &&
+                typeof (item as Filter).title === 'string' &&
+                typeof (item as Filter).key === 'string' &&
+                typeof (item as Filter).label === 'string' &&
+                typeof (item as Filter).value === 'string'
+        )
+    );
+}
+
+function isPageParam(
+    value: unknown
+): value is { start: number; rows: number } {
+    return (
+        value !== null &&
+        typeof value === 'object' &&
+        typeof (value as { start?: unknown }).start === 'number' &&
+        typeof (value as { rows?: unknown }).rows === 'number'
+    );
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const { query, res } = context;
+
+    let initialFilters: Filter[] = [];
+    let initialPage = { start: 0, rows: 10 };
+    let initialSortBy = 'score desc';
+
+    try {
+        const parsedFilters = parseJsonParam<unknown>(
+            queryParamString(query.search),
+            []
+        );
+        const parsedPage = parseJsonParam<unknown>(
+            queryParamString(query.page),
+            { start: 0, rows: 10 }
+        );
+        const parsedSortBy = parseJsonParam<unknown>(
+            queryParamString(query.sort_by),
+            'score desc'
+        );
+
+        if (!isFilterArray(parsedFilters)) {
+            throw new Error('Invalid search filters');
+        }
+        if (!isPageParam(parsedPage)) {
+            throw new Error('Invalid page');
+        }
+        if (typeof parsedSortBy !== 'string') {
+            throw new Error('Invalid sort_by');
+        }
+
+        initialFilters = parsedFilters;
+        initialPage = parsedPage;
+        initialSortBy = parsedSortBy;
+    } catch {
+        // Bots / junk URLs use plain-text ?search=... instead of the JSON
+        // filter array the UI writes. Avoid 500s from JSON.parse.
+        res.statusCode = 400;
+        return {
+            props: {
+                badRequest: true as const,
+                trpcState: null,
+                initialFilters: [],
+                initialPage: { start: 0, rows: 10 },
+                initialSortBy: 'score desc',
+            },
+        };
+    }
 
     const session = await getServerAuthSession(context);
     const helpers = createServerSideHelpers({
@@ -61,7 +136,7 @@ export async function getServerSideProps(
         transformer: superjson,
     });
 
-    const searchQuery = advance_search_query(initialFilters as Filter[]);
+    const searchQuery = advance_search_query(initialFilters);
 
     await helpers.dataset.getAllDataset.prefetch({
         ...searchQuery,
@@ -72,6 +147,7 @@ export async function getServerSideProps(
 
     return {
         props: {
+            badRequest: false as const,
             trpcState: helpers.dehydrate(),
             initialFilters,
             initialPage,
@@ -83,7 +159,36 @@ export async function getServerSideProps(
 export default function SearchPage(
     props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
-    const { initialFilters, initialPage, initialSortBy } = props;
+    if (props.badRequest) {
+        return (
+            <>
+                <Header />
+                <NextSeo title="Bad Request" noindex={true} />
+                <main className="mx-auto max-w-3xl px-4 py-16 text-center">
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                        Bad Request
+                    </h1>
+                    <p className="mt-3 text-gray-600">
+                        Invalid search parameters.
+                    </p>
+                </main>
+                <Footer />
+            </>
+        );
+    }
+
+    return <SearchPageContent {...props} />;
+}
+
+function SearchPageContent({
+    initialFilters,
+    initialPage,
+    initialSortBy,
+}: {
+    initialFilters: Filter[];
+    initialPage: { start: number; rows: number };
+    initialSortBy: string;
+}) {
     const router = useRouter();
     const session = useSession();
 
