@@ -68,12 +68,14 @@ export default function FilteredSearchLayout({
 
   const [facetsQuery] = useState<SearchInput>({
     search: '',
-    page: { start: 0, rows: 5 },
+    page: { start: 0, rows: 0 },
     facetFields: facetFields.map((ff) => ff.key),
   });
 
   const { data: facetsData, isLoading: isLoadingFacets } =
-    api.dataset.getAllDataset.useQuery(facetsQuery);
+    api.dataset.getAllDataset.useQuery(facetsQuery, {
+      staleTime: 10 * 60 * 1000,
+    });
 
   const searchFacets = facetsData?.searchFacets;
 
@@ -108,7 +110,7 @@ export default function FilteredSearchLayout({
         }));
       } else if (key === 'organization') {
         // && facetsData?.teamVisibility) {
-        const visibilityMap = facetsData.teamVisibility;
+        const visibilityMap = facetsData?.teamVisibility ?? {};
         // @ts-ignore
         searchFacets[key].items = searchFacets[key].items.map(
           (item) => {

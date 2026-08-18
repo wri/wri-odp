@@ -29,7 +29,8 @@ import {
   approvePendingDataset,
   getDatasetReleaseNotes,
   getCollaboratorPackages,
-  getAllOrganizations,
+  getTeamVisibilityMap,
+  toSlimSearchDataset,
 } from '@/utils/apiUtils';
 import { searchSchema } from '@/schema/search.schema';
 import type {
@@ -900,6 +901,7 @@ export const DatasetRouter = createTRPCRouter({
           .boolean()
           .optional()
           .default(false),
+        slimSearchResults: z.boolean().optional().default(false),
         showPendingDataset: z.boolean().optional().default(false),
       })
     )
@@ -948,10 +950,16 @@ export const DatasetRouter = createTRPCRouter({
         fq += '+is_approved:true';
       }
 
+      const wantsFacets = (input.facetFields?.length ?? 0) > 0;
+      const facetsOnly =
+        wantsFacets && (input.page?.rows ?? 0) === 0;
+      const slim = Boolean(input.slimSearchResults);
+
       let user_organization: WriOrganization[] = [];
       let collab: Collaborator[] = [];
 
-      if (!ctx.session?.user.sysadmin) {
+      // Skip auth enrichment when facets-only (no datasets returned).
+      if (!facetsOnly && !ctx.session?.user.sysadmin) {
         try {
           [user_organization, collab] = await Promise.all([
             getUserOrganizations({
@@ -980,21 +988,38 @@ export const DatasetRouter = createTRPCRouter({
         extLocationQ: input.extLocationQ,
         extAddressQ: input.extAddressQ,
         extGlobalQ: input.extGlobalQ,
+        // Search/list UI does not need group_show enrichment.
+        includeGroupTypes: !slim && !facetsOnly,
       });
 
-      const _datasets = input.removeUnecessaryDataInResources
-        ? dataset.datasets.map((d) => ({
-          ...d,
-          resources: d.resources.map((r) => ({
-            datastore_active: r.datastore_active,
-            format: r.format,
-          })),
-        }))
-        : dataset.datasets;
+      if (facetsOnly) {
+        const teamVisibility = await getTeamVisibilityMap({
+          apiKey: ctx.session?.user.apikey ?? '',
+        });
+        return {
+          datasets: [] as WriDataset[],
+          count: dataset.count,
+          searchFacets: dataset.searchFacets,
+          teamVisibility,
+        };
+      }
 
-      if (user_organization || collab) {
-        _datasets.forEach((d) => {
-          d.is_authorized =
+      let _datasets: WriDataset[] = slim
+        ? dataset.datasets.map(toSlimSearchDataset)
+        : input.removeUnecessaryDataInResources
+          ? (dataset.datasets.map((d) => ({
+              ...d,
+              resources: d.resources.map((r) => ({
+                datastore_active: r.datastore_active,
+                format: r.format,
+              })),
+            })) as unknown as WriDataset[])
+          : dataset.datasets;
+
+      if (user_organization.length || collab.length) {
+        _datasets = _datasets.map((d) => ({
+          ...d,
+          is_authorized:
             user_organization.some(
               (org) =>
                 org.id === d.owner_org &&
@@ -1006,31 +1031,22 @@ export const DatasetRouter = createTRPCRouter({
                 c.package_id === d.id &&
                 (c.capacity === 'admin' ||
                   c.capacity === 'editor')
-            );
-        });
+            ),
+        }));
       }
 
-      const orgSlugs = [
-        ...new Set(
-          dataset.datasets
-            .map((d) => d.organization?.name)
-            .filter(Boolean)
-        ),
-      ];
-
-      const allOrgs = await getAllOrganizations({
-        apiKey: ctx.session?.user.apikey ?? '',
-      });
-
-      const teamVisibility = Object.fromEntries(
-        allOrgs.map((org) => [org.name, org.visibility || 'public'])
-      );
+      // teamVisibility is only needed for facet org lock icons.
+      const teamVisibility = wantsFacets
+        ? await getTeamVisibilityMap({
+            apiKey: ctx.session?.user.apikey ?? '',
+          })
+        : {};
 
       return {
         datasets: _datasets as unknown as WriDataset[],
         count: dataset.count,
         searchFacets: dataset.searchFacets,
-        teamVisibility: teamVisibility,
+        teamVisibility,
       };
     }),
   getDatasetCollaborators: protectedProcedure

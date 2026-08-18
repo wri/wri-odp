@@ -212,44 +212,108 @@ export async function getAllUsers({
     }
 }
 
+const ORG_PAGE_SIZE = 25;
+const TEAM_VISIBILITY_TTL_MS = 10 * 60 * 1000;
+
+type TeamVisibilityCacheEntry = {
+    expiresAt: number;
+    map: Record<string, string>;
+};
+
+const teamVisibilityCache = new Map<string, TeamVisibilityCacheEntry>();
+
 export async function getAllOrganizations({
     apiKey,
 }: {
     apiKey: string;
 }): Promise<WriOrganization[]> {
     try {
-        const orgList = await Promise.all(
-            [0, 1, 2, 3, 4, 5].map(async (i) => {
-                const response = await fetch(
-                    `${
-                        env.CKAN_URL
-                    }/api/3/action/organization_list?include_extras=true&all_fields=true&limit=${
-                        (i + 1) * 25
-                    }&offset=${i * 25}`,
-                    {
-                        headers: {
-                            Authorization: apiKey,
-                        },
-                    }
-                );
-                const data = (await response.json()) as CkanResponse<
-                    WriOrganization[]
-                >;
-                if (!data.success && data.error) {
-                    if (data.error.message)
-                        throw Error(replaceNames(data.error.message, true));
-                    throw Error(replaceNames(JSON.stringify(data.error), true));
+        const organizations: WriOrganization[] = [];
+        let offset = 0;
+
+        while (true) {
+            const response = await fetch(
+                `${env.CKAN_URL}/api/3/action/organization_list?include_extras=true&all_fields=true&limit=${ORG_PAGE_SIZE}&offset=${offset}`,
+                {
+                    headers: {
+                        Authorization: apiKey,
+                    },
                 }
-                const organizations: WriOrganization[] | [] =
-                    data.success === true ? data.result : [];
-                return organizations;
-            })
-        );
-        return orgList.flat();
+            );
+            const data = (await response.json()) as CkanResponse<
+                WriOrganization[]
+            >;
+            if (!data.success && data.error) {
+                if (data.error.message)
+                    throw Error(replaceNames(data.error.message, true));
+                throw Error(replaceNames(JSON.stringify(data.error), true));
+            }
+            const page: WriOrganization[] =
+                data.success === true ? data.result : [];
+            organizations.push(...page);
+            if (page.length < ORG_PAGE_SIZE) break;
+            offset += ORG_PAGE_SIZE;
+            if (offset > 10000) break;
+        }
+
+        return organizations;
     } catch (e) {
         console.error(e);
         return [];
     }
+}
+
+/** Cached org name → visibility map for search facet lock icons. */
+export async function getTeamVisibilityMap({
+    apiKey,
+}: {
+    apiKey: string;
+}): Promise<Record<string, string>> {
+    const cacheKey = apiKey ? 'auth' : 'anon';
+    const cached = teamVisibilityCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+        return cached.map;
+    }
+
+    const allOrgs = await getAllOrganizations({ apiKey });
+    const map = Object.fromEntries(
+        allOrgs.map((org) => [org.name, org.visibility || 'public'])
+    );
+    teamVisibilityCache.set(cacheKey, {
+        expiresAt: Date.now() + TEAM_VISIBILITY_TTL_MS,
+        map,
+    });
+    return map;
+}
+
+/** Card-sized dataset fields for /search — drops spatial, extras, full resources, etc. */
+export function toSlimSearchDataset(dataset: WriDataset): WriDataset {
+    return {
+        id: dataset.id,
+        name: dataset.name,
+        title: dataset.title,
+        short_description: dataset.short_description,
+        organization: dataset.organization
+            ? {
+                  id: dataset.organization.id,
+                  name: dataset.organization.name,
+                  title: dataset.organization.title,
+              }
+            : dataset.organization,
+        visibility_type: dataset.visibility_type,
+        metadata_modified: dataset.metadata_modified,
+        temporal_coverage_start: dataset.temporal_coverage_start,
+        temporal_coverage_end: dataset.temporal_coverage_end,
+        rw_id: dataset.rw_id,
+        approval_status: dataset.approval_status,
+        creator_user_id: dataset.creator_user_id,
+        owner_org: dataset.owner_org,
+        is_authorized: dataset.is_authorized,
+        resources: (dataset.resources ?? []).map((r) => ({
+            datastore_active: r.datastore_active,
+            format: r.format,
+        })),
+    } as unknown as WriDataset;
 }
 
 export async function getUserGroups({
@@ -315,6 +379,7 @@ export async function getAllDatasetFq({
     extAddressQ = '',
     extGlobalQ = 'include',
     user = null,
+    includeGroupTypes = true,
 }: {
     apiKey: string;
     fq: string;
@@ -325,6 +390,8 @@ export async function getAllDatasetFq({
     extAddressQ?: string;
     extGlobalQ?: string;
     user?: boolean | null;
+    /** When false, CKAN skips per-result group_show (faster list/search). */
+    includeGroupTypes?: boolean;
 }): Promise<{
     datasets: WriDataset[];
     count: number;
@@ -367,6 +434,10 @@ export async function getAllDatasetFq({
 
         if (user) {
             params.set('user', 'true');
+        }
+
+        if (!includeGroupTypes) {
+            params.set('include_group_types', 'false');
         }
 
         if (query.page?.start !== undefined) {

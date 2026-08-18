@@ -48,12 +48,14 @@ export default function FiltersPanel({
 
     const [facetsQuery] = useState<SearchInput>({
         search: '',
-        page: { start: 0, rows: 5 },
+        page: { start: 0, rows: 0 },
         facetFields: facetFields.map((ff) => ff.key),
     });
 
     const { data: facetsData, isLoading: isLoadingFacets } =
-        api.dataset.getAllDataset.useQuery(facetsQuery);
+        api.dataset.getAllDataset.useQuery(facetsQuery, {
+            staleTime: 10 * 60 * 1000,
+        });
 
     const searchFacets = facetsData?.searchFacets;
 

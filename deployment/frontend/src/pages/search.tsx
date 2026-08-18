@@ -12,7 +12,6 @@ import { type SearchInput } from '@/schema/search.schema';
 import { api } from '@/utils/api';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { NextSeo } from 'next-seo';
 import { env } from '@/env.mjs';
 import { appRouter } from '@/server/api/root';
@@ -143,6 +142,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         page: initialPage,
         sortBy: initialSortBy,
         removeUnecessaryDataInResources: true,
+        slimSearchResults: true,
     });
 
     return {
@@ -190,7 +190,6 @@ function SearchPageContent({
     initialSortBy: string;
 }) {
     const router = useRouter();
-    const session = useSession();
 
     /**
      * Query used to show results
@@ -205,6 +204,7 @@ function SearchPageContent({
         page: initialPage,
         sortBy: initialSortBy,
         removeUnecessaryDataInResources: true,
+        slimSearchResults: true,
     });
     const [filters, setFilters] = useState<Filter[]>(initialFilters);
 
@@ -373,13 +373,7 @@ function SearchPageContent({
             />
             <Breadcrumbs links={links} />
             <Search filters={filters} setFilters={setFilters} />
-            {session.status == 'loading' && (
-                <div className="flex w-full justify-center mt-20">
-                    <Spinner />
-                </div>
-            )}
-            {session.status != 'loading' && (
-                <FilteredSearchLayout
+            <FilteredSearchLayout
                     setFilters={setFilters}
                     filters={filters}
                     facetSelectedCount={facetSelectedCount}
@@ -419,7 +413,6 @@ function SearchPageContent({
                         />
                     }
                 </FilteredSearchLayout>
-            )}
             <Footer
                 links={{
                     primary: [
