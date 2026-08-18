@@ -1,0 +1,22 @@
+diff --git a/ckanext/s3filestore/views/resource.py b/ckanext/s3filestore/views/resource.py
+index d3af2b6..e8f4c2a 100644
+--- a/ckanext/s3filestore/views/resource.py
++++ b/ckanext/s3filestore/views/resource.py
+@@ -66,6 +66,9 @@ def resource_download(package_type, id, resource_id, filename=None):
+ 
+         if filename is None:
+             filename = os.path.basename(rsc["url"])
++        # Bots/crawlers often append "\" or "/"; a bad key caused NoSuchKey and
++        # the view returned None (Flask 500). Normalize and always 404 on miss.
++        filename = filename.rstrip("\\/")
+         key_path = upload.get_path(rsc["id"], filename)
+         key = filename
+ 
+@@ -110,6 +113,7 @@ def resource_download(package_type, id, resource_id, filename=None):
+                             url = upload.get_signed_url_to_key(s3key, params)
+                         return redirect(url)
+                     except ClientError as ex:
+                         return abort(404, _("Resource data not found"))
++                return abort(404, _("Resource data not found"))
+             else:
+                 raise ex
