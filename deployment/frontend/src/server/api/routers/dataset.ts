@@ -1043,7 +1043,7 @@ export const DatasetRouter = createTRPCRouter({
         : {};
 
       return {
-        datasets: _datasets as unknown as WriDataset[],
+        datasets: _datasets,
         count: dataset.count,
         searchFacets: dataset.searchFacets,
         teamVisibility,
