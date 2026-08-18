@@ -23,6 +23,8 @@ export const searchSchema = z.object({
     allTree: z.boolean().optional(),
     pageEnabled: z.boolean().optional(),
     removeUnecessaryDataInResources: z.boolean().optional(),
+    /** Return card-sized dataset fields only (search page). */
+    slimSearchResults: z.boolean().optional(),
     tab: z.string().optional(),
 });
 

@@ -260,9 +260,10 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
         if fl = None, datasets are returned as a list of full dictionary.
     """
 
-    # Fix boolean Solr query for featured datasets
+    # Pop before schema validation (not a Solr param)
     q = data_dict.get("q")
     return_user = data_dict.pop("user", False)
+    include_group_types = asbool(data_dict.pop("include_group_types", True))
 
     for field in SOLR_BOOLEAN_FIELDS:
         if q and field in q:
@@ -413,7 +414,10 @@ def package_search(context: Context, data_dict: DataDict) -> ActionResult.Packag
     results_with_group_types = []
 
     for result in results:
-        result_dict = _add_group_types(context, result)
+        if include_group_types:
+            result_dict = _add_group_types(context, result)
+        else:
+            result_dict = result
         results_with_group_types.append(result_dict)
 
     results = results_with_group_types
