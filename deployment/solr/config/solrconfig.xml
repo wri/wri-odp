@@ -242,14 +242,8 @@
 
     <!-- Solr Internal Query Caches
 
-         There are two implementations of cache available for Solr,
-         LRUCache, based on a synchronized LinkedHashMap, and
-         FastLRUCache, based on a ConcurrentHashMap.  
-
-         FastLRUCache has faster gets and slower puts in single
-         threaded operation and thus is generally faster than LRUCache
-         when the hit ratio of the cache is high (> 75%), and may be
-         faster under other scenarios on multi-cpu systems.
+         Solr 9 removed legacy LRUCache / FastLRUCache. Use CaffeineCache
+         (available since Solr 8.3; required on Solr 9+).
     -->
 
     <!-- Filter Cache
@@ -258,20 +252,17 @@
          unordered sets of *all* documents that match a query.  When a
          new searcher is opened, its caches may be prepopulated or
          "autowarmed" using data from caches in the old searcher.
-         autowarmCount is the number of items to prepopulate.  For
-         LRUCache, the autowarmed items will be the most recently
-         accessed items.
+         autowarmCount is the number of items to prepopulate.
 
          Parameters:
-           class - the SolrCache implementation LRUCache or
-               (LRUCache or FastLRUCache)
+           class - the SolrCache implementation (solr.CaffeineCache)
            size - the maximum number of entries in the cache
            initialSize - the initial capacity (number of entries) of
                the cache.  (see java.util.HashMap)
            autowarmCount - the number of entries to prepopulate from
-               and old cache.  
+               and old cache.
       -->
-    <filterCache class="solr.FastLRUCache"
+    <filterCache class="solr.CaffeineCache"
                  size="512"
                  initialSize="512"
                  autowarmCount="0"/>
@@ -280,29 +271,29 @@
 
         Caches results of searches - ordered lists of document ids
         (DocList) based on a query, a sort, and the range of documents requested.
-        Additional supported parameter by LRUCache:
+        Additional supported parameter:
            maxRamMB - the maximum amount of RAM (in MB) that this cache is allowed
                       to occupy
      -->
-    <queryResultCache class="solr.LRUCache"
+    <queryResultCache class="solr.CaffeineCache"
                      size="512"
                      initialSize="512"
                      autowarmCount="0"/>
-   
+
     <!-- Document Cache
 
          Caches Lucene Document objects (the stored fields for each
          document).  Since Lucene internal document ids are transient,
-         this cache will not be autowarmed.  
+         this cache will not be autowarmed.
       -->
-    <documentCache class="solr.LRUCache"
+    <documentCache class="solr.CaffeineCache"
                    size="512"
                    initialSize="512"
                    autowarmCount="0"/>
-    
-    <!-- custom cache currently used by block join --> 
+
+    <!-- custom cache currently used by block join -->
     <cache name="perSegFilter"
-      class="solr.search.LRUCache"
+      class="solr.CaffeineCache"
       size="10"
       initialSize="0"
       autowarmCount="10"
