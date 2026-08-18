@@ -1,4 +1,10 @@
-import { type Dispatch, Fragment, type SetStateAction, useState } from 'react';
+import {
+  type Dispatch,
+  Fragment,
+  type SetStateAction,
+  useMemo,
+  useState,
+} from 'react';
 import { Dialog, Disclosure, Transition } from '@headlessui/react';
 import {
   Bars3Icon,
@@ -20,6 +26,23 @@ import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants';
 import Tags from './Tag';
 import React from 'react';
 
+const BASE_FACET_FIELDS = [
+  { key: 'project', title: 'Project' },
+  { key: 'organization', title: 'Team' },
+  { key: 'groups', title: 'Topics' },
+  { key: 'tags', title: 'Tags' },
+  {
+    key: 'temporal_coverage',
+    title: 'Temporal Coverage',
+  },
+  { key: 'update_frequency', title: 'Update Frequency' },
+  { key: 'res_format', title: 'Format' },
+  { key: 'license_id', title: 'License' },
+  { key: 'language', title: 'Language' },
+  { key: 'wri_data', title: 'WRI Data' },
+  { key: 'metadata_modified', title: 'Last Updated' },
+] as const;
+
 export default function FilteredSearchLayout({
   children,
   setFilters,
@@ -40,41 +63,34 @@ export default function FilteredSearchLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const session = useSession();
+  const isAuthenticated = session.status === 'authenticated';
+  const sessionReady = session.status !== 'loading';
 
   /*
-   * Query used to fetch all possible facet options
-   *
+   * Query used to fetch all possible facet options.
+   * Rebuild when auth settles so visibility_type is included for signed-in users.
    */
-  const facetFields = [
-    { key: 'project', title: 'Project' },
-    { key: 'organization', title: 'Team' },
-    { key: 'groups', title: 'Topics' },
-    { key: 'tags', title: 'Tags' },
-    {
-      key: 'temporal_coverage',
-      title: 'Temporal Coverage',
-    },
-    { key: 'update_frequency', title: 'Update Frequency' },
-    { key: 'res_format', title: 'Format' },
-    { key: 'license_id', title: 'License' },
-    { key: 'language', title: 'Language' },
-    { key: 'wri_data', title: 'WRI Data' },
-    { key: 'metadata_modified', title: 'Last Updated' },
-  ];
+  const facetFields = useMemo(() => {
+    const fields: { key: string; title: string }[] = [...BASE_FACET_FIELDS];
+    if (isAuthenticated) {
+      fields.push({ key: 'visibility_type', title: 'Visibility' });
+    }
+    return fields;
+  }, [isAuthenticated]);
 
-  if (session.status == 'authenticated') {
-    facetFields.push({ key: 'visibility_type', title: 'Visibility' });
-  }
-
-  const [facetsQuery] = useState<SearchInput>({
-    search: '',
-    page: { start: 0, rows: 0 },
-    facetFields: facetFields.map((ff) => ff.key),
-  });
+  const facetsQuery = useMemo<SearchInput>(
+    () => ({
+      search: '',
+      page: { start: 0, rows: 0 },
+      facetFields: facetFields.map((ff) => ff.key),
+    }),
+    [facetFields]
+  );
 
   const { data: facetsData, isLoading: isLoadingFacets } =
     api.dataset.getAllDataset.useQuery(facetsQuery, {
       staleTime: 10 * 60 * 1000,
+      enabled: sessionReady,
     });
 
   const searchFacets = facetsData?.searchFacets;

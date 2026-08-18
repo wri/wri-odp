@@ -253,7 +253,12 @@ export async function getAllOrganizations({
             organizations.push(...page);
             if (page.length < ORG_PAGE_SIZE) break;
             offset += ORG_PAGE_SIZE;
-            if (offset > 10000) break;
+            if (offset > 10000) {
+                console.warn(
+                    '[getAllOrganizations] Aborting pagination after offset > 10000; returning partial results'
+                );
+                break;
+            }
         }
 
         return organizations;
@@ -269,9 +274,14 @@ export async function getTeamVisibilityMap({
 }: {
     apiKey: string;
 }): Promise<Record<string, string>> {
-    const cacheKey = apiKey ? 'auth' : 'anon';
+    const now = Date.now();
+    for (const [key, entry] of teamVisibilityCache) {
+        if (entry.expiresAt <= now) teamVisibilityCache.delete(key);
+    }
+    // Key by API key so private org membership does not leak across users.
+    const cacheKey = apiKey || 'anon';
     const cached = teamVisibilityCache.get(cacheKey);
-    if (cached && cached.expiresAt > Date.now()) {
+    if (cached && cached.expiresAt > now) {
         return cached.map;
     }
 
@@ -280,7 +290,7 @@ export async function getTeamVisibilityMap({
         allOrgs.map((org) => [org.name, org.visibility || 'public'])
     );
     teamVisibilityCache.set(cacheKey, {
-        expiresAt: Date.now() + TEAM_VISIBILITY_TTL_MS,
+        expiresAt: now + TEAM_VISIBILITY_TTL_MS,
         map,
     });
     return map;
