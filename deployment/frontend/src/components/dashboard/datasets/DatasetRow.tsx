@@ -10,10 +10,10 @@ import { visibilityTypeLabels } from '@/utils/constants';
 import Chip from '@/components/_shared/Chip';
 import PendingApprovalTag from '@/components/_shared/PendingApprovalTag';
 
-function datasetTypeLabel(value?: string) {
+function datasetTypeLabel(value?: WriDataset['dataset_type_info']) {
   if (!value) return value;
 
-  const labels: Record<string, string> = {
+  const labels: Record<NonNullable<WriDataset['dataset_type_info']>, string> = {
     raster_data: 'Raster data',
     tiled_raster_data: 'Tiled raster data',
     vector_data: 'Vector data',
