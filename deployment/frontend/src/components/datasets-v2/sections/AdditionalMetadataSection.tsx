@@ -41,6 +41,10 @@ function getAdditionalMetadataItems(dataset: WriDataset): MetadataItem[] {
     return [
         { label: 'Project', value: dataset.project },
         {
+            label: 'Dataset type',
+            value: dataset.dataset_type_info?.replace(/_/g, ' '),
+        },
+        {
             label: 'Update frequency',
             value: dataset.update_frequency?.replace(/_/g, ' '),
         },

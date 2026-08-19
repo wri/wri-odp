@@ -206,13 +206,21 @@ const DatasetSchemaObject = z.object({
         visibility: z.string(),
     }),
     project: z.string().optional().nullable().or(emptyStringToUndefined),
-    dataset_type_info: z
-        .object({
-            value: datasetTypeInfoSchema,
-            label: z.string(),
-        })
-        .optional()
-        .nullable(),
+    dataset_type_info: z.preprocess(
+        (value) => {
+            if (!value || typeof value !== 'object') return undefined;
+            const option = value as { value?: string };
+            if (!option.value) return undefined;
+            return value;
+        },
+        z
+            .object({
+                value: datasetTypeInfoSchema,
+                label: z.string(),
+            })
+            .optional()
+            .nullable()
+    ),
     applications: z.array(z.string()).default([]),
     technical_notes: z
         .string()
