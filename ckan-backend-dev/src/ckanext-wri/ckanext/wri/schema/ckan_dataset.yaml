@@ -97,6 +97,33 @@ dataset_fields:
   label: Project
   form_placeholder: eg. Project Name
 
+- field_name: dataset_type_info
+  label: Dataset Type
+  preset: select
+  choices:
+  - value: raster_data
+    label: Raster data
+  - value: tiled_raster_data
+    label: Tiled raster data
+  - value: vector_data
+    label: Vector data
+  - value: tiled_vector_data
+    label: Tiled vector data
+  - value: tabular_data
+    label: Tabular data
+  - value: versioned_tabular_data
+    label: Versioned tabular data
+  - value: packaged_dataset
+    label: Packaged dataset
+  - value: mixed_dataset
+    label: Mixed dataset
+  - value: documentation
+    label: Documentation
+  - value: model_output
+    label: Model output
+  - value: api_dataset
+    label: API dataset
+
 - field_name: technical_notes
   label: Technical Notes
   form_placeholder: eg. https://example.com/technical_notes.pdf

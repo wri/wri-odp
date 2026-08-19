@@ -117,6 +117,18 @@ export interface WriDataset extends Omit<Dataset, 'groups'> {
     visibility_type: 'public' | 'private' | 'internal' | 'draft';
     short_description?: string;
     project?: string;
+    dataset_type_info?:
+        | 'raster_data'
+        | 'tiled_raster_data'
+        | 'vector_data'
+        | 'tiled_vector_data'
+        | 'tabular_data'
+        | 'versioned_tabular_data'
+        | 'packaged_dataset'
+        | 'mixed_dataset'
+        | 'documentation'
+        | 'model_output'
+        | 'api_dataset';
     reason_for_adding?: string;
     featured_dataset?: boolean;
     wri_data?: boolean;

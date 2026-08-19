@@ -107,7 +107,6 @@ export function About({
                                     'url'
                                 )}`}
                             >
-                                {' '}
                                 Source:
                             </dt>
                             <dd className="mb-1 text-sm font-light text-stone-900">

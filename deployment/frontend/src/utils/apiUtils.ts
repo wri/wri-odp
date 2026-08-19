@@ -667,6 +667,35 @@ export function activityDetails(activity: Activity): ActivityDisplay {
     };
 }
 
+function getDatasetTypeInfoFromExtras(dataset: WriDataset): WriDataset['dataset_type_info'] {
+    if (dataset.dataset_type_info) return dataset.dataset_type_info;
+    const extras = dataset.extras ?? [];
+    const datasetTypeExtra = extras.find(
+        (extra) => extra.key?.toLowerCase() === 'dataset_type_info'
+    );
+
+    const value = datasetTypeExtra?.value;
+    if (!value) return undefined;
+
+    const allowed = new Set([
+        'raster_data',
+        'tiled_raster_data',
+        'vector_data',
+        'tiled_vector_data',
+        'tabular_data',
+        'versioned_tabular_data',
+        'packaged_dataset',
+        'mixed_dataset',
+        'documentation',
+        'model_output',
+        'api_dataset',
+    ]);
+
+    return allowed.has(value)
+        ? (value as WriDataset['dataset_type_info'])
+        : undefined;
+}
+
 export async function getOneDataset(
     datasetName: string,
     session: Session | null,
@@ -820,6 +849,7 @@ export async function getOneDataset(
     );
     return {
         ...dataset.result,
+        dataset_type_info: getDatasetTypeInfoFromExtras(dataset.result),
         resources,
         open_in: dataset.result.open_in
             ? (JSON.parse(
@@ -956,6 +986,7 @@ export async function getOnePendingDataset(
 
     return {
         ...dataset,
+        dataset_type_info: getDatasetTypeInfoFromExtras(dataset),
         resources,
         open_in: dataset.open_in
             ? (JSON.parse(dataset.open_in as unknown as string) as OpenIn[])
@@ -2630,6 +2661,7 @@ const datasetFields = [
     'owner_org',
     'private',
     'project',
+    'dataset_type_info',
     'rw_dataset',
     'rw_id',
     'short_description',
