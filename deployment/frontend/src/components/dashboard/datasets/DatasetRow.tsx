@@ -7,44 +7,9 @@ import { formatDate } from '@/utils/general';
 import { useRouter } from 'next/router';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { visibilityTypeLabels } from '@/utils/constants';
+import { datasetFormatLabel, datasetTypeLabel } from '@/utils/datasetMetadata';
 import Chip from '@/components/_shared/Chip';
 import PendingApprovalTag from '@/components/_shared/PendingApprovalTag';
-
-function datasetTypeLabel(value?: WriDataset['dataset_type_info']) {
-    if (!value) return value;
-
-    const labels: Record<NonNullable<WriDataset['dataset_type_info']>, string> = {
-        raster_data: 'Raster data',
-        tiled_raster_data: 'Tiled raster data',
-        vector_data: 'Vector data',
-        tiled_vector_data: 'Tiled vector data',
-        tabular_data: 'Tabular data',
-        versioned_tabular_data: 'Versioned tabular data',
-        packaged_dataset: 'Packaged dataset',
-        mixed_dataset: 'Mixed dataset',
-        documentation: 'Documentation',
-        model_output: 'Model output',
-        api_dataset: 'API dataset',
-    };
-
-    return labels[value] ?? value;
-}
-
-function datasetFormatLabel(value?: WriDataset['dataset_format_info']) {
-    if (!value) return value;
-
-    const labels: Record<NonNullable<WriDataset['dataset_format_info']>, string> = {
-        geotiff_tif: 'GeoTIFF (.tif)',
-        shapefile_shp: 'Shapefile (.shp)',
-        geojson_geojson: 'GeoJSON (.geojson)',
-        csv_csv: 'CSV (.csv)',
-        excel_xlsx: 'Excel (.xlsx)',
-        json_json: 'JSON (.json)',
-        pdf_pdf: 'PDF (.pdf)',
-    };
-
-    return labels[value] ?? value;
-}
 
 function subFields(dataset: WriDataset) {
     return [

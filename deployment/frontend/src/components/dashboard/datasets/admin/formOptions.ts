@@ -5,6 +5,7 @@ import {
     type UpdateFrequencyUnion,
     type VisibilityTypeUnion,
 } from '@/schema/dataset.schema';
+import { datasetFormatLabels, datasetTypeLabels } from '@/utils/datasetMetadata';
 
 export const languageOptions = [
     { value: 'en', label: 'English' },
@@ -102,17 +103,10 @@ export const datasetTypeInfoOptions: {
     label: string;
 }[] = [
     { value: '', label: 'Not specified' },
-    { value: 'raster_data', label: 'Raster data' },
-    { value: 'tiled_raster_data', label: 'Tiled raster data' },
-    { value: 'vector_data', label: 'Vector data' },
-    { value: 'tiled_vector_data', label: 'Tiled vector data' },
-    { value: 'tabular_data', label: 'Tabular data' },
-    { value: 'versioned_tabular_data', label: 'Versioned tabular data' },
-    { value: 'packaged_dataset', label: 'Packaged dataset' },
-    { value: 'mixed_dataset', label: 'Mixed dataset' },
-    { value: 'documentation', label: 'Documentation' },
-    { value: 'model_output', label: 'Model output' },
-    { value: 'api_dataset', label: 'API dataset' },
+    ...Object.entries(datasetTypeLabels).map(([value, label]) => ({
+        value: value as DatasetTypeInfoUnion,
+        label,
+    })),
 ];
 
 export const datasetFormatInfoOptions: {
@@ -120,11 +114,8 @@ export const datasetFormatInfoOptions: {
     label: string;
 }[] = [
     { value: '', label: 'Not specified' },
-    { value: 'geotiff_tif', label: 'GeoTIFF (.tif)' },
-    { value: 'shapefile_shp', label: 'Shapefile (.shp)' },
-    { value: 'geojson_geojson', label: 'GeoJSON (.geojson)' },
-    { value: 'csv_csv', label: 'CSV (.csv)' },
-    { value: 'excel_xlsx', label: 'Excel (.xlsx)' },
-    { value: 'json_json', label: 'JSON (.json)' },
-    { value: 'pdf_pdf', label: 'PDF (.pdf)' },
+    ...Object.entries(datasetFormatLabels).map(([value, label]) => ({
+        value: value as DatasetFormatInfoUnion,
+        label,
+    })),
 ];
