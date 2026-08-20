@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import classNames from '@/utils/classnames';
 import {
     Controller,
@@ -26,6 +27,7 @@ interface SimpleSelectProps<T extends FieldValues, V extends object> {
     formObj?: UseFormReturn<T>;
     name: Path<T>;
     id?: string;
+    allowClear?: boolean;
 }
 
 export default function SimpleSelect<T extends FieldValues, V extends object>({
@@ -36,6 +38,7 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
     formObj,
     name,
     id,
+    allowClear = false,
     onChange: _onChange = (val) => {},
     disabled,
     str,
@@ -60,6 +63,9 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
                 const selectedFull = options.find(
                     (o) => o.value === (str ? selected : selected?.value)
                 );
+                const hasSelection = str
+                    ? selected !== undefined && selected !== null && selected !== ''
+                    : !!selected?.value;
                 return (
                     <Listbox
                         value={selected}
@@ -119,6 +125,26 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
                                             />
                                         </span>
                                     </Listbox.Button>
+                                    {allowClear && hasSelection && !disabled && (
+                                        <button
+                                            type="button"
+                                            className="absolute inset-y-0 right-7 flex items-center pr-1 text-gray-400 hover:text-gray-700"
+                                            onClick={(event) => {
+                                                event.preventDefault();
+                                                event.stopPropagation();
+                                                _onChange(undefined);
+                                                setSelected(
+                                                    str
+                                                        ? ('' as PathValue<T, Path<T>>)
+                                                        : (undefined as PathValue<T, Path<T>>)
+                                                );
+                                            }}
+                                            aria-label="Clear selection"
+                                            title="Clear selection"
+                                        >
+                                            <XMarkIcon className="h-4 w-4" />
+                                        </button>
+                                    )}
 
                                     <Transition
                                         show={open}

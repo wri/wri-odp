@@ -64,6 +64,10 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                                     label="Dataset Type"
                                     text={watch('dataset_type_info')?.label ?? '_'}
                                 />
+                                <SimpleDescription
+                                    label="Dataset Format"
+                                    text={watch('dataset_format_info')?.label ?? '_'}
+                                />
                                 <ListOfItems label="Topics" items={watch('topics') ?? []} />
                                 <SimpleDescription
                                     label="Technical Notes"

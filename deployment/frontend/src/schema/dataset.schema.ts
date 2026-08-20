@@ -30,6 +30,16 @@ const datasetTypeInfoSchema = z.enum([
     'api_dataset',
 ]);
 
+const datasetFormatInfoSchema = z.enum([
+    'geotiff_tif',
+    'shapefile_shp',
+    'geojson_geojson',
+    'csv_csv',
+    'excel_xlsx',
+    'json_json',
+    'pdf_pdf',
+]);
+
 const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal']);
 
 const capacitySchema = z.enum(['admin', 'editor', 'member']);
@@ -77,9 +87,7 @@ export const ResourceSchema = z
         key: z.string().optional(),
         format: z.string().optional().nullable(),
         size: z.number().optional().nullable(),
-        title: z
-            .string()
-            .min(2, { message: 'Title is required (minimum of 2 characters)' }),
+        title: z.string().min(2, { message: 'Title is required (minimum of 2 characters)' }),
         advanced_api_usage: z.string().optional().nullable(),
         not_downloadable: z.boolean().optional().default(false),
         fileBlob: z.any(),
@@ -117,10 +125,7 @@ export const ResourceSchema = z
         spatial_address: z.string().optional().nullable(),
         spatial_geom: z.any().optional().nullable(),
         spatial_coordinates: z.any().optional().nullable(),
-        spatial_type: z
-            .enum(['address', 'geom', 'global'])
-            .optional()
-            .nullable(),
+        spatial_type: z.enum(['address', 'geom', 'global']).optional().nullable(),
         data_api_dataset_id: z.string().optional().nullable(),
         data_api_version: z.string().optional().nullable(),
         data_api_asset_id: z.string().optional().nullable(),
@@ -130,11 +135,7 @@ export const ResourceSchema = z
         (obj) => {
             if (obj.type !== 'link' && obj.type !== 'tile-cache') return true;
             if (!obj.url) return false;
-            if (
-                !obj.url.startsWith('http://') &&
-                !obj.url.startsWith('https://')
-            )
-                return false;
+            if (!obj.url.startsWith('http://') && !obj.url.startsWith('https://')) return false;
             return true;
         },
         {
@@ -168,9 +169,7 @@ export const ResourceSchema = z
 const DatasetSchemaObject = z.object({
     id: z.string().uuid().optional().nullable(),
     rw_id: z.string().optional().nullable(),
-    title: z
-        .string()
-        .min(2, { message: 'Title is required (minimum 2 characters)' }),
+    title: z.string().min(2, { message: 'Title is required (minimum 2 characters)' }),
     name: z
         .string()
         .min(1, { message: 'Name is required' })
@@ -198,9 +197,7 @@ const DatasetSchemaObject = z.object({
         })
         .optional(),
     team: z.object({
-        value: z
-            .string()
-            .min(1, { message: 'Team is required for all Datasets' }),
+        value: z.string().min(1, { message: 'Team is required for all Datasets' }),
         label: z.string(),
         id: z.string(),
         visibility: z.string(),
@@ -221,6 +218,21 @@ const DatasetSchemaObject = z.object({
             .optional()
             .nullable()
     ),
+    dataset_format_info: z.preprocess(
+        (value) => {
+            if (!value || typeof value !== 'object') return undefined;
+            const option = value as { value?: string };
+            if (!option.value) return undefined;
+            return value;
+        },
+        z
+            .object({
+                value: datasetFormatInfoSchema,
+                label: z.string(),
+            })
+            .optional()
+            .nullable()
+    ),
     applications: z.array(z.string()).default([]),
     technical_notes: z
         .string()
@@ -232,11 +244,7 @@ const DatasetSchemaObject = z.object({
         .or(emptyStringToUndefined),
     tags: z.array(z.string()),
     topics: z.array(z.string()),
-    temporal_coverage_start: z
-        .number()
-        .optional()
-        .nullable()
-        .or(nanToUndefined),
+    temporal_coverage_start: z.number().optional().nullable().or(nanToUndefined),
     temporal_coverage_end: z.number().optional().nullable().or(nanToUndefined),
     update_frequency: z
         .object({
@@ -259,28 +267,17 @@ const DatasetSchemaObject = z.object({
             label: z.string(),
         })
         .optional(),
-    short_description: z
-        .string()
-        .min(1, { message: 'Description is required' }),
+    short_description: z.string().min(1, { message: 'Description is required' }),
     notes: z.string().optional().nullable(),
     wri_data: z.boolean().default(false),
     featured_dataset: z.boolean().optional().nullable(),
     featured_image: z.string().optional().nullable(),
-    signedUrl: z
-        .string()
-        .url()
-        .optional()
-        .nullable()
-        .or(emptyStringToUndefined),
+    signedUrl: z.string().url().optional().nullable().or(emptyStringToUndefined),
     authors: z
         .array(
             z.object({
                 name: z.string().min(1, { message: 'Author Name is required' }),
-                email: z
-                    .string()
-                    .optional()
-                    .nullable()
-                    .or(emptyStringToUndefined),
+                email: z.string().optional().nullable().or(emptyStringToUndefined),
             })
         )
         .min(1, {
@@ -289,17 +286,14 @@ const DatasetSchemaObject = z.object({
     maintainers: z
         .array(
             z.object({
-                name: z
-                    .string()
-                    .min(1, { message: 'Maintainer Name is required' }),
+                name: z.string().min(1, { message: 'Maintainer Name is required' }),
                 email: z.string().email().min(1, {
                     message: 'Maintainer Email is required',
                 }),
             })
         )
         .min(1, {
-            message:
-                'At least one (1) Maintainer Name and Maintainer Email is required.',
+            message: 'At least one (1) Maintainer Name and Maintainer Email is required.',
         }),
     function: z.string().optional().nullable(),
     restrictions: z.string().optional().nullable(),
@@ -324,18 +318,14 @@ const DatasetSchemaObject = z.object({
     open_in: z.array(
         z.object({
             title: z.string(),
-            url: z
-                .string()
-                .url('Invalid URL. Use the format https://www.website.com'),
+            url: z.string().url('Invalid URL. Use the format https://www.website.com'),
         })
     ),
     resources: z.array(ResourceSchema),
     collaborators: z.array(CollaboratorSchema).default([]),
     spatial_address: z.string().optional().nullable(),
     spatial: z.any().optional(),
-    spatial_type: z
-        .enum(['address', 'geom', 'global', 'derived_from_resources'])
-        .optional(),
+    spatial_type: z.enum(['address', 'geom', 'global', 'derived_from_resources']).optional(),
     release_notes: z.string().optional(),
 });
 
@@ -376,26 +366,22 @@ export const DatasetSchema = DatasetSchemaObject.refine(
     .refine(
         (obj) => {
             if (!obj.rw_dataset) return true;
-            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName)
-                return false;
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false;
             return true;
         },
         {
-            message:
-                'ConnectorUrl is required for RW Datasets, unless a table name is provided',
+            message: 'ConnectorUrl is required for RW Datasets, unless a table name is provided',
             path: ['connectorUrl'],
         }
     )
     .refine(
         (obj) => {
             if (!obj.rw_dataset) return true;
-            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName)
-                return false;
+            if (obj.rw_dataset && !obj.connectorUrl && !obj.tableName) return false;
             return true;
         },
         {
-            message:
-                'Tablename is required for RW Datasets, unless a connectorUrl is provided',
+            message: 'Tablename is required for RW Datasets, unless a connectorUrl is provided',
             path: ['tableName'],
         }
     )
@@ -426,8 +412,7 @@ export const DatasetSchema = DatasetSchemaObject.refine(
             return true;
         },
         {
-            message:
-                'At least one (1) Maintainer Name and Maintainer Email is required.',
+            message: 'At least one (1) Maintainer Name and Maintainer Email is required.',
             path: ['maintainers'],
         }
     )
@@ -461,6 +446,7 @@ export const DatasetSchemaForEdit = DatasetSchemaObject.partial();
 export type VisibilityTypeUnion = z.infer<typeof visibilityTypeSchema>;
 export type UpdateFrequencyUnion = z.infer<typeof updateFrequencySchema>;
 export type DatasetTypeInfoUnion = z.infer<typeof datasetTypeInfoSchema>;
+export type DatasetFormatInfoUnion = z.infer<typeof datasetFormatInfoSchema>;
 export type CapacityUnion = z.infer<typeof capacitySchema>;
 
 export type DataDictionaryFormType = z.infer<typeof DataDictionarySchema>;

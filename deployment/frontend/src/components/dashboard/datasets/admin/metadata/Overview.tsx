@@ -18,6 +18,7 @@ import Spinner from '@/components/_shared/Spinner';
 import classNames from '@/utils/classnames';
 import MulText from '../MulText';
 import {
+    datasetFormatInfoOptions,
     datasetTypeInfoOptions,
     languageOptions,
     updateFrequencyOptions,
@@ -175,6 +176,15 @@ export function OverviewForm({
                             name="dataset_type_info"
                             placeholder="Select dataset type"
                             options={datasetTypeInfoOptions}
+                        />
+                    </InputGroup>
+                    <InputGroup label="Dataset Format">
+                        <SimpleSelect
+                            id="dataset_format_info"
+                            formObj={formObj}
+                            name="dataset_format_info"
+                            placeholder="Select dataset format"
+                            options={datasetFormatInfoOptions}
                         />
                     </InputGroup>
                     <InputGroup label="Applications">

@@ -129,6 +129,14 @@ export interface WriDataset extends Omit<Dataset, 'groups'> {
         | 'documentation'
         | 'model_output'
         | 'api_dataset';
+    dataset_format_info?:
+        | 'geotiff_tif'
+        | 'shapefile_shp'
+        | 'geojson_geojson'
+        | 'csv_csv'
+        | 'excel_xlsx'
+        | 'json_json'
+        | 'pdf_pdf';
     reason_for_adding?: string;
     featured_dataset?: boolean;
     wri_data?: boolean;

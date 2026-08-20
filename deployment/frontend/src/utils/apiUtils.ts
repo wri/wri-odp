@@ -696,6 +696,33 @@ function getDatasetTypeInfoFromExtras(dataset: WriDataset): WriDataset['dataset_
         : undefined;
 }
 
+function getDatasetFormatInfoFromExtras(
+    dataset: WriDataset
+): WriDataset['dataset_format_info'] {
+    if (dataset.dataset_format_info) return dataset.dataset_format_info;
+    const extras = dataset.extras ?? [];
+    const datasetFormatExtra = extras.find(
+        (extra) => extra.key?.toLowerCase() === 'dataset_format_info'
+    );
+
+    const value = datasetFormatExtra?.value;
+    if (!value) return undefined;
+
+    const allowed = new Set([
+        'geotiff_tif',
+        'shapefile_shp',
+        'geojson_geojson',
+        'csv_csv',
+        'excel_xlsx',
+        'json_json',
+        'pdf_pdf',
+    ]);
+
+    return allowed.has(value)
+        ? (value as WriDataset['dataset_format_info'])
+        : undefined;
+}
+
 export async function getOneDataset(
     datasetName: string,
     session: Session | null,
@@ -850,6 +877,7 @@ export async function getOneDataset(
     return {
         ...dataset.result,
         dataset_type_info: getDatasetTypeInfoFromExtras(dataset.result),
+        dataset_format_info: getDatasetFormatInfoFromExtras(dataset.result),
         resources,
         open_in: dataset.result.open_in
             ? (JSON.parse(
@@ -987,6 +1015,7 @@ export async function getOnePendingDataset(
     return {
         ...dataset,
         dataset_type_info: getDatasetTypeInfoFromExtras(dataset),
+        dataset_format_info: getDatasetFormatInfoFromExtras(dataset),
         resources,
         open_in: dataset.open_in
             ? (JSON.parse(dataset.open_in as unknown as string) as OpenIn[])
@@ -2662,6 +2691,7 @@ const datasetFields = [
     'private',
     'project',
     'dataset_type_info',
+    'dataset_format_info',
     'rw_dataset',
     'rw_id',
     'short_description',

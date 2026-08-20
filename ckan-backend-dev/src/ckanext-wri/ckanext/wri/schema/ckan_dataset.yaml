@@ -124,6 +124,25 @@ dataset_fields:
   - value: api_dataset
     label: API dataset
 
+- field_name: dataset_format_info
+  label: Dataset Format
+  preset: select
+  choices:
+  - value: geotiff_tif
+    label: GeoTIFF (.tif)
+  - value: shapefile_shp
+    label: Shapefile (.shp)
+  - value: geojson_geojson
+    label: GeoJSON (.geojson)
+  - value: csv_csv
+    label: CSV (.csv)
+  - value: excel_xlsx
+    label: Excel (.xlsx)
+  - value: json_json
+    label: JSON (.json)
+  - value: pdf_pdf
+    label: PDF (.pdf)
+
 - field_name: technical_notes
   label: Technical Notes
   form_placeholder: eg. https://example.com/technical_notes.pdf

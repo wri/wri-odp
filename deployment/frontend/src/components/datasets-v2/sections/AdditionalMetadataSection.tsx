@@ -37,12 +37,32 @@ function getAuthorNames(dataset: WriDataset): string[] {
         .filter((name): name is string => hasValue(name));
 }
 
+function datasetFormatLabel(value?: WriDataset['dataset_format_info']) {
+    if (!value) return value;
+
+    const labels: Record<NonNullable<WriDataset['dataset_format_info']>, string> = {
+        geotiff_tif: 'GeoTIFF (.tif)',
+        shapefile_shp: 'Shapefile (.shp)',
+        geojson_geojson: 'GeoJSON (.geojson)',
+        csv_csv: 'CSV (.csv)',
+        excel_xlsx: 'Excel (.xlsx)',
+        json_json: 'JSON (.json)',
+        pdf_pdf: 'PDF (.pdf)',
+    };
+
+    return labels[value] ?? value;
+}
+
 function getAdditionalMetadataItems(dataset: WriDataset): MetadataItem[] {
     return [
         { label: 'Project', value: dataset.project },
         {
             label: 'Dataset type',
             value: dataset.dataset_type_info?.replace(/_/g, ' '),
+        },
+        {
+            label: 'Dataset format',
+            value: datasetFormatLabel(dataset.dataset_format_info),
         },
         {
             label: 'Update frequency',

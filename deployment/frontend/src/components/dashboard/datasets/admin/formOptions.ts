@@ -1,5 +1,6 @@
 import {
     type CapacityUnion,
+    type DatasetFormatInfoUnion,
     type DatasetTypeInfoUnion,
     type UpdateFrequencyUnion,
     type VisibilityTypeUnion,
@@ -97,9 +98,10 @@ export const visibilityOptions: {
 ];
 
 export const datasetTypeInfoOptions: {
-    value: DatasetTypeInfoUnion;
+    value: DatasetTypeInfoUnion | '';
     label: string;
 }[] = [
+    { value: '', label: 'Not specified' },
     { value: 'raster_data', label: 'Raster data' },
     { value: 'tiled_raster_data', label: 'Tiled raster data' },
     { value: 'vector_data', label: 'Vector data' },
@@ -111,4 +113,18 @@ export const datasetTypeInfoOptions: {
     { value: 'documentation', label: 'Documentation' },
     { value: 'model_output', label: 'Model output' },
     { value: 'api_dataset', label: 'API dataset' },
+];
+
+export const datasetFormatInfoOptions: {
+    value: DatasetFormatInfoUnion | '';
+    label: string;
+}[] = [
+    { value: '', label: 'Not specified' },
+    { value: 'geotiff_tif', label: 'GeoTIFF (.tif)' },
+    { value: 'shapefile_shp', label: 'Shapefile (.shp)' },
+    { value: 'geojson_geojson', label: 'GeoJSON (.geojson)' },
+    { value: 'csv_csv', label: 'CSV (.csv)' },
+    { value: 'excel_xlsx', label: 'Excel (.xlsx)' },
+    { value: 'json_json', label: 'JSON (.json)' },
+    { value: 'pdf_pdf', label: 'PDF (.pdf)' },
 ];
