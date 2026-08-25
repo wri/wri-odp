@@ -69,6 +69,7 @@ export default function CreateDatasetForm() {
                 value: 'notspecified',
                 label: 'License not specified',
             },
+            additional_reading: [],
             resources: [
                 {
                     resourceId: uuidv4(),
@@ -91,10 +92,7 @@ export default function CreateDatasetForm() {
 
     const createDataset = api.dataset.createDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
-            notify(
-                `Successfully created the "${title ?? name}" Dataset`,
-                'success'
-            );
+            notify(`Successfully created the "${title ?? name}" Dataset`, 'success');
             setIsOpen(false);
             router.push('/dashboard/datasets');
             formObj.reset();
@@ -117,10 +115,7 @@ export default function CreateDatasetForm() {
 
     return (
         <>
-            <Tab.Group
-                selectedIndex={selectedIndex}
-                onChange={setSelectedIndex}
-            >
+            <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
                 <div className="mx-auto w-full mb-5 3xl:max-w-[1380px]">
                     <CreateDatasetTabs currentStep={selectedIndex} />
                 </div>
@@ -178,37 +173,29 @@ export default function CreateDatasetForm() {
                         <ErrorAlert
                             text={
                                 <div>
-                                    The following fields have invalid
-                                    information
+                                    The following fields have invalid information
                                     <ul>
-                                        {Object.entries(
-                                            formObj.formState.errors
-                                        ).map(([key, _value]) => {
-                                            return (
-                                                <li key={key}>
-                                                    {key}:{' '}
-                                                    <ErrorMessage
-                                                        errors={
-                                                            formObj.formState
-                                                                .errors
-                                                        }
-                                                        render={({
-                                                            message,
-                                                        }) => (
-                                                            <>
-                                                                {message ??
-                                                                    (
-                                                                        _value as any
-                                                                    )?.value
-                                                                        ?.message ??
-                                                                    'Invalid data'}
-                                                            </>
-                                                        )}
-                                                        name={key}
-                                                    />
-                                                </li>
-                                            );
-                                        })}
+                                        {Object.entries(formObj.formState.errors).map(
+                                            ([key, _value]) => {
+                                                return (
+                                                    <li key={key}>
+                                                        {key}:{' '}
+                                                        <ErrorMessage
+                                                            errors={formObj.formState.errors}
+                                                            render={({ message }) => (
+                                                                <>
+                                                                    {message ??
+                                                                        (_value as any)?.value
+                                                                            ?.message ??
+                                                                        'Invalid data'}
+                                                                </>
+                                                            )}
+                                                            name={key}
+                                                        />
+                                                    </li>
+                                                );
+                                            }
+                                        )}
                                     </ul>
                                 </div>
                             }
@@ -272,11 +259,7 @@ export default function CreateDatasetForm() {
                         </LoaderButton>
                     )}
                 </div>
-                <Modal
-                    open={isOpen}
-                    setOpen={setIsOpen}
-                    className="sm:w-full sm:max-w-lg"
-                >
+                <Modal open={isOpen} setOpen={setIsOpen} className="sm:w-full sm:max-w-lg">
                     <div className="sm:flex sm:items-start">
                         <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                             <InformationCircleIcon
@@ -293,8 +276,7 @@ export default function CreateDatasetForm() {
                             </Dialog.Title>
                             <div className="mt-2">
                                 <p className="text-sm text-gray-500">
-                                    Are you sure you want to save this Dataset
-                                    as draft?
+                                    Are you sure you want to save this Dataset as draft?
                                 </p>
                             </div>
                         </div>
@@ -315,11 +297,7 @@ export default function CreateDatasetForm() {
                         >
                             Save as Draft
                         </LoaderButton>
-                        <Button
-                            variant="outline"
-                            type="button"
-                            onClick={() => setIsOpen(false)}
-                        >
+                        <Button variant="outline" type="button" onClick={() => setIsOpen(false)}>
                             Cancel
                         </Button>
                     </div>

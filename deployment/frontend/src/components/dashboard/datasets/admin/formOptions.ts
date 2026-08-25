@@ -1,11 +1,16 @@
 import {
+    type AdditionalReadingTagUnion,
     type CapacityUnion,
     type DatasetFormatInfoUnion,
     type DatasetTypeInfoUnion,
     type UpdateFrequencyUnion,
     type VisibilityTypeUnion,
 } from '@/schema/dataset.schema';
-import { datasetFormatLabels, datasetTypeLabels } from '@/utils/datasetMetadata';
+import {
+    additionalReadingTagLabels,
+    datasetFormatLabels,
+    datasetTypeLabels,
+} from '@/utils/datasetMetadata';
 
 export const languageOptions = [
     { value: 'en', label: 'English' },
@@ -119,3 +124,11 @@ export const datasetFormatInfoOptions: {
         label,
     })),
 ];
+
+export const additionalReadingTagOptions: {
+    value: AdditionalReadingTagUnion;
+    label: string;
+}[] = Object.entries(additionalReadingTagLabels).map(([value, label]) => ({
+    value: value as AdditionalReadingTagUnion,
+    label,
+}));

@@ -40,6 +40,14 @@ const datasetFormatInfoSchema = z.enum([
     'pdf_pdf',
 ]);
 
+const additionalReadingTagSchema = z.enum([
+    'article',
+    'publication',
+    'documentation',
+    'report',
+    'blog_post',
+]);
+
 const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal']);
 
 const capacitySchema = z.enum(['admin', 'editor', 'member']);
@@ -306,6 +314,18 @@ const DatasetSchemaObject = z.object({
         .optional()
         .nullable()
         .or(emptyStringToUndefined),
+    additional_reading: z
+        .array(
+            z.object({
+                title: z.string().min(1, { message: 'Title is required' }),
+                url: z.string().url({
+                    message: 'Invalid URL. Use the format https://www.website.com',
+                }),
+                tag: additionalReadingTagSchema,
+            })
+        )
+        .optional()
+        .default([]),
     cautions: z.string().optional().nullable(),
     methodology: z.string().optional().nullable(),
     usecases: z.string().optional().nullable(),
@@ -447,6 +467,7 @@ export type VisibilityTypeUnion = z.infer<typeof visibilityTypeSchema>;
 export type UpdateFrequencyUnion = z.infer<typeof updateFrequencySchema>;
 export type DatasetTypeInfoUnion = z.infer<typeof datasetTypeInfoSchema>;
 export type DatasetFormatInfoUnion = z.infer<typeof datasetFormatInfoSchema>;
+export type AdditionalReadingTagUnion = z.infer<typeof additionalReadingTagSchema>;
 export type CapacityUnion = z.infer<typeof capacitySchema>;
 
 export type DataDictionaryFormType = z.infer<typeof DataDictionarySchema>;

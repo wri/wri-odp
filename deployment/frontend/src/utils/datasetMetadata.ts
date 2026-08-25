@@ -22,6 +22,14 @@ export const datasetFormatLabels: Record<string, string> = {
     pdf_pdf: 'PDF (.pdf)',
 };
 
+export const additionalReadingTagLabels: Record<string, string> = {
+    article: 'Article',
+    publication: 'Publication',
+    documentation: 'Documentation',
+    report: 'Report',
+    blog_post: 'Blog post',
+};
+
 export function datasetFormatLabel(value?: string): string | undefined {
     if (!value) return value;
     return datasetFormatLabels[value] ?? value;
@@ -30,4 +38,9 @@ export function datasetFormatLabel(value?: string): string | undefined {
 export function datasetTypeLabel(value?: string): string | undefined {
     if (!value) return value;
     return datasetTypeLabels[value] ?? value;
+}
+
+export function additionalReadingTagLabel(value?: string): string | undefined {
+    if (!value) return value;
+    return additionalReadingTagLabels[value] ?? value;
 }

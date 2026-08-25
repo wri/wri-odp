@@ -20,6 +20,7 @@ import { match } from 'ts-pattern';
 import { type UseFormReturn } from 'react-hook-form';
 import { type DataDictionaryFormType, type DatasetFormType } from '@/schema/dataset.schema';
 import { convertBytes } from '@/utils/convertBytes';
+import { additionalReadingTagLabel } from '@/utils/datasetMetadata';
 import { PreviewMap } from '../datafiles/sections/BuildALayer/BuildALayerSection';
 import {
     convertFormToLayerObj,
@@ -196,10 +197,7 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                             </div>
                         </div>
                     )}
-                    {(watch('function') ||
-                        watch('restrictions') ||
-                        watch('learn_more') ||
-                        watch('reason_for_adding') ||
+                    {((watch('additional_reading')?.length ?? 0) > 0 ||
                         watch('methodology') ||
                         watch('cautions')) && (
                         <div className="border-b border-stone-50 py-8 pb-6">
@@ -208,31 +206,15 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                             </h3>
                             <div className="grid">
                                 <dl className="flex flex-col gap-y-6">
-                                    <SimpleDescription
-                                        label="Learn More"
-                                        text={watch('learn_more') ?? '_'}
+                                    <ListOfItems
+                                        label="Articles & other links"
+                                        items={
+                                            watch('additional_reading')?.map((item) => {
+                                                const tag = additionalReadingTagLabel(item.tag);
+                                                return `${item.title} (${tag ?? item.tag}) - ${item.url}`;
+                                            }) ?? []
+                                        }
                                     />
-                                    <FullDescription label="Function">
-                                        <div
-                                            dangerouslySetInnerHTML={{
-                                                __html: watch('function') ?? '_',
-                                            }}
-                                        ></div>
-                                    </FullDescription>
-                                    <FullDescription label="Restrictions">
-                                        <div
-                                            dangerouslySetInnerHTML={{
-                                                __html: watch('restrictions') ?? '_',
-                                            }}
-                                        ></div>
-                                    </FullDescription>
-                                    <FullDescription label="Reasons for adding">
-                                        <div
-                                            dangerouslySetInnerHTML={{
-                                                __html: watch('reason_for_adding') ?? '_',
-                                            }}
-                                        ></div>
-                                    </FullDescription>
                                     <FullDescription label="Cautions">
                                         <div
                                             dangerouslySetInnerHTML={{
@@ -398,7 +380,8 @@ interface DatafilePreviewProps {
         | 'layer-raw'
         | 'reference-layer'
         | 'tile-cache'
-        | 'gee-asset';
+        | 'gee-asset'
+        | 'data-api-dataset';
     name: string;
     title: string;
     format: string;

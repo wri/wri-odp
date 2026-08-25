@@ -19,12 +19,11 @@ import { OpenInForm } from './metadata/OpenIn';
 import { CustomFieldsForm } from './metadata/CustomFields';
 import {
     capacityOptions,
-    datasetFormatInfoOptions,
-    datasetTypeInfoOptions,
     languageOptions,
     updateFrequencyOptions,
     visibilityOptions,
 } from './formOptions';
+import { datasetFormatLabels, datasetTypeLabels } from '@/utils/datasetMetadata';
 import { api } from '@/utils/api';
 import notify from '@/utils/notify';
 import { LoaderButton } from '@/components/_shared/Button';
@@ -162,12 +161,22 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                   }
                 : { value: '', label: 'No Team', id: '', visibility: '' },
             license_id: license ? { value: license.id, label: license.title } : undefined,
-            dataset_type_info: datasetTypeInfoOptions.find(
-                (option) => option.value === dataset.dataset_type_info
-            ),
-            dataset_format_info: datasetFormatInfoOptions.find(
-                (option) => option.value === dataset.dataset_format_info
-            ),
+            dataset_type_info: dataset.dataset_type_info
+                ? {
+                      value: dataset.dataset_type_info,
+                      label:
+                          datasetTypeLabels[dataset.dataset_type_info] ?? dataset.dataset_type_info,
+                  }
+                : undefined,
+            dataset_format_info: dataset.dataset_format_info
+                ? {
+                      value: dataset.dataset_format_info,
+                      label:
+                          datasetFormatLabels[dataset.dataset_format_info] ??
+                          dataset.dataset_format_info,
+                  }
+                : undefined,
+            additional_reading: dataset.additional_reading ?? [],
             visibility_type: visibilityOptions.find(
                 (option) => option.value === dataset.visibility_type
             ),

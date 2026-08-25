@@ -289,6 +289,11 @@ dataset_fields:
   form_snippet: markdown.html
   form_placeholder: eg. This data is being added because...
 
+- field_name: additional_reading
+  label: Articles & other links
+  form_placeholder: 'eg. [{"title": "State of Forests 2025", "url": "https://example.com/report", "tag": "report"}]'
+  validators: ignore_missing
+
 - field_name: learn_more
   label: Learn More
   form_placeholder: eg. https://example.com/learn_more.pdf

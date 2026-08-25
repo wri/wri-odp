@@ -172,6 +172,7 @@ const datasetFormFieldmap: Record<string, string> = {
     maintainers: 'Maintainers',
     maintainer_emails: 'Maintainer Emails',
     learn_more: 'Learn more',
+    additional_reading: 'Articles & other links',
     open_in: 'Open In',
     function: 'Function',
     cautions: 'Cautions',
