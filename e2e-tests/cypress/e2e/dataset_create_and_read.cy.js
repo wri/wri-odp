@@ -107,7 +107,9 @@ describe("Create dataset", () => {
       .get(".tiptap.ProseMirror")
       .eq(2)
       .type("RICH TEXT EDITOR");
-    cy.get("input[name=learn_more]").type("https://google.com");
+    cy.get("@moredetails").contains("Add link").click();
+    cy.get('input[name="additional_reading.0.title"]').type("Related Article");
+    cy.get('input[name="additional_reading.0.url"]').type("https://google.com");
     cy.contains("Link to Another WRI Product").click();
     cy.get("button").contains("Add a link to another WRI product").click();
     cy.get('input[name="open_in.0.title"]').type("Test");
