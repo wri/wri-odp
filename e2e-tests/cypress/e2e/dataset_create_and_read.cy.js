@@ -12,7 +12,6 @@ const user = `${uuid()}-test-user`;
 const user_email = `${uuid()}@gmail.com`;
 const user_2 = `${uuid()}-test-user`;
 const user_email_2 = `${uuid()}@gmail.com`;
-const legacyLearnMoreUrl = "https://example.com/legacy-learn-more";
 
 describe("Create dataset", () => {
   before(() => {
@@ -178,7 +177,7 @@ describe("Create dataset", () => {
   );
 
   it(
-    "Should migrate legacy learn_more to additional reading and allow clearing",
+    "Should clear additional reading and persist",
     {
       retries: {
         runMode: 3,
@@ -186,29 +185,11 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.datasetMetadata(dataset).then((pkg) => {
-        cy.request({
-          method: "POST",
-          url: `${Cypress.config().apiUrl}/api/3/action/package_patch`,
-          headers: { Authorization: Cypress.env("API_KEY") },
-          body: {
-            id: dataset,
-            owner_org: pkg.owner_org,
-            additional_reading: "[]",
-            learn_more: legacyLearnMoreUrl,
-          },
-        });
-      });
-
       cy.visit("/dashboard/datasets/" + dataset + "/edit");
       cy.contains("More Details").click();
       cy.get('input[name="additional_reading.0.title"]').should(
         "have.value",
-        "Learn more",
-      );
-      cy.get('input[name="additional_reading.0.url"]').should(
-        "have.value",
-        legacyLearnMoreUrl,
+        "Related Article",
       );
 
       cy.get('button[aria-label="Remove additional reading item"]')

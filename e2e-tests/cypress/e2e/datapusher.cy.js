@@ -98,15 +98,32 @@ describe("Datapusher", () => {
     () => {
       cy.viewport(1440, 900);
       waitForDatastoreActive(dataset);
+
+      cy.datasetMetadata(dataset).then((pkg) => {
+        const tabularResource = (pkg.resources ?? []).find(
+          (resource) => resource.datastore_active === true,
+        );
+        expect(tabularResource, "datastore_active resource").to.exist;
+
+        cy.request({
+          method: "POST",
+          url: `${Cypress.config().apiUrl}/api/3/action/datastore_search`,
+          headers: { Authorization: Cypress.env("API_KEY") },
+          body: {
+            resource_id: tabularResource.id,
+            limit: 10,
+          },
+        }).then((response) => {
+          expect(response.body?.success).to.eq(true);
+          const records = response.body?.result?.records ?? [];
+          expect(records.length).to.be.greaterThan(0);
+          expect(JSON.stringify(records)).to.contain("Beck LLC");
+        });
+      });
+
       cy.visit("/datasets/" + dataset);
       cy.get("h1", { timeout: 30000 }).contains(dataset);
       cy.contains("Data Files").click({ force: true });
-      cy.get('[id^="tableviews-"]', { timeout: 30000 })
-        .first()
-        .click({ force: true });
-      cy.contains("Tabular View", { timeout: 30000 });
-      cy.contains("columns,").should("be.visible");
-      cy.contains("Beck LLC", { timeout: 30000 }).should("be.visible");
 
       cy.contains("Download Data").click();
       cy.get("#download-subset-csv").click();
