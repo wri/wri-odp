@@ -73,12 +73,7 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
                     >
                         {({ open }) => (
                             <>
-                                <div
-                                    className={classNames(
-                                        'relative w-full',
-                                        maxWidth
-                                    )}
-                                >
+                                <div className={classNames('relative w-full', maxWidth)}>
                                     <Listbox.Button
                                         id={id}
                                         className={classNames(
@@ -99,18 +94,12 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
                                                 {selected &&
                                                 selectedFull &&
                                                 (str ? true : selected.label)
-                                                    ? selectedFull.label
-                                                          .charAt(0)
-                                                          .toUpperCase() +
-                                                      selectedFull.label.slice(
-                                                          1
-                                                      )
+                                                    ? selectedFull.label.charAt(0).toUpperCase() +
+                                                      selectedFull.label.slice(1)
                                                     : placeholder}
                                             </span>
-                                            {selected?.visibility ===
-                                                'private' &&
-                                                selected?.value !=
-                                                    'private' && <>&#128274;</>}
+                                            {selected?.visibility === 'private' &&
+                                                selected?.value != 'private' && <>&#128274;</>}
                                         </span>
                                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                             <ChevronDownIcon
@@ -154,10 +143,8 @@ export default function SimpleSelect<T extends FieldValues, V extends object>({
                                                             >
                                                                 {option.label}
                                                                 {option?.visibility &&
-                                                                option.visibility ===
-                                                                    'private' &&
-                                                                option.value !=
-                                                                    'private' ? (
+                                                                option.visibility === 'private' &&
+                                                                option.value != 'private' ? (
                                                                     <span className="ml-1">
                                                                         {' '}
                                                                         &#128274;

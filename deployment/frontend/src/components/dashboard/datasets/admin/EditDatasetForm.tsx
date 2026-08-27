@@ -19,11 +19,11 @@ import { OpenInForm } from './metadata/OpenIn';
 import { CustomFieldsForm } from './metadata/CustomFields';
 import {
     capacityOptions,
-    datasetTypeInfoOptions,
     languageOptions,
     updateFrequencyOptions,
     visibilityOptions,
 } from './formOptions';
+import { datasetFormatLabels, datasetTypeLabels } from '@/utils/datasetMetadata';
 import { api } from '@/utils/api';
 import notify from '@/utils/notify';
 import { LoaderButton } from '@/components/_shared/Button';
@@ -89,23 +89,18 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         },
         { enabled: !!dataset.organization?.id }
     );
-    const license = possibleLicenses.data?.find(
-        (license) => license.id === dataset.license_id
-    );
+    const license = possibleLicenses.data?.find((license) => license.id === dataset.license_id);
     const session = useSession();
-    const { data: collaborators } =
-        api.dataset.getDatasetCollaborators.useQuery({
-            id: dataset.name,
-        });
+    const { data: collaborators } = api.dataset.getDatasetCollaborators.useQuery({
+        id: dataset.name,
+    });
 
     const canEditCollaborators = match(session.data?.user.sysadmin ?? false)
         .with(true, () => true)
         .with(false, () => {
             if (dataset.creator_user_id === session.data?.user.id) return true;
             if (teamUsers && teamUsers.length > 0) {
-                return teamUsers.some(
-                    (user: string[]) => user[0] === session.data?.user.id
-                );
+                return teamUsers.some((user: string[]) => user[0] === session.data?.user.id);
             }
             return collaborators
                 ? collaborators.some(
@@ -148,20 +143,14 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             update_frequency: updateFrequencyOptions.find(
                 (option) => option.value === dataset.update_frequency
             ),
-            language: languageOptions.find(
-                (option) => option.value === dataset.language
-            ),
+            language: languageOptions.find((option) => option.value === dataset.language),
             topics: dataset.groups
                 ? //@ts-ignore
-                  dataset.groups
-                      .filter((g) => g.type === 'group')
-                      .map((group) => group.name)
+                  dataset.groups.filter((g) => g.type === 'group').map((group) => group.name)
                 : [],
             applications: dataset.groups
                 ? //@ts-ignore
-                  dataset.groups
-                      .filter((g) => g.type === 'application')
-                      .map((group) => group.name)
+                  dataset.groups.filter((g) => g.type === 'application').map((group) => group.name)
                 : [],
             team: dataset.organization
                 ? {
@@ -171,12 +160,23 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       visibility: dataset.organization.visibility,
                   }
                 : { value: '', label: 'No Team', id: '', visibility: '' },
-            license_id: license
-                ? { value: license.id, label: license.title }
+            license_id: license ? { value: license.id, label: license.title } : undefined,
+            dataset_type_info: dataset.dataset_type_info
+                ? {
+                      value: dataset.dataset_type_info,
+                      label:
+                          datasetTypeLabels[dataset.dataset_type_info] ?? dataset.dataset_type_info,
+                  }
                 : undefined,
-            dataset_type_info: datasetTypeInfoOptions.find(
-                (option) => option.value === dataset.dataset_type_info
-            ),
+            dataset_format_info: dataset.dataset_format_info
+                ? {
+                      value: dataset.dataset_format_info,
+                      label:
+                          datasetFormatLabels[dataset.dataset_format_info] ??
+                          dataset.dataset_format_info,
+                  }
+                : undefined,
+            additional_reading: dataset.additional_reading ?? [],
             visibility_type: visibilityOptions.find(
                 (option) => option.value === dataset.visibility_type
             ),
@@ -205,11 +205,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 };
             }),
             spatial_type: dataset.spatial_type
-                ? (dataset.spatial_type as
-                      | 'address'
-                      | 'geom'
-                      | 'global'
-                      | 'derived_from_resources')
+                ? (dataset.spatial_type as 'address' | 'geom' | 'global' | 'derived_from_resources')
                 : dataset.spatial_address === 'Global'
                   ? 'global'
                   : dataset.spatial_address
@@ -223,10 +219,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
 
     const editDataset = api.dataset.editDataset.useMutation({
         onSuccess: async ({ title, name, visibility_type }) => {
-            notify(
-                `Successfully edited the "${title ?? name}" Dataset`,
-                'success'
-            );
+            notify(`Successfully edited the "${title ?? name}" Dataset`, 'success');
 
             router.push(`/datasets/${name}`);
         },
@@ -239,9 +232,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         formState: { dirtyFields },
     } = formObj;
 
-    const isAnyUploading = formObj
-        .watch('resources')
-        ?.some((r) => r.isUploading === true);
+    const isAnyUploading = formObj.watch('resources')?.some((r) => r.isUploading === true);
 
     const tabs = [
         { name: 'Metadata', enabled: true },
@@ -272,11 +263,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                                         ? 'border-wri-green sm:border-solid text-wri-dark-green sm:border-b-2 -mb-px'
                                                         : 'text-black'
                                                 )}
-                                                aria-current={
-                                                    selected
-                                                        ? 'page'
-                                                        : undefined
-                                                }
+                                                aria-current={selected ? 'page' : undefined}
                                             >
                                                 {tab.name}
                                             </div>
@@ -286,19 +273,13 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         </div>
                     </Tab.List>
                     <Tab.Panels>
-                        <Tab.Panel
-                            as="div"
-                            className="flex flex-col gap-y-12 mt-8"
-                        >
+                        <Tab.Panel as="div" className="flex flex-col gap-y-12 mt-8">
                             <form
                                 onSubmit={formObj.handleSubmit((data) => {
                                     editDataset.mutate(data);
                                 })}
                             >
-                                <OverviewForm
-                                    formObj={formObj}
-                                    editing={true}
-                                />
+                                <OverviewForm formObj={formObj} editing={true} />
                                 <LocationForm formObj={formObj} />
                                 <DescriptionForm formObj={formObj} />
                                 <PointOfContactForm formObj={formObj} />
@@ -308,42 +289,21 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 <CustomFieldsForm formObj={formObj} />
                             </form>
                         </Tab.Panel>
-                        <Tab.Panel
-                            as="div"
-                            className="flex flex-col gap-y-12 mt-8"
-                        >
-                            <DataFilesSection
-                                formObj={formObj}
-                                dataset={dataset}
-                            />
+                        <Tab.Panel as="div" className="flex flex-col gap-y-12 mt-8">
+                            <DataFilesSection formObj={formObj} dataset={dataset} />
                         </Tab.Panel>
-                        <Tab.Panel
-                            as="div"
-                            className="flex flex-col gap-y-12 mt-8"
-                        >
-                            <EditRwSection
-                                formObj={formObj}
-                            />
+                        <Tab.Panel as="div" className="flex flex-col gap-y-12 mt-8">
+                            <EditRwSection formObj={formObj} />
                         </Tab.Panel>
                         {canEditCollaborators && (
-                            <Tab.Panel
-                                as="div"
-                                className="flex flex-col gap-y-12 mt-8"
-                            >
-                                <Collaborators
-                                    formObj={formObj}
-                                    dataset={dataset}
-                                />
+                            <Tab.Panel as="div" className="flex flex-col gap-y-12 mt-8">
+                                <Collaborators formObj={formObj} dataset={dataset} />
                             </Tab.Panel>
                         )}
                     </Tab.Panels>
                 </div>
             </Tab.Group>
-            <div
-                className={classNames(
-                    'w-full mx-auto sm:px-6 xxl:px-0 max-w-[1380px]'
-                )}
-            >
+            <div className={classNames('w-full mx-auto sm:px-6 xxl:px-0 max-w-[1380px]')}>
                 {errorMessage && (
                     <div className="py-4">
                         <ErrorAlert text={errorMessage} />
@@ -354,37 +314,29 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                         <ErrorAlert
                             text={
                                 <div>
-                                    The following fields have invalid
-                                    information
+                                    The following fields have invalid information
                                     <ul>
-                                        {Object.entries(
-                                            formObj.formState.errors
-                                        ).map(([key, _value]) => {
-                                            return (
-                                                <li key={key}>
-                                                    {key}:{' '}
-                                                    <ErrorMessage
-                                                        errors={
-                                                            formObj.formState
-                                                                .errors
-                                                        }
-                                                        render={({
-                                                            message,
-                                                        }) => (
-                                                            <>
-                                                                {message ??
-                                                                    (
-                                                                        _value as any
-                                                                    )?.value
-                                                                        ?.message ??
-                                                                    'Invalid data'}
-                                                            </>
-                                                        )}
-                                                        name={key}
-                                                    />
-                                                </li>
-                                            );
-                                        })}
+                                        {Object.entries(formObj.formState.errors).map(
+                                            ([key, _value]) => {
+                                                return (
+                                                    <li key={key}>
+                                                        {key}:{' '}
+                                                        <ErrorMessage
+                                                            errors={formObj.formState.errors}
+                                                            render={({ message }) => (
+                                                                <>
+                                                                    {message ??
+                                                                        (_value as any)?.value
+                                                                            ?.message ??
+                                                                        'Invalid data'}
+                                                                </>
+                                                            )}
+                                                            name={key}
+                                                        />
+                                                    </li>
+                                                );
+                                            }
+                                        )}
                                     </ul>
                                 </div>
                             }
@@ -404,24 +356,17 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                 <LoaderButton
                     loading={editDataset.isLoading || !!isAnyUploading}
                     disabled={!!isAnyUploading}
-                    title={
-                        isAnyUploading
-                            ? 'Waiting for file upload to complete…'
-                            : undefined
-                    }
+                    title={isAnyUploading ? 'Waiting for file upload to complete…' : undefined}
                     type="submit"
                     onClick={formObj.handleSubmit(
                         (data) => {
-                            const diffLayerResources =
-                                dirtyFields?.resources?.filter(
-                                    (r) => !r?.layerObj
-                                );
+                            const diffLayerResources = dirtyFields?.resources?.filter(
+                                (r) => !r?.layerObj
+                            );
 
                             const newDirtyFields = {
                                 ...dirtyFields,
-                                resources: diffLayerResources
-                                    ? diffLayerResources
-                                    : false,
+                                resources: diffLayerResources ? diffLayerResources : false,
                             };
 
                             const changedFields: string[] = [];
@@ -430,11 +375,9 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                             if (data.featured_image !== dataset.featured_image)
                                 changedFields.push('featured_dataset');
 
-                            const toBeSavedData: Partial<DatasetFormType> =
-                                data;
+                            const toBeSavedData: Partial<DatasetFormType> = data;
 
-                            const storedDirty =
-                                sessionStorage.getItem('dirtyFields');
+                            const storedDirty = sessionStorage.getItem('dirtyFields');
 
                             // check if layerobj was updated
                             if (storedDirty) {
@@ -448,8 +391,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
 
                                 // check if new resource was added
                                 if (
-                                    newData.resources?.length !==
-                                    defaultvalues?.resources?.length
+                                    newData.resources?.length !== defaultvalues?.resources?.length
                                 ) {
                                     return editDataset.mutate(toBeSavedData);
                                 }
@@ -461,12 +403,8 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 ) {
                                     // filter out collaborators and id
                                     const newData = Object.fromEntries(
-                                        Object.entries(toBeSavedData).filter(
-                                            ([key]) =>
-                                                [
-                                                    'collaborators',
-                                                    'id',
-                                                ].includes(key)
+                                        Object.entries(toBeSavedData).filter(([key]) =>
+                                            ['collaborators', 'id'].includes(key)
                                         )
                                     );
 
@@ -481,45 +419,26 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                     const defaultLang = defaultvalues?.language
                                         ? defaultvalues?.language
                                         : { value: '', label: '' };
-                                    if (
-                                        newData.language?.value !==
-                                        defaultLang?.value
-                                    ) {
-                                        return editDataset.mutate(
-                                            toBeSavedData
-                                        );
+                                    if (newData.language?.value !== defaultLang?.value) {
+                                        return editDataset.mutate(toBeSavedData);
                                     } else {
-                                        if (
-                                            changedFields.includes(
-                                                'collaborators'
-                                            )
-                                        ) {
+                                        if (changedFields.includes('collaborators')) {
                                             const newData = Object.fromEntries(
-                                                Object.entries(
-                                                    toBeSavedData
-                                                ).filter(([key]) =>
-                                                    [
-                                                        'collaborators',
-                                                        'id',
-                                                    ].includes(key)
+                                                Object.entries(toBeSavedData).filter(([key]) =>
+                                                    ['collaborators', 'id'].includes(key)
                                                 )
                                             );
 
                                             return editDataset.mutate(newData);
                                         } else {
-                                            return editDataset.mutate(
-                                                toBeSavedData
-                                            );
+                                            return editDataset.mutate(toBeSavedData);
                                         }
                                     }
                                 } else if (changedFields.length > 0) {
                                     // if by anymeans the changed fields get here and is not empty
                                     return editDataset.mutate(toBeSavedData);
                                 } else {
-                                    notify(
-                                        'No changes to the Dataset',
-                                        'success'
-                                    );
+                                    notify('No changes to the Dataset', 'success');
                                     router.push(`/datasets/${dataset.name}`);
                                 }
                             }

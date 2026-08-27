@@ -124,6 +124,25 @@ dataset_fields:
   - value: api_dataset
     label: API dataset
 
+- field_name: dataset_format_info
+  label: Dataset Format
+  preset: select
+  choices:
+  - value: geotiff_tif
+    label: GeoTIFF (.tif)
+  - value: shapefile_shp
+    label: Shapefile (.shp)
+  - value: geojson_geojson
+    label: GeoJSON (.geojson)
+  - value: csv_csv
+    label: CSV (.csv)
+  - value: excel_xlsx
+    label: Excel (.xlsx)
+  - value: json_json
+    label: JSON (.json)
+  - value: pdf_pdf
+    label: PDF (.pdf)
+
 - field_name: technical_notes
   label: Technical Notes
   form_placeholder: eg. https://example.com/technical_notes.pdf
@@ -269,6 +288,11 @@ dataset_fields:
   label: Reason for Adding
   form_snippet: markdown.html
   form_placeholder: eg. This data is being added because...
+
+- field_name: additional_reading
+  label: Articles & other links
+  form_placeholder: 'eg. [{"title": "State of Forests 2025", "url": "https://example.com/report", "tag": "report"}]'
+  validators: ignore_missing additional_reading_json_object
 
 - field_name: learn_more
   label: Learn More

@@ -5,6 +5,29 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const dataset = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
+function waitForDatastoreActive(datasetName, retries = 30) {
+  return cy
+    .request({
+      method: "GET",
+      url: `${Cypress.config().apiUrl}/api/3/action/package_show`,
+      headers: { Authorization: Cypress.env("API_KEY") },
+      qs: { id: datasetName },
+      failOnStatusCode: false,
+    })
+    .then((res) => {
+      const resources = res.body?.result?.resources ?? [];
+      const hasDatastore = resources.some((r) => r.datastore_active === true);
+
+      if (hasDatastore) return;
+      if (retries <= 0) {
+        throw new Error("Timed out waiting for datastore_active=true");
+      }
+
+      cy.wait(2000);
+      return waitForDatastoreActive(datasetName, retries - 1);
+    });
+}
+
 describe("Datapusher", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
@@ -74,8 +97,34 @@ describe("Datapusher", () => {
     },
     () => {
       cy.viewport(1440, 900);
+      waitForDatastoreActive(dataset);
+
+      cy.datasetMetadata(dataset).then((pkg) => {
+        const tabularResource = (pkg.resources ?? []).find(
+          (resource) => resource.datastore_active === true,
+        );
+        expect(tabularResource, "datastore_active resource").to.exist;
+
+        cy.request({
+          method: "POST",
+          url: `${Cypress.config().apiUrl}/api/3/action/datastore_search`,
+          headers: { Authorization: Cypress.env("API_KEY") },
+          body: {
+            resource_id: tabularResource.id,
+            limit: 10,
+          },
+        }).then((response) => {
+          expect(response.body?.success).to.eq(true);
+          const records = response.body?.result?.records ?? [];
+          expect(records.length).to.be.greaterThan(0);
+          expect(JSON.stringify(records)).to.contain("Beck LLC");
+        });
+      });
+
       cy.visit("/datasets/" + dataset);
-      cy.contains("01D2539e270CEbd", { timeout: 30000 });
+      cy.get("h1", { timeout: 30000 }).contains(dataset);
+      cy.contains("Data Files").click({ force: true });
+
       cy.contains("Download Data").click();
       cy.get("#download-subset-csv").click();
       cy.contains("Submit", { timeout: 15000 });

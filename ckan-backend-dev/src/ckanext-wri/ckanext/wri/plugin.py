@@ -226,6 +226,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "iso_language_code": wri_validators.iso_language_code,
             "year_validator": wri_validators.year_validator,
             "agents_json_object": wri_validators.agents_json_object,
+            "additional_reading_json_object": wri_validators.additional_reading_json_object,
             "url_or_email_validator": wri_validators.url_or_email_validator,
             "title_validator": wri_validators.title_validator,
         }

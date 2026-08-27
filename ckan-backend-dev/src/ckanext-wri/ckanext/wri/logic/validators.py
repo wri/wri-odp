@@ -321,6 +321,33 @@ def url_or_email_validator(value: Any, context: Context):
     raise Invalid(_("Invalid URL"))
 
 
+def additional_reading_json_object(value: Any, context: Context):
+    if not value:
+        return
+
+    loaded_value = value
+    if isinstance(value, str):
+        try:
+            loaded_value = json.loads(value)
+        except Exception:
+            raise Invalid("additional_reading must be a valid JSON array")
+
+    if not isinstance(loaded_value, list):
+        raise Invalid("additional_reading must be a JSON array")
+
+    for idx, item in enumerate(loaded_value):
+        if not isinstance(item, dict):
+            raise Invalid(f"additional_reading[{idx}] must be an object")
+
+        url = item.get("url")
+        if not isinstance(url, str) or not _url_validator(url):
+            raise Invalid(
+                f"additional_reading[{idx}].url must be a valid http:// or https:// URL"
+            )
+
+    return value
+
+
 
 def resource_cross_fields(context: Context, data_dict: dict):
     """

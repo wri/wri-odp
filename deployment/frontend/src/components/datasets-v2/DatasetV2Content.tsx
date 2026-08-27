@@ -1,9 +1,6 @@
 import {
     getThemedFontSize,
     getThemedSpacing,
-    getThemedRadius,
-    getThemedBorderWidth,
-    getThemedColor,
     InlineMessage,
 } from '@worldresources/wri-design-systems';
 import DatasetTable from './DatasetTable';
@@ -17,7 +14,14 @@ import MethodologySection from './sections/MethodologySection';
 import ContactDetailsSection, {
     hasContactDetails as hasContactDetailsFromSection,
 } from './sections/ContactDetailsSection';
-import AdditionalMetadataSection from './sections/AdditionalMetadataSection';
+import AdditionalReadingSection, {
+    getAdditionalReadingLinks,
+    getPrimaryAdditionalReadingUrl,
+    hasAdditionalReading,
+} from './sections/AdditionalReadingSection';
+import AdditionalMetadataSection, {
+    hasAdditionalMetadata,
+} from './sections/AdditionalMetadataSection';
 import RelatedDatasetsSection, { hasDatasetKeywords } from './sections/RelatedDatasetsSection';
 import { hasValue, stripCmsTypography } from './utils/text';
 
@@ -64,7 +68,8 @@ export default function DatasetV2Content({ dataset }: Props) {
     const useCasesContentHtml = stripCmsTypography(useCasesHtml);
     const functionContentHtml = stripCmsTypography(functionHtml);
     const releaseNotesContentHtml = stripCmsTypography(releaseNotesHtml);
-    const safeLearnMoreUrl = dataset.learn_more;
+    const additionalReadingLinks = getAdditionalReadingLinks(dataset);
+    const safeLearnMoreUrl = getPrimaryAdditionalReadingUrl(dataset);
 
     const cautionsText = stripHtmlToText(dataset.cautions);
     const relatedDatasets = getExtraValue([
@@ -72,11 +77,9 @@ export default function DatasetV2Content({ dataset }: Props) {
         'related datasets',
         'related-datasets',
     ]);
-
     const hasContactDetailsSection = hasContactDetailsFromSection(dataset);
     const hasDescription = hasValue(descriptionHtml);
-    const hasAdditionalReading =
-        hasValue(dataset.learn_more) || hasValue(dataset.technical_notes) || hasValue(dataset.url);
+    const hasAdditionalReadingSection = hasAdditionalReading(dataset);
     const hasCitation = hasValue(citationHtml);
     const hasMethodology =
         hasValue(methodologyHtml) ||
@@ -85,23 +88,7 @@ export default function DatasetV2Content({ dataset }: Props) {
         hasValue(dataset.technical_notes);
     const hasRelatedDatasets = hasDatasetKeywords(dataset) || hasValue(relatedDatasets);
     const hasReleaseNotes = hasValue(releaseNotesHtml);
-    const hasAdditionalMetadataSection =
-        hasValue(dataset.project) ||
-        hasValue(dataset.update_frequency) ||
-        hasValue(dataset.visibility_type) ||
-        hasValue(dataset.language) ||
-        hasValue(dataset.spatial_type) ||
-        hasValue(dataset.spatial_address) ||
-        hasValue(dataset.provider) ||
-        hasValue(dataset.connectorType) ||
-        hasValue(dataset.tableName) ||
-        hasValue(dataset.restrictions) ||
-        (dataset.groups ?? []).length > 0 ||
-        (dataset.applications ?? []).length > 0 ||
-        (dataset.tags ?? []).length > 0 ||
-        hasValue(dataset.author) ||
-        hasValue(dataset.author_email) ||
-        (dataset.authors ?? []).length > 0;
+    const hasAdditionalMetadataSection = hasAdditionalMetadata(dataset);
 
     const sectionItems = [
         {
@@ -116,7 +103,7 @@ export default function DatasetV2Content({ dataset }: Props) {
                   },
               ]
             : []),
-        ...(hasAdditionalReading
+        ...(hasAdditionalReadingSection
             ? [
                   {
                       label: 'Additional Reading',
@@ -254,57 +241,8 @@ export default function DatasetV2Content({ dataset }: Props) {
                                 </section>
                             )}
 
-                            {hasAdditionalReading && (
-                                <section id="additional-reading">
-                                    <h2
-                                        style={{
-                                            fontSize: getThemedFontSize(700),
-                                            fontWeight: 700,
-                                            paddingBottom: getThemedSpacing(300),
-                                        }}
-                                    >
-                                        Additional Reading
-                                    </h2>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        {hasValue(dataset.learn_more) && (
-                                            <a
-                                                href={dataset.learn_more}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                <div
-                                                    style={{
-                                                        padding: getThemedSpacing(400),
-                                                        borderRadius: getThemedRadius(300),
-                                                        border: `${getThemedBorderWidth(100)} solid ${getThemedColor('neutral', 300)}`,
-                                                    }}
-                                                >
-                                                    Learn more
-                                                </div>
-                                            </a>
-                                        )}
-
-                                        {hasValue(dataset.url) && (
-                                            <a
-                                                className="text-wri-green underline"
-                                                href={dataset.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                <div
-                                                    style={{
-                                                        padding: getThemedSpacing(400),
-                                                        borderRadius: getThemedRadius(300),
-                                                        border: `${getThemedBorderWidth(100)} solid ${getThemedColor('neutral', 300)}`,
-                                                    }}
-                                                >
-                                                    Source
-                                                </div>
-                                            </a>
-                                        )}
-                                    </div>
-                                </section>
+                            {hasAdditionalReadingSection && (
+                                <AdditionalReadingSection links={additionalReadingLinks} />
                             )}
 
                             {hasCitation && (

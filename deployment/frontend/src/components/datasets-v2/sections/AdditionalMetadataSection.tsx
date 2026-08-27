@@ -4,6 +4,7 @@ import {
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
 import { type WriDataset } from '@/schema/ckan.schema';
+import { datasetFormatLabel, datasetTypeLabel } from '@/utils/datasetMetadata';
 import { hasValue, stripCmsTypography, toDisplay, unique } from '../utils/text';
 
 type MetadataItem = {
@@ -42,7 +43,11 @@ function getAdditionalMetadataItems(dataset: WriDataset): MetadataItem[] {
         { label: 'Project', value: dataset.project },
         {
             label: 'Dataset type',
-            value: dataset.dataset_type_info?.replace(/_/g, ' '),
+            value: datasetTypeLabel(dataset.dataset_type_info),
+        },
+        {
+            label: 'Dataset format',
+            value: datasetFormatLabel(dataset.dataset_format_info),
         },
         {
             label: 'Update frequency',

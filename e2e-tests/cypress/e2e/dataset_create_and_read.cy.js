@@ -67,6 +67,8 @@ describe("Create dataset", () => {
     cy.get("#tagsSearchInput").type("Tag 2{enter}", { force: true }).clear();
     cy.get("#tagsSearchInput").type("Tag 3{enter}", { force: true }).clear();
     cy.get("input[name=project]").focus().type("Project 1");
+    cy.get("#dataset_format_info").click();
+    cy.contains('[role="option"]', "CSV (.csv)").click();
     cy.get("input[name=technical_notes]").type("https://google.com");
     cy.get("input[name=temporal_coverage_start]").type(1998);
     cy.get("input[name=temporal_coverage_end]").type(2023);
@@ -107,7 +109,9 @@ describe("Create dataset", () => {
       .get(".tiptap.ProseMirror")
       .eq(2)
       .type("RICH TEXT EDITOR");
-    cy.get("input[name=learn_more]").type("https://google.com");
+    cy.get("@moredetails").contains("Add link").click();
+    cy.get('input[name="additional_reading.0.title"]').type("Related Article");
+    cy.get('input[name="additional_reading.0.url"]').type("https://google.com");
     cy.contains("Link to Another WRI Product").click();
     cy.get("button").contains("Add a link to another WRI product").click();
     cy.get('input[name="open_in.0.title"]').type("Test");
@@ -131,6 +135,8 @@ describe("Create dataset", () => {
     cy.wait(5000);
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
+    cy.contains("Related Article");
+    cy.contains("CSV (.csv)");
     //get button of type submit
     cy.get('button[type="submit"]').click();
     cy.wait(10000);
@@ -164,6 +170,38 @@ describe("Create dataset", () => {
       cy.contains("test-maintainer-1@example.com");
       cy.contains("Test Maintainer 2");
       cy.contains("test-maintainer-2@example.com");
+
+      // Current production route still renders legacy Learn more only.
+      cy.contains("Related Article").should("not.exist");
+    },
+  );
+
+  it(
+    "Should clear additional reading and persist",
+    {
+      retries: {
+        runMode: 3,
+        openMode: 0,
+      },
+    },
+    () => {
+      cy.visit("/dashboard/datasets/" + dataset + "/edit");
+      cy.contains("More Details").click();
+      cy.get('input[name="additional_reading.0.title"]').should(
+        "have.value",
+        "Related Article",
+      );
+
+      cy.get('button[aria-label="Remove additional reading item"]')
+        .first()
+        .click();
+      cy.get("button").contains("Update Dataset").click();
+      cy.contains("Successfully edited", { timeout: 30000 });
+
+      cy.visit("/dashboard/datasets/" + dataset + "/edit");
+      cy.get("#dataset_format_info").contains("CSV (.csv)");
+      cy.contains("More Details").click();
+      cy.get('input[name="additional_reading.0.url"]').should("not.exist");
     },
   );
 

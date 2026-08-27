@@ -1,9 +1,16 @@
 import {
+    type AdditionalReadingTagUnion,
     type CapacityUnion,
+    type DatasetFormatInfoUnion,
     type DatasetTypeInfoUnion,
     type UpdateFrequencyUnion,
     type VisibilityTypeUnion,
 } from '@/schema/dataset.schema';
+import {
+    additionalReadingTagLabels,
+    datasetFormatLabels,
+    datasetTypeLabels,
+} from '@/utils/datasetMetadata';
 
 export const languageOptions = [
     { value: 'en', label: 'English' },
@@ -97,18 +104,31 @@ export const visibilityOptions: {
 ];
 
 export const datasetTypeInfoOptions: {
-    value: DatasetTypeInfoUnion;
+    value: DatasetTypeInfoUnion | '';
     label: string;
 }[] = [
-    { value: 'raster_data', label: 'Raster data' },
-    { value: 'tiled_raster_data', label: 'Tiled raster data' },
-    { value: 'vector_data', label: 'Vector data' },
-    { value: 'tiled_vector_data', label: 'Tiled vector data' },
-    { value: 'tabular_data', label: 'Tabular data' },
-    { value: 'versioned_tabular_data', label: 'Versioned tabular data' },
-    { value: 'packaged_dataset', label: 'Packaged dataset' },
-    { value: 'mixed_dataset', label: 'Mixed dataset' },
-    { value: 'documentation', label: 'Documentation' },
-    { value: 'model_output', label: 'Model output' },
-    { value: 'api_dataset', label: 'API dataset' },
+    { value: '', label: 'Not specified' },
+    ...Object.entries(datasetTypeLabels).map(([value, label]) => ({
+        value: value as DatasetTypeInfoUnion,
+        label,
+    })),
 ];
+
+export const datasetFormatInfoOptions: {
+    value: DatasetFormatInfoUnion | '';
+    label: string;
+}[] = [
+    { value: '', label: 'Not specified' },
+    ...Object.entries(datasetFormatLabels).map(([value, label]) => ({
+        value: value as DatasetFormatInfoUnion,
+        label,
+    })),
+];
+
+export const additionalReadingTagOptions: {
+    value: AdditionalReadingTagUnion;
+    label: string;
+}[] = Object.entries(additionalReadingTagLabels).map(([value, label]) => ({
+    value: value as AdditionalReadingTagUnion,
+    label,
+}));
