@@ -19,7 +19,9 @@ import AdditionalReadingSection, {
     getPrimaryAdditionalReadingUrl,
     hasAdditionalReading,
 } from './sections/AdditionalReadingSection';
-import AdditionalMetadataSection from './sections/AdditionalMetadataSection';
+import AdditionalMetadataSection, {
+    hasAdditionalMetadata,
+} from './sections/AdditionalMetadataSection';
 import RelatedDatasetsSection, { hasDatasetKeywords } from './sections/RelatedDatasetsSection';
 import { hasValue, stripCmsTypography } from './utils/text';
 
@@ -75,9 +77,6 @@ export default function DatasetV2Content({ dataset }: Props) {
         'related datasets',
         'related-datasets',
     ]);
-    const datasetTypeInfo = getExtraValue(['dataset_type_info', 'dataset type']);
-    const datasetFormatInfo = getExtraValue(['dataset_format_info', 'dataset format']);
-
     const hasContactDetailsSection = hasContactDetailsFromSection(dataset);
     const hasDescription = hasValue(descriptionHtml);
     const hasAdditionalReadingSection = hasAdditionalReading(dataset);
@@ -89,25 +88,7 @@ export default function DatasetV2Content({ dataset }: Props) {
         hasValue(dataset.technical_notes);
     const hasRelatedDatasets = hasDatasetKeywords(dataset) || hasValue(relatedDatasets);
     const hasReleaseNotes = hasValue(releaseNotesHtml);
-    const hasAdditionalMetadataSection =
-        hasValue(dataset.project) ||
-        hasValue(datasetTypeInfo) ||
-        hasValue(datasetFormatInfo) ||
-        hasValue(dataset.update_frequency) ||
-        hasValue(dataset.visibility_type) ||
-        hasValue(dataset.language) ||
-        hasValue(dataset.spatial_type) ||
-        hasValue(dataset.spatial_address) ||
-        hasValue(dataset.provider) ||
-        hasValue(dataset.connectorType) ||
-        hasValue(dataset.tableName) ||
-        hasValue(dataset.restrictions) ||
-        (dataset.groups ?? []).length > 0 ||
-        (dataset.applications ?? []).length > 0 ||
-        (dataset.tags ?? []).length > 0 ||
-        hasValue(dataset.author) ||
-        hasValue(dataset.author_email) ||
-        (dataset.authors ?? []).length > 0;
+    const hasAdditionalMetadataSection = hasAdditionalMetadata(dataset);
 
     const sectionItems = [
         {

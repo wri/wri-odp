@@ -7,6 +7,8 @@ import {
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
 import { type WriDataset } from '@/schema/ckan.schema';
+import { additionalReadingTagLabels } from '@/utils/datasetMetadata';
+import { getAdditionalReadingFromDataset } from '@/utils/additionalReading';
 
 export type AdditionalReadingLink = {
     title: string;
@@ -14,56 +16,8 @@ export type AdditionalReadingLink = {
     tag: string;
 };
 
-const additionalReadingTagLabels: Record<string, string> = {
-    article: 'Article',
-    publication: 'Publication',
-    documentation: 'Documentation',
-    report: 'Report',
-    blog_post: 'Blog post',
-};
-
 export function getAdditionalReadingLinks(dataset: WriDataset): AdditionalReadingLink[] {
-    const rawAdditionalReading = (dataset as unknown as Record<string, unknown>).additional_reading;
-
-    const links = Array.isArray(rawAdditionalReading)
-        ? rawAdditionalReading
-              .map((item) => {
-                  const link = item as {
-                      title?: unknown;
-                      url?: unknown;
-                      tag?: unknown;
-                  };
-
-                  if (
-                      typeof link.title !== 'string' ||
-                      typeof link.url !== 'string' ||
-                      typeof link.tag !== 'string'
-                  ) {
-                      return null;
-                  }
-
-                  return {
-                      title: link.title,
-                      url: link.url,
-                      tag: link.tag,
-                  };
-              })
-              .filter((item): item is AdditionalReadingLink => item !== null)
-        : [];
-
-    if (links.length > 0) return links;
-
-    if (dataset.learn_more) {
-        return [
-            {
-                title: 'Learn more',
-                url: dataset.learn_more,
-                tag: 'documentation',
-            },
-        ];
-    }
-
-    return [];
+    return getAdditionalReadingFromDataset(dataset);
 }
 
 export function hasAdditionalReading(dataset: WriDataset): boolean {
