@@ -75,8 +75,15 @@ describe("Datapusher", () => {
     () => {
       cy.viewport(1440, 900);
       cy.visit("/datasets/" + dataset);
-      // The preview table content can vary by environment; assert stable UI instead.
       cy.get("h1", { timeout: 30000 }).contains(dataset);
+      cy.contains("Data Files").click({ force: true });
+      cy.contains("View Table Preview", { timeout: 30000 }).first().click({
+        force: true,
+      });
+      cy.contains("Tabular View", { timeout: 30000 });
+      cy.contains("columns,").should("be.visible");
+      cy.contains("Beck LLC", { timeout: 30000 }).should("be.visible");
+
       cy.contains("Download Data").click();
       cy.get("#download-subset-csv").click();
       cy.contains("Submit", { timeout: 15000 });
