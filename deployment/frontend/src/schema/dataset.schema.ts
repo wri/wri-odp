@@ -318,9 +318,19 @@ const DatasetSchemaObject = z.object({
         .array(
             z.object({
                 title: z.string().min(1, { message: 'Title is required' }),
-                url: z.string().url({
-                    message: 'Invalid URL. Use the format https://www.website.com',
-                }),
+                url: z
+                    .string()
+                    .url({
+                        message: 'Invalid URL. Use the format https://www.website.com',
+                    })
+                    .refine(
+                        (value) =>
+                            value.startsWith('http://') || value.startsWith('https://'),
+                        {
+                            message:
+                                'Invalid URL. Use a URL starting with http:// or https://',
+                        }
+                    ),
                 tag: additionalReadingTagSchema,
             })
         )

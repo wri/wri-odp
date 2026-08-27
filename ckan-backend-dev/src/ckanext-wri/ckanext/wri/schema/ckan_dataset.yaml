@@ -292,7 +292,7 @@ dataset_fields:
 - field_name: additional_reading
   label: Articles & other links
   form_placeholder: 'eg. [{"title": "State of Forests 2025", "url": "https://example.com/report", "tag": "report"}]'
-  validators: ignore_missing
+  validators: ignore_missing additional_reading_json_object
 
 - field_name: learn_more
   label: Learn More
