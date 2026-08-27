@@ -186,15 +186,18 @@ describe("Create dataset", () => {
       },
     },
     () => {
-      cy.request({
-        method: "POST",
-        url: `${Cypress.config().apiUrl}/api/3/action/package_patch`,
-        headers: { Authorization: Cypress.env("API_KEY") },
-        body: {
-          id: dataset,
-          additional_reading: "[]",
-          learn_more: legacyLearnMoreUrl,
-        },
+      cy.datasetMetadata(dataset).then((pkg) => {
+        cy.request({
+          method: "POST",
+          url: `${Cypress.config().apiUrl}/api/3/action/package_patch`,
+          headers: { Authorization: Cypress.env("API_KEY") },
+          body: {
+            id: dataset,
+            owner_org: pkg.owner_org,
+            additional_reading: "[]",
+            learn_more: legacyLearnMoreUrl,
+          },
+        });
       });
 
       cy.visit("/dashboard/datasets/" + dataset + "/edit");

@@ -5,6 +5,29 @@ const uuid = () => Math.random().toString(36).slice(2) + "-test";
 const org = `${uuid()}${Cypress.env("ORG_NAME_SUFFIX")}`;
 const dataset = `${uuid()}${Cypress.env("DATASET_NAME_SUFFIX")}`;
 
+function waitForDatastoreActive(datasetName, retries = 30) {
+  return cy
+    .request({
+      method: "GET",
+      url: `${Cypress.config().apiUrl}/api/3/action/package_show`,
+      headers: { Authorization: Cypress.env("API_KEY") },
+      qs: { id: datasetName },
+      failOnStatusCode: false,
+    })
+    .then((res) => {
+      const resources = res.body?.result?.resources ?? [];
+      const hasDatastore = resources.some((r) => r.datastore_active === true);
+
+      if (hasDatastore) return;
+      if (retries <= 0) {
+        throw new Error("Timed out waiting for datastore_active=true");
+      }
+
+      cy.wait(2000);
+      return waitForDatastoreActive(datasetName, retries - 1);
+    });
+}
+
 describe("Datapusher", () => {
   beforeEach(function () {
     cy.login(ckanUserName, ckanUserPassword);
@@ -74,12 +97,13 @@ describe("Datapusher", () => {
     },
     () => {
       cy.viewport(1440, 900);
+      waitForDatastoreActive(dataset);
       cy.visit("/datasets/" + dataset);
       cy.get("h1", { timeout: 30000 }).contains(dataset);
       cy.contains("Data Files").click({ force: true });
-      cy.contains("View Table Preview", { timeout: 30000 }).first().click({
-        force: true,
-      });
+      cy.get('[id^="tableviews-"]', { timeout: 30000 })
+        .first()
+        .click({ force: true });
       cy.contains("Tabular View", { timeout: 30000 });
       cy.contains("columns,").should("be.visible");
       cy.contains("Beck LLC", { timeout: 30000 }).should("be.visible");
