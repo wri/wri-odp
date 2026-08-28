@@ -80,7 +80,7 @@ export function OpenInForm({
             label={
                 <>
                     <ArrowUpRightIcon className="h-7 w-7" />
-                    Link to Another WRI Product
+                    Link to view dataset in another WRI product
                 </>
             }
         >
@@ -108,7 +108,7 @@ export function OpenInForm({
                         >
                             <PlusCircleIcon className="h-5 w-5 text-amber-400" />
                             <div className="font-['Acumin Pro SemiCondensed'] text-xl font-normal leading-tight text-black">
-                                Add a link to another WRI product
+                                Add a link to view dataset in another WRI product
                             </div>
                         </button>
                     </DefaultTooltip>

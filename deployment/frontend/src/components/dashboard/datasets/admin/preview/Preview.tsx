@@ -80,7 +80,7 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                                 />
                             </dl>
                             <dl className="flex flex-col gap-y-6">
-                                <ListOfItems label="Tags" items={watch('tags') ?? []} />
+                                <ListOfItems label="Keywords" items={watch('tags') ?? []} />
                                 <SimpleDescription
                                     label="Temporal Coverage"
                                     text={
@@ -124,10 +124,10 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                             </h3>
                             <dl className="flex flex-col gap-y-6">
                                 <SimpleDescription
-                                    label="Short Description"
+                                    label="Caption"
                                     text={watch('short_description') ?? '_'}
                                 />
-                                <FullDescription label="Full Description">
+                                <FullDescription label="Description">
                                     <div
                                         dangerouslySetInnerHTML={{
                                             __html: watch('notes') ?? '_',
@@ -207,7 +207,7 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                             <div className="grid">
                                 <dl className="flex flex-col gap-y-6">
                                     <ListOfItems
-                                        label="Articles & other links"
+                                        label="Additional reading"
                                         items={
                                             watch('additional_reading')?.map((item) => {
                                                 const tag = additionalReadingTagLabel(item.tag);
@@ -229,7 +229,7 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                                             }}
                                         ></div>
                                     </FullDescription>
-                                    <FullDescription label="Use cases">
+                                    <FullDescription label="Dataset API">
                                         <div
                                             dangerouslySetInnerHTML={{
                                                 __html: watch('usecases') ?? '_',

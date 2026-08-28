@@ -1,4 +1,5 @@
 import {
+    InformationCircleIcon,
     GlobeAmericasIcon,
     MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
@@ -14,6 +15,7 @@ import { type DatasetFormType } from '@/schema/dataset.schema';
 import { api } from '@/utils/api';
 import { Button } from '@/components/_shared/Button';
 import dynamic from 'next/dynamic';
+import DefaultTooltip from '@/components/_shared/Tooltip';
 
 const TileLocationSelect = dynamic(() => import('./TileLocationSelect'), {
     ssr: false,
@@ -262,10 +264,15 @@ export function DataApiDatasetForm({
             </InputGroup>
             <InputGroup label="Description" className="whitespace-nowrap">
                 <TextArea
-                    placeholder="Add a short description"
+                    placeholder="Describe this downloadable file"
                     {...register(`resources.${index}.description`)}
                     type="text"
                     maxWidth="max-w-[70rem]"
+                    icon={
+                        <DefaultTooltip content="Describe what this downloadable file contains so users know what to expect before adding it to their download. Avoid repeating dataset-level information. For example, explain if a ZIP archive contains multiple data tables, documentation or supporting resources.">
+                            <InformationCircleIcon className="h-5 w-5" />
+                        </DefaultTooltip>
+                    }
                 />
             </InputGroup>
             <InputGroup
