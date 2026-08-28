@@ -276,7 +276,7 @@ export function OverviewForm({
                     </InputGroup>
                 </div>
                 <div className="flex flex-col justify-start gap-y-4">
-                    <InputGroup label="Tags">
+                    <InputGroup label="Keywords">
                         {match(possibleTags)
                             .with({ isLoading: true }, () => (
                                 <span className="flex items-center text-sm gap-x-2">
@@ -298,7 +298,7 @@ export function OverviewForm({
                                         name="tags"
                                         formObj={formObj}
                                         options={data}
-                                        title="Tags"
+                                        title="Keywords"
                                         tooltip="Remove tag"
                                         aria-label="Remove tag"
                                         allowsCreationOfItems

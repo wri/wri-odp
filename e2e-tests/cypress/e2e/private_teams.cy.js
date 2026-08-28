@@ -31,7 +31,7 @@ function fillPublicDatasetWizard(name, team) {
   cy.contains('[role="option"]', "Public").click();
   cy.get("#team").click();
   cy.contains('[role="option"]', team).click();
-  cy.get("button").contains("Tags").click();
+  cy.get("button").contains("Keywords").click();
   cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
   cy.get("input[name=project]").focus().type("Project 1");
   cy.get("input[name=technical_notes]").type("https://google.com");

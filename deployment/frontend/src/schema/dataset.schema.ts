@@ -3,6 +3,7 @@ import z from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
 const nanToUndefined = z.literal(NaN).transform(() => undefined);
+const stripHtml = (value: string) => value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
 
 const updateFrequencySchema = z.enum([
     'annually',
@@ -275,8 +276,21 @@ const DatasetSchemaObject = z.object({
             label: z.string(),
         })
         .optional(),
-    short_description: z.string().min(1, { message: 'Description is required' }),
-    notes: z.string().optional().nullable(),
+    short_description: z
+        .string()
+        .min(1, { message: 'Caption is required' })
+        .max(200, { message: 'Caption must be 200 characters or fewer' }),
+    notes: z
+        .string()
+        .optional()
+        .nullable()
+        .refine(
+            (value) => {
+                if (!value) return true;
+                return stripHtml(value).length <= 1500;
+            },
+            { message: 'Description must be 1,500 characters or fewer' }
+        ),
     wri_data: z.boolean().default(false),
     featured_dataset: z.boolean().optional().nullable(),
     featured_image: z.string().optional().nullable(),
