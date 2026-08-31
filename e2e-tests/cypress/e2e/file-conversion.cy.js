@@ -24,8 +24,14 @@ describe("Data Files", () => {
     cy.get("input[name=title]").type(datasetName);
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("textarea[name=short_description]").type("test");
+    cy.contains("Description")
+      .parent()
+      .parent()
+      .find(".tiptap.ProseMirror")
+      .type("RICH TEXT EDITOR");
 
-    cy.get("#team", { timeout: 15000 }).should("be.visible").click();
+    cy.get("#team").click();
+    cy.get('[role="listbox"]').should("be.visible");
     cy.contains('[role="option"]', org).click();
 
     cy.contains("Add data maintainer").click();
@@ -82,6 +88,14 @@ describe("Data Files", () => {
   );
 
   after(() => {
-    cy.deleteDatasetAPI(datasetName);
+    cy.request({
+      method: "POST",
+      url: `${Cypress.config().apiUrl}/api/3/action/package_delete`,
+      headers: { Authorization: Cypress.env("API_KEY") },
+      failOnStatusCode: false,
+      body: {
+        id: datasetName,
+      },
+    });
   });
 });
