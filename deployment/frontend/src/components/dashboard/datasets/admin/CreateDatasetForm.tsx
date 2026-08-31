@@ -72,7 +72,12 @@ export default function CreateDatasetForm() {
                 label: 'License not specified',
             },
             additional_reading: [],
+            authors: [],
+            extras: [],
+            open_in: [],
             release_notes_items: [],
+            tags: [],
+            topics: [],
             resources: [
                 {
                     resourceId: uuidv4(),
