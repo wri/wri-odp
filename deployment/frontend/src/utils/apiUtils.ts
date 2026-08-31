@@ -2651,7 +2651,6 @@ export async function approvePendingDataset(
         }
     }
 
-    // delete pending dataset
     const deleteResponse = await fetch(
         `${env.CKAN_URL}/api/3/action/pending_dataset_delete`,
         {
@@ -2665,6 +2664,7 @@ export async function approvePendingDataset(
     );
 
     const deleteData = (await deleteResponse.json()) as CkanResponse<null>;
+
     if (!deleteData.success && deleteData.error)
         throw Error(JSON.stringify(deleteData.error).concat('pending_delete'));
     return dataset.result;
@@ -2675,6 +2675,7 @@ const datasetFields = [
     'approval_status',
     'authors',
     'citation',
+    'doi',
     'creator_user_id',
     'draft',
     'featured_dataset',

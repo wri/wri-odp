@@ -263,6 +263,7 @@ const DatasetSchemaObject = z.object({
         .optional()
         .nullable(),
     citation: z.string().optional().nullable(),
+    doi: z.string().optional().nullable().or(emptyStringToUndefined),
     visibility_type: z
         .object({
             value: visibilityTypeSchema,

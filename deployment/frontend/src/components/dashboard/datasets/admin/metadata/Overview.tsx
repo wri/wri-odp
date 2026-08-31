@@ -66,6 +66,14 @@ export function OverviewForm({
                         />
                         <ErrorDisplay name="title" errors={errors} />
                     </InputGroup>
+                                <InputGroup label="DOI">
+                                    <Input
+                                        {...register('doi')}
+                                        placeholder="ex. 10.1038/s41586-020-2649-2"
+                                        type="text"
+                                    />
+                                    <ErrorDisplay name="doi" errors={errors} />
+                                </InputGroup>
                     <InputGroup label="URL" required>
                         <Input
                             {...register('name')}

@@ -100,6 +100,7 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                                     label="Citation"
                                     text={watch('citation') ?? '_'}
                                 />
+                                <SimpleDescription label="DOI" text={watch('doi') ?? '_'} />
                                 <SimpleDescription
                                     label="Visibility"
                                     text={watch('visibility_type')?.label ?? '_'}

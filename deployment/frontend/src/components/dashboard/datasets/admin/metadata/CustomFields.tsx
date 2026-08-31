@@ -29,7 +29,7 @@ function CustomField({
     return (
         <div className="flex items-center gap-x-2">
             <div className="grid grow grid-cols-1 items-start gap-x-24 md:grid-cols-2">
-                <InputGroup label="Custom Field">
+                <InputGroup label="Attribute">
                     <Input
                         placeholder=""
                         {...register(`extras.${index}.key`)}
@@ -64,13 +64,14 @@ export function CustomFieldsForm({
         control,
         name: 'extras',
     });
+    const canAddMore = fields.length < 3;
     return (
         <MetadataAccordion
             label={
                 <>
                     <FolderPlusIcon className="h-7 w-7" />
                     Custom attributes
-                    <DefaultTooltip content="Custom fields allow additional metadata to be displayed on the Dataset page. They do not impact search or filtering.">
+                    <DefaultTooltip content="Add up to three key details that help users quickly understand this dataset. Use these fields for important dataset-specific attributes that aren't already captured elsewhere, such as spatial resolution, temporal coverage or scale.">
                         <InformationCircleIcon
                             className="h-5 w-5 text-neutral-500"
                             aria-hidden="true"
@@ -88,23 +89,25 @@ export function CustomFieldsForm({
                         register={register}
                     />
                 ))}
-                <div className="w-full flex justify-end">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            append({
-                                key: '',
-                                value: '',
-                            })
-                        }
-                        className="pt-5 flex items-center justify-end gap-x-1"
-                    >
-                        <PlusCircleIcon className="h-5 w-5 text-amber-400" />
-                        <div className="font-['Acumin Pro SemiCondensed'] text-xl font-normal leading-tight text-black">
-                            Add a custom attribute
-                        </div>
-                    </button>
-                </div>
+                {canAddMore && (
+                    <div className="w-full flex justify-end">
+                        <button
+                            type="button"
+                            onClick={() =>
+                                append({
+                                    key: '',
+                                    value: '',
+                                })
+                            }
+                            className="pt-5 flex items-center justify-end gap-x-1"
+                        >
+                            <PlusCircleIcon className="h-5 w-5 text-amber-400" />
+                            <div className="font-['Acumin Pro SemiCondensed'] text-xl font-normal leading-tight text-black">
+                                Add a custom attribute
+                            </div>
+                        </button>
+                    </div>
+                )}
             </Disclosure.Panel>
         </MetadataAccordion>
     );

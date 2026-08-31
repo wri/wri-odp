@@ -146,6 +146,7 @@ export interface WriDataset extends Omit<Dataset, 'groups'> {
     applications?: Application[];
     cautions?: string;
     citation?: string;
+    doi?: string;
     function?: string;
     isopen?: boolean;
     rw_id?: string;
