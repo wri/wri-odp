@@ -31,39 +31,34 @@ describe("Release notes", () => {
       cy.visit("/dashboard/datasets/new");
       cy.get("input[name=title]").type(dataset);
       cy.get("input[name=name]").should("have.value", dataset);
-      cy.get("#team", { timeout: 15000 }).should("be.visible").click();
-      cy.get('[role="listbox"]').should("be.visible");
+      cy.get("input[name=url]").type("https://google.com");
+      cy.get("#team").click();
       cy.contains('[role="option"]', org).click();
       cy.get("#visibility_type").click();
       cy.contains('[role="option"]', "Public").click();
       cy.get("textarea[name=short_description]").type("test");
-      cy.contains("Description")
-        .parent()
-        .parent()
-        .find(".tiptap.ProseMirror")
-        .type("RICH TEXT EDITOR");
 
-      cy.contains("Methodology").click();
       cy.get("input[name=technical_notes]").type("https://google.com");
 
-      cy.contains("Add data maintainer").click();
+      cy.contains("Add Author").click();
+      cy.get('input[name="authors.0.name"]').type("Test Author 1");
+      cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
+      cy.contains("Add Author").click();
+      cy.get('input[name="authors.1.name"]').type("Test Author 2");
+      cy.get('input[name="authors.1.email"]').type("test-author-2@example.com");
+
+      cy.contains("Add Maintainer").click();
       cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
       cy.get('input[name="maintainers.0.email"]').type(
         "test-maintainer-1@example.com",
       );
-      cy.contains("Add data maintainer").click();
+      cy.contains("Add Maintainer").click();
       cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
       cy.get('input[name="maintainers.1.email"]').type(
         "test-maintainer-2@example.com",
       );
 
       cy.contains("Next: Data Files").click();
-      cy.get(".datafile-accordion-trigger").eq(0).click();
-      cy.get("input[type=file]")
-        .eq(0)
-        .selectFile("cypress/fixtures/airtravel.csv", {
-          force: true,
-        });
       cy.contains("Next: Map Visualizations").click();
       cy.contains("Next: Preview").click();
       cy.get('button[type="submit"]').click();
@@ -72,6 +67,8 @@ describe("Release notes", () => {
       });
 
       cy.visit(`/datasets/${dataset}`);
+      cy.contains("Related Datasets", { timeout: 10000 });
+      cy.contains("Collaborators", { timeout: 50000 });
       cy.get("#release-notes", { timeout: 10000 }).click({ force: true });
       cy.contains("This Dataset is at its initial version");
     },
@@ -87,9 +84,13 @@ describe("Release notes", () => {
     },
     () => {
       cy.visit(`/dashboard/datasets/${dataset}/edit`);
-      cy.contains("Add another release note", { timeout: 15000 }).click();
-      cy.get('input[name="release_notes_items.0.date"]').type("2026-08-31");
-      cy.get('textarea[name="release_notes_items.0.note"]').type("Testing release notes");
+      cy.contains("Versioning").parent().parent().as("versioning");
+      cy.get("@versioning")
+        .get(".tiptap.ProseMirror")
+        .eq(1)
+        .type("Testing release notes", {
+          force: true,
+        });
       cy.get('[type="submit"]').click({ force: true });
       cy.contains(`Successfully edited the "${dataset}" Dataset`, {
         timeout: 30000,
@@ -107,6 +108,8 @@ describe("Release notes", () => {
     },
     () => {
       cy.visit(`/datasets/${dataset}?approval=true`);
+      cy.contains("Related Datasets", { timeout: 10000 });
+      cy.contains("Collaborators", { timeout: 50000 });
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
       cy.contains("Testing release notes", { timeout: 60000 });
       cy.contains("Approve request").click({ force: true });
@@ -127,6 +130,8 @@ describe("Release notes", () => {
     },
     () => {
       cy.visit(`/datasets/${dataset}`);
+      cy.contains("Related Datasets", { timeout: 10000 });
+      cy.contains("Collaborators", { timeout: 50000 });
       cy.get("#release-notes", { timeout: 60000 }).click({ force: true });
       cy.contains("Testing release notes", { timeout: 60000 });
     },
