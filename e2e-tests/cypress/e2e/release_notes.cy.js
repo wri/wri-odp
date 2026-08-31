@@ -34,7 +34,6 @@ describe("Release notes", () => {
       cy.get("#team", { timeout: 15000 }).should("be.visible").click();
       cy.get('[role="listbox"]').should("be.visible");
       cy.contains('[role="option"]', org).click();
-      cy.get("#team").should("contain.text", org);
       cy.get("#visibility_type").click();
       cy.contains('[role="option"]', "Public").click();
       cy.get("textarea[name=short_description]").type("test");

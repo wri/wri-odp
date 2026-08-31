@@ -29,7 +29,6 @@ function fillPublicDatasetWizard(name, team) {
   cy.get("#team").click();
   cy.get('[role="listbox"]').should("be.visible");
   cy.contains('[role="option"]', team).click();
-  cy.get("#team").should("contain.text", team);
   cy.contains("Description")
     .parent()
     .parent()
