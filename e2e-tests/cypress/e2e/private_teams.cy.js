@@ -37,11 +37,7 @@ function fillPublicDatasetWizard(name, team) {
   cy.get("input[name=technical_notes]").type("https://google.com");
   cy.get("textarea[name=short_description]").type("test");
 
-  cy.contains("Add Author").click();
-  cy.get('input[name="authors.0.name"]').type("Test Author 1");
-  cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
-
-  cy.contains("Add Maintainer").click();
+  cy.contains("Add data maintainer").click();
   cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
   cy.get('input[name="maintainers.0.email"]').type(
     "test-maintainer-1@example.com",

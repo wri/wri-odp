@@ -44,7 +44,7 @@ function CustomField({
                     />
                 </InputGroup>
             </div>
-            <DefaultTooltip content="Remove custom field">
+            <DefaultTooltip content="Remove custom attribute">
                 <MinusCircleIcon
                     onClick={() => remove(index)}
                     className="h-5 w-5 text-red-600"

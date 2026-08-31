@@ -138,35 +138,21 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                             </dl>
                         </div>
                     )}
-                    {(watch('authors')?.length > 0 || watch('maintainers')?.length > 0) && (
+                    {(watch('maintainers')?.length ?? 0) > 0 && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
-                                Points of Contact
+                                Contact details
                             </h3>
-                            <div className="grid sm:grid-cols-2">
-                                <dl className="flex flex-col gap-y-6">
-                                    {watch('authors')?.map((author, index) => (
-                                        <div key={`author-${index}`}>
-                                            <SimpleDescription
-                                                label="Author Name"
-                                                text={author.name ?? '_'}
-                                            />
-                                            <SimpleDescription
-                                                label="Author Email"
-                                                text={author.email ?? '_'}
-                                            />
-                                        </div>
-                                    ))}
-                                </dl>
+                            <div>
                                 <dl className="flex flex-col gap-y-6">
                                     {watch('maintainers')?.map((maintainer, index) => (
                                         <div key={`maintainer-${index}`}>
                                             <SimpleDescription
-                                                label="Maintainer Name"
+                                                label="Data maintainer name"
                                                 text={maintainer.name ?? '_'}
                                             />
                                             <SimpleDescription
-                                                label="Maintainer Email"
+                                                label="Data maintainer email"
                                                 text={maintainer.email ?? '_'}
                                             />
                                         </div>
@@ -176,24 +162,25 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                         </div>
                     )}
 
-                    {watch('release_notes') && (
+                    {(watch('release_notes_items')?.length ?? 0) > 0 && (
                         <div className="border-b border-stone-50 py-8 pb-6">
                             <h3 className="font-['Acumin Pro SemiCondensed'] pb-5 text-2xl font-semibold leading-tight text-blue-800">
                                 Versioning
                             </h3>
                             <div>
                                 <dl className="flex flex-col gap-y-6">
-                                    <SimpleDescription
-                                        label="Release Notes"
-                                        text={
-                                            <div
-                                                className="prose max-w-none prose-sm prose-a:text-wri-green min-h-[100px]"
-                                                dangerouslySetInnerHTML={{
-                                                    __html: watch('release_notes') ?? '_',
-                                                }}
-                                            ></div>
-                                        }
-                                    />
+                                    {watch('release_notes_items')?.map((item, index) => (
+                                        <div key={`release-note-${index}`} className="space-y-2">
+                                            <SimpleDescription
+                                                label="Date"
+                                                text={item.date || '_'}
+                                            />
+                                            <SimpleDescription
+                                                label="Release note"
+                                                text={item.note || '_'}
+                                            />
+                                        </div>
+                                    ))}
                                 </dl>
                             </div>
                         </div>

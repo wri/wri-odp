@@ -40,19 +40,12 @@ describe("Release notes", () => {
 
       cy.get("input[name=technical_notes]").type("https://google.com");
 
-      cy.contains("Add Author").click();
-      cy.get('input[name="authors.0.name"]').type("Test Author 1");
-      cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
-      cy.contains("Add Author").click();
-      cy.get('input[name="authors.1.name"]').type("Test Author 2");
-      cy.get('input[name="authors.1.email"]').type("test-author-2@example.com");
-
-      cy.contains("Add Maintainer").click();
+      cy.contains("Add data maintainer").click();
       cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
       cy.get('input[name="maintainers.0.email"]').type(
         "test-maintainer-1@example.com",
       );
-      cy.contains("Add Maintainer").click();
+      cy.contains("Add data maintainer").click();
       cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
       cy.get('input[name="maintainers.1.email"]').type(
         "test-maintainer-2@example.com",

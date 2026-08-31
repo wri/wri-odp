@@ -3,7 +3,14 @@ import z from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
 const nanToUndefined = z.literal(NaN).transform(() => undefined);
-const stripHtml = (value: string) => value.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+const stripHtml = (value: string) =>
+    value
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/[<>]/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .trim();
 
 const updateFrequencySchema = z.enum([
     'annually',
@@ -48,6 +55,11 @@ const additionalReadingTagSchema = z.enum([
     'report',
     'blog_post',
 ]);
+
+const releaseNoteItemSchema = z.object({
+    date: z.string().min(1, { message: 'Date is required' }),
+    note: z.string().min(1, { message: 'Release note is required' }),
+});
 
 const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal']);
 
@@ -303,9 +315,7 @@ const DatasetSchemaObject = z.object({
                 email: z.string().optional().nullable().or(emptyStringToUndefined),
             })
         )
-        .min(1, {
-            message: 'At least one (1) Author Name is required.',
-        }),
+        .default([]),
     maintainers: z
         .array(
             z.object({
@@ -339,11 +349,9 @@ const DatasetSchemaObject = z.object({
                         message: 'Invalid URL. Use the format https://www.website.com',
                     })
                     .refine(
-                        (value) =>
-                            value.startsWith('http://') || value.startsWith('https://'),
+                        (value) => value.startsWith('http://') || value.startsWith('https://'),
                         {
-                            message:
-                                'Invalid URL. Use a URL starting with http:// or https://',
+                            message: 'Invalid URL. Use a URL starting with http:// or https://',
                         }
                     ),
                 tag: additionalReadingTagSchema,
@@ -372,6 +380,7 @@ const DatasetSchemaObject = z.object({
     spatial: z.any().optional(),
     spatial_type: z.enum(['address', 'geom', 'global', 'derived_from_resources']).optional(),
     release_notes: z.string().optional(),
+    release_notes_items: z.array(releaseNoteItemSchema).optional().default([]),
 });
 
 export const DatasetSchema = DatasetSchemaObject.refine(
@@ -439,16 +448,6 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         {
             message: 'Technical notes are required for public Datasets',
             path: ['technical_notes'],
-        }
-    )
-    .refine(
-        (obj) => {
-            if (obj.authors.length === 0) return false;
-            return true;
-        },
-        {
-            message: 'At least one (1) Author Name is required.',
-            path: ['authors'],
         }
     )
     .refine(
