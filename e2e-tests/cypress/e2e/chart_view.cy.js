@@ -23,6 +23,11 @@ describe("Chart view", () => {
     cy.get("input[name=title]").type(datasetName);
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("textarea[name=short_description]").type("test");
+    cy.contains("Description")
+      .parent()
+      .parent()
+      .find(".tiptap.ProseMirror")
+      .type("RICH TEXT EDITOR");
 
     cy.get("#team").click();
     cy.get('[role="listbox"]').should("be.visible");
