@@ -42,7 +42,7 @@ describe("Create dataset via tabbing", () => {
       .realPress(["ArrowDown"]);
     cy.realPress([...org]);
     cy.realPress(["Enter"]);
-    cy.get("#team").should("contain.text", org);
+    cy.get("#team").should("contain.text", org.charAt(0).toUpperCase() + org.slice(1));
 
     // Visibility
     cy.tabTo({ selector: "#visibility_type" })
@@ -68,7 +68,8 @@ describe("Create dataset via tabbing", () => {
     cy.get('input[name="maintainers.0.email"]').type("test.maintainer@example.com");
 
     cy.contains("Next: Data Files").click();
-    cy.get(".datafile-accordion-trigger").eq(0).click();
+    cy.contains("Add another Data File", { timeout: 15000 }).should("be.visible");
+    cy.get(".datafile-accordion-trigger", { timeout: 15000 }).eq(0).click();
     cy.get("input[type=file]")
       .eq(0)
       .selectFile("cypress/fixtures/airtravel.csv", {

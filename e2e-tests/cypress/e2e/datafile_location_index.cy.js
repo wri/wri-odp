@@ -52,7 +52,8 @@ describe("Data File location", () => {
       );
 
       cy.contains("Next: Data Files").click();
-      cy.get(".datafile-accordion-trigger").eq(0).click();
+      cy.contains("Add another Data File", { timeout: 15000 }).should("be.visible");
+      cy.get(".datafile-accordion-trigger", { timeout: 15000 }).eq(0).click();
       cy.get("input[type=file]").selectFile("cypress/fixtures/airtravel.csv", {
         force: true,
       });
