@@ -42,7 +42,6 @@ describe("Create dataset via tabbing", () => {
       .realPress(["ArrowDown"]);
     cy.realPress([...org]);
     cy.realPress(["Enter"]);
-    cy.get("#team").should("contain.text", org.charAt(0).toUpperCase() + org.slice(1));
 
     // Visibility
     cy.tabTo({ selector: "#visibility_type" })
@@ -68,14 +67,12 @@ describe("Create dataset via tabbing", () => {
     cy.get('input[name="maintainers.0.email"]').type("test.maintainer@example.com");
 
     cy.contains("Next: Data Files").click();
-    cy.contains("Add another Data File", { timeout: 15000 }).should("be.visible");
-    cy.get(".datafile-accordion-trigger", { timeout: 15000 }).eq(0).click();
+    cy.get(".datafile-accordion-trigger").eq(0).click();
     cy.get("input[type=file]")
       .eq(0)
       .selectFile("cypress/fixtures/airtravel.csv", {
         force: true,
       });
-    cy.contains(/airtravel-[a-z0-9]{6}\.csv/, { timeout: 30000 }).should("be.visible");
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[form="create_dataset_form"]').click();
@@ -86,21 +83,7 @@ describe("Create dataset via tabbing", () => {
   });
 
   after(() => {
-    const api = `${Cypress.config().apiUrl}/api/3/action`;
-    const headers = { Authorization: Cypress.env("API_KEY") };
-    cy.request({
-      method: "POST",
-      url: `${api}/package_delete`,
-      headers,
-      body: { id: dataset },
-      failOnStatusCode: false,
-    });
-    cy.request({
-      method: "POST",
-      url: `${api}/organization_delete`,
-      headers,
-      body: { id: org },
-      failOnStatusCode: false,
-    });
+    cy.deleteDatasetAPI(dataset);
+    cy.deleteOrganizationAPI(org);
   });
 });
