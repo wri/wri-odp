@@ -75,6 +75,7 @@ describe("Create dataset via tabbing", () => {
       .selectFile("cypress/fixtures/airtravel.csv", {
         force: true,
       });
+    cy.contains("airtravel.csv", { timeout: 30000 }).should("be.visible");
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[form="create_dataset_form"]').click();

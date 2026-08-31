@@ -32,7 +32,7 @@ describe("Chart view", () => {
     cy.get("#team").click();
     cy.get('[role="listbox"]').should("be.visible");
     cy.contains('[role="option"]', org).click();
-    cy.get("#team").should("contain.text", org);
+    cy.get("#team").should("contain.text", org.charAt(0).toUpperCase() + org.slice(1));
 
     cy.contains("Add data maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");

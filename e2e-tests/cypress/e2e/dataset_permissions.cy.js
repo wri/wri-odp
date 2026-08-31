@@ -36,12 +36,14 @@ describe("Chart view", () => {
     );
 
     cy.contains("Next: Data Files").click();
+    cy.contains("Add another Data File", { timeout: 15000 }).should("be.visible");
+    cy.get(".datafile-accordion-trigger", { timeout: 15000 }).eq(0).click();
     cy.get("input[type=file]")
       .eq(0)
       .selectFile("cypress/fixtures/airtravel.csv", {
         force: true,
       });
-    cy.wait(5000);
+    cy.contains("airtravel.csv", { timeout: 30000 }).should("be.visible");
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();

@@ -33,7 +33,7 @@ describe("Data Files", () => {
     cy.get("#team").click();
     cy.get('[role="listbox"]').should("be.visible");
     cy.contains('[role="option"]', org).click();
-    cy.get("#team").should("contain.text", org);
+    cy.get("#team").should("contain.text", org.charAt(0).toUpperCase() + org.slice(1));
 
     cy.get("#visibility_type").click();
     cy.contains('[role="option"]', "Public").click();
@@ -52,8 +52,8 @@ describe("Data Files", () => {
     );
 
     cy.contains("Next: Data Files").click();
-    cy.contains("Next: Map Visualizations").should("be.visible");
-    cy.get(".datafile-accordion-trigger").eq(0).click();
+    cy.contains("Add another Data File", { timeout: 15000 }).should("be.visible");
+    cy.get(".datafile-accordion-trigger", { timeout: 15000 }).eq(0).click();
     cy.get("input[type=file]")
       .eq(0)
       .selectFile("cypress/fixtures/airtravel.csv", {
