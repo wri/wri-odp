@@ -29,7 +29,7 @@ describe("Data File not downloadable", () => {
       cy.get("input[name=name]").should("have.value", datasetName);
       cy.get("textarea[name=short_description]").type("test");
 
-      cy.get("#team").click();
+      cy.get("#team", { timeout: 15000 }).should("be.visible").click();
       cy.get('[role="listbox"]').should("be.visible");
       cy.contains('[role="option"]', org).click();
 

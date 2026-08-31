@@ -45,6 +45,7 @@ export function KeyDetailsForm({
 
     return (
         <MetadataAccordion
+            defaultOpen
             label={
                 <>
                     <AdjustmentsHorizontalIcon className="h-7 w-7" />

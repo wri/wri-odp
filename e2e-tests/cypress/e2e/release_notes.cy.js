@@ -31,13 +31,13 @@ describe("Release notes", () => {
       cy.visit("/dashboard/datasets/new");
       cy.get("input[name=title]").type(dataset);
       cy.get("input[name=name]").should("have.value", dataset);
-      cy.get("input[name=url]").type("https://google.com");
-      cy.get("#team").click();
+      cy.get("#team", { timeout: 15000 }).should("be.visible").click();
       cy.contains('[role="option"]', org).click();
       cy.get("#visibility_type").click();
       cy.contains('[role="option"]', "Public").click();
       cy.get("textarea[name=short_description]").type("test");
 
+      cy.contains("Methodology").click();
       cy.get("input[name=technical_notes]").type("https://google.com");
 
       cy.contains("Add data maintainer").click();
@@ -77,13 +77,9 @@ describe("Release notes", () => {
     },
     () => {
       cy.visit(`/dashboard/datasets/${dataset}/edit`);
-      cy.contains("Versioning").parent().parent().as("versioning");
-      cy.get("@versioning")
-        .get(".tiptap.ProseMirror")
-        .eq(1)
-        .type("Testing release notes", {
-          force: true,
-        });
+      cy.contains("Add another release note").click();
+      cy.get('input[name="release_notes_items.0.date"]').type("2026-08-31");
+      cy.get('textarea[name="release_notes_items.0.note"]').type("Testing release notes");
       cy.get('[type="submit"]').click({ force: true });
       cy.contains(`Successfully edited the "${dataset}" Dataset`, {
         timeout: 30000,

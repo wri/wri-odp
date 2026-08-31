@@ -24,16 +24,16 @@ function fillPublicDatasetWizard(name, team) {
   cy.visit(`/dashboard/datasets/new`);
   cy.get("input[name=title]", { timeout: 15000 }).should("be.visible").type(name);
   cy.get("input[name=name]").should("have.value", name);
-  cy.get("input[name=url]").type("https://google.com");
   cy.get("#language").click();
   cy.contains('[role="option"]', "English").click();
   cy.get("#visibility_type").click();
   cy.contains('[role="option"]', "Public").click();
-  cy.get("#team").click();
+  cy.get("#team", { timeout: 15000 }).should("be.visible").click();
   cy.contains('[role="option"]', team).click();
   cy.get("button").contains("Keywords").click();
   cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
   cy.get("input[name=project]").focus().type("Project 1");
+  cy.contains("Methodology").click();
   cy.get("input[name=technical_notes]").type("https://google.com");
   cy.get("textarea[name=short_description]").type("test");
 

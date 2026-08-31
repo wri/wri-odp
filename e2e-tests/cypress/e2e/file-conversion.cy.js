@@ -25,7 +25,7 @@ describe("Data Files", () => {
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("textarea[name=short_description]").type("test");
 
-    cy.get("#team").click();
+    cy.get("#team", { timeout: 15000 }).should("be.visible").click();
     cy.contains('[role="option"]', org).click();
 
     cy.contains("Add data maintainer").click();
