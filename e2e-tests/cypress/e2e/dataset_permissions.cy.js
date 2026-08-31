@@ -43,7 +43,7 @@ describe("Chart view", () => {
       .selectFile("cypress/fixtures/airtravel.csv", {
         force: true,
       });
-    cy.contains("airtravel.csv", { timeout: 30000 }).should("be.visible");
+    cy.contains(/airtravel-[a-z0-9]{6}\.csv/, { timeout: 30000 }).should("be.visible");
     cy.contains("Next: Map Visualizations").click();
     cy.contains("Next: Preview").click();
     cy.get('button[type="submit"]').click();
