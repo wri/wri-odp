@@ -24,15 +24,17 @@ function fillPublicDatasetWizard(name, team) {
   cy.visit(`/dashboard/datasets/new`);
   cy.get("input[name=title]", { timeout: 15000 }).should("be.visible").type(name);
   cy.get("input[name=name]").should("have.value", name);
-  cy.get("#language").click();
-  cy.contains('[role="option"]', "English").click();
   cy.get("#visibility_type").click();
   cy.contains('[role="option"]', "Public").click();
-  cy.get("#team", { timeout: 15000 }).should("be.visible").click();
+  cy.get("#team").click();
+  cy.get('[role="listbox"]').should("be.visible");
   cy.contains('[role="option"]', team).click();
-  cy.get("button").contains("Keywords").click();
-  cy.get("#tagsSearchInput").type("Tag 1{enter}", { force: true }).clear();
-  cy.get("input[name=project]").focus().type("Project 1");
+  cy.get("#team").should("contain.text", team);
+  cy.contains("Description")
+    .parent()
+    .parent()
+    .find(".tiptap.ProseMirror")
+    .type("RICH TEXT EDITOR");
   cy.contains("Methodology").click();
   cy.get("input[name=technical_notes]").type("https://google.com");
   cy.get("textarea[name=short_description]").type("test");
@@ -44,6 +46,13 @@ function fillPublicDatasetWizard(name, team) {
   );
 
   cy.contains("Next: Data Files").click();
+  cy.contains("Next: Map Visualizations").should("be.visible");
+  cy.get(".datafile-accordion-trigger").eq(0).click();
+  cy.get("input[type=file]")
+    .eq(0)
+    .selectFile("cypress/fixtures/airtravel.csv", {
+      force: true,
+    });
   cy.contains("Next: Map Visualizations").click();
   cy.contains("Next: Preview").click();
   cy.get('button[type="submit"]').click();

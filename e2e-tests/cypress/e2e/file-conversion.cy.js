@@ -33,6 +33,12 @@ describe("Data Files", () => {
     cy.get("#team").click();
     cy.get('[role="listbox"]').should("be.visible");
     cy.contains('[role="option"]', org).click();
+    cy.get("#team").should("contain.text", org);
+
+    cy.get("#visibility_type").click();
+    cy.contains('[role="option"]', "Public").click();
+    cy.contains("Methodology").click();
+    cy.get("input[name=technical_notes]").type("https://google.com");
 
     cy.contains("Add data maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
@@ -46,6 +52,7 @@ describe("Data Files", () => {
     );
 
     cy.contains("Next: Data Files").click();
+    cy.contains("Next: Map Visualizations").should("be.visible");
     cy.get(".datafile-accordion-trigger").eq(0).click();
     cy.get("input[type=file]")
       .eq(0)

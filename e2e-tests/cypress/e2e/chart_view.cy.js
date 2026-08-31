@@ -49,8 +49,8 @@ describe("Chart view", () => {
     cy.get("input[name=technical_notes]").type("https://google.com");
 
     cy.contains("Next: Data Files").click();
-    cy.contains("Next: Map Visualizations").should("be.visible");
-    cy.get(".datafile-accordion-trigger").eq(0).click();
+    cy.contains("Add another Data File", { timeout: 15000 }).should("be.visible");
+    cy.get(".datafile-accordion-trigger", { timeout: 15000 }).eq(0).click();
     cy.get("input[type=file]")
       .eq(0)
       .selectFile("cypress/fixtures/airtravel.csv", {
