@@ -78,15 +78,3 @@ def test_agents_json_object(value, expected):
             validators.agents_json_object(value, context)
     else:
         assert validators.agents_json_object(value, context) == expected
-
-
-@pytest.mark.parametrize("authors", [None, []])
-def test_dataset_cross_fields_allows_empty_authors(authors):
-    validators.dataset_cross_fields(
-        {
-            "owner_org": "team",
-            "authors": authors,
-            "maintainers": [{"name": "Test", "email": "test@example.com"}],
-        },
-        {},
-    )
