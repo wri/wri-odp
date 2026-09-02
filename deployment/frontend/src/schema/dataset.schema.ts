@@ -3,14 +3,59 @@ import z from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
 const nanToUndefined = z.literal(NaN).transform(() => undefined);
-const stripHtml = (value: string) =>
-    value
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-        .replace(/<[^>]*>/g, '')
-        .replace(/[<>]/g, '')
-        .replace(/&nbsp;/g, ' ')
-        .trim();
+const getTagName = (tag: string) => {
+    let index = tag.startsWith('/') ? 1 : 0;
+    while (tag[index] === ' ') index += 1;
+
+    let name = '';
+    while (index < tag.length) {
+        const char = tag[index];
+        if (!char || char === ' ' || char === '>' || char === '/') break;
+        name += char.toLowerCase();
+        index += 1;
+    }
+
+    return name;
+};
+
+const stripHtml = (value: string) => {
+    if (typeof document !== 'undefined') {
+        const template = document.createElement('template');
+        template.innerHTML = value;
+        template.content.querySelectorAll('script, style').forEach((element) => element.remove());
+
+        return (template.content.textContent ?? '').replaceAll('\u00a0', ' ').trim();
+    }
+
+    let text = '';
+    let index = 0;
+    let skippedTag: 'script' | 'style' | null = null;
+
+    while (index < value.length) {
+        if (value[index] !== '<') {
+            if (!skippedTag) text += value[index];
+            index += 1;
+            continue;
+        }
+
+        const closeIndex = value.indexOf('>', index + 1);
+        if (closeIndex === -1) break;
+
+        const tag = value.slice(index + 1, closeIndex).trim();
+        const isClosingTag = tag.startsWith('/');
+        const tagName = getTagName(tag);
+
+        if (skippedTag) {
+            if (isClosingTag && tagName === skippedTag) skippedTag = null;
+        } else if (!isClosingTag && (tagName === 'script' || tagName === 'style')) {
+            skippedTag = tagName;
+        }
+
+        index = closeIndex + 1;
+    }
+
+    return text.replaceAll('&nbsp;', ' ').replaceAll('\u00a0', ' ').trim();
+};
 
 const updateFrequencySchema = z.enum([
     'annually',
