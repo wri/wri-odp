@@ -340,6 +340,7 @@ const DatasetSchemaObject = z.object({
         .max(200, { message: 'Caption must be 200 characters or fewer' }),
     notes: z
         .string()
+        .max(15000, { message: 'Description is too long' })
         .optional()
         .nullable()
         .refine(
@@ -407,12 +408,14 @@ const DatasetSchemaObject = z.object({
     cautions: z.string().optional().nullable(),
     methodology: z.string().optional().nullable(),
     usecases: z.string().optional().nullable(),
-    extras: z.array(
-        z.object({
-            key: z.string(),
-            value: z.string(),
-        })
-    ),
+    extras: z
+        .array(
+            z.object({
+                key: z.string(),
+                value: z.string(),
+            })
+        )
+        .max(3, { message: 'A maximum of three (3) custom attributes is allowed.' }),
     open_in: z.array(
         z.object({
             title: z.string(),
