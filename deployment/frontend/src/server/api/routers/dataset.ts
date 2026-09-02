@@ -186,6 +186,10 @@ export const DatasetRouter = createTRPCRouter({
             input.additional_reading && input.additional_reading.length > 0
               ? JSON.stringify(input.additional_reading)
               : undefined,
+          release_notes_items:
+            input.release_notes_items && input.release_notes_items.length > 0
+              ? JSON.stringify(input.release_notes_items)
+              : undefined,
           featured_image:
             input.featured_image && input.featured_dataset
               ? !isValidUrl(cleanUrl(input.featured_image))
@@ -195,7 +199,7 @@ export const DatasetRouter = createTRPCRouter({
                 : input.featured_image
               : null,
           visibility_type: input.visibility_type?.value ?? '',
-          authors: input.authors.map((author) => ({
+          authors: (input.authors ?? []).map((author) => ({
             name: author.name,
             email: author.email,
           })),
@@ -506,6 +510,10 @@ export const DatasetRouter = createTRPCRouter({
             additional_reading:
               input.additional_reading && input.additional_reading.length > 0
                 ? JSON.stringify(input.additional_reading)
+                : undefined,
+            release_notes_items:
+              input.release_notes_items && input.release_notes_items.length > 0
+                ? JSON.stringify(input.release_notes_items)
                 : undefined,
             featured_image:
               input.featured_image && input.featured_dataset

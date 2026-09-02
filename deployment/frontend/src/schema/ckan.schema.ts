@@ -146,6 +146,7 @@ export interface WriDataset extends Omit<Dataset, 'groups'> {
     applications?: Application[];
     cautions?: string;
     citation?: string;
+    doi?: string;
     function?: string;
     isopen?: boolean;
     rw_id?: string;
@@ -173,6 +174,10 @@ export interface WriDataset extends Omit<Dataset, 'groups'> {
     rw_dataset?: boolean;
     is_approved?: boolean;
     release_notes: string;
+    release_notes_items?: Array<{
+        date: string;
+        note: string;
+    }>;
     groups?: Array<Group | Application>;
     is_authorized?: boolean;
 }

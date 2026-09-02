@@ -3,6 +3,59 @@ import z from 'zod';
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
 const nanToUndefined = z.literal(NaN).transform(() => undefined);
+const getTagName = (tag: string) => {
+    let index = tag.startsWith('/') ? 1 : 0;
+    while (tag[index] === ' ') index += 1;
+
+    let name = '';
+    while (index < tag.length) {
+        const char = tag[index];
+        if (!char || char === ' ' || char === '>' || char === '/') break;
+        name += char.toLowerCase();
+        index += 1;
+    }
+
+    return name;
+};
+
+const stripHtml = (value: string) => {
+    if (typeof document !== 'undefined') {
+        const template = document.createElement('template');
+        template.innerHTML = value;
+        template.content.querySelectorAll('script, style').forEach((element) => element.remove());
+
+        return (template.content.textContent ?? '').replaceAll('\u00a0', ' ').trim();
+    }
+
+    let text = '';
+    let index = 0;
+    let skippedTag: 'script' | 'style' | null = null;
+
+    while (index < value.length) {
+        if (value[index] !== '<') {
+            if (!skippedTag) text += value[index];
+            index += 1;
+            continue;
+        }
+
+        const closeIndex = value.indexOf('>', index + 1);
+        if (closeIndex === -1) break;
+
+        const tag = value.slice(index + 1, closeIndex).trim();
+        const isClosingTag = tag.startsWith('/');
+        const tagName = getTagName(tag);
+
+        if (skippedTag) {
+            if (isClosingTag && tagName === skippedTag) skippedTag = null;
+        } else if (!isClosingTag && (tagName === 'script' || tagName === 'style')) {
+            skippedTag = tagName;
+        }
+
+        index = closeIndex + 1;
+    }
+
+    return text.replaceAll('&nbsp;', ' ').replaceAll('\u00a0', ' ').trim();
+};
 
 const updateFrequencySchema = z.enum([
     'annually',
@@ -47,6 +100,11 @@ const additionalReadingTagSchema = z.enum([
     'report',
     'blog_post',
 ]);
+
+const releaseNoteItemSchema = z.object({
+    date: z.string().min(1, { message: 'Date is required' }),
+    note: z.string().min(1, { message: 'Release note is required' }),
+});
 
 const visibilityTypeSchema = z.enum(['public', 'private', 'draft', 'internal']);
 
@@ -262,6 +320,7 @@ const DatasetSchemaObject = z.object({
         .optional()
         .nullable(),
     citation: z.string().optional().nullable(),
+    doi: z.string().optional().nullable().or(emptyStringToUndefined),
     visibility_type: z
         .object({
             value: visibilityTypeSchema,
@@ -275,8 +334,22 @@ const DatasetSchemaObject = z.object({
             label: z.string(),
         })
         .optional(),
-    short_description: z.string().min(1, { message: 'Description is required' }),
-    notes: z.string().optional().nullable(),
+    short_description: z
+        .string()
+        .min(1, { message: 'Caption is required' })
+        .max(200, { message: 'Caption must be 200 characters or fewer' }),
+    notes: z
+        .string()
+        .max(15000, { message: 'Description is too long' })
+        .optional()
+        .nullable()
+        .refine(
+            (value) => {
+                if (!value) return true;
+                return stripHtml(value).length <= 1500;
+            },
+            { message: 'Description must be 1,500 characters or fewer' }
+        ),
     wri_data: z.boolean().default(false),
     featured_dataset: z.boolean().optional().nullable(),
     featured_image: z.string().optional().nullable(),
@@ -288,9 +361,7 @@ const DatasetSchemaObject = z.object({
                 email: z.string().optional().nullable().or(emptyStringToUndefined),
             })
         )
-        .min(1, {
-            message: 'At least one (1) Author Name is required.',
-        }),
+        .default([]),
     maintainers: z
         .array(
             z.object({
@@ -324,11 +395,9 @@ const DatasetSchemaObject = z.object({
                         message: 'Invalid URL. Use the format https://www.website.com',
                     })
                     .refine(
-                        (value) =>
-                            value.startsWith('http://') || value.startsWith('https://'),
+                        (value) => value.startsWith('http://') || value.startsWith('https://'),
                         {
-                            message:
-                                'Invalid URL. Use a URL starting with http:// or https://',
+                            message: 'Invalid URL. Use a URL starting with http:// or https://',
                         }
                     ),
                 tag: additionalReadingTagSchema,
@@ -339,12 +408,14 @@ const DatasetSchemaObject = z.object({
     cautions: z.string().optional().nullable(),
     methodology: z.string().optional().nullable(),
     usecases: z.string().optional().nullable(),
-    extras: z.array(
-        z.object({
-            key: z.string(),
-            value: z.string(),
-        })
-    ),
+    extras: z
+        .array(
+            z.object({
+                key: z.string(),
+                value: z.string(),
+            })
+        )
+        .max(3, { message: 'A maximum of three (3) custom attributes is allowed.' }),
     open_in: z.array(
         z.object({
             title: z.string(),
@@ -357,6 +428,7 @@ const DatasetSchemaObject = z.object({
     spatial: z.any().optional(),
     spatial_type: z.enum(['address', 'geom', 'global', 'derived_from_resources']).optional(),
     release_notes: z.string().optional(),
+    release_notes_items: z.array(releaseNoteItemSchema).optional().default([]),
 });
 
 export const DatasetSchema = DatasetSchemaObject.refine(
@@ -424,16 +496,6 @@ export const DatasetSchema = DatasetSchemaObject.refine(
         {
             message: 'Technical notes are required for public Datasets',
             path: ['technical_notes'],
-        }
-    )
-    .refine(
-        (obj) => {
-            if (obj.authors.length === 0) return false;
-            return true;
-        },
-        {
-            message: 'At least one (1) Author Name is required.',
-            path: ['authors'],
         }
     )
     .refine(

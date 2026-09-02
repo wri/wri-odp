@@ -397,7 +397,7 @@ export default function SourceForm({
                         <InputGroup
                             label={
                                 <span className="flex items-center gap-x-1">
-                                    Advanced API Usage
+                                    Dataset API
                                     <DefaultTooltip content="This field will end up next to the API tab in the Dataset page, you can use it to provide code samples that are useful for this particular data">
                                         <InformationCircleIcon className="h-5 w-5" />
                                     </DefaultTooltip>

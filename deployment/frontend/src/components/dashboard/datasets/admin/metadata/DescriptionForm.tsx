@@ -3,7 +3,6 @@ import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { Disclosure } from '@headlessui/react';
 import { SimpleEditor } from '@/components/dashboard/datasets/admin/metadata/RTE/SimpleEditor';
 import { MetadataAccordion } from './MetadataAccordion';
-import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { type UseFormReturn } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
@@ -14,7 +13,6 @@ export function DescriptionForm({
     formObj: UseFormReturn<DatasetFormType>;
 }) {
     const {
-        register,
         formState: { errors },
     } = formObj;
     return (
@@ -29,37 +27,10 @@ export function DescriptionForm({
         >
             <Disclosure.Panel className="flex flex-col gap-y-8 pb-12 pt-5">
                 <InputGroup
-                    required
-                    label={
-                        <div className="flex items-center gap-x-1">
-                            <span>
-                                Short Description{' '}
-                                <span className="text-red-500">*</span>
-                            </span>
-                            <DefaultTooltip content="This description will appear in search results and Dataset thumbnails. We suggest keeping this around 200 characters.">
-                                <InformationCircleIcon
-                                    className="h-5 w-5 text-neutral-500"
-                                    aria-hidden="true"
-                                />
-                            </DefaultTooltip>
-                        </div>
-                    }
-                    className="mb-2 flex  flex-col items-start whitespace-nowrap sm:flex-col"
-                >
-                    <TextArea
-                        aria-label="Short Description"
-                        placeholder=""
-                        type="text"
-                        {...register('short_description')}
-                        className="h-44 col-span-full"
-                    />
-                    <ErrorDisplay name="short_description" errors={errors} />
-                </InputGroup>
-                <InputGroup
                     label={
                         <div className="flex items-center gap-x-1">
                             <span>Description</span>
-                            <DefaultTooltip content="This description will appear in the About section when a user previews this Dataset">
+                            <DefaultTooltip content="Describe what this dataset contains, its intended use, and any important limitations users should know before downloading. For detailed documentation, use the Methodology section or Additional reading resources.">
                                 <InformationCircleIcon
                                     className="h-5 w-5 text-neutral-500"
                                     aria-hidden="true"
@@ -74,6 +45,7 @@ export function DescriptionForm({
                         name="notes"
                         defaultValue=""
                     />
+                    <ErrorDisplay name="notes" errors={errors} />
                 </InputGroup>
             </Disclosure.Panel>
         </MetadataAccordion>

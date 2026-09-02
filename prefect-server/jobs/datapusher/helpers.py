@@ -262,7 +262,7 @@ def get_package(package_id, ckan_url, api_key) -> Package:
 
 
 def update_resource(resource, ckan_url, api_key) -> Resource:
-    url = get_url("resource_update", ckan_url)
+    url = get_url("resource_patch", ckan_url)
     r = requests.post(
         url,
         verify=True,

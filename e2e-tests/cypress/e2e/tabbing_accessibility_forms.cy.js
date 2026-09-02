@@ -43,11 +43,6 @@ describe("Create dataset via tabbing", () => {
     cy.realPress([...org]);
     cy.realPress(["Enter"]);
 
-    // Topics
-    cy.tabTo({ selector: "#topicsButton" })
-      .tab()
-      .realPress([..."https://example.com/technical-notes"]);
-
     // Visibility
     cy.tabTo({ selector: "#visibility_type" })
       .realPress(["ArrowDown"])
@@ -57,29 +52,30 @@ describe("Create dataset via tabbing", () => {
     // Ensure visibility dropdown is closed (seems to inconsistently close automatically)
     cy.get("[id^=headlessui-listbox-options-]").should("not.exist");
 
-    // Short description
-    cy.tabTo({ numberOfTabs: 7 }).realPress([
-      ..."Test dataset short description",
-    ]);
+    // Required fields in current metadata layout
+    cy.get("textarea[name=short_description]").type("Test dataset short description");
+    cy.contains("Description")
+      .parent()
+      .parent()
+      .find(".tiptap.ProseMirror")
+      .type("RICH TEXT EDITOR");
+    cy.contains("Methodology").click();
+    cy.get("input[name=technical_notes]").type("https://example.com/technical-notes");
 
-    // Author
-    cy.tabTo({ numberOfTabs: 11 }).realPress(["Enter"]);
-    cy.realPress([..."Test Author"]);
+    cy.contains("Add data maintainer").click();
+    cy.get('input[name="maintainers.0.name"]').type("Test Maintainer");
+    cy.get('input[name="maintainers.0.email"]').type("test.maintainer@example.com");
 
-    // Maintainer
-    cy.tabTo({ numberOfTabs: 4 }).realPress(["Enter"]);
-    cy.realPress([..."Test Maintainer"])
-      .tab()
-      .realPress([..."test.maintainer@example.com"]);
-
-    // Go to end of form and skip resources
-    cy.tabTo({ numberOfTabs: 18 }).realPress(["Enter"]);
-    cy.realPress(["Enter"]);
-    cy.realPress(["Enter"]);
-
-    // Submit/Save
-    cy.contains("Save as Draft").focus();
-    cy.tabTo({ numberOfTabs: 3 }).realPress(["Enter"]);
+    cy.contains("Next: Data Files").click();
+    cy.get(".datafile-accordion-trigger").eq(0).click();
+    cy.get("input[type=file]")
+      .eq(0)
+      .selectFile("cypress/fixtures/airtravel.csv", {
+        force: true,
+      });
+    cy.contains("Next: Map Visualizations").click();
+    cy.contains("Next: Preview").click();
+    cy.get('button[form="create_dataset_form"]').click();
 
     cy.contains(`Successfully created the "${datasetTitle}" Dataset`, {
       timeout: 20000,

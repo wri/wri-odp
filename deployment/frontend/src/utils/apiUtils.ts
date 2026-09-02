@@ -724,6 +724,40 @@ function getDatasetFormatInfoFromExtras(
         : undefined;
 }
 
+function getReleaseNotesItemsFromDataset(
+    dataset: WriDataset
+): NonNullable<WriDataset['release_notes_items']> {
+    const raw = (dataset as unknown as Record<string, unknown>).release_notes_items;
+
+    const parseItems = (value: unknown): NonNullable<WriDataset['release_notes_items']> => {
+        if (!Array.isArray(value)) return [];
+
+        return value
+            .map((item) => {
+                const note = item as { date?: unknown; note?: unknown };
+                if (typeof note.date !== 'string' || typeof note.note !== 'string') return null;
+
+                const date = note.date.trim();
+                const text = note.note.trim();
+                if (!date || !text) return null;
+
+                return { date, note: text };
+            })
+            .filter((item): item is { date: string; note: string } => item !== null);
+    };
+
+    if (Array.isArray(raw)) return parseItems(raw);
+    if (typeof raw === 'string' && raw.trim()) {
+        try {
+            return parseItems(JSON.parse(raw));
+        } catch {
+            return [];
+        }
+    }
+
+    return [];
+}
+
 export async function getOneDataset(
     datasetName: string,
     session: Session | null,
@@ -880,6 +914,7 @@ export async function getOneDataset(
         dataset_type_info: getDatasetTypeInfoFromExtras(dataset.result),
         dataset_format_info: getDatasetFormatInfoFromExtras(dataset.result),
         additional_reading: getAdditionalReadingFromDataset(dataset.result),
+        release_notes_items: getReleaseNotesItemsFromDataset(dataset.result),
         resources,
         open_in: dataset.result.open_in
             ? (JSON.parse(
@@ -1019,6 +1054,7 @@ export async function getOnePendingDataset(
         dataset_type_info: getDatasetTypeInfoFromExtras(dataset),
         dataset_format_info: getDatasetFormatInfoFromExtras(dataset),
         additional_reading: getAdditionalReadingFromDataset(dataset),
+        release_notes_items: getReleaseNotesItemsFromDataset(dataset),
         resources,
         open_in: dataset.open_in
             ? (JSON.parse(dataset.open_in as unknown as string) as OpenIn[])
@@ -2651,7 +2687,6 @@ export async function approvePendingDataset(
         }
     }
 
-    // delete pending dataset
     const deleteResponse = await fetch(
         `${env.CKAN_URL}/api/3/action/pending_dataset_delete`,
         {
@@ -2665,6 +2700,7 @@ export async function approvePendingDataset(
     );
 
     const deleteData = (await deleteResponse.json()) as CkanResponse<null>;
+
     if (!deleteData.success && deleteData.error)
         throw Error(JSON.stringify(deleteData.error).concat('pending_delete'));
     return dataset.result;
@@ -2675,6 +2711,7 @@ const datasetFields = [
     'approval_status',
     'authors',
     'citation',
+    'doi',
     'creator_user_id',
     'draft',
     'featured_dataset',
@@ -2735,6 +2772,7 @@ const datasetFields = [
     'cautions',
     'function',
     'release_notes',
+    'release_notes_items',
 ];
 
 export function filterDatasetFields(dataset: any) {
