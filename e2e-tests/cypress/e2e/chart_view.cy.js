@@ -23,29 +23,34 @@ describe("Chart view", () => {
     cy.get("input[name=title]").type(datasetName);
     cy.get("input[name=name]").should("have.value", datasetName);
     cy.get("textarea[name=short_description]").type("test");
+    cy.contains("Description")
+      .parent()
+      .parent()
+      .find(".tiptap.ProseMirror")
+      .type("RICH TEXT EDITOR");
 
     cy.get("#team").click();
     cy.get('[role="listbox"]').should("be.visible");
     cy.contains('[role="option"]', org).click();
-    cy.contains("Add Author").click();
-    cy.get('input[name="authors.0.name"]').type("Test Author 1");
-    cy.get('input[name="authors.0.email"]').type("test-author-1@example.com");
-    cy.contains("Add Author").click();
-    cy.get('input[name="authors.1.name"]').type("Test Author 2");
-    cy.get('input[name="authors.1.email"]').type("test-author-2@example.com");
+    cy.get("#team").should("contain.text", org.charAt(0).toUpperCase() + org.slice(1));
 
-    cy.contains("Add Maintainer").click();
+    cy.contains("Add data maintainer").click();
     cy.get('input[name="maintainers.0.name"]').type("Test Maintainer 1");
     cy.get('input[name="maintainers.0.email"]').type(
       "test-maintainer-1@example.com",
     );
-    cy.contains("Add Maintainer").click();
+    cy.contains("Add data maintainer").click();
     cy.get('input[name="maintainers.1.name"]').type("Test Maintainer 2");
     cy.get('input[name="maintainers.1.email"]').type(
       "test-maintainer-2@example.com",
     );
+
+    cy.contains("Methodology").click();
+    cy.get("input[name=technical_notes]").type("https://google.com");
+
     cy.contains("Next: Data Files").click();
-    cy.get(".datafile-accordion-trigger").eq(0).click();
+    cy.contains("Add another Data File", { timeout: 15000 }).should("be.visible");
+    cy.get(".datafile-accordion-trigger", { timeout: 15000 }).eq(0).click();
     cy.get("input[type=file]")
       .eq(0)
       .selectFile("cypress/fixtures/airtravel.csv", {

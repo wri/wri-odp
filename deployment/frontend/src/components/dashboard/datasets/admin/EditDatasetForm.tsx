@@ -14,9 +14,12 @@ import { useForm } from 'react-hook-form';
 import { OverviewForm } from './metadata/Overview';
 import { DescriptionForm } from './metadata/DescriptionForm';
 import { PointOfContactForm } from './metadata/PointOfContact';
-import { MoreDetailsForm } from './metadata/MoreDetails';
-import { OpenInForm } from './metadata/OpenIn';
-import { CustomFieldsForm } from './metadata/CustomFields';
+import { KeyDetailsForm } from './metadata/KeyDetailsForm';
+import { AdditionalReadingForm } from './metadata/AdditionalReadingForm';
+import { CitationForm } from './metadata/CitationForm';
+import { MethodologyForm } from './metadata/MethodologyForm';
+import { DatasetApiForm } from './metadata/DatasetApiForm';
+import { AdditionalMetadataForm } from './metadata/AdditionalMetadataForm';
 import {
     capacityOptions,
     languageOptions,
@@ -177,6 +180,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                   }
                 : undefined,
             additional_reading: dataset.additional_reading ?? [],
+            release_notes_items: dataset.release_notes_items ?? [],
             visibility_type: visibilityOptions.find(
                 (option) => option.value === dataset.visibility_type
             ),
@@ -280,13 +284,16 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                                 })}
                             >
                                 <OverviewForm formObj={formObj} editing={true} />
+                                <KeyDetailsForm formObj={formObj} />
                                 <LocationForm formObj={formObj} />
                                 <DescriptionForm formObj={formObj} />
+                                <AdditionalReadingForm formObj={formObj} />
+                                <CitationForm formObj={formObj} />
+                                <MethodologyForm formObj={formObj} />
                                 <PointOfContactForm formObj={formObj} />
-                                <MoreDetailsForm formObj={formObj} />
-                                <OpenInForm formObj={formObj} />
+                                <DatasetApiForm formObj={formObj} />
                                 <VersioningForm formObj={formObj} />
-                                <CustomFieldsForm formObj={formObj} />
+                                <AdditionalMetadataForm formObj={formObj} />
                             </form>
                         </Tab.Panel>
                         <Tab.Panel as="div" className="flex flex-col gap-y-12 mt-8">

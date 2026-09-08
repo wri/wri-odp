@@ -92,7 +92,7 @@ export function LocationForm({
             label={
                 <>
                     <MapPinIcon className="h-7 w-7" />
-                    Location Coverage
+                    Geographic coverage
                     <DefaultTooltip content="Complete this section if the Dataset should be included in search results when doing a search by location">
                         <InformationCircleIcon
                             className="h-5 w-5 text-neutral-500"

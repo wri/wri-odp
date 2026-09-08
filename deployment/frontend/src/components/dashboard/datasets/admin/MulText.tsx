@@ -24,6 +24,7 @@ interface MulTextProps<T extends FieldValues> {
     name: Path<T>;
     title: string;
     tooltip?: string;
+    removeItemAriaLabel?: string;
     allowsCreationOfItems?: boolean;
 }
 
@@ -39,6 +40,7 @@ export default function MulText<T extends FieldValues>({
     name,
     title,
     tooltip = 'Remove item',
+    removeItemAriaLabel,
     allowsCreationOfItems = false,
 }: MulTextProps<T>) {
     const { control } = formObj;
@@ -102,7 +104,13 @@ export default function MulText<T extends FieldValues>({
                                                     <DefaultTooltip
                                                         content={tooltip}
                                                     >
-                                                        <XMarkIcon
+                                                        <span
+                                                            role="button"
+                                                            tabIndex={0}
+                                                            aria-label={
+                                                                removeItemAriaLabel ??
+                                                                tooltip
+                                                            }
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 onChange(
@@ -115,8 +123,30 @@ export default function MulText<T extends FieldValues>({
                                                                     )
                                                                 );
                                                             }}
-                                                            className="mt-0.5 h-3 w-3 cursor-pointer text-red-600"
-                                                        />
+                                                            onKeyDown={(e) => {
+                                                                if (
+                                                                    e.key !== 'Enter' &&
+                                                                    e.key !== ' '
+                                                                ) {
+                                                                    return;
+                                                                }
+
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                onChange(
+                                                                    value.filter(
+                                                                        (
+                                                                            option: string
+                                                                        ) =>
+                                                                            option !==
+                                                                            item
+                                                                    )
+                                                                );
+                                                            }}
+                                                            className="inline-flex"
+                                                        >
+                                                            <XMarkIcon className="mt-0.5 h-3 w-3 cursor-pointer text-red-600" />
+                                                        </span>
                                                     </DefaultTooltip>
                                                 </span>
                                             )

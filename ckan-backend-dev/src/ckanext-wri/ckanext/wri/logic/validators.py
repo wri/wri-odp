@@ -431,13 +431,12 @@ def dataset_cross_fields(context: Context, data_dict: dict):
         if not data_dict.get("technical_notes"):
             raise tk.ValidationError({"technical_notes": "Technical notes are required for public Datasets"})
 
-    authors = data_dict.get("authors", None)
-    if authors is None:
-        raise tk.ValidationError({"authors": "At least one author is required"})
-    try:
-        _validate_agents_list(authors, context, "author")
-    except Invalid as e:
-        raise tk.ValidationError({"authors": str(e)})
+    authors = data_dict.get("authors")
+    if authors:
+        try:
+            _validate_agents_list(authors, context, "author")
+        except Invalid as e:
+            raise tk.ValidationError({"authors": str(e)})
     
     maintainers = data_dict.get("maintainers", None)
     if maintainers is None:

@@ -37,7 +37,7 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
             <Disclosure.Panel className="grid grid-cols-1 items-start gap-x-24 py-5">
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup
-                        label="Articles & other links"
+                        label="Additional reading"
                         className="mb-2 flex flex-col items-start whitespace-nowrap sm:flex-col"
                     >
                         <div className="flex flex-col gap-y-3 w-full">
@@ -139,7 +139,7 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                     <InputGroup
                         label={
                             <span className="relative flex items-center gap-x-1">
-                                Advanced API Usage
+                                Dataset API
                                 <DefaultTooltip
                                     contentClassName="max-w-sm whitespace-normal lg:max-w-xl"
                                     side="right"

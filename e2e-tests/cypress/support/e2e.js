@@ -235,27 +235,51 @@ Cypress.Commands.add("deleteOrganization", (orgName) => {
 });
 
 // Command for frontend test sepecific
-Cypress.Commands.add("createOrganizationAPI", (name, visibility = "public", parent = null) => {
-  cy.request({
-    method: "POST",
-    url: apiUrl("organization_create"),
-    headers: headers,
-    body: parent
-      ? {
-          name: name,
-          title: name,
-          description: "Some organization description",
-          visibility: visibility,
-          groups: [{ name: parent }],
+Cypress.Commands.add(
+  "createOrganizationAPI",
+  (name, visibility = "public", parent = null, member = null) => {
+    cy.request({
+      method: "POST",
+      url: apiUrl("organization_create"),
+      headers: headers,
+      body: parent
+        ? {
+            name: name,
+            title: name,
+            description: "Some organization description",
+            visibility: visibility,
+            groups: [{ name: parent }],
+          }
+        : {
+            name: name,
+            title: name,
+            description: "Some organization description",
+            visibility: visibility,
+          },
+    }).then(() => {
+      const uiUser = member || Cypress.env("CKAN_USERNAME");
+      if (!uiUser) return;
+
+      cy.request({
+        method: "POST",
+        url: apiUrl("organization_member_create"),
+        headers: headers,
+        failOnStatusCode: false,
+        body: {
+          id: name,
+          username: uiUser,
+          role: "admin",
+        },
+      }).then((response) => {
+        if (![200, 409].includes(response.status)) {
+          throw new Error(
+            `Failed to add ${uiUser} as admin for organization ${name}. Status: ${response.status}`,
+          );
         }
-      : {
-          name: name,
-          title: name,
-          description: "Some organization description",
-          visibility: visibility,
-    },
-  });
-});
+      });
+    });
+  },
+);
 
 // Command for frontend test sepecific
 Cypress.Commands.add(

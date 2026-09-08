@@ -45,12 +45,12 @@ export function LinkExternalForm({
             </InputGroup>
             <InputGroup label="Description" className="whitespace-nowrap">
                 <TextArea
-                    placeholder="Add a short description. If there are additional steps for accessing data not stored directly in the Data Explorer, you may want to include them here."
+                    placeholder="Describe this downloadable file"
                     {...register(`resources.${index}.description`)}
                     type="text"
                     maxWidth="max-w-[70rem]"
                     icon={
-                        <DefaultTooltip content="Recommended: 150-200 characters">
+                        <DefaultTooltip content="Describe what this downloadable file contains so users know what to expect before adding it to their download. Avoid repeating dataset-level information. For example, explain if a ZIP archive contains multiple data tables, documentation or supporting resources.">
                             <InformationCircleIcon className="h-5 w-5" />
                         </DefaultTooltip>
                     }
@@ -85,7 +85,7 @@ export function LinkExternalForm({
             <InputGroup
                 label={
                     <span className="flex items-center gap-x-1">
-                        Advanced API Usage
+                        Dataset API
                         <DefaultTooltip content="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
                             <InformationCircleIcon className="h-5 w-5" />
                         </DefaultTooltip>

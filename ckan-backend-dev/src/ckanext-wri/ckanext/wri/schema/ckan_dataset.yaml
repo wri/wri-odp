@@ -192,6 +192,11 @@ dataset_fields:
   form_snippet: markdown.html
   form_placeholder: eg. Citation information
 
+- field_name: doi
+  label: DOI
+  form_placeholder: eg. 10.1038/s41586-020-2649-2
+  validators: ignore_missing
+
 - field_name: visibility_type
   label: Visibility Type
   preset: select
@@ -318,6 +323,11 @@ dataset_fields:
   label: Release Notes
   form_snippet: markdown.html
   form_placeholder: eg. A description of the dataset changes
+
+- field_name: release_notes_items
+  label: Release Notes Items
+  form_placeholder: 'eg. [{"date": "2026-01-31", "note": "Added 2025 data"}]'
+  validators: ignore_missing
 
 - field_name: migration_extras
   label: Migration Extras

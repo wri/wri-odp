@@ -3,10 +3,13 @@ import { Button, LoaderButton } from '@/components/_shared/Button';
 import { CreateDatasetTabs } from '@/components/dashboard/datasets/admin/CreateDatasetTabs';
 import { DataFilesSection } from '@/components/dashboard/datasets/admin/datafiles/DataFilesSection';
 import { CreateLayersSection } from '@/components/dashboard/datasets/admin/datafiles/CreateLayersSection';
-import { CustomFieldsForm } from '@/components/dashboard/datasets/admin/metadata/CustomFields';
+import { AdditionalMetadataForm } from '@/components/dashboard/datasets/admin/metadata/AdditionalMetadataForm';
+import { AdditionalReadingForm } from '@/components/dashboard/datasets/admin/metadata/AdditionalReadingForm';
+import { CitationForm } from '@/components/dashboard/datasets/admin/metadata/CitationForm';
+import { DatasetApiForm } from '@/components/dashboard/datasets/admin/metadata/DatasetApiForm';
 import { DescriptionForm } from '@/components/dashboard/datasets/admin/metadata/DescriptionForm';
-import { MoreDetailsForm } from '@/components/dashboard/datasets/admin/metadata/MoreDetails';
-import { OverviewForm } from '@/components/dashboard/datasets/admin/metadata/Overview';
+import { KeyDetailsForm } from '@/components/dashboard/datasets/admin/metadata/KeyDetailsForm';
+import { MethodologyForm } from '@/components/dashboard/datasets/admin/metadata/MethodologyForm';
 import { PointOfContactForm } from '@/components/dashboard/datasets/admin/metadata/PointOfContact';
 import { Preview } from '@/components/dashboard/datasets/admin/preview/Preview';
 import { type DatasetFormType, DatasetSchema } from '@/schema/dataset.schema';
@@ -21,9 +24,9 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { v4 as uuidv4 } from 'uuid';
-import { OpenInForm } from './metadata/OpenIn';
 import Link from 'next/link';
 import { LocationForm } from './metadata/LocationForm';
+import { OverviewForm } from './metadata/Overview';
 import dynamic from 'next/dynamic';
 const Modal = dynamic(() => import('@/components/_shared/Modal'), {
     ssr: false,
@@ -31,7 +34,6 @@ const Modal = dynamic(() => import('@/components/_shared/Modal'), {
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import { VersioningForm } from './metadata/VersioningForm';
-import { ErrorMessage } from '@hookform/error-message';
 
 export default function CreateDatasetForm() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -70,6 +72,12 @@ export default function CreateDatasetForm() {
                 label: 'License not specified',
             },
             additional_reading: [],
+            authors: [],
+            extras: [],
+            open_in: [],
+            release_notes_items: [],
+            tags: [],
+            topics: [],
             resources: [
                 {
                     resourceId: uuidv4(),
@@ -91,10 +99,10 @@ export default function CreateDatasetForm() {
     });
 
     const createDataset = api.dataset.createDataset.useMutation({
-        onSuccess: async ({ title, name, visibility_type }) => {
+        onSuccess: ({ title, name }) => {
             notify(`Successfully created the "${title ?? name}" Dataset`, 'success');
             setIsOpen(false);
-            router.push('/dashboard/datasets');
+            void router.push('/dashboard/datasets');
             formObj.reset();
         },
         onError: (error) => {
@@ -102,16 +110,17 @@ export default function CreateDatasetForm() {
         },
     });
 
+    const watchedTitle = formObj.watch('title');
+
     const {
         setValue,
-        watch,
         trigger,
-        formState: { dirtyFields, errors },
+        formState: { dirtyFields },
     } = formObj;
 
     useEffect(() => {
-        if (!dirtyFields.name) setValue('name', slugify(watch('title')));
-    }, [watch('title')]);
+        if (!dirtyFields.name) setValue('name', slugify(watchedTitle));
+    }, [dirtyFields.name, setValue, watchedTitle]);
 
     return (
         <>
@@ -129,13 +138,16 @@ export default function CreateDatasetForm() {
                             })}
                         >
                             <OverviewForm formObj={formObj} />
+                            <KeyDetailsForm formObj={formObj} />
                             <LocationForm formObj={formObj} />
                             <DescriptionForm formObj={formObj} />
+                            <AdditionalReadingForm formObj={formObj} />
+                            <CitationForm formObj={formObj} />
+                            <MethodologyForm formObj={formObj} />
                             <PointOfContactForm formObj={formObj} />
-                            <MoreDetailsForm formObj={formObj} />
-                            <OpenInForm formObj={formObj} />
+                            <DatasetApiForm formObj={formObj} />
                             <VersioningForm formObj={formObj} />
-                            <CustomFieldsForm formObj={formObj} />
+                            <AdditionalMetadataForm formObj={formObj} />
                         </form>
                     </Tab.Panel>
                     <Tab.Panel as="div" className="flex flex-col gap-y-12">
@@ -176,22 +188,10 @@ export default function CreateDatasetForm() {
                                     The following fields have invalid information
                                     <ul>
                                         {Object.entries(formObj.formState.errors).map(
-                                            ([key, _value]) => {
+                                            ([key]) => {
                                                 return (
                                                     <li key={key}>
-                                                        {key}:{' '}
-                                                        <ErrorMessage
-                                                            errors={formObj.formState.errors}
-                                                            render={({ message }) => (
-                                                                <>
-                                                                    {message ??
-                                                                        (_value as any)?.value
-                                                                            ?.message ??
-                                                                        'Invalid data'}
-                                                                </>
-                                                            )}
-                                                            name={key}
-                                                        />
+                                                        {key}: Invalid data
                                                     </li>
                                                 );
                                             }
