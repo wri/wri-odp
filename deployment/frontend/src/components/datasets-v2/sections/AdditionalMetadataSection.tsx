@@ -5,7 +5,7 @@ import {
 } from '@worldresources/wri-design-systems';
 import { type WriDataset } from '@/schema/ckan.schema';
 import { datasetFormatLabel, datasetTypeLabel } from '@/utils/datasetMetadata';
-import { hasValue, stripCmsTypography, toDisplay, unique } from '../utils/text';
+import { hasValue, toDisplay, unique } from '../utils/text';
 
 type MetadataItem = {
     label: string;
@@ -125,7 +125,6 @@ function MetadataRow({ label, values }: { label: string; values: string[] }) {
 export default function AdditionalMetadataSection({ dataset, cmsContentClassName }: Props) {
     const authorNames = getAuthorNames(dataset);
     const additionalMetadataItems = getAdditionalMetadataItems(dataset);
-    const restrictionsHtml = stripCmsTypography(dataset.restrictions ?? '');
 
     const topicNames = unique(
         (dataset.groups ?? [])
@@ -175,22 +174,6 @@ export default function AdditionalMetadataSection({ dataset, cmsContentClassName
                 ))}
             </div>
 
-            {hasValue(restrictionsHtml) && (
-                <>
-                    <h3 className="font-semibold pt-4">Restrictions</h3>
-                    <div
-                        className={cmsContentClassName}
-                        style={{
-                            fontFamily: 'inherit',
-                            fontSize: 'inherit',
-                            lineHeight: 'inherit',
-                        }}
-                        dangerouslySetInnerHTML={{
-                            __html: restrictionsHtml,
-                        }}
-                    ></div>
-                </>
-            )}
         </section>
     );
 }

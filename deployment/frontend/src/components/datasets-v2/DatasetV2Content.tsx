@@ -61,12 +61,10 @@ export default function DatasetV2Content({ dataset }: Props) {
     const citationHtml = dataset.citation ?? '';
     const releaseNotesHtml = dataset.release_notes ?? '';
     const useCasesHtml = dataset.usecases ?? '';
-    const functionHtml = dataset.function ?? '';
     const descriptionContentHtml = stripCmsTypography(descriptionHtml);
     const methodologyContentHtml = stripCmsTypography(methodologyHtml);
     const citationContentHtml = stripCmsTypography(citationHtml);
     const useCasesContentHtml = stripCmsTypography(useCasesHtml);
-    const functionContentHtml = stripCmsTypography(functionHtml);
     const releaseNotesContentHtml = stripCmsTypography(releaseNotesHtml);
     const additionalReadingLinks = getAdditionalReadingLinks(dataset);
     const safeLearnMoreUrl = getPrimaryAdditionalReadingUrl(dataset);
@@ -82,10 +80,7 @@ export default function DatasetV2Content({ dataset }: Props) {
     const hasAdditionalReadingSection = hasAdditionalReading(dataset);
     const hasCitation = hasValue(citationHtml);
     const hasMethodology =
-        hasValue(methodologyHtml) ||
-        hasValue(useCasesHtml) ||
-        hasValue(functionHtml) ||
-        hasValue(dataset.technical_notes);
+        hasValue(methodologyHtml) || hasValue(useCasesHtml) || hasValue(dataset.technical_notes);
     const hasRelatedDatasets = hasDatasetKeywords(dataset) || hasValue(relatedDatasets);
     const hasReleaseNotes = hasValue(releaseNotesHtml);
     const hasAdditionalMetadataSection = hasAdditionalMetadata(dataset);
@@ -257,7 +252,6 @@ export default function DatasetV2Content({ dataset }: Props) {
                                 <MethodologySection
                                     methodologyHtml={methodologyContentHtml}
                                     useCasesHtml={useCasesContentHtml}
-                                    functionHtml={functionContentHtml}
                                     technicalNotesUrl={dataset.technical_notes}
                                     cmsContentClassName={cmsContentClassName}
                                 />
