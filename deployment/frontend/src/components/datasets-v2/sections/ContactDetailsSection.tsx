@@ -98,14 +98,9 @@ function ContactCard({ entry, role }: { entry: ContactEntry; role: string }) {
 }
 
 export default function ContactDetailsSection({ dataset }: Props) {
-    const { authors, maintainers } = getContactEntries(dataset);
+    const { maintainers } = getContactEntries(dataset);
 
     const cards = [
-        ...authors.map((entry, index) => ({
-            key: `author-${index}`,
-            role: 'Author',
-            entry,
-        })),
         ...maintainers.map((entry, index) => ({
             key: `maintainer-${index}`,
             role: 'Maintainer',
