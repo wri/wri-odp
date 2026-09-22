@@ -289,10 +289,7 @@ export default function DatasetV2Content({ dataset }: Props) {
                             )}
 
                             {hasAdditionalMetadataSection && (
-                                <AdditionalMetadataSection
-                                    dataset={dataset}
-                                    cmsContentClassName={cmsContentClassName}
-                                />
+                                <AdditionalMetadataSection dataset={dataset} />
                             )}
                         </div>
                     </section>

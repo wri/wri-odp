@@ -13,6 +13,7 @@ import {
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
 import type { WriDataset } from '@/schema/ckan.schema';
+import { datasetFormatLabel } from '@/utils/datasetMetadata';
 
 function DatasetTable({
     datasetId: _datasetId,
@@ -84,6 +85,35 @@ function DatasetTable({
             label: 'Tree cover scale',
             value: getExtraValue(['tree_cover_scale', 'tree cover scale']),
         },
+        {
+            icon: InformationCircleIcon,
+            label: 'Dataset format',
+            value: datasetFormatLabel(dataset?.dataset_format_info),
+        },
+        ...(dataset?.extras ?? [])
+            .filter((extra) => {
+                const reservedKeys = [
+                    'geographic_coverage',
+                    'geographic coverage',
+                    'location_coverage',
+                    'spatial_coverage',
+                    'dataset_type',
+                    'dataset type',
+                    'spatial_resolution',
+                    'spatial resolution',
+                    'tree_cover_scale',
+                    'tree cover scale',
+                    'related_datasets',
+                    'related datasets',
+                    'related-datasets',
+                ];
+                return !reservedKeys.includes(extra.key?.toLowerCase() ?? '');
+            })
+            .map((extra) => ({
+                icon: InformationCircleIcon,
+                label: extra.key,
+                value: extra.value,
+            })),
     ].filter((row) => !!row.value);
     return (
         <div
