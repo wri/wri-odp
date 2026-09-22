@@ -55,9 +55,9 @@ export function getContactEntries(dataset: WriDataset): {
 }
 
 export function hasContactDetails(dataset: WriDataset): boolean {
-    const { authors, maintainers } = getContactEntries(dataset);
+    const { maintainers } = getContactEntries(dataset);
 
-    return authors.length > 0 || maintainers.length > 0;
+    return maintainers.length > 0;
 }
 
 function ContactCard({ entry, role }: { entry: ContactEntry; role: string }) {

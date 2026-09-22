@@ -64,8 +64,6 @@ export default function MethodologySection({
                     </>
                 )}
 
-          
-
                 {hasValue(technicalNotesUrl) && (
                     <div>
                         <Button

@@ -74,7 +74,6 @@ export function hasAdditionalMetadata(dataset: WriDataset): boolean {
 
     return (
         additionalMetadataItems.length > 0 ||
-        hasValue(dataset.restrictions) ||
         topicCount > 0 ||
         applicationCount > 0 ||
         keywordCount > 0 ||
@@ -173,7 +172,6 @@ export default function AdditionalMetadataSection({ dataset }: Props) {
                     <MetadataRow key={row.label} label={row.label} values={row.values} />
                 ))}
             </div>
-
         </section>
     );
 }
