@@ -1,5 +1,3 @@
-version: "3"
-
 volumes:
   ckan_storage:
   pg_data:
@@ -151,7 +149,7 @@ services:
 
   minio:
     container_name: ${MINIO_CONTAINER_NAME}
-    image: minio/minio
+    image: ${MINIO_IMAGE:-quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z}
     volumes:
       - minio_data:/data
     environment:
@@ -167,7 +165,7 @@ services:
       - ckan-dev
 
   minio-setup:
-    image: minio/mc
+    image: ${MINIO_MC_IMAGE:-quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z}
     entrypoint: ["/bin/sh"]
     depends_on:
       - minio

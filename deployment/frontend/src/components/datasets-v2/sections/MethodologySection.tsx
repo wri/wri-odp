@@ -4,7 +4,6 @@ import { hasValue } from '../utils/text';
 type Props = {
     methodologyHtml: string;
     useCasesHtml: string;
-    functionHtml: string;
     technicalNotesUrl?: string;
     cmsContentClassName: string;
 };
@@ -12,7 +11,6 @@ type Props = {
 export default function MethodologySection({
     methodologyHtml,
     useCasesHtml,
-    functionHtml,
     technicalNotesUrl,
     cmsContentClassName,
 }: Props) {
@@ -61,23 +59,6 @@ export default function MethodologySection({
                             }}
                             dangerouslySetInnerHTML={{
                                 __html: useCasesHtml,
-                            }}
-                        ></div>
-                    </>
-                )}
-
-                {hasValue(functionHtml) && (
-                    <>
-                        <h3 className="font-semibold">Function</h3>
-                        <div
-                            className={cmsContentClassName}
-                            style={{
-                                fontFamily: 'inherit',
-                                fontSize: 'inherit',
-                                lineHeight: 'inherit',
-                            }}
-                            dangerouslySetInnerHTML={{
-                                __html: functionHtml,
                             }}
                         ></div>
                     </>

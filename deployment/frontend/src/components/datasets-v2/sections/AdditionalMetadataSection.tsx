@@ -4,8 +4,13 @@ import {
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
 import { type WriDataset } from '@/schema/ckan.schema';
-import { datasetFormatLabel, datasetTypeLabel } from '@/utils/datasetMetadata';
-import { hasValue, stripCmsTypography, toDisplay, unique } from '../utils/text';
+import { hasValue, toDisplay, unique } from '../utils/text';
+
+const languageLabels: Record<string, string> = {
+    en: 'English',
+    fr: 'French',
+    pt: 'Portuguese',
+};
 
 type MetadataItem = {
     label: string;
@@ -42,20 +47,15 @@ function getAdditionalMetadataItems(dataset: WriDataset): MetadataItem[] {
     return [
         { label: 'Project', value: dataset.project },
         {
-            label: 'Dataset type',
-            value: datasetTypeLabel(dataset.dataset_type_info),
-        },
-        {
-            label: 'Dataset format',
-            value: datasetFormatLabel(dataset.dataset_format_info),
-        },
-        {
             label: 'Update frequency',
             value: dataset.update_frequency?.replace(/_/g, ' '),
         },
-        { label: 'Visibility', value: dataset.visibility_type },
-        { label: 'Language', value: dataset.language },
-        { label: 'Spatial type', value: dataset.spatial_type },
+        {
+            label: 'Language',
+            value: dataset.language
+                ? (languageLabels[dataset.language] ?? dataset.language)
+                : undefined,
+        },
         { label: 'Spatial address', value: dataset.spatial_address },
         { label: 'Provider', value: dataset.provider },
         { label: 'Connector type', value: dataset.connectorType },
@@ -74,7 +74,6 @@ export function hasAdditionalMetadata(dataset: WriDataset): boolean {
 
     return (
         additionalMetadataItems.length > 0 ||
-        hasValue(dataset.restrictions) ||
         topicCount > 0 ||
         applicationCount > 0 ||
         keywordCount > 0 ||
@@ -122,10 +121,9 @@ function MetadataRow({ label, values }: { label: string; values: string[] }) {
     );
 }
 
-export default function AdditionalMetadataSection({ dataset, cmsContentClassName }: Props) {
+export default function AdditionalMetadataSection({ dataset }: Props) {
     const authorNames = getAuthorNames(dataset);
     const additionalMetadataItems = getAdditionalMetadataItems(dataset);
-    const restrictionsHtml = stripCmsTypography(dataset.restrictions ?? '');
 
     const topicNames = unique(
         (dataset.groups ?? [])
@@ -174,23 +172,6 @@ export default function AdditionalMetadataSection({ dataset, cmsContentClassName
                     <MetadataRow key={row.label} label={row.label} values={row.values} />
                 ))}
             </div>
-
-            {hasValue(restrictionsHtml) && (
-                <>
-                    <h3 className="font-semibold pt-4">Restrictions</h3>
-                    <div
-                        className={cmsContentClassName}
-                        style={{
-                            fontFamily: 'inherit',
-                            fontSize: 'inherit',
-                            lineHeight: 'inherit',
-                        }}
-                        dangerouslySetInnerHTML={{
-                            __html: restrictionsHtml,
-                        }}
-                    ></div>
-                </>
-            )}
         </section>
     );
 }

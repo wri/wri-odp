@@ -9,6 +9,7 @@ import { ChevronDownIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/20/
 import type { DatasetDetailsHeaderContentProps } from './types';
 import DatasetDownloadButton from './DatasetDownloadButton';
 import AccessApiButton from './AccessApiButton';
+import { formatDate } from './download-utils';
 
 export default function DatasetDetailsHeaderContent({
     dataset,
@@ -90,6 +91,25 @@ export default function DatasetDetailsHeaderContent({
                         }
                     />
                 ) : null}
+            </div>
+
+            <div
+                className="flex flex-col md:flex-row md:items-center"
+                style={{
+                    gap: getThemedSpacing(400),
+                    marginTop: getThemedSpacing(400),
+                    fontSize: getThemedFontSize(300),
+                    color: getThemedColor('neutral', 800),
+                    lineHeight: getThemedSpacing(500),
+                }}
+            >
+                {dataset?.metadata_created && (
+                    <span>Created: {formatDate(dataset.metadata_created)}</span>
+                )}
+                {dataset?.metadata_modified && (
+                    <span>Last updated: {formatDate(dataset.metadata_modified)}</span>
+                )}
+                {dataset?.doi && <span>DOI: {dataset.doi}</span>}
             </div>
         </div>
     );
