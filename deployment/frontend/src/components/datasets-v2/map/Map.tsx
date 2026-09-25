@@ -40,9 +40,12 @@ export default function Map({
     const { data: activeLayersIds } = useInteractiveLayers();
     const { isDrawing } = useIsDrawing();
 
-    // Default to terrain basemap for datasets-v2 maps (unless the user already picked one).
+    // Default to terrain basemap for datasets-v2 maps, applied only once on
+    // initial setup so the user can still select 'light' afterwards.
+    const basemapDefaultApplied = useRef(false);
     useEffect(() => {
-        if (selectedBasemap === 'light') {
+        if (!basemapDefaultApplied.current && selectedBasemap === 'light') {
+            basemapDefaultApplied.current = true;
             setBasemap('terrain');
         }
     }, [selectedBasemap, setBasemap]);
