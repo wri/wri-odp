@@ -176,7 +176,7 @@ services:
 
   minio:
     container_name: ${MINIO_CONTAINER_NAME}
-    image: minio/minio
+    image: ${MINIO_IMAGE:-alpine/minio:RELEASE.2025-10-15T17-29-55Z}
     volumes:
       - minio_data:/data
     environment:
@@ -192,7 +192,7 @@ services:
       - ckan-dev
 
   minio-setup:
-    image: minio/mc
+    image: ${MINIO_MC_IMAGE:-bitnamilegacy/minio-client:2025.7.21-debian-12-r3}
     entrypoint: ["/bin/sh"]
     depends_on:
       - minio
