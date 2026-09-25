@@ -1,9 +1,9 @@
-import { useIsDrawing, useMapState } from '@/utils/storeHooks';
+import { useBasemap, useIsDrawing, useMapState } from '@/utils/storeHooks';
 import { getThemedColor } from '@worldresources/wri-design-systems';
 import { useEffect, useRef, useState } from 'react';
 import ReactMapGL, { type MapRef } from 'react-map-gl';
 import { useInteractiveLayers } from '@/utils/queryHooks';
-import Tooltip, { type TooltipRef } from './Tooltip';
+import MapTooltip, { type MapTooltipRef } from './MapTooltip';
 import { type APILayerSpec } from '@/interfaces/layer.interface';
 import { Legends } from './controls/Legends';
 import Controls from './controls/Controls';
@@ -32,12 +32,20 @@ export default function Map({
     layerRwId?: string | null;
 }) {
     const { setViewState, viewState } = useMapState();
+    const { selectedBasemap, setBasemap } = useBasemap();
     const mapRef = useRef<MapRef | null>(null);
-    const mapTooltipRef = useRef<TooltipRef | null>(null);
+    const mapTooltipRef = useRef<MapTooltipRef | null>(null);
     const mapContainerRef = useRef<HTMLDivElement | null>(null);
     const [ready, setReady] = useState(false);
     const { data: activeLayersIds } = useInteractiveLayers();
     const { isDrawing } = useIsDrawing();
+
+    // Default to terrain basemap for datasets-v2 maps (unless the user already picked one).
+    useEffect(() => {
+        if (selectedBasemap === 'light') {
+            setBasemap('terrain');
+        }
+    }, [selectedBasemap, setBasemap]);
 
     useEffect(() => {
         const ro = new ResizeObserver(() => {
@@ -91,7 +99,7 @@ export default function Map({
                             <Controls mapRef={mapRef} mapContainerRef={mapContainerRef} />
                         )}
 
-                        {!isDrawing && <Tooltip ref={mapTooltipRef} />}
+                        {!isDrawing && <MapTooltip ref={mapTooltipRef} mapRef={mapRef} />}
 
                         {showLegends && <Legends />}
                         <YourLocationButton mapRef={mapRef} />
