@@ -38,7 +38,7 @@ type LayerInfo = {
             suffix?: string;
             type?: string;
         };
-        value: unknown;
+value: string | number | boolean | null | undefined;
     }>;
 };
 
