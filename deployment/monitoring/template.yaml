@@ -246,6 +246,17 @@ alertmanager:
           group_interval: 2m
           repeat_interval: 30m
           receiver: '{{ALERT_RECEIVER}}'
+        # EKS does not expose kube-scheduler. The default rule is
+        # absent(up{job="kube-scheduler"}), so it fires forever and is not an outage.
+        - match:
+            alertname: KubeSchedulerDown
+          receiver: 'null'
+        # This CronJob fails every hour and the Job object is then deleted, so
+        # KubeJobFailed fires and auto-resolves on a loop. Not a service outage.
+        - match_re:
+            alertname: KubeJobFailed
+            job_name: update-fe-cronjob-secret.*
+          receiver: 'null'
         - match:
             severity: critical
           receiver: '{{ALERT_RECEIVER}}'
@@ -276,6 +287,14 @@ nodeExporter:
 kubeStateMetrics:
   enabled: true
 
+# Drop default rules that cannot be true on EKS. kube-scheduler is part of the
+# managed control plane and is not a scrape target, so KubeSchedulerDown
+# (absent(up{job="kube-scheduler"})) pages critical with nothing to fix.
+# The Alertmanager null route above is the backstop if this chart key is ignored.
+defaultRules:
+  disabled:
+    KubeSchedulerDown: true
+
 # Prometheus Operator
 prometheusOperator:
   enabled: true
@@ -305,10 +324,13 @@ additionalPrometheusRulesMap:
               summary: "High memory usage in {{ $labels.namespace }}"
               description: "Pod {{ $labels.pod }} is using {{ $value }}% of its memory limit"
           
-          # Pod crash looping
+          # Pod crash looping. Job/CronJob pods are excluded: they are not
+          # long-running services, and a failed run is KubeJobFailed instead.
+          # CronJob pods are owned by a Job, not by the CronJob.
           - alert: PodCrashLooping
             expr: |
               rate(kube_pod_container_status_restarts_total{namespace=~"wri-odp-.*"}[15m]) > 0
+              unless on (namespace, pod) kube_pod_owner{owner_kind="Job", namespace=~"wri-odp-.*"}
             for: 5m
             labels:
               severity: warning
