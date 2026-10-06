@@ -76,6 +76,7 @@ export type DatasetJsonLdOutput = {
     citation?: string;
     identifier?: string | string[];
     sameAs?: string | string[];
+    image?: string;
     temporalCoverage?: string;
     spatialCoverage?: string | Record<string, unknown>;
     distribution?: Array<{
@@ -736,7 +737,12 @@ function buildCreator(
 export function buildDatasetJsonLd(
     dataset: DatasetJsonLdInput,
     pageUrl: string,
-    options?: { catalogName?: string; catalogUrl?: string; ckanBaseUrl?: string }
+    options?: {
+        catalogName?: string;
+        catalogUrl?: string;
+        ckanBaseUrl?: string;
+        imageUrl?: string;
+    }
 ): DatasetJsonLdOutput {
     const name = dataset.title?.trim() || dataset.name.trim();
     const description = buildDescription(dataset) || name;
@@ -774,6 +780,11 @@ export function buildDatasetJsonLd(
         output.sameAs = sameAs[0];
     } else if (sameAs.length > 1) {
         output.sameAs = sameAs;
+    }
+
+    const imageUrl = options?.imageUrl?.trim();
+    if (isHttpUrl(imageUrl)) {
+        output.image = imageUrl;
     }
 
     const temporalCoverage = formatTemporalCoverage(

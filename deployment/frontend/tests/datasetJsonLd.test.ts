@@ -363,6 +363,7 @@ describe('buildDatasetJsonLd', () => {
             {
                 catalogName: 'WRI Data Explorer',
                 catalogUrl: 'https://datasets.wri.org',
+                imageUrl: 'https://datasets.wri.org/images/WRI_logo_thumbnail.png',
             }
         );
 
@@ -380,6 +381,7 @@ describe('buildDatasetJsonLd', () => {
             identifier: 'https://doi.org/10.1016/j.rse.2023.113574',
             sameAs:
                 'https://data.globalforestwatch.org/datasets/gfw::tropical-tree-cover',
+            image: 'https://datasets.wri.org/images/WRI_logo_thumbnail.png',
             temporalCoverage: '2001/2023',
             spatialCoverage: 'Global',
             isAccessibleForFree: true,
