@@ -185,7 +185,9 @@ Open: https://odp-grafana.wri.org/d/wri-http-errors
 
 Alertmanager is included in the stack. Alerts are pre-configured in the template for:
 - High memory usage (>85% of limit)
-- Pod crash looping
+- Pod crash looping (excludes Job/CronJob pods)
+- `KubeSchedulerDown` is dropped (EKS does not scrape kube-scheduler)
+- `KubeJobFailed` for `update-fe-cronjob-secret` is routed to the null receiver (hourly fail/resolve loop)
 - High error rate (>5% 5xx responses) — requires nginx Prometheus metrics (not currently scraped)
 - Pod not ready for >10 minutes (excludes completed Job/CronJob pods in `Succeeded` phase)
 - **Ingress HTTP 5xx** — Grafana + Loki access-log alert → Alertmanager → Slack (any 5xx in last 2m)
