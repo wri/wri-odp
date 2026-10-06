@@ -76,7 +76,6 @@ export type DatasetJsonLdOutput = {
     citation?: string;
     identifier?: string | string[];
     sameAs?: string | string[];
-    measurementTechnique?: string;
     temporalCoverage?: string;
     spatialCoverage?: string | Record<string, unknown>;
     distribution?: Array<{
@@ -164,37 +163,223 @@ export function stripHtmlToText(value: string | null | undefined): string {
         .trim();
 }
 
+function linkHref(tag: string): string | undefined {
+    const match = tag.match(
+        /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/i
+    );
+    const href = (match?.[1] ?? match?.[2] ?? match?.[3])?.trim();
+    if (!href || !isHttpUrl(href)) {
+        return undefined;
+    }
+    return href;
+}
+
+/**
+ * Plain text with Markdown lists and links for Google Dataset Search descriptions.
+ * Google renders Markdown in `description`, including bullets.
+ */
+export function htmlToMarkdown(value: string | null | undefined): string {
+    if (!value) {
+        return '';
+    }
+
+    const listStack: Array<{ type: 'ul' | 'ol'; index: number }> = [];
+    const linkStack: string[] = [];
+    let inListItem = false;
+    const chunks: string[] = [];
+
+    const endsWithNewline = () => {
+        for (let index = chunks.length - 1; index >= 0; index -= 1) {
+            const chunk = chunks[index];
+            if (!chunk) {
+                continue;
+            }
+            return chunk.endsWith('\n');
+        }
+        return false;
+    };
+
+    for (const token of value.split(/(<[^>]*>)/g)) {
+        if (!token) {
+            continue;
+        }
+
+        if (!token.startsWith('<')) {
+            if (token.trim()) {
+                chunks.push(token);
+            }
+            continue;
+        }
+
+        const match = token.match(/^<\s*(\/)?\s*([a-zA-Z0-9]+)/);
+        if (!match) {
+            continue;
+        }
+        const closing = Boolean(match[1]);
+        const tag = match[2].toLowerCase();
+
+        if (tag === 'br') {
+            chunks.push('\n');
+            continue;
+        }
+
+        if (tag === 'a' && !closing) {
+            const href = linkHref(token);
+            if (href) {
+                linkStack.push(href);
+                chunks.push('[');
+            }
+            continue;
+        }
+        if (tag === 'a' && closing) {
+            const href = linkStack.pop();
+            if (href) {
+                chunks.push(`](${href})`);
+            }
+            continue;
+        }
+
+        if ((tag === 'ul' || tag === 'ol') && !closing) {
+            listStack.push({ type: tag, index: 0 });
+            if (!inListItem) {
+                chunks.push('\n\n');
+            }
+            continue;
+        }
+        if ((tag === 'ul' || tag === 'ol') && closing) {
+            listStack.pop();
+            if (!inListItem) {
+                chunks.push('\n\n');
+            }
+            continue;
+        }
+
+        if (tag === 'li' && !closing) {
+            inListItem = true;
+            const depth = Math.max(0, listStack.length - 1);
+            const current = listStack[listStack.length - 1];
+            let marker = '-';
+            if (current?.type === 'ol') {
+                current.index += 1;
+                marker = `${current.index}.`;
+            }
+            chunks.push(
+                `${endsWithNewline() ? '' : '\n'}${'  '.repeat(depth)}${marker} `
+            );
+            continue;
+        }
+        if (tag === 'li' && closing) {
+            inListItem = false;
+            chunks.push('\n');
+            continue;
+        }
+
+        if (
+            closing &&
+            (tag === 'p' || tag === 'div' || /^h[1-6]$/.test(tag))
+        ) {
+            chunks.push(inListItem ? ' ' : '\n\n');
+            continue;
+        }
+    }
+
+    return decodeHtmlEntities(chunks.join('').replace(/[<>]/g, ''))
+        .split('\n')
+        .map((line) => {
+            const indent = line.match(/^[ \t]*/)?.[0] ?? '';
+            const rest = line
+                .slice(indent.length)
+                .replace(/[ \t]{2,}/g, ' ')
+                .trimEnd();
+            return `${indent}${rest}`;
+        })
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+}
+
+function truncateText(value: string, maxLength: number): string {
+    if (value.length <= maxLength) {
+        return value;
+    }
+    if (maxLength <= 1) {
+        return '';
+    }
+    return `${value.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
+function joinSections(sections: string[]): string {
+    return sections.filter(Boolean).join('\n\n');
+}
+
+/**
+ * Google Dataset Search labels `measurementTechnique` as "Measurement technique"
+ * and does not render Markdown there. Methodology is part of `description`,
+ * which supports Markdown lists and up to 5000 characters.
+ * When the combined text is too long, methodology is kept in full.
+ */
+function fitDescription(
+    about: string,
+    methodology: string,
+    cautions: string
+): string {
+    const methodologySection = methodology
+        ? `Methodology\n\n${methodology}`
+        : '';
+    const cautionsSection = cautions ? `Cautions:\n${cautions}` : '';
+    const full = joinSections([about, methodologySection, cautionsSection]);
+    if (full.length <= MAX_DESCRIPTION_LENGTH) {
+        return full;
+    }
+    if (methodologySection.length >= MAX_DESCRIPTION_LENGTH) {
+        return truncateText(methodologySection, MAX_DESCRIPTION_LENGTH);
+    }
+
+    const room = MAX_DESCRIPTION_LENGTH - methodologySection.length;
+    const methodologySeparator = methodologySection ? '\n\n'.length : 0;
+    let aboutOut = '';
+    if (about) {
+        const maxForAbout = Math.max(0, room - methodologySeparator);
+        if (maxForAbout > 1) {
+            aboutOut = truncateText(about, maxForAbout);
+        }
+    }
+
+    const usedByAbout = aboutOut
+        ? aboutOut.length + methodologySeparator
+        : 0;
+    const roomForCautions = room - usedByAbout;
+    const cautionsSeparator =
+        cautionsSection && (aboutOut || methodologySection) ? '\n\n'.length : 0;
+    const cautionsOut =
+        cautionsSection && roomForCautions - cautionsSeparator > 1
+            ? truncateText(cautionsSection, roomForCautions - cautionsSeparator)
+            : '';
+
+    return joinSections([aboutOut, methodologySection, cautionsOut]);
+}
+
 export function buildDescription(dataset: {
     notes?: string | null;
     short_description?: string | null;
     cautions?: string | null;
+    methodology?: string | null;
 }): string {
-    const about = stripHtmlToText(dataset.notes);
+    const about = htmlToMarkdown(dataset.notes);
     const shortDescription = dataset.short_description?.trim() ?? '';
-    const cautions = stripHtmlToText(dataset.cautions);
+    const cautions = htmlToMarkdown(dataset.cautions);
+    const methodology = htmlToMarkdown(dataset.methodology);
 
-    const parts: string[] = [];
+    let summary = '';
     if (about.length >= 50) {
-        parts.push(about);
+        summary = about;
     } else if (shortDescription) {
-        parts.push(shortDescription);
+        summary = shortDescription;
     } else if (about) {
-        parts.push(about);
+        summary = about;
     }
 
-    if (cautions) {
-        parts.push(`Cautions:\n${cautions}`);
-    }
-
-    const description = parts.join('\n\n').trim();
-    if (!description) {
-        return '';
-    }
-
-    if (description.length <= MAX_DESCRIPTION_LENGTH) {
-        return description;
-    }
-    return `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1).trimEnd()}…`;
+    return fitDescription(summary, methodology, cautions);
 }
 
 export function buildKeywords(dataset: {
@@ -589,14 +774,6 @@ export function buildDatasetJsonLd(
         output.sameAs = sameAs[0];
     } else if (sameAs.length > 1) {
         output.sameAs = sameAs;
-    }
-
-    const methodology = stripHtmlToText(dataset.methodology);
-    if (methodology) {
-        output.measurementTechnique =
-            methodology.length > 500
-                ? `${methodology.slice(0, 499).trimEnd()}…`
-                : methodology;
     }
 
     const temporalCoverage = formatTemporalCoverage(
