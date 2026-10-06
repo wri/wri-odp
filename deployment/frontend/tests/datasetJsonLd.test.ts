@@ -7,6 +7,7 @@ import {
     buildLicense,
     buildSpatialCoverage,
     formatTemporalCoverage,
+    htmlToMarkdown,
     stripHtmlToText,
     type DatasetJsonLdInput,
 } from '@/utils/datasetJsonLd';
@@ -65,6 +66,56 @@ describe('stripHtmlToText', () => {
     });
 });
 
+describe('htmlToMarkdown', () => {
+    it('keeps unordered and ordered lists as Markdown', () => {
+        expect(
+            htmlToMarkdown(
+                '<p>Intro</p><ul><li><p>Capping the maximum number of images per year at 12</p></li><li><p>Improving Sentinel-2 imagery selection</p></li></ul>'
+            )
+        ).toBe(
+            'Intro\n\n- Capping the maximum number of images per year at 12\n- Improving Sentinel-2 imagery selection'
+        );
+
+        expect(
+            htmlToMarkdown('<ol><li>First step</li><li>Second step</li></ol>')
+        ).toBe('1. First step\n2. Second step');
+    });
+
+    it('indents nested lists and keeps absolute links', () => {
+        expect(
+            htmlToMarkdown(
+                '<ul><li>Parent<ul><li>Child</li></ul></li></ul><p>See <a href="https://example.com/notes">the note</a>.</p>'
+            )
+        ).toBe(
+            '- Parent\n  - Child\n\nSee [the note](https://example.com/notes).'
+        );
+    });
+
+    it('indents nested lists to the parent ordered-list marker width', () => {
+        expect(
+            htmlToMarkdown('<ol><li>Parent<ul><li>Child</li></ul></li></ol>')
+        ).toBe('1. Parent\n   - Child');
+
+        const earlierItems = Array.from(
+            { length: 9 },
+            (_, index) => `<li>Item ${index + 1}</li>`
+        ).join('');
+        expect(
+            htmlToMarkdown(
+                `<ol>${earlierItems}<li>Item 10<ul><li>Nested</li></ul></li></ol>`
+            )
+        ).toContain('10. Item 10\n    - Nested');
+    });
+
+    it('drops non-http links and leftover markup', () => {
+        expect(
+            htmlToMarkdown(
+                '<p>Before <a href="javascript:alert(1)">click</a> <scr<script>ipt>alert(1)</script></p>'
+            )
+        ).not.toMatch(/[<>]/);
+    });
+});
+
 describe('buildDescription', () => {
     it('prefers About notes over short description', () => {
         expect(
@@ -95,6 +146,62 @@ describe('buildDescription', () => {
         ).toBe(
             'This layer displays tree extent at the ten-meter scale for monitoring.'
         );
+    });
+
+    it('includes the full methodology with a Methodology heading and Markdown bullets', () => {
+        const methodologyBody =
+            'Capping the maximum number of images per year at 12 to reduce data throughput requirements. '.repeat(
+                12
+            );
+        const description = buildDescription({
+            notes: '<p>The tropical tree cover data maps tree extent at the ten-meter scale and tree cover at the half hectare scale to enable accurate monitoring.</p>',
+            methodology: `<ul><li><p>${methodologyBody}</p></li><li><p>Improving Sentinel-2 imagery selection across the time series.</p></li></ul>`,
+            cautions: '<p>Different tree definition than Hansen.</p>',
+        });
+
+        expect(description).toContain('Methodology\n\n- ');
+        expect(description).toContain(methodologyBody.trim());
+        expect(description).toContain(
+            '- Improving Sentinel-2 imagery selection across the time series.'
+        );
+        expect(description).not.toMatch(/…/);
+        expect(description).toContain('Cautions:');
+    });
+
+    it('keeps methodology intact when the combined text exceeds 5000 characters', () => {
+        const methodology = 'Method detail. '.repeat(80).trim();
+        const description = buildDescription({
+            notes: `<p>${'About the dataset. '.repeat(300)}</p>`,
+            methodology: `<p>${methodology}</p>`,
+            cautions: `<p>${'Use with care. '.repeat(80)}</p>`,
+        });
+
+        expect(description.length).toBeLessThanOrEqual(5000);
+        expect(description).toContain(`Methodology\n\n${methodology}`);
+        expect(description.endsWith(methodology)).toBe(true);
+    });
+
+    it('drops a Markdown link instead of cutting it off', () => {
+        const url = 'https://example.com/very-long-methodology-document';
+        const prefix = `${'x'.repeat(4978)} `;
+        const description = buildDescription({
+            notes: `<p>${prefix}<a href="${url}">note</a> after the link</p>`,
+        });
+
+        expect(description.length).toBeLessThanOrEqual(5000);
+        expect(description.endsWith('…')).toBe(true);
+        expect(description).not.toContain(url);
+        expect(description).not.toContain('[note]');
+        expect(description.replace(/…$/, '')).not.toMatch(/\[|\]\(/);
+    });
+
+    it('keeps a Markdown link that fits before the character limit', () => {
+        const description = buildDescription({
+            notes: `<p>${'About the dataset. '.repeat(20)}<a href="https://example.com/notes">note</a> ${'More detail. '.repeat(400)}</p>`,
+        });
+
+        expect(description.length).toBeLessThanOrEqual(5000);
+        expect(description).toContain('[note](https://example.com/notes)');
     });
 });
 
@@ -295,6 +402,7 @@ describe('buildDatasetJsonLd', () => {
             {
                 catalogName: 'WRI Data Explorer',
                 catalogUrl: 'https://datasets.wri.org',
+                imageUrl: 'https://datasets.wri.org/images/WRI_logo_thumbnail.png',
             }
         );
 
@@ -312,8 +420,7 @@ describe('buildDatasetJsonLd', () => {
             identifier: 'https://doi.org/10.1016/j.rse.2023.113574',
             sameAs:
                 'https://data.globalforestwatch.org/datasets/gfw::tropical-tree-cover',
-            measurementTechnique:
-                'Multi-temporal convolutional neural network models applied to Sentinel imagery.',
+            image: 'https://datasets.wri.org/images/WRI_logo_thumbnail.png',
             temporalCoverage: '2001/2023',
             spatialCoverage: 'Global',
             isAccessibleForFree: true,
@@ -343,6 +450,10 @@ describe('buildDatasetJsonLd', () => {
         expect(jsonLd.description).toContain(
             'Different tree definition than Hansen et al.'
         );
+        expect(jsonLd.description).toContain(
+            'Methodology\n\nMulti-temporal convolutional neural network models applied to Sentinel imagery.'
+        );
+        expect(jsonLd).not.toHaveProperty('measurementTechnique');
     });
 
     it('falls back to name when title is blank', () => {

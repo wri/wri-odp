@@ -76,7 +76,7 @@ export type DatasetJsonLdOutput = {
     citation?: string;
     identifier?: string | string[];
     sameAs?: string | string[];
-    measurementTechnique?: string;
+    image?: string;
     temporalCoverage?: string;
     spatialCoverage?: string | Record<string, unknown>;
     distribution?: Array<{
@@ -164,37 +164,283 @@ export function stripHtmlToText(value: string | null | undefined): string {
         .trim();
 }
 
+function trimmedOrUndefined(
+    value: string | null | undefined
+): string | undefined {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+        return undefined;
+    }
+    return trimmed;
+}
+
+function linkHref(tag: string): string | undefined {
+    const match =
+        /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/i.exec(tag);
+    const href = (match?.[1] ?? match?.[2] ?? match?.[3])?.trim();
+    if (!href || !isHttpUrl(href)) {
+        return undefined;
+    }
+    return href;
+}
+
+/**
+ * Plain text with Markdown lists and links for Google Dataset Search descriptions.
+ * Google renders Markdown in `description`, including bullets.
+ */
+export function htmlToMarkdown(value: string | null | undefined): string {
+    if (!value) {
+        return '';
+    }
+
+    const listStack: Array<{
+        type: 'ul' | 'ol';
+        index: number;
+        contentColumn: number;
+    }> = [];
+    const linkStack: string[] = [];
+    let inListItem = false;
+    const chunks: string[] = [];
+
+    const endsWithNewline = () => {
+        for (let index = chunks.length - 1; index >= 0; index -= 1) {
+            const chunk = chunks[index];
+            if (!chunk) {
+                continue;
+            }
+            return chunk.endsWith('\n');
+        }
+        return false;
+    };
+
+    for (const token of value.split(/(<[^>]*>)/g)) {
+        if (!token) {
+            continue;
+        }
+
+        if (!token.startsWith('<')) {
+            if (token.trim()) {
+                chunks.push(token);
+            }
+            continue;
+        }
+
+        const match = /^<\s*(\/)?\s*([a-zA-Z0-9]+)/.exec(token);
+        if (!match) {
+            continue;
+        }
+        const closing = Boolean(match[1]);
+        const tag = match[2].toLowerCase();
+
+        if (tag === 'br') {
+            chunks.push('\n');
+            continue;
+        }
+
+        if (tag === 'a' && !closing) {
+            const href = linkHref(token);
+            if (href) {
+                linkStack.push(href);
+                chunks.push('[');
+            }
+            continue;
+        }
+        if (tag === 'a' && closing) {
+            const href = linkStack.pop();
+            if (href) {
+                chunks.push(`](${href})`);
+            }
+            continue;
+        }
+
+        if ((tag === 'ul' || tag === 'ol') && !closing) {
+            listStack.push({ type: tag, index: 0, contentColumn: 0 });
+            if (!inListItem) {
+                chunks.push('\n\n');
+            }
+            continue;
+        }
+        if ((tag === 'ul' || tag === 'ol') && closing) {
+            listStack.pop();
+            if (!inListItem) {
+                chunks.push('\n\n');
+            }
+            continue;
+        }
+
+        if (tag === 'li' && !closing) {
+            inListItem = true;
+            const current = listStack[listStack.length - 1];
+            let marker = '-';
+            if (current?.type === 'ol') {
+                current.index += 1;
+                marker = `${current.index}.`;
+            }
+            if (current) {
+                // Content starts after the marker and the space that follows it.
+                // "1. " is three columns and "10. " is four; "- " is two.
+                current.contentColumn = marker.length + 1;
+            }
+            const indent = listStack
+                .slice(0, -1)
+                .reduce((width, frame) => width + frame.contentColumn, 0);
+            chunks.push(
+                `${endsWithNewline() ? '' : '\n'}${' '.repeat(indent)}${marker} `
+            );
+            continue;
+        }
+        if (tag === 'li' && closing) {
+            inListItem = false;
+            chunks.push('\n');
+            continue;
+        }
+
+        if (
+            closing &&
+            (tag === 'p' || tag === 'div' || /^h[1-6]$/.test(tag))
+        ) {
+            chunks.push(inListItem ? ' ' : '\n\n');
+            continue;
+        }
+    }
+
+    return decodeHtmlEntities(chunks.join('').replace(/[<>]/g, ''))
+        .split('\n')
+        .map((line) => {
+            const indent = /^[ \t]*/.exec(line)?.[0] ?? '';
+            const rest = line
+                .slice(indent.length)
+                .replace(/[ \t]{2,}/g, ' ')
+                .trimEnd();
+            return `${indent}${rest}`;
+        })
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+}
+
+function markdownLinkRanges(
+    value: string
+): Array<{ start: number; end: number }> {
+    const ranges: Array<{ start: number; end: number }> = [];
+    for (let index = 0; index < value.length; index += 1) {
+        if (value[index] !== '[') {
+            continue;
+        }
+        const labelEnd = value.indexOf(']', index + 1);
+        if (labelEnd === -1 || value[labelEnd + 1] !== '(') {
+            continue;
+        }
+        const urlEnd = value.indexOf(')', labelEnd + 2);
+        if (urlEnd === -1) {
+            continue;
+        }
+        const url = value.slice(labelEnd + 2, urlEnd);
+        if (!/^https?:\/\/\S+$/i.test(url)) {
+            continue;
+        }
+        ranges.push({ start: index, end: urlEnd + 1 });
+        index = urlEnd;
+    }
+    return ranges;
+}
+
+function truncateText(value: string, maxLength: number): string {
+    if (value.length <= maxLength) {
+        return value;
+    }
+    if (maxLength <= 1) {
+        return '';
+    }
+
+    // Keep the cut on a Markdown token boundary. A link that would be split
+    // is dropped so the description does not keep a partial URL or an open bracket.
+    let end = maxLength - 1;
+    for (const link of markdownLinkRanges(value)) {
+        if (link.start < end && link.end > end) {
+            end = link.start;
+        }
+    }
+
+    const sliced = value.slice(0, end).trimEnd();
+    if (!sliced) {
+        return '';
+    }
+    return `${sliced}…`;
+}
+
+function joinSections(sections: string[]): string {
+    return sections.filter(Boolean).join('\n\n');
+}
+
+/**
+ * Google Dataset Search labels `measurementTechnique` as "Measurement technique"
+ * and does not render Markdown there. Methodology is part of `description`,
+ * which supports Markdown lists and up to 5000 characters.
+ * When the combined text is too long, methodology is kept in full.
+ */
+function fitDescription(
+    about: string,
+    methodology: string,
+    cautions: string
+): string {
+    const methodologySection = methodology
+        ? `Methodology\n\n${methodology}`
+        : '';
+    const cautionsSection = cautions ? `Cautions:\n${cautions}` : '';
+    const full = joinSections([about, methodologySection, cautionsSection]);
+    if (full.length <= MAX_DESCRIPTION_LENGTH) {
+        return full;
+    }
+    if (methodologySection.length >= MAX_DESCRIPTION_LENGTH) {
+        return truncateText(methodologySection, MAX_DESCRIPTION_LENGTH);
+    }
+
+    const room = MAX_DESCRIPTION_LENGTH - methodologySection.length;
+    const methodologySeparator = methodologySection ? '\n\n'.length : 0;
+    let aboutOut = '';
+    if (about) {
+        const maxForAbout = Math.max(0, room - methodologySeparator);
+        if (maxForAbout > 1) {
+            aboutOut = truncateText(about, maxForAbout);
+        }
+    }
+
+    const usedByAbout = aboutOut
+        ? aboutOut.length + methodologySeparator
+        : 0;
+    const roomForCautions = room - usedByAbout;
+    const cautionsSeparator =
+        cautionsSection && (aboutOut || methodologySection) ? '\n\n'.length : 0;
+    const cautionsOut =
+        cautionsSection && roomForCautions - cautionsSeparator > 1
+            ? truncateText(cautionsSection, roomForCautions - cautionsSeparator)
+            : '';
+
+    return joinSections([aboutOut, methodologySection, cautionsOut]);
+}
+
 export function buildDescription(dataset: {
     notes?: string | null;
     short_description?: string | null;
     cautions?: string | null;
+    methodology?: string | null;
 }): string {
-    const about = stripHtmlToText(dataset.notes);
+    const about = htmlToMarkdown(dataset.notes);
     const shortDescription = dataset.short_description?.trim() ?? '';
-    const cautions = stripHtmlToText(dataset.cautions);
+    const cautions = htmlToMarkdown(dataset.cautions);
+    const methodology = htmlToMarkdown(dataset.methodology);
 
-    const parts: string[] = [];
+    let summary = '';
     if (about.length >= 50) {
-        parts.push(about);
+        summary = about;
     } else if (shortDescription) {
-        parts.push(shortDescription);
+        summary = shortDescription;
     } else if (about) {
-        parts.push(about);
+        summary = about;
     }
 
-    if (cautions) {
-        parts.push(`Cautions:\n${cautions}`);
-    }
-
-    const description = parts.join('\n\n').trim();
-    if (!description) {
-        return '';
-    }
-
-    if (description.length <= MAX_DESCRIPTION_LENGTH) {
-        return description;
-    }
-    return `${description.slice(0, MAX_DESCRIPTION_LENGTH - 1).trimEnd()}…`;
+    return fitDescription(summary, methodology, cautions);
 }
 
 export function buildKeywords(dataset: {
@@ -480,7 +726,7 @@ function resourceEncodingFormat(
     if (format) {
         return format.toUpperCase() === format ? format : format.toUpperCase();
     }
-    return resource.mimetype?.trim() || undefined;
+    return trimmedOrUndefined(resource.mimetype);
 }
 
 export function buildDistribution(
@@ -511,7 +757,9 @@ export function buildDistribution(
             if (encodingFormat) {
                 entry.encodingFormat = encodingFormat;
             }
-            const name = resource.title?.trim() || resource.name?.trim();
+            const name =
+                trimmedOrUndefined(resource.title) ??
+                trimmedOrUndefined(resource.name);
             if (name) {
                 entry.name = name;
             }
@@ -526,8 +774,8 @@ function buildCreator(
     dataset: DatasetJsonLdInput
 ): DatasetJsonLdOutput['creator'] {
     const organizationName =
-        dataset.organization?.title?.trim() ||
-        dataset.organization?.name?.trim();
+        trimmedOrUndefined(dataset.organization?.title) ??
+        trimmedOrUndefined(dataset.organization?.name);
     if (organizationName) {
         return {
             '@type': 'Organization',
@@ -551,9 +799,14 @@ function buildCreator(
 export function buildDatasetJsonLd(
     dataset: DatasetJsonLdInput,
     pageUrl: string,
-    options?: { catalogName?: string; catalogUrl?: string; ckanBaseUrl?: string }
+    options?: {
+        catalogName?: string;
+        catalogUrl?: string;
+        ckanBaseUrl?: string;
+        imageUrl?: string;
+    }
 ): DatasetJsonLdOutput {
-    const name = dataset.title?.trim() || dataset.name.trim();
+    const name = trimmedOrUndefined(dataset.title) ?? dataset.name.trim();
     const description = buildDescription(dataset) || name;
 
     const output: DatasetJsonLdOutput = {
@@ -591,12 +844,9 @@ export function buildDatasetJsonLd(
         output.sameAs = sameAs;
     }
 
-    const methodology = stripHtmlToText(dataset.methodology);
-    if (methodology) {
-        output.measurementTechnique =
-            methodology.length > 500
-                ? `${methodology.slice(0, 499).trimEnd()}…`
-                : methodology;
+    const imageUrl = options?.imageUrl?.trim();
+    if (isHttpUrl(imageUrl)) {
+        output.image = imageUrl;
     }
 
     const temporalCoverage = formatTemporalCoverage(
