@@ -91,6 +91,22 @@ describe('htmlToMarkdown', () => {
         );
     });
 
+    it('indents nested lists to the parent ordered-list marker width', () => {
+        expect(
+            htmlToMarkdown('<ol><li>Parent<ul><li>Child</li></ul></li></ol>')
+        ).toBe('1. Parent\n   - Child');
+
+        const earlierItems = Array.from(
+            { length: 9 },
+            (_, index) => `<li>Item ${index + 1}</li>`
+        ).join('');
+        expect(
+            htmlToMarkdown(
+                `<ol>${earlierItems}<li>Item 10<ul><li>Nested</li></ul></li></ol>`
+            )
+        ).toContain('10. Item 10\n    - Nested');
+    });
+
     it('drops non-http links and leftover markup', () => {
         expect(
             htmlToMarkdown(

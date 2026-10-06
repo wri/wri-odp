@@ -184,7 +184,11 @@ export function htmlToMarkdown(value: string | null | undefined): string {
         return '';
     }
 
-    const listStack: Array<{ type: 'ul' | 'ol'; index: number }> = [];
+    const listStack: Array<{
+        type: 'ul' | 'ol';
+        index: number;
+        contentColumn: number;
+    }> = [];
     const linkStack: string[] = [];
     let inListItem = false;
     const chunks: string[] = [];
@@ -241,7 +245,7 @@ export function htmlToMarkdown(value: string | null | undefined): string {
         }
 
         if ((tag === 'ul' || tag === 'ol') && !closing) {
-            listStack.push({ type: tag, index: 0 });
+            listStack.push({ type: tag, index: 0, contentColumn: 0 });
             if (!inListItem) {
                 chunks.push('\n\n');
             }
@@ -257,15 +261,22 @@ export function htmlToMarkdown(value: string | null | undefined): string {
 
         if (tag === 'li' && !closing) {
             inListItem = true;
-            const depth = Math.max(0, listStack.length - 1);
             const current = listStack[listStack.length - 1];
             let marker = '-';
             if (current?.type === 'ol') {
                 current.index += 1;
                 marker = `${current.index}.`;
             }
+            if (current) {
+                // Content starts after the marker and the space that follows it.
+                // "1. " is three columns and "10. " is four; "- " is two.
+                current.contentColumn = marker.length + 1;
+            }
+            const indent = listStack
+                .slice(0, -1)
+                .reduce((width, frame) => width + frame.contentColumn, 0);
             chunks.push(
-                `${endsWithNewline() ? '' : '\n'}${'  '.repeat(depth)}${marker} `
+                `${endsWithNewline() ? '' : '\n'}${' '.repeat(indent)}${marker} `
             );
             continue;
         }
