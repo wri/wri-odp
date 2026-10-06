@@ -310,6 +310,32 @@ export function htmlToMarkdown(value: string | null | undefined): string {
         .trim();
 }
 
+function markdownLinkRanges(
+    value: string
+): Array<{ start: number; end: number }> {
+    const ranges: Array<{ start: number; end: number }> = [];
+    for (let index = 0; index < value.length; index += 1) {
+        if (value[index] !== '[') {
+            continue;
+        }
+        const labelEnd = value.indexOf(']', index + 1);
+        if (labelEnd === -1 || value[labelEnd + 1] !== '(') {
+            continue;
+        }
+        const urlEnd = value.indexOf(')', labelEnd + 2);
+        if (urlEnd === -1) {
+            continue;
+        }
+        const url = value.slice(labelEnd + 2, urlEnd);
+        if (!/^https?:\/\/\S+$/i.test(url)) {
+            continue;
+        }
+        ranges.push({ start: index, end: urlEnd + 1 });
+        index = urlEnd;
+    }
+    return ranges;
+}
+
 function truncateText(value: string, maxLength: number): string {
     if (value.length <= maxLength) {
         return value;
@@ -317,7 +343,21 @@ function truncateText(value: string, maxLength: number): string {
     if (maxLength <= 1) {
         return '';
     }
-    return `${value.slice(0, maxLength - 1).trimEnd()}…`;
+
+    // Keep the cut on a Markdown token boundary. A link that would be split
+    // is dropped so the description does not keep a partial URL or an open bracket.
+    let end = maxLength - 1;
+    for (const link of markdownLinkRanges(value)) {
+        if (link.start < end && link.end > end) {
+            end = link.start;
+        }
+    }
+
+    const sliced = value.slice(0, end).trimEnd();
+    if (!sliced) {
+        return '';
+    }
+    return `${sliced}…`;
 }
 
 function joinSections(sections: string[]): string {

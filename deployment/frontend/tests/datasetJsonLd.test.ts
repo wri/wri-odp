@@ -180,6 +180,29 @@ describe('buildDescription', () => {
         expect(description).toContain(`Methodology\n\n${methodology}`);
         expect(description.endsWith(methodology)).toBe(true);
     });
+
+    it('drops a Markdown link instead of cutting it off', () => {
+        const url = 'https://example.com/very-long-methodology-document';
+        const prefix = `${'x'.repeat(4978)} `;
+        const description = buildDescription({
+            notes: `<p>${prefix}<a href="${url}">note</a> after the link</p>`,
+        });
+
+        expect(description.length).toBeLessThanOrEqual(5000);
+        expect(description.endsWith('…')).toBe(true);
+        expect(description).not.toContain(url);
+        expect(description).not.toContain('[note]');
+        expect(description.replace(/…$/, '')).not.toMatch(/\[|\]\(/);
+    });
+
+    it('keeps a Markdown link that fits before the character limit', () => {
+        const description = buildDescription({
+            notes: `<p>${'About the dataset. '.repeat(20)}<a href="https://example.com/notes">note</a> ${'More detail. '.repeat(400)}</p>`,
+        });
+
+        expect(description.length).toBeLessThanOrEqual(5000);
+        expect(description).toContain('[note](https://example.com/notes)');
+    });
 });
 
 describe('buildKeywords', () => {
