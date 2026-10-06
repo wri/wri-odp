@@ -164,10 +164,19 @@ export function stripHtmlToText(value: string | null | undefined): string {
         .trim();
 }
 
+function trimmedOrUndefined(
+    value: string | null | undefined
+): string | undefined {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+        return undefined;
+    }
+    return trimmed;
+}
+
 function linkHref(tag: string): string | undefined {
-    const match = tag.match(
-        /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/i
-    );
+    const match =
+        /\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/i.exec(tag);
     const href = (match?.[1] ?? match?.[2] ?? match?.[3])?.trim();
     if (!href || !isHttpUrl(href)) {
         return undefined;
@@ -216,7 +225,7 @@ export function htmlToMarkdown(value: string | null | undefined): string {
             continue;
         }
 
-        const match = token.match(/^<\s*(\/)?\s*([a-zA-Z0-9]+)/);
+        const match = /^<\s*(\/)?\s*([a-zA-Z0-9]+)/.exec(token);
         if (!match) {
             continue;
         }
@@ -298,7 +307,7 @@ export function htmlToMarkdown(value: string | null | undefined): string {
     return decodeHtmlEntities(chunks.join('').replace(/[<>]/g, ''))
         .split('\n')
         .map((line) => {
-            const indent = line.match(/^[ \t]*/)?.[0] ?? '';
+            const indent = /^[ \t]*/.exec(line)?.[0] ?? '';
             const rest = line
                 .slice(indent.length)
                 .replace(/[ \t]{2,}/g, ' ')
@@ -717,7 +726,7 @@ function resourceEncodingFormat(
     if (format) {
         return format.toUpperCase() === format ? format : format.toUpperCase();
     }
-    return resource.mimetype?.trim() || undefined;
+    return trimmedOrUndefined(resource.mimetype);
 }
 
 export function buildDistribution(
@@ -748,7 +757,9 @@ export function buildDistribution(
             if (encodingFormat) {
                 entry.encodingFormat = encodingFormat;
             }
-            const name = resource.title?.trim() || resource.name?.trim();
+            const name =
+                trimmedOrUndefined(resource.title) ??
+                trimmedOrUndefined(resource.name);
             if (name) {
                 entry.name = name;
             }
@@ -763,8 +774,8 @@ function buildCreator(
     dataset: DatasetJsonLdInput
 ): DatasetJsonLdOutput['creator'] {
     const organizationName =
-        dataset.organization?.title?.trim() ||
-        dataset.organization?.name?.trim();
+        trimmedOrUndefined(dataset.organization?.title) ??
+        trimmedOrUndefined(dataset.organization?.name);
     if (organizationName) {
         return {
             '@type': 'Organization',
@@ -795,7 +806,7 @@ export function buildDatasetJsonLd(
         imageUrl?: string;
     }
 ): DatasetJsonLdOutput {
-    const name = dataset.title?.trim() || dataset.name.trim();
+    const name = trimmedOrUndefined(dataset.title) ?? dataset.name.trim();
     const description = buildDescription(dataset) || name;
 
     const output: DatasetJsonLdOutput = {
