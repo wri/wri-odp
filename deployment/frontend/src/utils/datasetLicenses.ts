@@ -18,7 +18,7 @@ export const datasetLicenses = [
     { id: 'other-open', title: 'Other (Open)', url: '' },
     {
         id: 'cc-by-nc-4-0',
-        title: 'Creative Commons Non-Commercial 4.0',
+        title: 'Creative Commons Attribution-NonCommercial 4.0',
         url: 'https://creativecommons.org/licenses/by-nc/4.0/',
     },
     { id: 'other-closed', title: 'Other (Not Open)', url: '' },
