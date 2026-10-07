@@ -334,6 +334,12 @@ const DatasetSchemaObject = z.object({
             label: z.string(),
         })
         .optional(),
+    license_type_id: z
+        .object({
+            value: z.string(),
+            label: z.string(),
+        })
+        .optional(),
     short_description: z
         .string()
         .min(1, { message: 'Caption is required' })

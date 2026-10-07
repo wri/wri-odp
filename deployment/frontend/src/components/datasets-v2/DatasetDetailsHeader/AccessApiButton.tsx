@@ -80,6 +80,7 @@ export default function AccessApiButton({
             case 'terms':
                 return (
                     <ReviewDetailsAndTermsStep
+                        dataset={dataset}
                         onBack={() => {
                             if (hasCautions) {
                                 setActiveStep('caution');

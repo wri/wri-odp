@@ -215,6 +215,10 @@ dataset_fields:
   form_snippet: license.html
   help_text: License definitions and additional information can be found at http://opendefinition.org/
 
+- field_name: license_type_id
+  label: License type ID
+  validators: ignore_missing unicode_safe
+
 - field_name: featured_dataset
   label: Featured Dataset
   validators: boolean_validator

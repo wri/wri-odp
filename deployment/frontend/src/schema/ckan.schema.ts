@@ -98,6 +98,7 @@ export interface ActivityDisplay {
 }
 
 export interface WriDataset extends Omit<Dataset, 'groups'> {
+    license_type_id?: string | null;
     has_chart_views?: boolean;
     methodology?: string;
     usecases?: string;

@@ -17,6 +17,7 @@ import { api } from '@/utils/api';
 import { P, match } from 'ts-pattern';
 import Spinner from '@/components/_shared/Spinner';
 import { datasetFormatInfoOptions, datasetTypeInfoOptions } from '../formOptions';
+import { datasetLicenseOptions } from '@/utils/datasetLicenses';
 
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: currentYear - 1900 + 1 }, (_, index) =>
@@ -41,7 +42,6 @@ export function KeyDetailsForm({
     const canAddMore = fields.length < 3;
 
     const possibleOwners = api.teams.getAllTeams.useQuery();
-    const possibleLicenses = api.dataset.getLicenses.useQuery();
 
     return (
         <MetadataAccordion
@@ -166,39 +166,14 @@ export function KeyDetailsForm({
                             </span>
                         }
                     >
-                        {match(possibleLicenses)
-                            .with({ isLoading: true }, () => (
-                                <span className="flex items-center text-sm gap-x-2">
-                                    <Spinner />
-                                    <span className="mt-1">Loading licenses...</span>
-                                </span>
-                            ))
-                            .with({ isError: true }, () => (
-                                <span className="flex items-center text-sm text-red-600">
-                                    Error loading licenses, please refresh the page
-                                </span>
-                            ))
-                            .with(
-                                { isSuccess: true, data: P.select() },
-                                (data) => (
-                                    <SimpleSelect
-                                        name="license_id"
-                                        id="license"
-                                        formObj={formObj}
-                                        options={data.map((license) => ({
-                                            label: license.title,
-                                            value: license.id,
-                                        }))}
-                                        placeholder="Select a license"
-                                    />
-                                )
-                            )
-                            .otherwise(() => (
-                                <span className="flex items-center text-sm text-red-600">
-                                    Error loading licenses, please refresh the page
-                                </span>
-                            ))}
-                        <ErrorDisplay name="license" errors={errors} />
+                        <SimpleSelect
+                            name="license_type_id"
+                            id="license"
+                            formObj={formObj}
+                            options={datasetLicenseOptions}
+                            placeholder="Select a license"
+                        />
+                        <ErrorDisplay name="license_type_id" errors={errors} />
                     </InputGroup>
 
                     <InputGroup

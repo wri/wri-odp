@@ -41,6 +41,7 @@ import { EditRwSection } from './datafiles/EditRwSection';
 import { VersioningForm } from './metadata/VersioningForm';
 import { ErrorMessage } from '@hookform/error-message';
 import { isLayerResource } from '@/utils/datasetResources';
+import { datasetLicenseOptions } from '@/utils/datasetLicenses';
 
 function getDiff<T>(dirtyObject: T, changedFields: string[]) {
     for (const key in dirtyObject) {
@@ -84,7 +85,6 @@ function getDiff<T>(dirtyObject: T, changedFields: string[]) {
 export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const router = useRouter();
-    const possibleLicenses = api.dataset.getLicenses.useQuery();
     const { data: teamUsers } = api.teams.getTeamUsers.useQuery(
         {
             id: dataset.organization?.id ?? dataset.owner_org ?? '',
@@ -92,7 +92,6 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
         },
         { enabled: !!dataset.organization?.id }
     );
-    const license = possibleLicenses.data?.find((license) => license.id === dataset.license_id);
     const session = useSession();
     const { data: collaborators } = api.dataset.getDatasetCollaborators.useQuery({
         id: dataset.name,
@@ -163,7 +162,12 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
                       visibility: dataset.organization.visibility,
                   }
                 : { value: '', label: 'No Team', id: '', visibility: '' },
-            license_id: license ? { value: license.id, label: license.title } : undefined,
+            license_id: dataset.license_id
+                ? { value: dataset.license_id, label: dataset.license_title ?? '' }
+                : undefined,
+            license_type_id: datasetLicenseOptions.find(
+                (option) => option.value === dataset.license_type_id
+            ),
             dataset_type_info: dataset.dataset_type_info
                 ? {
                       value: dataset.dataset_type_info,

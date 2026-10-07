@@ -62,6 +62,7 @@ def test_package_create(mail_user):
         "citation": "Citation information",
         "visibility_type": "public",
         "license_id": "cc-by-4.0",
+        "license_type_id": "cc-by-nc-sa-4-0",
         "draft": False,
         "featured_dataset": True,
         "short_description": "A short description of the dataset",
@@ -120,6 +121,7 @@ def test_package_create(mail_user):
     assert result["citation"] == dataset["citation"]
     assert result["visibility_type"] == dataset["visibility_type"]
     assert result["license_id"] == dataset["license_id"]
+    assert result["license_type_id"] == dataset["license_type_id"]
     assert result["draft"] is False
     assert result["featured_dataset"] is True
     assert result["short_description"] == dataset["short_description"]
@@ -138,6 +140,27 @@ def test_package_create(mail_user):
     assert application_group_dict["name"] in [group["name"] for group in result["groups"]]
     assert application_group_dict["title"] in [group["title"] for group in result["groups"]]
     assert application_group_dict["type"] in [group["type"] for group in result["groups"]]
+
+    license_patch_data = {
+        "id": result["id"],
+        "owner_org": dataset["owner_org"],
+        "technical_notes": dataset["technical_notes"],
+        "maintainers": dataset["maintainers"],
+        "resources": [],
+    }
+    updated_license = get_action("package_patch")(
+        context=context,
+        data_dict={**license_patch_data, "license_type_id": "cc-zero-1-0"}
+    )
+    assert updated_license["license_type_id"] == "cc-zero-1-0"
+    assert updated_license["license_id"] == dataset["license_id"]
+
+    updated_legacy_license = get_action("package_patch")(
+        context=context,
+        data_dict={**license_patch_data, "license_id": "other-open"}
+    )
+    assert updated_legacy_license["license_id"] == "other-open"
+    assert updated_legacy_license["license_type_id"] == "cc-zero-1-0"
 
     invalid_urls = ["invalid_url_1", "invalid_url_2", "invalid_url_3"]
 

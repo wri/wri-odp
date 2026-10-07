@@ -2720,6 +2720,7 @@ const datasetFields = [
     'isopen',
     'license_id',
     'license_title',
+    'license_type_id',
     'language',
     'maintainers',
     'metadata_created',

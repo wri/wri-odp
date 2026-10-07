@@ -71,6 +71,10 @@ export default function CreateDatasetForm() {
                 value: 'notspecified',
                 label: 'License not specified',
             },
+            license_type_id: {
+                value: 'notspecified',
+                label: 'License not specified',
+            },
             additional_reading: [],
             authors: [],
             extras: [],
