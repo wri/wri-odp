@@ -246,8 +246,13 @@ alertmanager:
           group_interval: 2m
           repeat_interval: 30m
           receiver: '{{ALERT_RECEIVER}}'
+        # Heartbeat that is always firing. It checks the pipeline; it is not an incident.
+        - match:
+            alertname: Watchdog
+          receiver: 'null'
         # EKS does not expose kube-scheduler. The default rule is
         # absent(up{job="kube-scheduler"}), so it fires forever and is not an outage.
+        # Must stay above the critical route: this alert is severity=critical.
         - match:
             alertname: KubeSchedulerDown
           receiver: 'null'
@@ -256,6 +261,11 @@ alertmanager:
         - match_re:
             alertname: KubeJobFailed
             job_name: update-fe-cronjob-secret.*
+          receiver: 'null'
+        # Same CronJob, if the Job-owner exclusion on PodCrashLooping is not active.
+        - match_re:
+            alertname: PodCrashLooping
+            pod: update-fe-cronjob-secret.*
           receiver: 'null'
         - match:
             severity: critical
@@ -374,6 +384,12 @@ additionalPrometheusRulesMap:
 loki-stack:
   loki:
     enabled: true
+
+    # kube-prometheus-stack already provisions Loki (uid: loki). This chart's copy
+    # has no uid and defaults to isDefault: true, so Grafana exits on startup:
+    # two defaults, then a second datasource named Loki ("data source not found").
+    datasource:
+      enabled: false
     
     persistence:
       enabled: true
