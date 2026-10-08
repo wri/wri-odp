@@ -176,6 +176,7 @@ export const DatasetRouter = createTRPCRouter({
           language: input.language?.value ?? '',
           license_id: input.license_id?.value ?? '',
           license_title: input.license_id?.label ?? '',
+          license_type_id: input.license_type_id?.value ?? '',
           owner_org: input.team.value,
           collaborators: null,
           rw_id: '',
@@ -494,8 +495,9 @@ export const DatasetRouter = createTRPCRouter({
             applications: undefined,
             open_in: JSON.stringify(input.open_in) ?? '',
             language: input.language?.value ?? '',
-            license_id: input.license_id?.value ?? '',
-            license_title: input.license_id?.label ?? '',
+            license_id: input.license_id?.value ?? prevDataset.license_id,
+            license_title: input.license_id?.label ?? prevDataset.license_title,
+            license_type_id: input.license_type_id?.value ?? prevDataset.license_type_id,
             rw_id: rw_id ?? '',
             owner_org:
               datasetDetails.organization?.name ===

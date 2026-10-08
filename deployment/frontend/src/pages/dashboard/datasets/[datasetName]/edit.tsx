@@ -54,7 +54,6 @@ export async function getServerSideProps(
         await helpers.teams.getAllTeams.prefetch();
         await helpers.tags.getAllTags.prefetch();
         await helpers.topics.getTopicsHierarchy.prefetch();
-        await helpers.dataset.getLicenses.prefetch();
         await helpers.dataset.getOneActualOrPendingDataset.prefetch({
             id: initialDataset.id,
             isPending: pendingExist,

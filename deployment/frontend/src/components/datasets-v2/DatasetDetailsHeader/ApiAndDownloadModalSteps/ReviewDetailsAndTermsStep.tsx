@@ -10,6 +10,8 @@ import {
     TextInput,
 } from '@worldresources/wri-design-systems';
 import { type FormEvent, useState } from 'react';
+import type { WriDataset } from '@/schema/ckan.schema';
+import { getDatasetLicense } from '@/utils/datasetLicenses';
 import {
     affiliationOptions,
     countryOptions,
@@ -21,6 +23,7 @@ import {
 } from './reviewDetailsAndTermsStep.utils';
 
 type ReviewDetailsAndTermsStepProps = {
+    dataset: WriDataset;
     downloadMultipleFiles?: boolean;
     onBack: () => void;
     onContinue: (formData: ReviewDetailsAndTermsFormData) => Promise<void> | void;
@@ -30,11 +33,13 @@ type ReviewDetailsAndTermsStepProps = {
 export type { ReviewDetailsAndTermsFormData } from './reviewDetailsAndTermsStep.utils';
 
 function ReviewDetailsAndTermsStep({
+    dataset,
     onBack,
     onContinue,
     isSubmitting = false,
     downloadMultipleFiles = false,
 }: ReviewDetailsAndTermsStepProps) {
+    const license = getDatasetLicense(dataset);
     const [formData, setFormData] = useState<ReviewDetailsAndTermsFormData>(
         initialReviewDetailsAndTermsFormData
     );
@@ -337,14 +342,22 @@ function ReviewDetailsAndTermsStep({
                             >
                                 <span style={{ color: '#c11101' }}>* </span>
                                 {"I agree to the dataset's "}
-                                <span
-                                    style={{
-                                        textDecoration: 'underline',
-                                        color: getThemedColor('neutral', 900),
-                                    }}
-                                >
-                                    Licence Terms
-                                </span>
+                                {license?.url ? (
+                                    <a
+                                        href={license.url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        title={license.title}
+                                        style={{
+                                            textDecoration: 'underline',
+                                            color: getThemedColor('neutral', 900),
+                                        }}
+                                    >
+                                        Licence Terms
+                                    </a>
+                                ) : (
+                                    <span>Licence Terms</span>
+                                )}
                                 .
                             </p>
                         </Checkbox>

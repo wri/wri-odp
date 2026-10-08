@@ -24,6 +24,7 @@ import AdditionalMetadataSection, {
 } from './sections/AdditionalMetadataSection';
 import RelatedDatasetsSection, { hasDatasetKeywords } from './sections/RelatedDatasetsSection';
 import { hasValue, stripCmsTypography } from './utils/text';
+import { getDatasetLicense } from '@/utils/datasetLicenses';
 
 type Props = {
     dataset: WriDataset;
@@ -38,7 +39,7 @@ export default function DatasetV2Content({ dataset }: Props) {
     const datasetDescription = dataset.short_description ?? '';
     const datasetId = dataset.id;
     const datasetName = dataset.name;
-    const licenseTitle = dataset.license_title ?? '';
+    const licenseTitle = getDatasetLicense(dataset)?.title ?? '';
     const layerResource = dataset.resources?.find(
         (resource: { format?: string; rw_id?: string | null }) =>
             resource?.format === 'Layer' || !!resource?.rw_id

@@ -182,6 +182,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
             case 'terms':
                 return (
                     <ReviewDetailsAndTermsStep
+                        dataset={dataset}
                         onBack={() => setActiveStep('files')}
                         onContinue={submitReviewDetails}
                         isSubmitting={requestDownload.isLoading || createDownloadEvent.isLoading}

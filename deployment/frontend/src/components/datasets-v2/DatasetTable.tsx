@@ -14,6 +14,7 @@ import {
 } from '@worldresources/wri-design-systems';
 import type { WriDataset } from '@/schema/ckan.schema';
 import { datasetFormatLabel } from '@/utils/datasetMetadata';
+import { getDatasetLicense } from '@/utils/datasetLicenses';
 
 function DatasetTable({
     datasetId: _datasetId,
@@ -24,6 +25,7 @@ function DatasetTable({
     licenseTitle: string;
     dataset?: WriDataset;
 }) {
+    const license = getDatasetLicense(dataset ?? { license_title: licenseTitle });
     const getExtraValue = (keys: string[]) => {
         if (!dataset?.extras?.length) return undefined;
 
@@ -73,7 +75,11 @@ function DatasetTable({
         {
             icon: UserCircleIcon,
             label: 'License',
-            value: licenseTitle,
+            value: license?.url ? (
+                <a href={license.url} target="_blank" rel="noreferrer" className="text-wri-green underline">
+                    {license.title}
+                </a>
+            ) : license?.title,
         },
         {
             icon: InformationCircleIcon,

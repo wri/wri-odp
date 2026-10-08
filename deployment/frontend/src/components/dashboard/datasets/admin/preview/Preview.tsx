@@ -107,7 +107,7 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                                 />
                                 <SimpleDescription
                                     label="License"
-                                    text={watch('license_id')?.label ?? '_'}
+                                    text={watch('license_type_id')?.label ?? '_'}
                                 />
                                 <SimpleDescription
                                     label="Location"

@@ -215,6 +215,27 @@ dataset_fields:
   form_snippet: license.html
   help_text: License definitions and additional information can be found at http://opendefinition.org/
 
+- field_name: license_type_id
+  label: License type ID
+  preset: select
+  choices:
+  - value: notspecified
+    label: License not specified
+  - value: cc-zero-1-0
+    label: Creative Commons CC0 1.0 (Public Domain)
+  - value: cc-by-4-0
+    label: Creative Commons Attribution 4.0
+  - value: cc-by-sa-4-0
+    label: Creative Commons Attribution-ShareAlike 4.0
+  - value: other-open
+    label: Other (Open)
+  - value: cc-by-nc-4-0
+    label: Creative Commons Non-Commercial 4.0
+  - value: other-closed
+    label: Other (Not Open)
+  - value: cc-by-nc-sa-4-0
+    label: Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+
 - field_name: featured_dataset
   label: Featured Dataset
   validators: boolean_validator
