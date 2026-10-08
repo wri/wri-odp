@@ -384,12 +384,6 @@ additionalPrometheusRulesMap:
 loki-stack:
   loki:
     enabled: true
-
-    # kube-prometheus-stack already provisions Loki (uid: loki). This chart's copy
-    # has no uid and defaults to isDefault: true, so Grafana exits on startup:
-    # two defaults, then a second datasource named Loki ("data source not found").
-    datasource:
-      enabled: false
     
     persistence:
       enabled: true
@@ -487,6 +481,15 @@ loki-stack:
 
   grafana:
     enabled: false
+    # kube-prometheus-stack already provisions Loki (uid: loki) via
+    # additionalDataSources. This chart still emits its own datasource ConfigMap
+    # when sidecar.datasources.enabled is true (the default), even with Grafana
+    # itself disabled. That copy has no uid and isDefault defaults to true, so
+    # Grafana exits on startup: two defaults, then a second datasource named
+    # Loki ("data source not found").
+    sidecar:
+      datasources:
+        enabled: false
 
   prometheus:
     enabled: false
