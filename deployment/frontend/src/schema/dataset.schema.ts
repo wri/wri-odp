@@ -71,26 +71,29 @@ const updateFrequencySchema = z.enum([
 
 const datasetTypeInfoSchema = z.enum([
     'raster_data',
-    'tiled_raster_data',
     'vector_data',
-    'tiled_vector_data',
     'tabular_data',
-    'versioned_tabular_data',
-    'packaged_dataset',
-    'mixed_dataset',
-    'documentation',
-    'model_output',
-    'api_dataset',
+    'data_package',
+    'other',
 ]);
 
 const datasetFormatInfoSchema = z.enum([
     'geotiff_tif',
+    'cloud_optimized_geotiff',
+    'zarr',
+    'gis_raster',
     'shapefile_shp',
     'geojson_geojson',
+    'geopackage',
+    'file_geodatabase',
+    'geoparquet',
+    'gis_vector',
     'csv_csv',
     'excel_xlsx',
+    'parquet',
     'json_json',
     'pdf_pdf',
+    'other',
 ]);
 
 const additionalReadingTagSchema = z.enum([

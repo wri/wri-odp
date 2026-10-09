@@ -20,7 +20,7 @@ import { match } from 'ts-pattern';
 import { type UseFormReturn } from 'react-hook-form';
 import { type DataDictionaryFormType, type DatasetFormType } from '@/schema/dataset.schema';
 import { convertBytes } from '@/utils/convertBytes';
-import { additionalReadingTagLabel } from '@/utils/datasetMetadata';
+import { additionalReadingTagLabel, datasetFormatLabel } from '@/utils/datasetMetadata';
 import { PreviewMap } from '../datafiles/sections/BuildALayer/BuildALayerSection';
 import {
     convertFormToLayerObj,
@@ -67,7 +67,10 @@ export function Preview({ formObj }: { formObj: UseFormReturn<DatasetFormType> }
                                 />
                                 <SimpleDescription
                                     label="Dataset Format"
-                                    text={watch('dataset_format_info')?.label ?? '_'}
+                                    text={
+                                        datasetFormatLabel(watch('dataset_format_info')?.value) ??
+                                        '_'
+                                    }
                                 />
                                 <ListOfItems label="Topics" items={watch('topics') ?? []} />
                                 <SimpleDescription
