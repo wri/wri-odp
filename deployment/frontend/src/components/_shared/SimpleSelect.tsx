@@ -15,7 +15,7 @@ export interface Option<V> {
     label: string;
     value: V;
     default?: boolean;
-    disbaled?: boolean;
+    disabled?: boolean;
 }
 
 interface SimpleSelectProps<T extends FieldValues, V extends object> {
