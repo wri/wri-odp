@@ -4,8 +4,9 @@ import {
     getThemedFontSize,
     getThemedRadius,
     getThemedSpacing,
+    TextInput,
 } from '@worldresources/wri-design-systems';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { contactDetailsFormSchema, type ContactDetailsFormData } from './contactDetailsForm.utils';
 import { FieldErrorDisplay } from '../../utils/ErrorDisplay';
 
@@ -25,12 +26,17 @@ function ContactDetailsForm({
     requireEmail = false,
 }: ContactDetailsFormProps) {
     const {
-        register,
         formState: { errors },
+        control,
     } = useForm<ContactDetailsFormData>({
         resolver: zodResolver(contactDetailsFormSchema),
         defaultValues: formData,
         mode: 'onChange',
+    });
+
+    // Use useWatch to make inputs reactive to formData changes
+    const formValues = useWatch<ContactDetailsFormData>({
+        control,
     });
 
     return (
@@ -111,38 +117,13 @@ function ContactDetailsForm({
                                 *
                             </span>
                         </div>
-                        <div
-                            style={{
-                                backgroundColor: getThemedColor('neutral', 100),
-                                border: `1px solid ${getThemedColor('neutral', 400)}`,
-                                borderRadius: getThemedRadius(300),
-                                boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.05)',
-                                height: '40px',
-                                padding: getThemedSpacing(300),
-                                display: 'flex',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <input
-                                type="text"
-                                {...register('firstName', {
-                                    onChange: (e) =>
-                                        onChange({ ...formData, firstName: e.target.value }),
-                                })}
-                                style={{
-                                    border: 'none',
-                                    outline: 'none',
-                                    backgroundColor: 'transparent',
-                                    width: '100%',
-                                    fontSize: getThemedFontSize(400),
-                                    color: getThemedColor('neutral', 800),
-                                    fontFamily: 'var(--style/regular-font, "Acumin_Pro:Regular")',
-                                }}
-                                placeholder=""
-                            />
-                        </div>
+                        <TextInput
+                            value={formValues.firstName ?? ''}
+                            onChange={(e) => onChange({ ...formData, firstName: e.target.value })}
+                            errorMessage={fieldErrors.firstName ?? errors.firstName?.message}
+                        />
                         <FieldErrorDisplay
-                            error={fieldErrors.firstName || errors.firstName?.message}
+                            error={fieldErrors.firstName ?? errors.firstName?.message}
                         />
                     </div>
 
@@ -177,38 +158,13 @@ function ContactDetailsForm({
                                 *
                             </span>
                         </div>
-                        <div
-                            style={{
-                                backgroundColor: getThemedColor('neutral', 100),
-                                border: `1px solid ${getThemedColor('neutral', 400)}`,
-                                borderRadius: getThemedRadius(300),
-                                boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.05)',
-                                height: '40px',
-                                padding: getThemedSpacing(300),
-                                display: 'flex',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <input
-                                type="text"
-                                {...register('lastName', {
-                                    onChange: (e) =>
-                                        onChange({ ...formData, lastName: e.target.value }),
-                                })}
-                                style={{
-                                    border: 'none',
-                                    outline: 'none',
-                                    backgroundColor: 'transparent',
-                                    width: '100%',
-                                    fontSize: getThemedFontSize(400),
-                                    color: getThemedColor('neutral', 800),
-                                    fontFamily: 'var(--style/regular-font, "Acumin_Pro:Regular")',
-                                }}
-                                placeholder=""
-                            />
-                        </div>
+                        <TextInput
+                            value={formValues.lastName ?? ''}
+                            onChange={(e) => onChange({ ...formData, lastName: e.target.value })}
+                            errorMessage={fieldErrors.lastName ?? errors.lastName?.message}
+                        />
                         <FieldErrorDisplay
-                            error={fieldErrors.lastName || errors.lastName?.message}
+                            error={fieldErrors.lastName ?? errors.lastName?.message}
                         />
                     </div>
                 </div>
@@ -252,38 +208,15 @@ function ContactDetailsForm({
                                 (optional)
                             </span>
                         </div>
-                        <div
-                            style={{
-                                backgroundColor: getThemedColor('neutral', 100),
-                                border: `1px solid ${getThemedColor('neutral', 400)}`,
-                                borderRadius: getThemedRadius(300),
-                                boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.05)',
-                                height: '40px',
-                                padding: getThemedSpacing(300),
-                                display: 'flex',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <input
-                                type="text"
-                                {...register('organization', {
-                                    onChange: (e) =>
-                                        onChange({ ...formData, organization: e.target.value }),
-                                })}
-                                style={{
-                                    border: 'none',
-                                    outline: 'none',
-                                    backgroundColor: 'transparent',
-                                    width: '100%',
-                                    fontSize: getThemedFontSize(400),
-                                    color: getThemedColor('neutral', 800),
-                                    fontFamily: 'var(--style/regular-font, "Acumin_Pro:Regular")',
-                                }}
-                                placeholder=""
-                            />
-                        </div>
+                        <TextInput
+                            value={formValues.organization ?? ''}
+                            onChange={(e) =>
+                                onChange({ ...formData, organization: e.target.value })
+                            }
+                            errorMessage={fieldErrors.organization ?? errors.organization?.message}
+                        />
                         <FieldErrorDisplay
-                            error={fieldErrors.organization || errors.organization?.message}
+                            error={fieldErrors.organization ?? errors.organization?.message}
                         />
                     </div>
 
@@ -318,38 +251,13 @@ function ContactDetailsForm({
                                 (optional)
                             </span>
                         </div>
-                        <div
-                            style={{
-                                backgroundColor: getThemedColor('neutral', 100),
-                                border: `1px solid ${getThemedColor('neutral', 400)}`,
-                                borderRadius: getThemedRadius(300),
-                                boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.05)',
-                                height: '40px',
-                                padding: getThemedSpacing(300),
-                                display: 'flex',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <input
-                                type="text"
-                                {...register('jobTitle', {
-                                    onChange: (e) =>
-                                        onChange({ ...formData, jobTitle: e.target.value }),
-                                })}
-                                style={{
-                                    border: 'none',
-                                    outline: 'none',
-                                    backgroundColor: 'transparent',
-                                    width: '100%',
-                                    fontSize: getThemedFontSize(400),
-                                    color: getThemedColor('neutral', 800),
-                                    fontFamily: 'var(--style/regular-font, "Acumin_Pro:Regular")',
-                                }}
-                                placeholder=""
-                            />
-                        </div>
+                        <TextInput
+                            value={formValues.jobTitle ?? ''}
+                            onChange={(e) => onChange({ ...formData, jobTitle: e.target.value })}
+                            errorMessage={fieldErrors.jobTitle ?? errors.jobTitle?.message}
+                        />
                         <FieldErrorDisplay
-                            error={fieldErrors.jobTitle || errors.jobTitle?.message}
+                            error={fieldErrors.jobTitle ?? errors.jobTitle?.message}
                         />
                     </div>
                 </div>
@@ -388,36 +296,13 @@ function ContactDetailsForm({
                             </span>
                         )}
                     </div>
-                    <div
-                        style={{
-                            backgroundColor: getThemedColor('neutral', 100),
-                            border: `1px solid ${getThemedColor('neutral', 400)}`,
-                            borderRadius: getThemedRadius(300),
-                            boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.05)',
-                            height: '40px',
-                            padding: getThemedSpacing(300),
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}
-                    >
-                        <input
-                            type="email"
-                            {...register('email', {
-                                onChange: (e) => onChange({ ...formData, email: e.target.value }),
-                            })}
-                            style={{
-                                border: 'none',
-                                outline: 'none',
-                                backgroundColor: 'transparent',
-                                width: '100%',
-                                fontSize: getThemedFontSize(400),
-                                color: getThemedColor('neutral', 800),
-                                fontFamily: 'var(--style/regular-font, "Acumin_Pro:Regular")',
-                            }}
-                            placeholder=""
-                        />
-                    </div>
-                    <FieldErrorDisplay error={fieldErrors.email || errors.email?.message} />
+                    <TextInput
+                        type="email"
+                        value={formValues.email ?? ''}
+                        onChange={(e) => onChange({ ...formData, email: e.target.value })}
+                        errorMessage={fieldErrors.email ?? errors.email?.message}
+                    />
+                    <FieldErrorDisplay error={fieldErrors.email ?? errors.email?.message} />
                 </div>
             </div>
         </div>
