@@ -16,8 +16,8 @@ export type ReviewDetailsAndTermsFormData = {
     contactForResearch: boolean;
     firstName: string;
     lastName: string;
-    organization: string;
-    jobTitle: string;
+    organization?: string;
+    jobTitle?: string;
 };
 
 export type ReviewDetailsAndTermsFieldErrors = Partial<
@@ -54,8 +54,8 @@ export const initialReviewDetailsAndTermsFormData: ReviewDetailsAndTermsFormData
     contactForResearch: false,
     firstName: '',
     lastName: '',
-    organization: '',
-    jobTitle: '',
+    organization: undefined,
+    jobTitle: undefined,
 };
 
 export const getOptionByValue = (options: SelectOption[], value?: string) => {
