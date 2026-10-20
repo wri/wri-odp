@@ -343,12 +343,16 @@ export default function DatasetV2Content({ dataset, diffFields = [] }: Props) {
                                 <div
                                     className={hl(
                                         'applications',
-                                        'connector',
+                                        'author',
+                                        'authors',
+                                        'connectorType',
                                         'groups',
                                         'language',
                                         'project',
                                         'provider',
-                                        'table',
+                                        'spatial_address',
+                                        'tableName',
+                                        'tags',
                                         'update_frequency'
                                     )}
                                 >
