@@ -267,7 +267,7 @@ export default function DatasetV2Content({ dataset, diffFields = [] }: Props) {
                             )}
 
                             {hasAdditionalReadingSection && (
-                                <div className={hl('learn_more', 'extras')}>
+                                <div className={hl('additional_reading', 'learn_more', 'extras')}>
                                     <AdditionalReadingSection links={additionalReadingLinks} />
                                 </div>
                             )}
