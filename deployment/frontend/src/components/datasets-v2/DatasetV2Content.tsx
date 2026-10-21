@@ -28,13 +28,22 @@ import { getDatasetLicense } from '@/utils/datasetLicenses';
 
 type Props = {
     dataset: WriDataset;
+    diffFields?: string[];
 };
+
+const HIGHLIGHT = 'bg-yellow-200 outline outline-4 -outline-offset-4 outline-yellow-300';
 
 export const proseClassName =
     'prose max-w-none prose-a:text-wri-green prose-pre:bg-pre-code prose-pre:text-black prose-pre:text-base';
 export const cmsContentClassName = proseClassName;
 
-export default function DatasetV2Content({ dataset }: Props) {
+export default function DatasetV2Content({ dataset, diffFields = [] }: Props) {
+    const hl = (...fields: string[]) =>
+        diffFields.some((d) =>
+            fields.some((f) => d === f || d.startsWith(`${f}[`) || d.startsWith(`${f}.`))
+        )
+            ? HIGHLIGHT
+            : '';
     const datasetTitle = dataset.title ?? dataset.name;
     const datasetDescription = dataset.short_description ?? '';
     const datasetId = dataset.id;
@@ -162,15 +171,33 @@ export default function DatasetV2Content({ dataset }: Props) {
             <Navigation />
             <div className={layerRwId ? 'flex flex-col md:flex-row' : 'flex flex-col'}>
                 <section className={layerRwId ? 'flex-1' : 'w-full'}>
-                    <DatasetDetailsHeader
-                        datasetTitle={datasetTitle}
-                        datasetDescription={datasetDescription}
-                        datasetName={datasetName}
-                        dataset={dataset}
-                        sectionItems={sectionItems}
-                    />
+                    <div className={hl('title', 'short_description', 'doi')}>
+                        <DatasetDetailsHeader
+                            datasetTitle={datasetTitle}
+                            datasetDescription={datasetDescription}
+                            datasetName={datasetName}
+                            dataset={dataset}
+                            sectionItems={sectionItems}
+                        />
+                    </div>
 
-                    <section id="key-details" style={{ scrollMarginTop: getThemedSpacing(700) }}>
+                    <section
+                        id="key-details"
+                        className={hl(
+                            'organization',
+                            'owner_org',
+                            'license_id',
+                            'license_title',
+                            'temporal_coverage_start',
+                            'temporal_coverage_end',
+                            'spatial_address',
+                            'spatial',
+                            'extras',
+                            'dataset_format_info',
+                            'dataset_type_info'
+                        )}
+                        style={{ scrollMarginTop: getThemedSpacing(700) }}
+                    >
                         <DatasetTable
                             datasetId={datasetId}
                             licenseTitle={licenseTitle}
@@ -184,24 +211,26 @@ export default function DatasetV2Content({ dataset }: Props) {
                         }}
                     >
                         {hasValue(cautionsText) && (
-                            <InlineMessage
-                                size="full-width"
-                                variant="warning"
-                                label="Caution for using this dataset"
-                                caption={cautionsText}
-                                actionLabel={safeLearnMoreUrl ? 'Read more' : undefined}
-                                onActionClick={
-                                    safeLearnMoreUrl
-                                        ? () => {
-                                              window.open(
-                                                  safeLearnMoreUrl,
-                                                  '_blank',
-                                                  'noopener,noreferrer'
-                                              );
-                                          }
-                                        : undefined
-                                }
-                            />
+                            <div className={hl('cautions')}>
+                                <InlineMessage
+                                    size="full-width"
+                                    variant="warning"
+                                    label="Caution for using this dataset"
+                                    caption={cautionsText}
+                                    actionLabel={safeLearnMoreUrl ? 'Read more' : undefined}
+                                    onActionClick={
+                                        safeLearnMoreUrl
+                                            ? () => {
+                                                  window.open(
+                                                      safeLearnMoreUrl,
+                                                      '_blank',
+                                                      'noopener,noreferrer'
+                                                  );
+                                              }
+                                            : undefined
+                                    }
+                                />
+                            </div>
                         )}
 
                         <div
@@ -213,7 +242,7 @@ export default function DatasetV2Content({ dataset }: Props) {
                             }}
                         >
                             {hasDescription && (
-                                <section id="description">
+                                <section id="description" className={hl('notes')}>
                                     <h2
                                         style={{
                                             fontSize: getThemedFontSize(700),
@@ -238,34 +267,55 @@ export default function DatasetV2Content({ dataset }: Props) {
                             )}
 
                             {hasAdditionalReadingSection && (
-                                <AdditionalReadingSection links={additionalReadingLinks} />
+                                <div className={hl('additional_reading', 'learn_more', 'extras')}>
+                                    <AdditionalReadingSection links={additionalReadingLinks} />
+                                </div>
                             )}
 
                             {hasCitation && (
-                                <CitationSection
-                                    citationHtml={citationContentHtml}
-                                    citationText={stripHtmlToText(citationHtml)}
-                                    cmsContentClassName={cmsContentClassName}
-                                />
+                                <div className={hl('citation')}>
+                                    <CitationSection
+                                        citationHtml={citationContentHtml}
+                                        citationText={stripHtmlToText(citationHtml)}
+                                        cmsContentClassName={cmsContentClassName}
+                                    />
+                                </div>
                             )}
 
                             {hasMethodology && (
-                                <MethodologySection
-                                    methodologyHtml={methodologyContentHtml}
-                                    useCasesHtml={useCasesContentHtml}
-                                    technicalNotesUrl={dataset.technical_notes}
-                                    cmsContentClassName={cmsContentClassName}
-                                />
+                                <div className={hl('methodology', 'usecases', 'technical_notes')}>
+                                    <MethodologySection
+                                        methodologyHtml={methodologyContentHtml}
+                                        useCasesHtml={useCasesContentHtml}
+                                        technicalNotesUrl={dataset.technical_notes}
+                                        cmsContentClassName={cmsContentClassName}
+                                    />
+                                </div>
                             )}
 
                             {hasContactDetailsSection && (
-                                <ContactDetailsSection dataset={dataset} />
+                                <div
+                                    className={hl(
+                                        'author',
+                                        'author_email',
+                                        'authors',
+                                        'maintainer',
+                                        'maintainer_email',
+                                        'maintainers'
+                                    )}
+                                >
+                                    <ContactDetailsSection dataset={dataset} />
+                                </div>
                             )}
 
-                            {hasRelatedDatasets && <RelatedDatasetsSection dataset={dataset} />}
+                            {hasRelatedDatasets && (
+                                <div className={hl('tags')}>
+                                    <RelatedDatasetsSection dataset={dataset} />
+                                </div>
+                            )}
 
                             {hasReleaseNotes && (
-                                <section id="release-notes">
+                                <section id="release-notes" className={hl('release_notes')}>
                                     <h2
                                         style={{
                                             fontSize: getThemedFontSize(700),
@@ -290,7 +340,24 @@ export default function DatasetV2Content({ dataset }: Props) {
                             )}
 
                             {hasAdditionalMetadataSection && (
-                                <AdditionalMetadataSection dataset={dataset} />
+                                <div
+                                    className={hl(
+                                        'applications',
+                                        'author',
+                                        'authors',
+                                        'connectorType',
+                                        'groups',
+                                        'language',
+                                        'project',
+                                        'provider',
+                                        'spatial_address',
+                                        'tableName',
+                                        'tags',
+                                        'update_frequency'
+                                    )}
+                                >
+                                    <AdditionalMetadataSection dataset={dataset} />
+                                </div>
                             )}
                         </div>
                     </section>
