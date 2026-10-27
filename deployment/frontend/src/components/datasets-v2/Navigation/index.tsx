@@ -47,7 +47,7 @@ export default function Navigation() {
                 navigationSection={[
                     {
                         label: 'Datasets',
-                        link: '/datasets',
+                        link: '/search',
                     },
                     {
                         label: 'Topics',
