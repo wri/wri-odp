@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { getThemedFontSize, Navbar } from '@worldresources/wri-design-systems';
+import { Navbar } from '@worldresources/wri-design-systems';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import LoginModal from '@/components/_shared/LoginModal';
 import NavigationUserMenu from './UserMenu';
 import WriLogo from '@/components/icons/WriLogo';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import Image from 'next/image';
 
 export default function Navigation() {
     const router = useRouter();
@@ -27,17 +28,27 @@ export default function Navigation() {
                 }}
                 logo={
                     <Link href="/">
-                        <span
-                            style={{
-                                fontWeight: 700,
-                                fontSize: getThemedFontSize(600),
-                            }}
-                        >
-                            Data explorer
-                        </span>
+                        <Image
+                            src="/images/WRI_logo_4c.png"
+                            alt="Logo"
+                            width={220}
+                            height={250}
+                            className="hidden sm:block"
+                        />
+                        <Image
+                            src="/images/WRI_logo_4c.png"
+                            alt="Logo"
+                            width={150}
+                            height={250}
+                            className="block sm:hidden"
+                        />
                     </Link>
                 }
                 navigationSection={[
+                    {
+                        label: 'Datasets',
+                        link: '/datasets',
+                    },
                     {
                         label: 'Topics',
                         link: '/topics',
@@ -80,6 +91,7 @@ export default function Navigation() {
                         }}
                     >
                         <WriLogo aria-hidden="true" focusable="false" />
+                        <span>Hosted by WRI</span>
                     </div>,
                     ...(session.status === 'authenticated'
                         ? [

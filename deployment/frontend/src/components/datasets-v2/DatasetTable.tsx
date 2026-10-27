@@ -45,7 +45,16 @@ function DatasetTable({
         {
             icon: UserIcon,
             label: 'Team',
-            value: dataset?.organization?.title,
+            value: dataset?.organization?.name ? (
+                <a
+                    href={`/teams/${dataset.organization.name}`}
+                    className="text-wri-green underline"
+                >
+                    {dataset?.organization?.title ?? dataset.organization.name}
+                </a>
+            ) : (
+                dataset?.organization?.title
+            ),
         },
         {
             icon: GlobeAltIcon,

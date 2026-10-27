@@ -25,6 +25,7 @@ import AdditionalMetadataSection, {
 import RelatedDatasetsSection, { hasDatasetKeywords } from './sections/RelatedDatasetsSection';
 import { hasValue, stripCmsTypography } from './utils/text';
 import { getDatasetLicense } from '@/utils/datasetLicenses';
+import ExclamationTriangleIcon from '@heroicons/react/24/solid/ExclamationTriangleIcon';
 
 type Props = {
     dataset: WriDataset;
@@ -213,6 +214,7 @@ export default function DatasetV2Content({ dataset, diffFields = [] }: Props) {
                         {hasValue(cautionsText) && (
                             <div className={hl('cautions')}>
                                 <InlineMessage
+                                    icon={<ExclamationTriangleIcon width={18} height={18} />}
                                     size="full-width"
                                     variant="warning"
                                     label="Caution for using this dataset"
