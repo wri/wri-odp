@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Navbar } from '@worldresources/wri-design-systems';
-import { useState } from 'react';
+import { Navbar, Search, Button } from '@worldresources/wri-design-systems';
+import { useState, type FormEvent } from 'react';
 import { useSession } from 'next-auth/react';
 import LoginModal from '@/components/_shared/LoginModal';
 import NavigationUserMenu from './UserMenu';
@@ -14,6 +14,27 @@ export default function Navigation() {
     const { pathname } = router;
     const session = useSession();
     const [isOpen, setIsOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+
+    const handleSearch = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const value = searchValue.trim();
+        setIsSearchOpen(false);
+        setSearchValue('');
+
+        if (!value) {
+            void router.push('/search');
+            return;
+        }
+
+        void router.push({
+            pathname: '/search',
+            query: `search=${encodeURIComponent(
+                JSON.stringify([{ title: 'Search', key: 'search', label: value, value }])
+            )}`,
+        });
+    };
 
     return (
         <>
@@ -63,24 +84,36 @@ export default function Navigation() {
                     },
                 ]}
                 utilitySection={[
-                    <Link href="/search" key="search">
-                        <div
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                whiteSpace: 'nowrap',
-                            }}
-                        >
-                            <MagnifyingGlassIcon
-                                aria-hidden="true"
-                                focusable="false"
-                                width={15}
-                                height={15}
+                    isSearchOpen ? (
+                        <form key="search" onSubmit={handleSearch}>
+                            <Search
+                                autoFocus
+                                placeholder="Search datasets"
+                                options={[]}
+                                displayResults="none"
+                                onQueryChange={setSearchValue}
+                                onClear={() => setSearchValue('')}
                             />
-                            <span>Search</span>
-                        </div>
-                    </Link>,
+                        </form>
+                    ) : (
+                        <Button
+                            key="search"
+                            variant="borderless"
+                            size="default"
+                            aria-label="Search"
+                            leftIcon={
+                                <MagnifyingGlassIcon
+                                    aria-hidden="true"
+                                    focusable="false"
+                                    width={15}
+                                    height={15}
+                                />
+                            }
+                            onClick={() => setIsSearchOpen(true)}
+                        >
+                            Search
+                        </Button>
+                    ),
                     <div
                         key="wri-apps"
                         style={{
