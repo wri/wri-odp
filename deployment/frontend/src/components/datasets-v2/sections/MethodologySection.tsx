@@ -1,4 +1,10 @@
-import { Button, getThemedFontSize, getThemedSpacing } from '@worldresources/wri-design-systems';
+import type { CSSProperties } from 'react';
+import {
+    Button,
+    getThemedFontSize,
+    getThemedLineHeight,
+    getThemedSpacing,
+} from '@worldresources/wri-design-systems';
 import { hasValue } from '../utils/text';
 
 type Props = {
@@ -15,7 +21,15 @@ export default function MethodologySection({
     cmsContentClassName,
 }: Props) {
     return (
-        <section id="methodology">
+        <section
+            id="methodology"
+            className="[&_ul]:!my-0 [&_ul>li]:!my-0 [&_ul>li>p]:!my-0 [&_ul>li]:!leading-[var(--methodology-li-line-height)]"
+            style={
+                {
+                    '--methodology-li-line-height': getThemedLineHeight(600),
+                } as CSSProperties
+            }
+        >
             <h2
                 style={{
                     fontSize: getThemedFontSize(700),
@@ -39,7 +53,7 @@ export default function MethodologySection({
                         style={{
                             fontFamily: 'inherit',
                             fontSize: 'inherit',
-                            lineHeight: 'inherit',
+                            lineHeight: getThemedLineHeight(600),
                         }}
                         dangerouslySetInnerHTML={{
                             __html: methodologyHtml,
@@ -55,7 +69,7 @@ export default function MethodologySection({
                             style={{
                                 fontFamily: 'inherit',
                                 fontSize: 'inherit',
-                                lineHeight: 'inherit',
+                                lineHeight: getThemedLineHeight(600),
                             }}
                             dangerouslySetInnerHTML={{
                                 __html: useCasesHtml,
