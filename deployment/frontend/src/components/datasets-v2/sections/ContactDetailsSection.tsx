@@ -75,21 +75,21 @@ function ContactCard({ entry, role }: { entry: ContactEntry; role: string }) {
         >
             <div className="pt-2">
                 {hasValue(entry.name) && <p>{entry.name}</p>}
-                <div
-                    style={{
-                        color: getThemedColor('neutral', 600),
-                        fontSize: getThemedFontSize(300),
-                    }}
-                >
-                    {role}
-                </div>
                 {hasValue(entry.email) && (
                     <div
                         style={{
                             color: getThemedColor('secondary', 800),
                         }}
                     >
-                        {entry.email}
+                        <a
+                            href={`mailto:${entry.email}`}
+                            style={{
+                                color: getThemedColor('secondary', 800),
+                                textDecoration: 'underline',
+                            }}
+                        >
+                            {entry.email}
+                        </a>
                     </div>
                 )}
             </div>

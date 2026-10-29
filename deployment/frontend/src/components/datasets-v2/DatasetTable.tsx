@@ -13,7 +13,7 @@ import {
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
 import type { WriDataset } from '@/schema/ckan.schema';
-import { datasetFormatLabel } from '@/utils/datasetMetadata';
+import { datasetFormatLabel, datasetTypeLabel } from '@/utils/datasetMetadata';
 import { getDatasetLicense } from '@/utils/datasetLicenses';
 
 function DatasetTable({
@@ -45,7 +45,16 @@ function DatasetTable({
         {
             icon: UserIcon,
             label: 'Team',
-            value: dataset?.organization?.title,
+            value: dataset?.organization?.name ? (
+                <a
+                    href={`/teams/${dataset.organization.name}`}
+                    className="text-wri-green underline"
+                >
+                    {dataset?.organization?.title ?? dataset.organization.name}
+                </a>
+            ) : (
+                dataset?.organization?.title
+            ),
         },
         {
             icon: GlobeAltIcon,
@@ -67,19 +76,26 @@ function DatasetTable({
         {
             icon: Square3Stack3DIcon,
             label: 'Dataset type',
-            value:
-                getExtraValue(['dataset_type', 'dataset type']) ??
-                (dataset?.type && dataset.type !== 'dataset' ? dataset.type : undefined),
+            value: datasetTypeLabel(
+                dataset?.dataset_type_info ?? getExtraValue(['dataset_type_info'])
+            ),
         },
 
         {
             icon: UserCircleIcon,
             label: 'License',
             value: license?.url ? (
-                <a href={license.url} target="_blank" rel="noreferrer" className="text-wri-green underline">
+                <a
+                    href={license.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-wri-green underline"
+                >
                     {license.title}
                 </a>
-            ) : license?.title,
+            ) : (
+                license?.title
+            ),
         },
         {
             icon: InformationCircleIcon,
@@ -105,6 +121,7 @@ function DatasetTable({
                     'spatial_coverage',
                     'dataset_type',
                     'dataset type',
+                    'dataset_type_info',
                     'spatial_resolution',
                     'spatial resolution',
                     'tree_cover_scale',

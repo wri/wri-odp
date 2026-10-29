@@ -8,7 +8,6 @@ import {
 } from '@/schema/dataset.schema';
 import {
     additionalReadingTagLabels,
-    datasetFormatLabels,
     datasetTypeLabels,
 } from '@/utils/datasetMetadata';
 
@@ -114,15 +113,40 @@ export const datasetTypeInfoOptions: {
     })),
 ];
 
+type DatasetFormatOptionValue =
+    | DatasetFormatInfoUnion
+    | ''
+    | '__group_gis_raster__'
+    | '__group_gis_vector__'
+    | '__group_tabular__'
+    | '__group_misc__';
+
 export const datasetFormatInfoOptions: {
-    value: DatasetFormatInfoUnion | '';
+    value: DatasetFormatOptionValue;
     label: string;
+    disabled?: boolean;
 }[] = [
     { value: '', label: 'Not specified' },
-    ...Object.entries(datasetFormatLabels).map(([value, label]) => ({
-        value: value as DatasetFormatInfoUnion,
-        label,
-    })),
+    { value: '__group_gis_raster__', label: ' ------ GIS Raster ------', disabled: true },
+    { value: 'geotiff_tif', label: 'GeoTIFF' },
+    { value: 'cloud_optimized_geotiff', label: 'Cloud-Optimized GeoTIFF' },
+    { value: 'zarr', label: 'Zarr' },
+    { value: 'gis_raster', label: 'Other' },
+    { value: '__group_gis_vector__', label: ' ------ GIS Vector ------', disabled: true },
+    { value: 'shapefile_shp', label: 'Shapefile' },
+    { value: 'geojson_geojson', label: 'GeoJSON' },
+    { value: 'geopackage', label: 'GeoPackage' },
+    { value: 'file_geodatabase', label: 'File GeoDatabase' },
+    { value: 'geoparquet', label: 'GeoParquet' },
+    { value: 'gis_vector', label: 'Other' },
+    { value: '__group_tabular__', label: ' ------ Tabular ------ ', disabled: true },
+    { value: 'csv_csv', label: 'CSV' },
+    { value: 'excel_xlsx', label: 'Excel' },
+    { value: 'parquet', label: 'Parquet' },
+    { value: '__group_misc__', label: ' ------ Miscellaneous ------', disabled: true },
+    { value: 'json_json', label: 'JSON' },
+    { value: 'pdf_pdf', label: 'PDF' },
+    { value: 'other', label: 'Other' },
 ];
 
 export const additionalReadingTagOptions: {

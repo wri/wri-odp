@@ -3,7 +3,6 @@ import {
     Checkbox,
     getThemedColor,
     getThemedFontSize,
-    getThemedRadius,
     getThemedSpacing,
     Select,
     Textarea,
@@ -21,6 +20,7 @@ import {
     type ReviewDetailsAndTermsFormData,
     validateReviewDetailsAndTermsForm,
 } from './reviewDetailsAndTermsStep.utils';
+import ContactDetailsForm from './ContactDetailsForm';
 
 type ReviewDetailsAndTermsStepProps = {
     dataset: WriDataset;
@@ -474,109 +474,26 @@ function ReviewDetailsAndTermsStep({
                 </div>
 
                 {shouldShowAdditionalContactFields && (
-                    <div
-                        style={{
-                            border: `1px solid ${getThemedColor('neutral', 300)}`,
-                            borderRadius: getThemedRadius(300),
-                            padding: `${getThemedSpacing(400)} ${getThemedSpacing(300)}`,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: getThemedSpacing(500),
+                    <ContactDetailsForm
+                        formData={{
+                            firstName: formData.firstName,
+                            lastName: formData.lastName,
+                            organization: formData.organization,
+                            jobTitle: formData.jobTitle,
+                            email: formData.email,
                         }}
-                    >
-                        <div>
-                            <h3
-                                style={{
-                                    fontSize: getThemedFontSize(500),
-                                    fontWeight: 700,
-                                    color: getThemedColor('neutral', 800),
-                                }}
-                            >
-                                Your details
-                            </h3>
-                            <p
-                                style={{
-                                    fontSize: getThemedFontSize(300),
-                                    color: getThemedColor('neutral', 900),
-                                    marginTop: getThemedSpacing(50),
-                                }}
-                            >
-                                We only use your details if you have opted in above.
-                            </p>
-                        </div>
-                        <div
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: getThemedSpacing(600),
-                            }}
-                        >
-                            <div
-                                style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: '1fr 1fr',
-                                    gap: getThemedSpacing(400),
-                                }}
-                            >
-                                <TextInput
-                                    label="First name"
-                                    noMarginBottom
-                                    showOptionalLabel
-                                    value={formData.firstName}
-                                    onChange={(event) =>
-                                        setFormData((current) => ({
-                                            ...current,
-                                            firstName: event.target.value,
-                                        }))
-                                    }
-                                />
-                                <TextInput
-                                    label="Last name"
-                                    noMarginBottom
-                                    showOptionalLabel
-                                    value={formData.lastName}
-                                    onChange={(event) =>
-                                        setFormData((current) => ({
-                                            ...current,
-                                            lastName: event.target.value,
-                                        }))
-                                    }
-                                />
-                            </div>
-                            <div
-                                style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: '1fr 1fr',
-                                    gap: getThemedSpacing(400),
-                                }}
-                            >
-                                <TextInput
-                                    label="Organization"
-                                    showOptionalLabel
-                                    noMarginBottom
-                                    value={formData.organization}
-                                    onChange={(event) =>
-                                        setFormData((current) => ({
-                                            ...current,
-                                            organization: event.target.value,
-                                        }))
-                                    }
-                                />
-                                <TextInput
-                                    label="Job title"
-                                    showOptionalLabel
-                                    noMarginBottom
-                                    value={formData.jobTitle}
-                                    onChange={(event) =>
-                                        setFormData((current) => ({
-                                            ...current,
-                                            jobTitle: event.target.value,
-                                        }))
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </div>
+                        onChange={(contactData) => {
+                            setFormData((current) => ({
+                                ...current,
+                                firstName: contactData.firstName,
+                                lastName: contactData.lastName,
+                                organization: contactData.organization,
+                                jobTitle: contactData.jobTitle,
+                                email: contactData.email,
+                            }));
+                        }}
+                        requireEmail={downloadMultipleFiles}
+                    />
                 )}
             </div>
 

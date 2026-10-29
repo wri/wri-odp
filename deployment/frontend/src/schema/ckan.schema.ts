@@ -1,9 +1,5 @@
 import { type Dataset, type Resource } from '@/interfaces/dataset.interface';
-import type {
-    Tag,
-    Activity as CkanActivity,
-    User as CkanUser,
-} from '@portaljs/ckan';
+import type { Tag, Activity as CkanActivity, User as CkanUser } from '@portaljs/ckan';
 
 interface Group {
     display_name: string;
@@ -118,26 +114,24 @@ export interface WriDataset extends Omit<Dataset, 'groups'> {
     visibility_type: 'public' | 'private' | 'internal' | 'draft';
     short_description?: string;
     project?: string;
-    dataset_type_info?:
-        | 'raster_data'
-        | 'tiled_raster_data'
-        | 'vector_data'
-        | 'tiled_vector_data'
-        | 'tabular_data'
-        | 'versioned_tabular_data'
-        | 'packaged_dataset'
-        | 'mixed_dataset'
-        | 'documentation'
-        | 'model_output'
-        | 'api_dataset';
+    dataset_type_info?: 'raster_data' | 'vector_data' | 'tabular_data' | 'data_package' | 'other';
     dataset_format_info?:
         | 'geotiff_tif'
+        | 'cloud_optimized_geotiff'
+        | 'zarr'
+        | 'gis_raster'
         | 'shapefile_shp'
         | 'geojson_geojson'
+        | 'geopackage'
+        | 'file_geodatabase'
+        | 'geoparquet'
+        | 'gis_vector'
         | 'csv_csv'
         | 'excel_xlsx'
+        | 'parquet'
         | 'json_json'
-        | 'pdf_pdf';
+        | 'pdf_pdf'
+        | 'other';
     reason_for_adding?: string;
     featured_dataset?: boolean;
     wri_data?: boolean;
