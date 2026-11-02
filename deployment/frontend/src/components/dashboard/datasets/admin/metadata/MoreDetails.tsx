@@ -10,7 +10,7 @@ import { MetadataAccordion } from './MetadataAccordion';
 import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
-import { Input } from '@/components/_shared/SimpleInput';
+import { Input, Select } from '@/components/_shared/SimpleInput';
 import { SimpleEditor } from './RTE/SimpleEditor';
 import { additionalReadingTagOptions } from '../formOptions';
 
@@ -39,12 +39,13 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                     <InputGroup
                         label="Additional reading"
                         className="mb-2 flex flex-col items-start whitespace-nowrap sm:flex-col"
+                        info="Add external references related to this dataset. Choose a category for each link: Publication (research or report where the dataset is used), Documentation (guides or manuals on how to use the data), Source code (GitHub repositories or reproducibility packages), or Announcement (launch, update, or sunsetting notices)."
                     >
                         <div className="flex flex-col gap-y-3 w-full">
                             {fields.map((field, index) => (
                                 <div
                                     key={field.id}
-                                    className="grid grid-cols-1 gap-3 md:grid-cols-[1.2fr_0.8fr_1.2fr_auto]"
+                                    className="grid grid-cols-1 items-start gap-3 md:grid-cols-[1.2fr_1fr_1.2fr_auto]"
                                 >
                                     <div>
                                         <Input
@@ -58,16 +59,16 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                                         />
                                     </div>
                                     <div>
-                                        <select
+                                        <Select
                                             {...register(`additional_reading.${index}.tag`)}
-                                            className="w-full rounded-sm border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+                                            aria-label="Link category"
                                         >
                                             {additionalReadingTagOptions.map((option) => (
                                                 <option key={option.value} value={option.value}>
                                                     {option.label}
                                                 </option>
                                             ))}
-                                        </select>
+                                        </Select>
                                         <ErrorDisplay
                                             name={`additional_reading.${index}.tag`}
                                             errors={errors}
@@ -75,7 +76,7 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                                     </div>
                                     <div>
                                         <Input
-                                            placeholder="https://example.com/article"
+                                            placeholder="https://example.com/link"
                                             {...register(`additional_reading.${index}.url`)}
                                             type="text"
                                         />
@@ -87,7 +88,7 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                                     <button
                                         type="button"
                                         onClick={() => remove(index)}
-                                        className="inline-flex items-center justify-center text-red-600"
+                                        className="inline-flex items-center justify-center text-red-600 mt-3"
                                         aria-label="Remove additional reading item"
                                     >
                                         <MinusCircleIcon className="h-5 w-5" />
@@ -95,13 +96,13 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                                 </div>
                             ))}
 
-                            <DefaultTooltip content="Add external references related to this dataset, such as articles, publications, reports, documentation, or blog posts.">
+                            <DefaultTooltip content="Add external references related to this dataset, such as publications, documentation, source code, or announcements.">
                                 <button
                                     type="button"
                                     onClick={() =>
                                         append({
                                             title: '',
-                                            tag: 'article',
+                                            tag: 'publication',
                                             url: '',
                                         })
                                     }

@@ -26,11 +26,10 @@ export const datasetFormatLabels: Record<string, string> = {
 };
 
 export const additionalReadingTagLabels: Record<string, string> = {
-    article: 'Article',
     publication: 'Publication',
     documentation: 'Documentation',
-    report: 'Report',
-    blog_post: 'Blog post',
+    source_code: 'Source code',
+    announcement: 'Announcement',
 };
 
 export function datasetFormatLabel(value?: string): string | undefined {

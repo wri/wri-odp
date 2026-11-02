@@ -1,12 +1,27 @@
 import { type WriDataset } from '@/schema/ckan.schema';
 
-const allowedTags = new Set([
-    'article',
+type AdditionalReadingTag = NonNullable<WriDataset['additional_reading']>[number]['tag'];
+
+const allowedTags = new Set<AdditionalReadingTag>([
     'publication',
     'documentation',
-    'report',
-    'blog_post',
+    'source_code',
+    'announcement',
 ]);
+
+// Tags used before the additional reading categories were redefined.
+const legacyTagMap: Record<string, AdditionalReadingTag> = {
+    article: 'publication',
+    report: 'publication',
+    blog_post: 'publication',
+};
+
+function normalizeTag(value: string): AdditionalReadingTag | undefined {
+    if (allowedTags.has(value as AdditionalReadingTag)) {
+        return value as AdditionalReadingTag;
+    }
+    return legacyTagMap[value];
+}
 
 function isHttpUrl(value: string): boolean {
     return value.startsWith('http://') || value.startsWith('https://');
@@ -25,19 +40,15 @@ function normalizeItems(value: unknown): NonNullable<WriDataset['additional_read
 
             const title = typeof link.title === 'string' ? link.title.trim() : '';
             const url = typeof link.url === 'string' ? link.url.trim() : '';
-            const tag = typeof link.tag === 'string' ? link.tag.trim() : '';
+            const rawTag = typeof link.tag === 'string' ? link.tag.trim() : '';
+            const tag = normalizeTag(rawTag);
 
-            if (!title || !url || !isHttpUrl(url) || !allowedTags.has(tag)) return null;
+            if (!title || !url || !isHttpUrl(url) || !tag) return null;
 
             return {
                 title,
                 url,
-                tag: tag as
-                    | 'article'
-                    | 'publication'
-                    | 'documentation'
-                    | 'report'
-                    | 'blog_post',
+                tag,
             };
         })
         .filter((item): item is NonNullable<typeof item> => !!item);
@@ -61,9 +72,7 @@ export function getAdditionalReadingFromDataset(
     if (fromField.length > 0) return fromField;
 
     const extras = dataset.extras ?? [];
-    const fromExtra = extras.find(
-        (extra) => extra.key?.toLowerCase() === 'additional_reading'
-    );
+    const fromExtra = extras.find((extra) => extra.key?.toLowerCase() === 'additional_reading');
     const parsedFromExtras = parseJson(fromExtra?.value);
     if (parsedFromExtras.length > 0) return parsedFromExtras;
 

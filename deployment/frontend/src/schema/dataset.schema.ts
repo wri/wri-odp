@@ -97,11 +97,10 @@ const datasetFormatInfoSchema = z.enum([
 ]);
 
 const additionalReadingTagSchema = z.enum([
-    'article',
     'publication',
     'documentation',
-    'report',
-    'blog_post',
+    'source_code',
+    'announcement',
 ]);
 
 const releaseNoteItemSchema = z.object({

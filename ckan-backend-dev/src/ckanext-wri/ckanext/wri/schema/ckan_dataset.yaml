@@ -323,7 +323,8 @@ dataset_fields:
 
 - field_name: additional_reading
   label: Articles & other links
-  form_placeholder: 'eg. [{"title": "State of Forests 2025", "url": "https://example.com/report", "tag": "report"}]'
+  help_text: Add external references related to this dataset. Categories - Publication (research or report where the dataset is used), Documentation (guides or manuals on how to use the data), Source code (GitHub repositories or reproducibility packages), Announcement (launch, update, or sunsetting notices).
+  form_placeholder: 'eg. [{"title": "State of Forests 2025", "url": "https://example.com/report", "tag": "publication"}]'
   validators: ignore_missing additional_reading_json_object
 
 - field_name: learn_more
