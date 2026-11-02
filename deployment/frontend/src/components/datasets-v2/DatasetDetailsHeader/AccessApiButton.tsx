@@ -57,7 +57,14 @@ export default function AccessApiButton({
         return {
             id: `step-${index + 1}`,
             label: (
-                <div style={{ display: 'flex', alignItems: 'center', gap: getThemedSpacing(200) }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: getThemedSpacing(200),
+                        fontWeight: activeStep === step ? 700 : undefined,
+                    }}
+                >
                     {label}
                     {index < activeStepIndex && <CheckIcon height={16} width={16} />}
                 </div>

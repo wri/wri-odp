@@ -103,45 +103,51 @@ dataset_fields:
   choices:
   - value: raster_data
     label: Raster data
-  - value: tiled_raster_data
-    label: Tiled raster data
   - value: vector_data
     label: Vector data
-  - value: tiled_vector_data
-    label: Tiled vector data
   - value: tabular_data
     label: Tabular data
-  - value: versioned_tabular_data
-    label: Versioned tabular data
-  - value: packaged_dataset
-    label: Packaged dataset
-  - value: mixed_dataset
-    label: Mixed dataset
-  - value: documentation
-    label: Documentation
-  - value: model_output
-    label: Model output
-  - value: api_dataset
-    label: API dataset
+  - value: data_package
+    label: Data package
+  - value: other
+    label: Other
 
 - field_name: dataset_format_info
   label: Dataset Format
   preset: select
   choices:
   - value: geotiff_tif
-    label: GeoTIFF (.tif)
+    label: GIS Raster (GeoTIFF)
+  - value: cloud_optimized_geotiff
+    label: GIS Raster (Cloud-Optimized GeoTIFF)
+  - value: zarr
+    label: GIS Raster (Zarr)
+  - value: gis_raster
+    label: GIS Raster
   - value: shapefile_shp
-    label: Shapefile (.shp)
+    label: GIS Vector (Shapefile)
   - value: geojson_geojson
-    label: GeoJSON (.geojson)
+    label: GIS Vector (GeoJSON)
+  - value: geopackage
+    label: GIS Vector (GeoPackage)
+  - value: file_geodatabase
+    label: GIS Vector (File GeoDatabase)
+  - value: geoparquet
+    label: GIS Vector (GeoParquet)
+  - value: gis_vector
+    label: GIS Vector
   - value: csv_csv
-    label: CSV (.csv)
+    label: Tabular (CSV)
   - value: excel_xlsx
-    label: Excel (.xlsx)
+    label: Tabular (Excel)
+  - value: parquet
+    label: Tabular (Parquet)
   - value: json_json
-    label: JSON (.json)
+    label: JSON
   - value: pdf_pdf
-    label: PDF (.pdf)
+    label: PDF
+  - value: other
+    label: Other
 
 - field_name: technical_notes
   label: Technical Notes

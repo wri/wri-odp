@@ -1,25 +1,28 @@
 export const datasetTypeLabels: Record<string, string> = {
     raster_data: 'Raster data',
-    tiled_raster_data: 'Tiled raster data',
     vector_data: 'Vector data',
-    tiled_vector_data: 'Tiled vector data',
     tabular_data: 'Tabular data',
-    versioned_tabular_data: 'Versioned tabular data',
-    packaged_dataset: 'Packaged dataset',
-    mixed_dataset: 'Mixed dataset',
-    documentation: 'Documentation',
-    model_output: 'Model output',
-    api_dataset: 'API dataset',
+    data_package: 'Data package',
+    other: 'Other',
 };
 
 export const datasetFormatLabels: Record<string, string> = {
-    geotiff_tif: 'GeoTIFF (.tif)',
-    shapefile_shp: 'Shapefile (.shp)',
-    geojson_geojson: 'GeoJSON (.geojson)',
-    csv_csv: 'CSV (.csv)',
-    excel_xlsx: 'Excel (.xlsx)',
-    json_json: 'JSON (.json)',
-    pdf_pdf: 'PDF (.pdf)',
+    geotiff_tif: 'GIS Raster (GeoTIFF)',
+    cloud_optimized_geotiff: 'GIS Raster (Cloud-Optimized GeoTIFF)',
+    zarr: 'GIS Raster (Zarr)',
+    gis_raster: 'GIS Raster',
+    shapefile_shp: 'GIS Vector (Shapefile)',
+    geojson_geojson: 'GIS Vector (GeoJSON)',
+    geopackage: 'GIS Vector (GeoPackage)',
+    file_geodatabase: 'GIS Vector (File GeoDatabase)',
+    geoparquet: 'GIS Vector (GeoParquet)',
+    gis_vector: 'GIS Vector',
+    csv_csv: 'Tabular (CSV)',
+    excel_xlsx: 'Tabular (Excel)',
+    parquet: 'Tabular (Parquet)',
+    json_json: 'JSON',
+    pdf_pdf: 'PDF',
+    other: 'Other',
 };
 
 export const additionalReadingTagLabels: Record<string, string> = {

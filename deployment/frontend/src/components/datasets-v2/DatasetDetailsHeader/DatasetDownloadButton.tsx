@@ -142,6 +142,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                         display: 'flex',
                         alignItems: 'center',
                         gap: getThemedSpacing(200),
+                        fontWeight: activeStep === step ? 700 : undefined,
                     }}
                 >
                     {label}

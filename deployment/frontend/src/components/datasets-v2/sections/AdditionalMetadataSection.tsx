@@ -3,8 +3,23 @@ import {
     getThemedFontSize,
     getThemedSpacing,
 } from '@worldresources/wri-design-systems';
+import Link from 'next/link';
 import { type WriDataset } from '@/schema/ckan.schema';
 import { hasValue, toDisplay, unique } from '../utils/text';
+
+type SearchFilter = {
+    title: string;
+    key: string;
+    label: string;
+    value: string;
+};
+
+function searchHref(filters: SearchFilter[]) {
+    return {
+        pathname: '/search',
+        query: { search: JSON.stringify(filters) },
+    };
+}
 
 const languageLabels: Record<string, string> = {
     en: 'English',
@@ -81,7 +96,15 @@ export function hasAdditionalMetadata(dataset: WriDataset): boolean {
     );
 }
 
-function MetadataRow({ label, values }: { label: string; values: string[] }) {
+function MetadataRow({
+    label,
+    values,
+    links,
+}: {
+    label: string;
+    values: string[];
+    links?: Array<{ label: string; href: ReturnType<typeof searchHref> }>;
+}) {
     if (!values.length) {
         return null;
     }
@@ -115,7 +138,14 @@ function MetadataRow({ label, values }: { label: string; values: string[] }) {
                     textDecorationStyle: 'dotted',
                 }}
             >
-                {values.join(', ')}
+                {links
+                    ? links.map((link, index) => (
+                          <span key={link.label}>
+                              {index > 0 && ', '}
+                              <Link href={link.href}>{link.label}</Link>
+                          </span>
+                      ))
+                    : values.join(', ')}
             </p>
         </div>
     );
@@ -140,15 +170,57 @@ export default function AdditionalMetadataSection({ dataset }: Props) {
             .map((group) => toDisplay(group.display_name ?? group.title ?? group.name)) ?? []),
     ]);
 
-    const keywordNames = unique(
-        (dataset.tags ?? []).map((tag) => toDisplay(tag.display_name ?? tag.name))
-    );
+    const keywordEntries = unique((dataset.tags ?? []).map((tag) => tag.name)).map((tagName) => {
+        const tag = (dataset.tags ?? []).find((t) => t.name === tagName);
 
-    const metadataRows: Array<{ label: string; values: string[] }> = [
+        return {
+            label: toDisplay(tag?.display_name ?? tagName) ?? tagName,
+            value: tagName,
+        };
+    });
+
+    const authorEntries = unique(authorNames).map((name) => ({
+        label: toDisplay(name) ?? name,
+        value: name,
+    }));
+
+    const metadataRows: Array<{
+        label: string;
+        values: string[];
+        links?: Array<{ label: string; href: ReturnType<typeof searchHref> }>;
+    }> = [
         { label: 'Topic(s):', values: topicNames },
         { label: 'Application:', values: applicationNames },
-        { label: 'Keywords:', values: keywordNames },
-        { label: 'Authors:', values: unique(authorNames.map((name) => toDisplay(name))) },
+        {
+            label: 'Keywords:',
+            values: keywordEntries.map((entry) => entry.label),
+            links: keywordEntries.map((entry) => ({
+                label: entry.label,
+                href: searchHref([
+                    {
+                        title: 'Tags',
+                        key: 'tags',
+                        label: entry.label,
+                        value: entry.value,
+                    },
+                ]),
+            })),
+        },
+        {
+            label: 'Authors:',
+            values: authorEntries.map((entry) => entry.label),
+            links: authorEntries.map((entry) => ({
+                label: entry.label,
+                href: searchHref([
+                    {
+                        title: 'Search',
+                        key: 'search',
+                        label: entry.value,
+                        value: entry.value,
+                    },
+                ]),
+            })),
+        },
         ...additionalMetadataItems.map((item) => ({
             label: `${item.label}:`,
             values: [item.value],
@@ -169,7 +241,12 @@ export default function AdditionalMetadataSection({ dataset }: Props) {
 
             <div>
                 {metadataRows.map((row) => (
-                    <MetadataRow key={row.label} label={row.label} values={row.values} />
+                    <MetadataRow
+                        key={row.label}
+                        label={row.label}
+                        values={row.values}
+                        links={row.links}
+                    />
                 ))}
             </div>
         </section>

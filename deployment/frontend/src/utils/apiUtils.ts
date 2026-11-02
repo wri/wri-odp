@@ -16,40 +16,23 @@ import type {
 } from '@/schema/ckan.schema';
 import type { Group } from '@portaljs/ckan';
 import type { SearchInput } from '@/schema/search.schema';
-import {
-    type Facets,
-    type FacetsCount,
-    type Filter,
-} from '@/interfaces/search.interface';
+import { type Facets, type FacetsCount, type Filter } from '@/interfaces/search.interface';
 import { replaceNames } from '@/utils/replaceNames';
 import { type Session } from 'next-auth';
 import nodemailer from 'nodemailer';
 import { randomBytes } from 'crypto';
-import {
-    type RwDatasetResp,
-    type RwErrorResponse,
-    isRwError,
-} from '@/interfaces/rw.interface';
+import { type RwDatasetResp, type RwErrorResponse, isRwError } from '@/interfaces/rw.interface';
 import type Team from '@/interfaces/team.interface';
 import type Topic from '@/interfaces/topic.interface';
-import type {
-    NewNotificationInputType,
-    NotificationType,
-} from '@/schema/notification.schema';
+import type { NewNotificationInputType, NotificationType } from '@/schema/notification.schema';
 import { type Resource, type View } from '@/interfaces/dataset.interface';
-import {
-    type CreateViewFormSchema,
-    type EditViewFormSchema,
-} from '@/schema/view.schema';
+import { type CreateViewFormSchema, type EditViewFormSchema } from '@/schema/view.schema';
 import { getLayerRw } from '@/server/api/routers/dataset';
 import {
     convertLayerObjToForm,
     getRawObjFromApiSpec,
 } from '@/components/dashboard/datasets/admin/datafiles/sections/BuildALayer/convertObjects';
-import {
-    type DatasetFormType,
-    type ResourceFormType,
-} from '@/schema/dataset.schema';
+import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema';
 import { TRPCError } from '@trpc/server';
 import {
     editLayerRw,
@@ -78,15 +61,11 @@ export async function searchHierarchy({
             let urLink = '';
             if (q) {
                 urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group'
-                        ? 'group_list_wri'
-                        : 'organization_list_wri'
+                    group_type == 'group' ? 'group_list_wri' : 'organization_list_wri'
                 }?include_extras=true&all_fields=true&q=${q}`;
             } else {
                 urLink = `${env.CKAN_URL}/api/3/action/${
-                    group_type == 'group'
-                        ? 'group_list_wri'
-                        : 'organization_list_wri'
+                    group_type == 'group' ? 'group_list_wri' : 'organization_list_wri'
                 }?include_extras=true&all_fields=true`;
             }
 
@@ -159,8 +138,7 @@ export async function groupList({ apiKey }: { apiKey: string | null }) {
         }
     );
     const topics: CkanResponse<Group[]> = await topicRes.json();
-    if (!topics.success && topics.error)
-        throw Error(replaceNames(topics.error.message));
+    if (!topics.success && topics.error) throw Error(replaceNames(topics.error.message));
     return topics.result.filter((topic) => topic.state === 'active');
 }
 
@@ -172,17 +150,13 @@ export async function getGroup({
     id: string;
 }): Promise<Group | Record<string, string>> {
     try {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/group_show?id=${id}`,
-            {
-                headers: {
-                    Authorization: apiKey,
-                },
-            }
-        );
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/group_show?id=${id}`, {
+            headers: {
+                Authorization: apiKey,
+            },
+        });
         const data = (await response.json()) as CkanResponse<Group>;
-        const groups: Group | Record<string, string> =
-            data.success === true ? data.result : {};
+        const groups: Group | Record<string, string> = data.success === true ? data.result : {};
         return groups;
     } catch (e) {
         console.error(e);
@@ -190,20 +164,13 @@ export async function getGroup({
     }
 }
 
-export async function getAllUsers({
-    apiKey,
-}: {
-    apiKey: string;
-}): Promise<User[]> {
+export async function getAllUsers({ apiKey }: { apiKey: string }): Promise<User[]> {
     try {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/user_list?all_fields=True`,
-            {
-                headers: {
-                    Authorization: apiKey,
-                },
-            }
-        );
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/user_list?all_fields=True`, {
+            headers: {
+                Authorization: apiKey,
+            },
+        });
         const data = (await response.json()) as CkanResponse<User[]>;
         const users: User[] | null = data.success === true ? data.result : [];
         return users;
@@ -241,16 +208,12 @@ export async function getAllOrganizations({
                     },
                 }
             );
-            const data = (await response.json()) as CkanResponse<
-                WriOrganization[]
-            >;
+            const data = (await response.json()) as CkanResponse<WriOrganization[]>;
             if (!data.success && data.error) {
-                if (data.error.message)
-                    throw Error(replaceNames(data.error.message, true));
+                if (data.error.message) throw Error(replaceNames(data.error.message, true));
                 throw Error(replaceNames(JSON.stringify(data.error), true));
             }
-            const page: WriOrganization[] =
-                data.success === true ? data.result : [];
+            const page: WriOrganization[] = data.success === true ? data.result : [];
             organizations.push(...page);
             if (page.length < ORG_PAGE_SIZE) break;
             offset += ORG_PAGE_SIZE;
@@ -287,9 +250,7 @@ export async function getTeamVisibilityMap({
     }
 
     const allOrgs = await getAllOrganizations({ apiKey });
-    const map = Object.fromEntries(
-        allOrgs.map((org) => [org.name, org.visibility || 'public'])
-    );
+    const map = Object.fromEntries(allOrgs.map((org) => [org.name, org.visibility || 'public']));
     teamVisibilityCache.set(cacheKey, {
         expiresAt: now + TEAM_VISIBILITY_TTL_MS,
         map,
@@ -344,8 +305,7 @@ export async function getUserGroups({
             }
         );
         const data = (await response.json()) as CkanResponse<Group[] | null>;
-        const groups: Group[] | null =
-            data.success === true ? data.result : null;
+        const groups: Group[] | null = data.success === true ? data.result : null;
         return groups;
     } catch (e) {
         console.error(e);
@@ -361,18 +321,13 @@ export async function getOrgDetails({
     apiKey: string;
 }): Promise<WriOrganization | null> {
     try {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/organization_show?id=${orgId}`,
-            {
-                headers: {
-                    Authorization: apiKey,
-                },
-            }
-        );
-        const data =
-            (await response.json()) as CkanResponse<WriOrganization | null>;
-        const organization: WriOrganization | null =
-            data.success === true ? data.result : null;
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/organization_show?id=${orgId}`, {
+            headers: {
+                Authorization: apiKey,
+            },
+        });
+        const data = (await response.json()) as CkanResponse<WriOrganization | null>;
+        const organization: WriOrganization | null = data.success === true ? data.result : null;
         return organization;
     } catch (e) {
         console.error(e);
@@ -420,9 +375,7 @@ export async function getAllDatasetFq({
             params.set('fq', `(${fq.replace(/\+/g, ' ')})`);
         }
 
-        const _facetFields = (facetFields ?? []).filter(
-            (f) => f !== 'metadata_modified'
-        );
+        const _facetFields = (facetFields ?? []).filter((f) => f !== 'metadata_modified');
         if (_facetFields.length > 0) {
             params.set('facet.field', `["${_facetFields.join('","')}"]`);
         }
@@ -483,8 +436,7 @@ export async function getAllDatasetFq({
 
         const count = data.success === true ? data.result.count : 0;
         const facets = data.success === true ? data.result.facets : {};
-        const searchFacets =
-            data.success === true ? data.result?.search_facets : {};
+        const searchFacets = data.success === true ? data.result?.search_facets : {};
 
         return { datasets, count, searchFacets, facets };
     } catch (e) {
@@ -510,8 +462,7 @@ export async function getUserOrganizations({
             }
         );
         const data = (await response.json()) as CkanResponse<WriOrganization[]>;
-        const organizations: WriOrganization[] | [] =
-            data.success === true ? data.result : [];
+        const organizations: WriOrganization[] | [] = data.success === true ? data.result : [];
         return organizations;
     } catch (e) {
         console.error(e);
@@ -585,14 +536,11 @@ export async function getUser({
     apiKey: string;
 }): Promise<User | null> {
     try {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/user_show?id=${userId}`,
-            {
-                headers: {
-                    Authorization: apiKey,
-                },
-            }
-        );
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/user_show?id=${userId}`, {
+            headers: {
+                Authorization: apiKey,
+            },
+        });
         const data = (await response.json()) as CkanResponse<User | null>;
         const user: User | null = data.success === true ? data.result : null;
         return user;
@@ -680,26 +628,16 @@ function getDatasetTypeInfoFromExtras(dataset: WriDataset): WriDataset['dataset_
 
     const allowed = new Set([
         'raster_data',
-        'tiled_raster_data',
         'vector_data',
-        'tiled_vector_data',
         'tabular_data',
-        'versioned_tabular_data',
-        'packaged_dataset',
-        'mixed_dataset',
-        'documentation',
-        'model_output',
-        'api_dataset',
+        'data_package',
+        'other',
     ]);
 
-    return allowed.has(value)
-        ? (value as WriDataset['dataset_type_info'])
-        : undefined;
+    return allowed.has(value) ? (value as WriDataset['dataset_type_info']) : undefined;
 }
 
-function getDatasetFormatInfoFromExtras(
-    dataset: WriDataset
-): WriDataset['dataset_format_info'] {
+function getDatasetFormatInfoFromExtras(dataset: WriDataset): WriDataset['dataset_format_info'] {
     if (dataset.dataset_format_info) return dataset.dataset_format_info;
     const extras = dataset.extras ?? [];
     const datasetFormatExtra = extras.find(
@@ -711,17 +649,24 @@ function getDatasetFormatInfoFromExtras(
 
     const allowed = new Set([
         'geotiff_tif',
+        'cloud_optimized_geotiff',
+        'zarr',
+        'gis_raster',
         'shapefile_shp',
         'geojson_geojson',
+        'geopackage',
+        'file_geodatabase',
+        'geoparquet',
+        'gis_vector',
         'csv_csv',
         'excel_xlsx',
+        'parquet',
         'json_json',
         'pdf_pdf',
+        'other',
     ]);
 
-    return allowed.has(value)
-        ? (value as WriDataset['dataset_format_info'])
-        : undefined;
+    return allowed.has(value) ? (value as WriDataset['dataset_format_info']) : undefined;
 }
 
 function getReleaseNotesItemsFromDataset(
@@ -763,15 +708,12 @@ export async function getOneDataset(
     session: Session | null,
     noLayer?: boolean
 ) {
-    const datasetRes = await fetch(
-        `${env.CKAN_URL}/api/action/package_show?id=${datasetName}`,
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: session?.user.apikey ?? '',
-            },
-        }
-    );
+    const datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_show?id=${datasetName}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: session?.user.apikey ?? '',
+        },
+    });
 
     const dataset: CkanResponse<WriDataset> = await datasetRes.json();
     if (!dataset.success && dataset.error) {
@@ -804,9 +746,7 @@ export async function getOneDataset(
         const datasetRw: RwDatasetResp | RwErrorResponse = await rwRes.json();
         if (isRwError(datasetRw))
             throw Error(
-                `Error resource at the Resource Watch API - (${JSON.stringify(
-                    datasetRw.errors
-                )})`
+                `Error resource at the Resource Watch API - (${JSON.stringify(datasetRw.errors)})`
             );
         dataset.result.connectorType = datasetRw.data.attributes.connectorType;
         dataset.result.connectorUrl = datasetRw.data.attributes.connectorUrl;
@@ -851,11 +791,7 @@ export async function getOneDataset(
                 }
                 const resourceHasChartView =
                     r.datastore_active &&
-                    _views.some(
-                        (v) =>
-                            v.view_type == 'custom' &&
-                            v.config_obj.type == 'chart'
-                    );
+                    _views.some((v) => v.view_type == 'custom' && v.config_obj.type == 'chart');
 
                 r._hasChartView = resourceHasChartView!;
 
@@ -873,16 +809,12 @@ export async function getOneDataset(
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
-                        layerObjRaw: !noLayer
-                            ? getRawObjFromApiSpec(layerObj)
-                            : true,
+                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(layerObj) : true,
                     };
                 if (r.url_type === 'layer')
                     return {
                         ...r,
-                        layerObj: !noLayer
-                            ? convertLayerObjToForm(layerObj)
-                            : true,
+                        layerObj: !noLayer ? convertLayerObjToForm(layerObj) : true,
                     };
             }
 
@@ -890,18 +822,14 @@ export async function getOneDataset(
                 if (r.layerObjRaw) {
                     return {
                         ...r,
-                        layerObjRaw: !noLayer
-                            ? getRawObjFromApiSpec(r.layerObjRaw)
-                            : true,
+                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(r.layerObjRaw) : true,
                         rw_id: r.id,
                     };
                 }
                 if (r.layerObj) {
                     return {
                         ...r,
-                        layerObj: !noLayer
-                            ? convertLayerObjToForm(r.layerObj)
-                            : true,
+                        layerObj: !noLayer ? convertLayerObjToForm(r.layerObj) : true,
                         rw_id: r.id,
                     };
                 }
@@ -917,9 +845,7 @@ export async function getOneDataset(
         release_notes_items: getReleaseNotesItemsFromDataset(dataset.result),
         resources,
         open_in: dataset.result.open_in
-            ? (JSON.parse(
-                  dataset.result.open_in as unknown as string
-              ) as OpenIn[])
+            ? (JSON.parse(dataset.result.open_in as unknown as string) as OpenIn[])
             : [],
         spatial,
     };
@@ -963,9 +889,7 @@ export async function getOnePendingDataset(
     }
 
     // if (dataset.rw_id) {
-    const resourceLayer = dataset.resources.filter(
-        (x) => x.format?.toLowerCase() === 'layer'
-    );
+    const resourceLayer = dataset.resources.filter((x) => x.format?.toLowerCase() === 'layer');
     if (resourceLayer.length) {
         const layer = resourceLayer[0]!;
         dataset.connectorType = layer.connectorType;
@@ -989,16 +913,12 @@ export async function getOnePendingDataset(
                 if (r.url_type === 'layer')
                     return {
                         ...r,
-                        layerObj: !noLayer
-                            ? convertLayerObjToForm(layerObj)
-                            : true,
+                        layerObj: !noLayer ? convertLayerObjToForm(layerObj) : true,
                     };
                 if (r.url_type === 'layer-raw')
                     return {
                         ...r,
-                        layerObjRaw: !noLayer
-                            ? getRawObjFromApiSpec(layerObj)
-                            : true,
+                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(layerObj) : true,
                     };
             }
 
@@ -1007,18 +927,14 @@ export async function getOnePendingDataset(
                 if (r.layerObj) {
                     return {
                         ...r,
-                        layerObj: !noLayer
-                            ? convertLayerObjToForm(r.layerObj)
-                            : true,
+                        layerObj: !noLayer ? convertLayerObjToForm(r.layerObj) : true,
                         rw_id: r.url ? r.rw_id : r.id,
                     };
                 }
                 if (r.layerObjRaw) {
                     return {
                         ...r,
-                        layerObjRaw: !noLayer
-                            ? getRawObjFromApiSpec(r.layerObjRaw)
-                            : true,
+                        layerObjRaw: !noLayer ? getRawObjFromApiSpec(r.layerObjRaw) : true,
                         rw_id: r.url ? r.rw_id : r.id,
                     };
                 }
@@ -1068,22 +984,18 @@ export async function upsertCollaborator(
     session: Session
 ) {
     const user = session.user;
-    const collaboratorRes = await fetch(
-        `${env.CKAN_URL}/api/action/package_collaborator_create`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `${user?.apikey ?? ''}`,
-            },
-            body: JSON.stringify({
-                ..._collaborator,
-                id: _collaborator.package_id,
-            }),
-        }
-    );
-    const collaborator: CkanResponse<Collaborator> =
-        await collaboratorRes.json();
+    const collaboratorRes = await fetch(`${env.CKAN_URL}/api/action/package_collaborator_create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user?.apikey ?? ''}`,
+        },
+        body: JSON.stringify({
+            ..._collaborator,
+            id: _collaborator.package_id,
+        }),
+    });
+    const collaborator: CkanResponse<Collaborator> = await collaboratorRes.json();
     if (!collaborator.success && collaborator.error) {
         if (collaborator.error.message) throw Error(collaborator.error.message);
         throw Error(JSON.stringify(collaborator.error));
@@ -1096,22 +1008,18 @@ export async function deleteCollaborator(
     session: Session
 ) {
     const user = session.user;
-    const collaboratorRes = await fetch(
-        `${env.CKAN_URL}/api/action/package_collaborator_delete`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `${user?.apikey ?? ''}`,
-            },
-            body: JSON.stringify({
-                ..._collaborator,
-                id: _collaborator.package_id,
-            }),
-        }
-    );
-    const collaborator: CkanResponse<Collaborator> =
-        await collaboratorRes.json();
+    const collaboratorRes = await fetch(`${env.CKAN_URL}/api/action/package_collaborator_delete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${user?.apikey ?? ''}`,
+        },
+        body: JSON.stringify({
+            ..._collaborator,
+            id: _collaborator.package_id,
+        }),
+    });
+    const collaborator: CkanResponse<Collaborator> = await collaboratorRes.json();
     if (!collaborator.success && collaborator.error) {
         if (collaborator.error.message) throw Error(collaborator.error.message);
         throw Error(JSON.stringify(collaborator.error));
@@ -1140,10 +1048,7 @@ export function timeAgo(timestamp: string): string {
     }
 }
 
-export function findNameInTree(
-    tree: GroupTree,
-    targetName: string
-): GroupTree | null {
+export function findNameInTree(tree: GroupTree, targetName: string): GroupTree | null {
     // Base case: if the current node's name matches the target, return the node
     if (tree.name === targetName) {
         return tree;
@@ -1163,10 +1068,7 @@ export function findNameInTree(
     return null;
 }
 
-export function findAllNameInTree(
-    tree: GroupTree,
-    targetName: string
-): GroupTree[] {
+export function findAllNameInTree(tree: GroupTree, targetName: string): GroupTree[] {
     const result: GroupTree[] = [];
 
     // Check if the targetName is a substring of the current node's name
@@ -1252,11 +1154,7 @@ export async function getOrganizationTreeDetails({
         {} as Record<string, GroupsmDetails>
     );
 
-    const facets = await fetchFacets(
-        teamDetails,
-        'organization',
-        session?.user.apikey ?? ''
-    );
+    const facets = await fetchFacets(teamDetails, 'organization', session?.user.apikey ?? '');
     for (const group in teamDetails) {
         const team = teamDetails[group]!;
         team.package_count = facets[team.name] ?? 0;
@@ -1348,11 +1246,7 @@ export async function getTopicTreeDetails({
         {} as Record<string, GroupsmDetails>
     );
 
-    const facets = await fetchFacets(
-        topicDetails,
-        'groups',
-        session?.user.apikey ?? ''
-    );
+    const facets = await fetchFacets(topicDetails, 'groups', session?.user.apikey ?? '');
 
     for (const group in topicDetails) {
         const topic = topicDetails[group]!;
@@ -1368,34 +1262,22 @@ export async function getTopicTreeDetails({
     };
 }
 
-export async function getDatasetDetails({
-    id,
-    session,
-}: {
-    id: string;
-    session: Session | null;
-}) {
+export async function getDatasetDetails({ id, session }: { id: string; session: Session | null }) {
     try {
         const user = session?.user;
-        let datasetRes = await fetch(
-            `${env.CKAN_URL}/api/action/package_show?id=${id}`,
-            {
+        let datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_show?id=${id}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${user?.apikey ?? ''}`,
+            },
+        });
+        if (datasetRes.status !== 200) {
+            datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_show?id=${id}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `${user?.apikey ?? ''}`,
                 },
-            }
-        );
-        if (datasetRes.status !== 200) {
-            datasetRes = await fetch(
-                `${env.CKAN_URL}/api/action/package_show?id=${id}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${user?.apikey ?? ''}`,
-                    },
-                }
-            );
+            });
         }
         const dataset: CkanResponse<WriDataset> = await datasetRes.json();
         if (!dataset.success && dataset.error) {
@@ -1419,18 +1301,14 @@ function cryptoRandomFloat(): number {
     return randomBytes(4).readUInt32BE(0) / 0xffffffff;
 }
 
-export async function getRandomUsernameFromEmail(
-    email: string
-): Promise<string> {
+export async function getRandomUsernameFromEmail(email: string): Promise<string> {
     const localpart = email.split('@')[0]!;
     const cleanedLocalpart = localpart.replace(/[^\w]/g, '-').toLowerCase();
 
     const maxNameCreationAttempts = 100;
 
     const checkUsernameExists = async (username: string): Promise<boolean> => {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/user_show?q=${username}`
-        );
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/user_show?q=${username}`);
         const userData = (await response.json()) as CkanResponse<User>;
         return !!userData.result;
     };
@@ -1451,8 +1329,7 @@ export async function getRandomUsernameFromEmail(
 }
 
 export function generateRandomPassword(length: number): string {
-    const charset =
-        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+';
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+';
     let password = '';
 
     for (let i = 0; i < length; i++) {
@@ -1464,11 +1341,7 @@ export function generateRandomPassword(length: number): string {
     return password;
 }
 
-export async function sendEmail(
-    to: string,
-    subject: string,
-    html: string
-): Promise<void> {
+export async function sendEmail(to: string, subject: string, html: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     const transporter = nodemailer.createTransport({
         host: env.SMTP_SERVER,
@@ -1495,11 +1368,7 @@ export async function sendEmail(
     }
 }
 
-export function generateEmail(
-    email: string,
-    password: string,
-    username: string
-): string {
+export function generateEmail(email: string, password: string, username: string): string {
     return `
         <p>Hi there,</p>
         <p>You have been invited to join the WRI OpenData Platform. Please use the following credentials to log in to ${env.NEXTAUTH_URL}:</p>
@@ -1537,12 +1406,8 @@ async function generateMemberEmail(
     notification: NotificationType
 ): Promise<{ subject: string; body: string }> {
     const actionType = notification.activity_type.split('_');
-    const senderUsername = senderUser.fullname
-        ? senderUser.fullname
-        : senderUser.name;
-    const recipientUsername = recipientUser.fullname
-        ? recipientUser.fullname
-        : recipientUser.name;
+    const senderUsername = senderUser.fullname ? senderUser.fullname : senderUser.name;
+    const recipientUsername = recipientUser.fullname ? recipientUser.fullname : recipientUser.name;
 
     let msg = '';
     let subject = '';
@@ -1585,10 +1450,7 @@ async function generateMemberEmail(
                 msg = `${senderUserLink} ${action} ${subMsg} ${datasetLink}`;
             }
         }
-    } else if (
-        notification.object_type === 'team' ||
-        notification.object_type === 'topic'
-    ) {
+    } else if (notification.object_type === 'team' || notification.object_type === 'topic') {
         const actionType = notification.activity_type.split('_');
         let teamOrTopic;
 
@@ -1613,17 +1475,12 @@ async function generateMemberEmail(
         }
 
         if (!teamOrTopic) {
-            throw new Error(
-                `Could not find Team or Topic with id ${notification.object_id}`
-            );
+            throw new Error(`Could not find Team or Topic with id ${notification.object_id}`);
         }
 
-        const teamOrTopicData = (await teamOrTopic.json()) as CkanResponse<
-            Team | Topic
-        >;
+        const teamOrTopicData = (await teamOrTopic.json()) as CkanResponse<Team | Topic>;
         const teamOrTopicName = teamOrTopicData.result.name;
-        const teamOrTopicTitle =
-            teamOrTopicData.result.title ?? teamOrTopicName;
+        const teamOrTopicTitle = teamOrTopicData.result.title ?? teamOrTopicName;
         const objectLink = `<a href="${portalUrl}/${
             notification.object_type === 'team' ? 'teams' : 'topics'
         }/${teamOrTopicData.result.name}">${teamOrTopicTitle}</a>`;
@@ -1674,9 +1531,7 @@ export async function sendMemberNotifications(
     const addedMembers = findAddedMembers(newMembers, existingMembers);
     const removedMembers = findRemovedMembers(newMembers, existingMembers);
     const updatedMembers = findUpdatedMembers(newMembers, existingMembers);
-    const sendType = ['team', 'topic'].includes(objectType)
-        ? 'member'
-        : 'collaborator';
+    const sendType = ['team', 'topic'].includes(objectType) ? 'member' : 'collaborator';
 
     for (const user of addedMembers) {
         await sendNotification(
@@ -1742,11 +1597,7 @@ async function sendNotification(
                         userObj,
                         notification as NotificationType
                     );
-                    await sendEmail(
-                        userObj.email ?? '',
-                        email.subject,
-                        email.body
-                    );
+                    await sendEmail(userObj.email ?? '', email.subject, email.body);
                 }
             }
         }
@@ -1758,21 +1609,13 @@ function findAddedMembers(newMembers: User[], existingMembers: User[]): User[] {
     return newMembers.filter((user) => !existingIds.has(user.name));
 }
 
-function findRemovedMembers(
-    newMembers: User[],
-    existingMembers: User[]
-): User[] {
+function findRemovedMembers(newMembers: User[], existingMembers: User[]): User[] {
     const newIds = new Set(newMembers.map((user) => user.name));
     return existingMembers.filter((user) => !newIds.has(user.name));
 }
 
-function findUpdatedMembers(
-    newMembers: User[],
-    existingMembers: User[]
-): User[] {
-    const existingIdMap = new Map(
-        existingMembers.map((user) => [user.name, user])
-    );
+function findUpdatedMembers(newMembers: User[], existingMembers: User[]): User[] {
+    const existingIdMap = new Map(existingMembers.map((user) => [user.name, user]));
     return newMembers.filter((user) => {
         const existingUser = existingIdMap.get(user.name);
         return existingUser && user.capacity !== existingUser.capacity;
@@ -1788,26 +1631,22 @@ async function createNotification(
     is_unread: boolean
 ) {
     try {
-        const response = await fetch(
-            `${env.CKAN_URL}/api/3/action/notification_create`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${env.SYS_ADMIN_API_KEY}`,
-                },
-                body: JSON.stringify({
-                    recipient_id,
-                    sender_id,
-                    activity_type,
-                    object_type,
-                    object_id,
-                    is_unread,
-                }),
-            }
-        );
-        const data =
-            (await response.json()) as CkanResponse<NewNotificationInputType>;
+        const response = await fetch(`${env.CKAN_URL}/api/3/action/notification_create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${env.SYS_ADMIN_API_KEY}`,
+            },
+            body: JSON.stringify({
+                recipient_id,
+                sender_id,
+                activity_type,
+                object_type,
+                object_id,
+                is_unread,
+            }),
+        });
+        const data = (await response.json()) as CkanResponse<NewNotificationInputType>;
         if (!data.success && data.error) {
             if (data.error.message) throw Error(data.error.message);
             throw Error(JSON.stringify(data.error));
@@ -1819,11 +1658,7 @@ async function createNotification(
     }
 }
 
-export async function getRecipient({
-    owner_org,
-}: {
-    owner_org: string;
-}): Promise<WriUser[]> {
+export async function getRecipient({ owner_org }: { owner_org: string }): Promise<WriUser[]> {
     try {
         const response = await fetch(
             `${env.CKAN_URL}/api/3/action/organization_show?id=${owner_org}&include_users=true`,
@@ -1836,13 +1671,10 @@ export async function getRecipient({
         );
 
         if (!response.ok) {
-            throw new Error(
-                `Failed to fetch organization information: ${response.statusText}`
-            );
+            throw new Error(`Failed to fetch organization information: ${response.statusText}`);
         }
 
-        const responseData =
-            (await response.json()) as CkanResponse<WriOrganization | null>;
+        const responseData = (await response.json()) as CkanResponse<WriOrganization | null>;
         const organization: WriOrganization | null =
             responseData.success === true ? responseData.result : null;
 
@@ -1851,8 +1683,7 @@ export async function getRecipient({
 
             // Filter members to include only admins and editors
             const adminAndEditorMembers = members.filter(
-                (member) =>
-                    member.capacity === 'admin' || member.capacity === 'editor'
+                (member) => member.capacity === 'admin' || member.capacity === 'editor'
             );
 
             // Extract member IDs into an array
@@ -1951,12 +1782,8 @@ export async function sendIssueOrCommentNotigication({
                         .filter((user) => user.email)
                         .map(async (user) => {
                             const subject = `Issue ${action} on Dataset ${dataset.title}`;
-                            const body = `<p>Hi ${
-                                user.name ?? user.display_name ?? 'There'
-                            }</p>
-                        <p>There has been an issue ${action} on the Dataset ${
-                            dataset.title
-                        }.</p>`;
+                            const body = `<p>Hi ${user.name ?? user.display_name ?? 'There'}</p>
+                        <p>There has been an issue ${action} on the Dataset ${dataset.title}.</p>`;
                             const email = user.email!;
                             return await sendEmail(email, subject, body);
                         })
@@ -1969,13 +1796,7 @@ export async function sendIssueOrCommentNotigication({
     }
 }
 
-export async function getResourceViews({
-    id,
-    session,
-}: {
-    id: string;
-    session: Session | null;
-}) {
+export async function getResourceViews({ id, session }: { id: string; session: Session | null }) {
     const headers = {
         'Content-Type': 'application/json',
     } as any;
@@ -1997,13 +1818,7 @@ export async function getResourceViews({
     return views.result;
 }
 
-export async function getResourceView({
-    id,
-    session,
-}: {
-    id: string;
-    session: Session | null;
-}) {
+export async function getResourceView({ id, session }: { id: string; session: Session | null }) {
     const headers = {
         'Content-Type': 'application/json',
     } as any;
@@ -2012,10 +1827,9 @@ export async function getResourceView({
         headers.Authorization = session.user.apikey;
     }
 
-    const viewsRes = await fetch(
-        `${env.CKAN_URL}/api/action/resource_view_show?id=${id}`,
-        { headers }
-    );
+    const viewsRes = await fetch(`${env.CKAN_URL}/api/action/resource_view_show?id=${id}`, {
+        headers,
+    });
     const views: CkanResponse<View> = await viewsRes.json();
 
     if (!views.success && views.error) {
@@ -2041,14 +1855,11 @@ export async function createResourceView({
         headers.Authorization = session.user.apikey;
     }
 
-    const viewsRes = await fetch(
-        `${env.CKAN_URL}/api/action/resource_view_create`,
-        {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(view),
-        }
-    );
+    const viewsRes = await fetch(`${env.CKAN_URL}/api/action/resource_view_create`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(view),
+    });
     const views: CkanResponse<View[]> = await viewsRes.json();
 
     if (!views.success && views.error) {
@@ -2074,14 +1885,11 @@ export async function updateResourceView({
         headers.Authorization = session.user.apikey;
     }
 
-    const viewsRes = await fetch(
-        `${env.CKAN_URL}/api/action/resource_view_update`,
-        {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(view),
-        }
-    );
+    const viewsRes = await fetch(`${env.CKAN_URL}/api/action/resource_view_update`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(view),
+    });
     const views: CkanResponse<View[]> = await viewsRes.json();
 
     if (!views.success && views.error) {
@@ -2092,13 +1900,7 @@ export async function updateResourceView({
     return views.result;
 }
 
-export async function deleteResourceView({
-    id,
-    session,
-}: {
-    id: string;
-    session: Session | null;
-}) {
+export async function deleteResourceView({ id, session }: { id: string; session: Session | null }) {
     const headers = {
         'Content-Type': 'application/json',
     } as any;
@@ -2107,14 +1909,11 @@ export async function deleteResourceView({
         headers.Authorization = session.user.apikey;
     }
 
-    const viewsRes = await fetch(
-        `${env.CKAN_URL}/api/action/resource_view_delete`,
-        {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ id }),
-        }
-    );
+    const viewsRes = await fetch(`${env.CKAN_URL}/api/action/resource_view_delete`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ id }),
+    });
     const views: CkanResponse<View[]> = await viewsRes.json();
 
     if (!views.success && views.error) {
@@ -2157,9 +1956,7 @@ export async function sendGroupNotification({
             });
 
             if (recipientUsers) {
-                recipientUsers = recipientUsers.concat([
-                    creatorUser as WriUser,
-                ]);
+                recipientUsers = recipientUsers.concat([creatorUser as WriUser]);
             } else {
                 recipientUsers = [creatorUser as WriUser];
             }
@@ -2224,9 +2021,7 @@ export async function sendGroupNotification({
                         .map(async (user) => {
                             const mainAction = action.split('_')[0];
                             const subject = `Approval status on Dataset ${dataset.title}`;
-                            const body = `<p>Hi ${
-                                user.name ?? user.display_name ?? 'There'
-                            }</p>
+                            const body = `<p>Hi ${user.name ?? user.display_name ?? 'There'}</p>
                         <p>The approval status for the Dataset <a href="${
                             env.NEXTAUTH_URL
                         }/datasets/${dataset.name}">${
@@ -2244,21 +2039,14 @@ export async function sendGroupNotification({
     }
 }
 
-export async function getDatasetViews({
-    rwDatasetId,
-}: {
-    rwDatasetId: string;
-}) {
-    const viewsRes = await fetch(
-        `https://api.resourcewatch.org/v1/dataset/${rwDatasetId}/widget`,
-        {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${env.RW_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-        }
-    );
+export async function getDatasetViews({ rwDatasetId }: { rwDatasetId: string }) {
+    const viewsRes = await fetch(`https://api.resourcewatch.org/v1/dataset/${rwDatasetId}/widget`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${env.RW_API_KEY}`,
+            'Content-Type': 'application/json',
+        },
+    });
     const result = await viewsRes.json();
     return result.data.map((d: any) => ({
         id: d.id,
@@ -2267,16 +2055,13 @@ export async function getDatasetViews({
 }
 
 export async function getDatasetView({ id }: { id: string }) {
-    const viewsRes = await fetch(
-        `https://api.resourcewatch.org/v1/widget/${id}`,
-        {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${env.RW_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-        }
-    );
+    const viewsRes = await fetch(`https://api.resourcewatch.org/v1/widget/${id}`, {
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${env.RW_API_KEY}`,
+            'Content-Type': 'application/json',
+        },
+    });
     const result = await viewsRes.json();
     return {
         id: result.data.id,
@@ -2291,17 +2076,14 @@ export async function patchDataset({
     dataset: Partial<WriDataset>;
     session: Session;
 }) {
-    const datasetRes = await fetch(
-        `${env.CKAN_URL}/api/action/old_package_patch`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `${session.user.apikey}`,
-            },
-            body: JSON.stringify(dataset),
-        }
-    );
+    const datasetRes = await fetch(`${env.CKAN_URL}/api/action/old_package_patch`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${session.user.apikey}`,
+        },
+        body: JSON.stringify(dataset),
+    });
 
     const datasetObj: CkanResponse<WriDataset> = await datasetRes.json();
     if (!datasetObj.success && datasetObj.error) {
@@ -2320,18 +2102,14 @@ export async function updateDatasetHasChartsFlag({
 }) {
     const ckanDataset = await getOneDataset(ckanDatasetId, session);
     const ckanViews = ckanDataset.resources?.map((r) => r._views).flat() ?? [];
-    const ckanHasChartViews = ckanViews.some(
-        (v) => v?.config_obj?.type == 'chart'
-    );
+    const ckanHasChartViews = ckanViews.some((v) => v?.config_obj?.type == 'chart');
     let hasChartViews = ckanHasChartViews;
 
     if (ckanDataset?.rw_id) {
         const rwDatasetViews = await getDatasetViews({
             rwDatasetId: ckanDataset.rw_id,
         });
-        const rwHasChartViews = rwDatasetViews.some(
-            (v) => v?.config_obj?.type == 'chart'
-        );
+        const rwHasChartViews = rwDatasetViews.some((v) => v?.config_obj?.type == 'chart');
 
         hasChartViews = hasChartViews || rwHasChartViews;
     }
@@ -2403,10 +2181,7 @@ export async function deleteDatasetView(datasetId: string, id: string) {
     return result;
 }
 
-export async function approvePendingDataset(
-    datasetId: string,
-    session: Session
-) {
+export async function approvePendingDataset(datasetId: string, session: Session) {
     const response = await fetch(
         `${env.CKAN_URL}/api/3/action/pending_dataset_show?package_id=${datasetId}`,
         {
@@ -2428,15 +2203,12 @@ export async function approvePendingDataset(
         submittedDataset.is_approved = true;
     } else {
         // fetch dataset from package_show
-        const datasetRes = await fetch(
-            `${env.CKAN_URL}/api/action/package_show?id=${datasetId}`,
-            {
-                headers: {
-                    Authorization: session.user.apikey,
-                    'Content-Type': 'application/json',
-                },
-            }
-        );
+        const datasetRes = await fetch(`${env.CKAN_URL}/api/action/package_show?id=${datasetId}`, {
+            headers: {
+                Authorization: session.user.apikey,
+                'Content-Type': 'application/json',
+            },
+        });
         const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>;
         if (!dataset.success && dataset.error)
             throw Error(JSON.stringify(dataset.error).concat('package_show'));
@@ -2454,9 +2226,7 @@ export async function approvePendingDataset(
     const resourcesWithoutLayer = submittedDataset.resources
         .filter((r) => !r.layerObj && !r.layerObjRaw)
         .map((r) => {
-            const defaultResource = InitialresourcesWithoutLayer.find(
-                (x) => x.id === r.id
-            );
+            const defaultResource = InitialresourcesWithoutLayer.find((x) => x.id === r.id);
             if (defaultResource) {
                 return {
                     ...r,
@@ -2471,13 +2241,9 @@ export async function approvePendingDataset(
         });
 
     let rw_id = submittedDataset.rw_id ?? null;
-    const isLayer = submittedDataset.resources.some(
-        (x) => x.format === 'Layer'
-    );
+    const isLayer = submittedDataset.resources.some((x) => x.format === 'Layer');
 
-    const layerFilter = submittedDataset.resources.filter(
-        (x) => x.connectorUrl
-    );
+    const layerFilter = submittedDataset.resources.filter((x) => x.connectorUrl);
     const layer = layerFilter[0]!;
 
     if (!submittedDataset.rw_id && isLayer && layer) {
@@ -2492,9 +2258,7 @@ export async function approvePendingDataset(
         rw_id = datasetRw.data.id;
     }
 
-    const hasLayersToEdit = submittedDataset.resources.some(
-        (l) => l.rw_id && l.url
-    );
+    const hasLayersToEdit = submittedDataset.resources.some((l) => l.rw_id && l.url);
     const resourcesToEditLayer = hasLayersToEdit
         ? await Promise.all(
               submittedDataset.resources
@@ -2526,23 +2290,17 @@ export async function approvePendingDataset(
                       .filter(
                           (r) =>
                               (r.layerObj || r.layerObjRaw) &&
-                              !r.url?.startsWith(
-                                  'https://api.resourcewatch.org'
-                              )
+                              !r.url?.startsWith('https://api.resourcewatch.org')
                       )
                       .map(async (r) => {
                           const rr = r as ResourceFormType;
                           if (r.layerObj) {
-                              const layerForm = convertLayerObjToForm(
-                                  r.layerObj
-                              );
+                              const layerForm = convertLayerObjToForm(r.layerObj);
 
                               rr.layerObj = layerForm;
                               return await createLayerRw(rr, rw_id ?? '');
                           }
-                          const rawLayerForm = getRawObjFromApiSpec(
-                              r.layerObjRaw!
-                          );
+                          const rawLayerForm = getRawObjFromApiSpec(r.layerObjRaw!);
                           rr.layerObjRaw = rawLayerForm;
                           return await createLayerRw(rr, rw_id ?? '');
                       })
@@ -2551,9 +2309,7 @@ export async function approvePendingDataset(
 
     // if there is some error, when creating layer, delete all layers and throw
     if (resourcesToCreateLayer.some((x) => x.status === 'rejected')) {
-        const fulfilled = resourcesToCreateLayer
-            .filter(assertFullfilled)
-            .map((lp) => lp.value);
+        const fulfilled = resourcesToCreateLayer.filter(assertFullfilled).map((lp) => lp.value);
         await Promise.all(fulfilled.map(async (l) => await deleteLayerRw(l)));
         const errorString = resourcesToCreateLayer.reduce((acc, cur) => {
             if (cur.status === 'rejected') {
@@ -2567,9 +2323,7 @@ export async function approvePendingDataset(
     // filter fulfillped promises so typescript doesnt complain
     const resources = [
         ...resourcesWithoutLayer,
-        ...resourcesToCreateLayer
-            .filter(assertFullfilled)
-            .map((lp) => lp.value),
+        ...resourcesToCreateLayer.filter(assertFullfilled).map((lp) => lp.value),
         ...resourcesToEditLayer,
     ];
 
@@ -2594,23 +2348,18 @@ export async function approvePendingDataset(
         };
     }) as Resource[];
 
-    const datasetRes = await fetch(
-        `${env.CKAN_URL}/api/action/old_package_update`,
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `${session.user.apikey}`,
-            },
-            body: JSON.stringify(submittedDataset),
-        }
-    );
+    const datasetRes = await fetch(`${env.CKAN_URL}/api/action/old_package_update`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${session.user.apikey}`,
+        },
+        body: JSON.stringify(submittedDataset),
+    });
     const dataset = (await datasetRes.json()) as CkanResponse<WriDataset>;
     if (!dataset.success && dataset.error) {
         if (dataset.error.message)
-            throw Error(
-                JSON.stringify(dataset.error).concat('old_package_update')
-            );
+            throw Error(JSON.stringify(dataset.error).concat('old_package_update'));
         throw Error(JSON.stringify(dataset.error).concat('old_package_update'));
     }
 
@@ -2624,8 +2373,7 @@ export async function approvePendingDataset(
             },
         }
     );
-    const issues: CkanResponse<{ count: number; results: Issue[] }> =
-        await issuesRes.json();
+    const issues: CkanResponse<{ count: number; results: Issue[] }> = await issuesRes.json();
     if (!issues.success && issues.error) {
         if (issues.error.message) throw Error(issues.error.message);
         throw Error(JSON.stringify(issues.error));
@@ -2640,25 +2388,19 @@ export async function approvePendingDataset(
                     issue_number: issue.number,
                     dataset_id: dataset.result.id,
                     status: 'closed',
-                    description:
-                        issue.description ||
-                        'Closed automatically on dataset approval',
+                    description: issue.description || 'Closed automatically on dataset approval',
                 };
-                const response = await fetch(
-                    `${env.CKAN_URL}/api/3/action/issue_update`,
-                    {
-                        method: 'POST',
-                        body: JSON.stringify(inputData),
-                        headers: {
-                            Authorization: session.user.apikey,
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                );
+                const response = await fetch(`${env.CKAN_URL}/api/3/action/issue_update`, {
+                    method: 'POST',
+                    body: JSON.stringify(inputData),
+                    headers: {
+                        Authorization: session.user.apikey,
+                        'Content-Type': 'application/json',
+                    },
+                });
 
                 const data = (await response.json()) as CkanResponse<null>;
-                if (!data.success && data.error)
-                    throw Error(data.error.message);
+                if (!data.success && data.error) throw Error(data.error.message);
                 return issue;
             })
     );
@@ -2667,14 +2409,9 @@ export async function approvePendingDataset(
         // send notification to user
         try {
             // get dataset collaborators id
-            const collab = await fetchDatasetCollabIds(
-                dataset.result.id,
-                session.user.apikey
-            );
+            const collab = await fetchDatasetCollabIds(dataset.result.id, session.user.apikey);
             await sendGroupNotification({
-                owner_org: dataset.result.owner_org
-                    ? dataset.result.owner_org
-                    : null,
+                owner_org: dataset.result.owner_org ? dataset.result.owner_org : null,
                 creator_id: dataset.result.creator_user_id,
                 collaborator_id: collab,
                 dataset_id: dataset.result.id,
@@ -2687,17 +2424,14 @@ export async function approvePendingDataset(
         }
     }
 
-    const deleteResponse = await fetch(
-        `${env.CKAN_URL}/api/3/action/pending_dataset_delete`,
-        {
-            method: 'POST',
-            body: JSON.stringify({ package_id: datasetId }),
-            headers: {
-                Authorization: `${env.SYS_ADMIN_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-        }
-    );
+    const deleteResponse = await fetch(`${env.CKAN_URL}/api/3/action/pending_dataset_delete`, {
+        method: 'POST',
+        body: JSON.stringify({ package_id: datasetId }),
+        headers: {
+            Authorization: `${env.SYS_ADMIN_API_KEY}`,
+            'Content-Type': 'application/json',
+        },
+    });
 
     const deleteData = (await deleteResponse.json()) as CkanResponse<null>;
 
@@ -2786,10 +2520,7 @@ export function filterDatasetFields(dataset: any) {
     }
     return filteredDataset;
 }
-export async function fetchDatasetCollabIds(
-    datasetId: string,
-    userApiKey: string
-) {
+export async function fetchDatasetCollabIds(datasetId: string, userApiKey: string) {
     const res = await fetch(
         `${env.CKAN_URL}/api/3/action/package_collaborator_list?id=${datasetId}`,
         {
@@ -2828,9 +2559,8 @@ export async function getDatasetReleaseNotes({ id }: { id: string }) {
         },
     });
 
-    const releaseNotes: CkanResponse<
-        { release_notes: string; date: string }[]
-    > = await response.json();
+    const releaseNotes: CkanResponse<{ release_notes: string; date: string }[]> =
+        await response.json();
 
     return releaseNotes.result;
 }
@@ -2885,9 +2615,7 @@ export async function generateDataSiteMap() {
 }
 
 export function advance_search_query(filters: Filter[]) {
-    const keys = [...new Set(filters.map((f) => f.key))].filter(
-        (key) => key != 'search'
-    );
+    const keys = [...new Set(filters.map((f) => f.key))].filter((key) => key != 'search');
 
     const fq: any = {};
     let extLocationQ = '';
@@ -2923,10 +2651,7 @@ export function advance_search_query(filters: Filter[]) {
                     keyFq = `[${temporalCoverageStart} TO *]`;
                 }
             }
-        } else if (
-            key === 'metadata_modified_since' ||
-            key === 'metadata_modified_before'
-        ) {
+        } else if (key === 'metadata_modified_since' || key === 'metadata_modified_before') {
             const metadataModifiedSinceFilter = filters.find(
                 (f) => f.key === 'metadata_modified_since'
             );
@@ -2968,17 +2693,14 @@ export function advance_search_query(filters: Filter[]) {
 }
 
 export async function getTokenList(session: Session) {
-    const response = await fetch(
-        `${env.CKAN_URL}/api/3/action/api_token_list`,
-        {
-            method: 'POST',
-            body: JSON.stringify({ user_id: session.user.id }),
-            headers: {
-                Authorization: session.user.apikey,
-                'Content-Type': 'application/json',
-            },
-        }
-    );
+    const response = await fetch(`${env.CKAN_URL}/api/3/action/api_token_list`, {
+        method: 'POST',
+        body: JSON.stringify({ user_id: session.user.id }),
+        headers: {
+            Authorization: session.user.apikey,
+            'Content-Type': 'application/json',
+        },
+    });
 
     const json = await response.json();
 
