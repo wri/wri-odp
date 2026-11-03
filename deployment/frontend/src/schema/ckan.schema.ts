@@ -149,7 +149,7 @@ export interface WriDataset extends Omit<Dataset, 'groups'> {
     additional_reading?: Array<{
         title: string;
         url: string;
-        tag: 'article' | 'publication' | 'documentation' | 'report' | 'blog_post';
+        tag: 'publication' | 'documentation' | 'source_code' | 'announcement';
     }>;
     restrictions?: string;
     open_in: OpenIn[];
