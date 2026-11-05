@@ -29,6 +29,8 @@ export type TileGeojson = {
     id: string;
     datafile: Resource;
     filtered?: boolean;
+    // Display name for list rows; falls back to the resource name when absent.
+    name?: string;
     [key: string]: unknown;
 };
 
@@ -50,6 +52,14 @@ type SelectFilesMapProps = {
     geojsons: TileGeojson[];
     formObj: UseFormReturn<LocationSearchFormType>;
     onToggleResource: (resource: Resource) => void;
+    // When provided, map clicks and list checkboxes toggle individual tiles
+    // (one geojson per tile) instead of the whole resource.
+    onToggleTile?: (geojson: TileGeojson) => void;
+    onSelectAllTiles?: () => void;
+    onClearAllTiles?: () => void;
+    // When provided, drawing an area selects the tiles intersecting it
+    // instead of running the resource location search.
+    onSelectTilesInArea?: (bbox: [number, number, number, number]) => void;
 };
 
 type ViewMode = 'map' | 'list';
@@ -58,6 +68,10 @@ export default function SelectFilesMap({
     geojsons,
     formObj,
     onToggleResource,
+    onToggleTile,
+    onSelectAllTiles,
+    onClearAllTiles,
+    onSelectTilesInArea,
 }: SelectFilesMapProps) {
     const { setValue } = formObj;
     const [cursor, setCursor] = useState('grab');
@@ -107,7 +121,7 @@ export default function SelectFilesMap({
 
         return geojsons.filter((geojson) => {
             const resource = geojson.datafile;
-            const searchableText = [resource.name, resource.title, resource.id]
+            const searchableText = [geojson.name, resource.name, resource.title, resource.id]
                 .filter(Boolean)
                 .join(' ')
                 .toLowerCase();
@@ -132,20 +146,30 @@ export default function SelectFilesMap({
     });
 
     const handleSelectAll = useCallback(() => {
+        if (onSelectAllTiles) {
+            onSelectAllTiles();
+            return;
+        }
+
         geojsons.forEach((geojson) => {
             if (!geojson.selected) {
                 onToggleResource(geojson.datafile);
             }
         });
-    }, [geojsons, onToggleResource]);
+    }, [geojsons, onToggleResource, onSelectAllTiles]);
 
     const handleClearAll = useCallback(() => {
+        if (onClearAllTiles) {
+            onClearAllTiles();
+            return;
+        }
+
         geojsons.forEach((geojson) => {
             if (geojson.selected) {
                 onToggleResource(geojson.datafile);
             }
         });
-    }, [geojsons, onToggleResource]);
+    }, [geojsons, onToggleResource, onClearAllTiles]);
 
     const handleGeocoderResult = useCallback(
         (event: GeoCoderResultEvent) => {
@@ -258,9 +282,14 @@ export default function SelectFilesMap({
             const geojson = layerGeojsonMap.current[clickedLayerId];
             if (!geojson?.datafile) return;
 
+            if (onToggleTile) {
+                onToggleTile(geojson);
+                return;
+            }
+
             onToggleResource(geojson.datafile);
         },
-        [onToggleResource]
+        [onToggleResource, onToggleTile]
     );
 
     const onUpdate = useCallback(
@@ -281,6 +310,27 @@ export default function SelectFilesMap({
                         number[],
                         number[],
                     ];
+
+                    if (onSelectTilesInArea) {
+                        // Area-select mode: pick every tile intersecting the
+                        // drawn rectangle.
+                        let minLon = Infinity;
+                        let minLat = Infinity;
+                        let maxLon = -Infinity;
+                        let maxLat = -Infinity;
+                        for (const [lng, lat] of coordinates) {
+                            if (lng === undefined || lat === undefined) continue;
+                            if (lng < minLon) minLon = lng;
+                            if (lng > maxLon) maxLon = lng;
+                            if (lat < minLat) minLat = lat;
+                            if (lat > maxLat) maxLat = lat;
+                        }
+                        if (Number.isFinite(minLon) && Number.isFinite(minLat)) {
+                            onSelectTilesInArea([minLon, minLat, maxLon, maxLat]);
+                        }
+                        return;
+                    }
+
                     setValue('point', null);
                     setValue('location', '');
                     setValue('bbox', [minLng, maxLat]);
@@ -289,7 +339,7 @@ export default function SelectFilesMap({
                 }
             }
         },
-        [setValue]
+        [onSelectTilesInArea, setValue]
     );
 
     const onModeChange = useCallback((event: ModeChangeEvent) => {
@@ -417,6 +467,10 @@ export default function SelectFilesMap({
                                         checked={isSelected}
                                         onCheckedChange={(event) => {
                                             if (event.checked !== isSelected) {
+                                                if (onToggleTile) {
+                                                    onToggleTile(geojson);
+                                                    return;
+                                                }
                                                 onToggleResource(resource);
                                             }
                                         }}
@@ -427,7 +481,10 @@ export default function SelectFilesMap({
                                             color: getThemedColor('neutral', 900),
                                         }}
                                     >
-                                        {resource.name ?? resource.title ?? resource.id}
+                                        {geojson.name ??
+                                            resource.name ??
+                                            resource.title ??
+                                            resource.id}
                                     </span>
                                 </div>
                             );

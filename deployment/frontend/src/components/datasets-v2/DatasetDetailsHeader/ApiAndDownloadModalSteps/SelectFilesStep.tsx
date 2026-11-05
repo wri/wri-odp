@@ -13,7 +13,14 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { api } from '@/utils/api';
 import FileCard from './FileCard';
-import { formatDate, formatFileSize, getResourceFormatLabel } from '../download-utils';
+import {
+    formatDate,
+    formatFileSize,
+    getResourceFormatLabel,
+    isDataApiResource,
+    isDownloadableResource,
+    tileToBbox,
+} from '../download-utils';
 import { type LocationSearchFormType, type TileGeojson } from './SelectFilesMap';
 
 const SelectFilesMap = dynamic(() => import('./SelectFilesMap'), {
@@ -23,7 +30,9 @@ const SelectFilesMap = dynamic(() => import('./SelectFilesMap'), {
 type SelectFilesStepProps = {
     dataset: WriDataset;
     selectedResourceIds: string[];
+    selectedTilesByResourceId: Record<string, string[]>;
     onToggleResource: (resourceId: string) => void;
+    onSelectTiles: (resourceId: string, tiles: string[] | null) => void;
     onBack: () => void;
     onContinue: () => void;
 };
@@ -31,14 +40,15 @@ type SelectFilesStepProps = {
 function SelectFilesStep({
     dataset,
     selectedResourceIds,
+    selectedTilesByResourceId,
     onToggleResource,
+    onSelectTiles,
     onBack,
     onContinue,
 }: SelectFilesStepProps) {
     const datafiles = dataset?.resources;
-    const selectableResources = (datafiles ?? []).filter(
-        (resource) => Boolean(resource.key) || Boolean(resource.url)
-    );
+    const selectableResources = (datafiles ?? []).filter(isDownloadableResource);
+    const dataApiResources = selectableResources.filter(isDataApiResource);
     const geoSpatialResources = selectableResources
         .filter((resource) => resource.spatial_type !== 'global')
         .filter((resource) => (resource.spatial_address ?? resource.spatial_geom) != null);
@@ -127,6 +137,115 @@ function SelectFilesStep({
         setIsMapOpen(false);
     };
 
+    // One map feature per tile of a data-api resource. The id is a pseudo id
+    // (`${resourceId}:${tileIndex}`) so toggling a tile never toggles another
+    // feature sharing the same underlying resource id.
+    const tileGeojsonsByResourceId = useMemo(() => {
+        const result: Record<string, TileGeojson[]> = {};
+        for (const resource of dataApiResources) {
+            const selectedTiles = new Set(selectedTilesByResourceId[resource.id] ?? []);
+            result[resource.id] = (resource.data_api_tiles ?? [])
+                .filter((tile): tile is string => typeof tile === 'string')
+                .map((tile, index) => {
+                    const bbox = tileToBbox(tile);
+                    return {
+                        // Mapbox <Source> needs a valid GeoJSON Feature.
+                        type: 'Feature' as const,
+                        id: `${resource.id}:${index}`,
+                        datafile: resource,
+                        name: tile.split('/').pop() ?? tile,
+                        selected: selectedTiles.has(tile),
+                        ...(bbox
+                            ? {
+                                  geometry: {
+                                      type: 'Polygon' as const,
+                                      coordinates: [
+                                          [
+                                              [bbox[0], bbox[1]],
+                                              [bbox[2], bbox[1]],
+                                              [bbox[2], bbox[3]],
+                                              [bbox[0], bbox[3]],
+                                              [bbox[0], bbox[1]],
+                                          ],
+                                      ],
+                                  },
+                              }
+                            : {}),
+                    };
+                });
+        }
+        return result;
+    }, [dataApiResources, selectedTilesByResourceId]);
+
+    const handleDataApiResourceButton = (resource: Resource) => {
+        const isSelected = selectedResourceIds.includes(resource.id);
+        onToggleResource(resource.id);
+
+        if (isSelected) {
+            onSelectTiles(resource.id, null);
+            return;
+        }
+
+        onSelectTiles(
+            resource.id,
+            (resource.data_api_tiles ?? []).filter(
+                (tile): tile is string => typeof tile === 'string'
+            )
+        );
+    };
+
+    // SelectFilesMap passes the clicked tile's geojson back; the tile is
+    // identified by the pseudo id `${resourceId}:${tileIndex}`.
+    const toggleTileByMap = (resource: Resource, geojson: TileGeojson) => {
+        const index = Number(geojson.id.split(':')[1]);
+        const tiles = (resource.data_api_tiles ?? []).filter(
+            (tile): tile is string => typeof tile === 'string'
+        );
+        const tile = tiles[index];
+        if (tile === undefined) return;
+
+        const selected = new Set(selectedTilesByResourceId[resource.id] ?? []);
+        if (selected.has(tile)) {
+            selected.delete(tile);
+        } else {
+            selected.add(tile);
+        }
+        onSelectTiles(resource.id, selected.size === 0 ? null : Array.from(selected));
+    };
+
+    const selectAllTiles = (resource: Resource) => {
+        onSelectTiles(
+            resource.id,
+            (resource.data_api_tiles ?? []).filter(
+                (tile): tile is string => typeof tile === 'string'
+            )
+        );
+    };
+
+    const clearAllTiles = (resource: Resource) => {
+        onSelectTiles(resource.id, null);
+    };
+
+    // Adds every tile of the resource whose bbox intersects the drawn area.
+    const selectTilesInArea = (resource: Resource, bbox: [number, number, number, number]) => {
+        const [minLon, minLat, maxLon, maxLat] = bbox;
+        const selected = new Set(selectedTilesByResourceId[resource.id] ?? []);
+        for (const tile of resource.data_api_tiles ?? []) {
+            if (typeof tile !== 'string') continue;
+            const tileBbox = tileToBbox(tile);
+            if (!tileBbox) continue;
+            const intersects =
+                tileBbox[2] > minLon &&
+                tileBbox[0] < maxLon &&
+                tileBbox[3] > minLat &&
+                tileBbox[1] < maxLat;
+            if (intersects) {
+                selected.add(tile);
+            }
+        }
+        onSelectTiles(resource.id, selected.size === 0 ? null : Array.from(selected));
+    };
+
     return (
         <div
             style={{
@@ -210,6 +329,75 @@ function SelectFilesStep({
                 </div>
             )}
 
+            {/* Data API tile sets: map + searchable tile list */}
+            {dataApiResources.map((resource) => {
+                const isSelected = selectedResourceIds.includes(resource.id);
+                const tileGeojsons = tileGeojsonsByResourceId[resource.id] ?? [];
+                const selectedTileCount = tileGeojsons.filter((t) => t.selected).length;
+
+                return (
+                    <div
+                        key={resource.id}
+                        style={{
+                            border: `1px solid ${getThemedColor('neutral', 300)}`,
+                            borderRadius: getThemedRadius(400),
+                            overflow: 'hidden',
+                        }}
+                    >
+                        <div
+                            style={{
+                                padding: getThemedSpacing(400),
+                                borderBottom: isSelected
+                                    ? `1px solid ${getThemedColor('neutral', 300)}`
+                                    : undefined,
+                            }}
+                        >
+                            <FileCard
+                                title={resource.title ?? resource.name ?? 'Selected file'}
+                                titleFontSize={getThemedFontSize(500)}
+                                badge={getResourceFormatLabel(resource)}
+                                description={
+                                    isSelected
+                                        ? selectedTileCount > 0
+                                            ? `${selectedTileCount} of ${tileGeojsons.length} tiles selected`
+                                            : 'No tiles selected yet — pick them on the map or list below.'
+                                        : resource.description ?? resource.name ?? ''
+                                }
+                                createdAt={formatDate(resource.created)}
+                                updatedAt={formatDate(
+                                    resource.metadata_modified ?? resource.last_modified
+                                )}
+                                borderless
+                                rightContent={
+                                    <Button
+                                        variant={isSelected ? 'negative' : 'secondary'}
+                                        size="default"
+                                        leftIcon={isSelected ? <TrashIcon /> : <PlusIcon />}
+                                        onClick={() => handleDataApiResourceButton(resource)}
+                                    >
+                                        {isSelected ? 'Remove' : 'Add'}
+                                    </Button>
+                                }
+                            />
+                        </div>
+
+                        {isSelected && (
+                            <SelectFilesMap
+                                geojsons={tileGeojsons}
+                                formObj={formObj}
+                                onToggleResource={toggleResourceByMap}
+                                onToggleTile={(geojson) => toggleTileByMap(resource, geojson)}
+                                onSelectAllTiles={() => selectAllTiles(resource)}
+                                onClearAllTiles={() => clearAllTiles(resource)}
+                                onSelectTilesInArea={(bbox) =>
+                                    selectTilesInArea(resource, bbox)
+                                }
+                            />
+                        )}
+                    </div>
+                );
+            })}
+
             {/* Cards */}
             <div
                 style={{
@@ -218,8 +406,13 @@ function SelectFilesStep({
                     gap: getThemedSpacing(400),
                 }}
             >
-                {!showMapCard &&
-                    selectableResources.map((resource) => {
+                {selectableResources
+                    .filter(
+                        (resource) =>
+                            !isDataApiResource(resource) &&
+                            !(showMapCard && geoSpatialResources.includes(resource))
+                    )
+                    .map((resource) => {
                         const isExternallyHosted = Boolean(resource.not_downloadable);
 
                         return (

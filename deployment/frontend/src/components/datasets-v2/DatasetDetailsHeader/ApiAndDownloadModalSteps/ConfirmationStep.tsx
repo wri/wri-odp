@@ -18,13 +18,19 @@ import { useEffect } from 'react';
 import DownloadStartedBanner from './DownloadStartedBanner';
 import ExternallyHostedResourcesSection from './ExternallyHostedResourcesSection';
 import FileCard from './FileCard';
-import { formatDate, formatFileSize, getResourceFormatLabel } from '../download-utils';
+import {
+    formatDate,
+    formatFileSize,
+    getResourceFormatLabel,
+    isDirectDownloadResource,
+} from '../download-utils';
 import { useDirectDownload } from './useDirectDownload';
 
 type ConfirmationStepProps = {
     selectedResources: Resource[];
     totalSelectedBytes: number;
     datasetName: string;
+    deliveryEmail?: string;
     onBack: () => void;
     onClose: () => void;
 };
@@ -33,11 +39,17 @@ function ConfirmationStep({
     selectedResources,
     totalSelectedBytes: _totalSelectedBytes,
     datasetName,
+    deliveryEmail,
     onBack,
     onClose,
 }: ConfirmationStepProps) {
+    // Data API tile sets are too large to zip in the browser, so they are
+    // delivered by email through the server-side ZIP flow instead.
     const directResources = selectedResources.filter(
-        (resource) => !resource.not_downloadable && (Boolean(resource.key) || Boolean(resource.url))
+        (resource) => !resource.not_downloadable && isDirectDownloadResource(resource)
+    );
+    const serverDeliveredResources = selectedResources.filter(
+        (resource) => !resource.not_downloadable && !isDirectDownloadResource(resource)
     );
     const selectedCount = directResources.length;
     const totalDirectBytes = directResources.reduce(
@@ -119,6 +131,23 @@ function ConfirmationStep({
                     fileCount={selectedCount}
                     fileSize={formatFileSize(totalDirectBytes)}
                     onRetry={() => void download(directResources)}
+                />
+            )}
+
+            {serverDeliveredResources.length > 0 && deliveryEmail && (
+                <DownloadStartedBanner
+                    variant="email"
+                    fileCount={serverDeliveredResources.reduce(
+                        (acc, resource) => acc + (resource.data_api_tiles?.length ?? 1),
+                        0
+                    )}
+                    fileSize={formatFileSize(
+                        serverDeliveredResources.reduce(
+                            (acc, resource) => acc + Number(resource.size ?? 0),
+                            0
+                        )
+                    )}
+                    email={deliveryEmail}
                 />
             )}
 
@@ -209,6 +238,37 @@ function ConfirmationStep({
                             {formatFileSize(totalDirectBytes)}
                         </span>
                     </div>
+                </>
+            )}
+            {serverDeliveredResources.length > 0 && (
+                <>
+                    <h3
+                        style={{
+                            fontSize: getThemedFontSize(600),
+                            fontWeight: 700,
+                            color: getThemedColor('neutral', 900),
+                            marginBottom: getThemedSpacing(400),
+                        }}
+                    >
+                        {"What's included"}
+                    </h3>
+
+                    {serverDeliveredResources.map((resource) => (
+                        <div key={resource.id} style={{ marginBottom: getThemedSpacing(200) }}>
+                            <FileCard
+                                title={resource.title ?? resource.name ?? 'Selected file'}
+                                badge={getResourceFormatLabel(resource)}
+                                description={getResourceDescription(resource)}
+                                extraInfo={
+                                    resource.data_api_tiles?.length
+                                        ? `${resource.data_api_tiles.length} files`
+                                        : undefined
+                                }
+                                createdAt={formatDate(resource.created)}
+                                updatedAt={formatDate(resource.last_modified)}
+                            />
+                        </div>
+                    ))}
                 </>
             )}
             <ExternallyHostedResourcesSection resources={externallyHostedResources} />
