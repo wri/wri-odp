@@ -147,7 +147,7 @@
         "@types/eslint": "^8.44.2",
         "@types/lodash": "^4.14.200",
         "@types/mapbox__mapbox-gl-draw": "^1.4.5",
-        "@types/mapbox__mapbox-gl-geocoder": "^4.7.6",
+        "@types/mapbox__mapbox-gl-geocoder": "^5.1.2",
         "@types/node": "^18.16.0",
         "@types/nodemailer": "^8.0.1",
         "@types/papaparse": "^5.3.11",

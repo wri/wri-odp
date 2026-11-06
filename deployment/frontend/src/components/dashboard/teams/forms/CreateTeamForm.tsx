@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { slugify } from '@/utils/slugify';
 import TeamForm from './TeamForm';
@@ -61,6 +61,10 @@ export default function CreateTeamForm() {
     });
     const formObj = useForm<TeamFormType>({
         resolver: zodResolver(TeamSchemaRefine),
+        defaultValues: {
+            title: '',
+            name: '',
+        },
     });
 
     const createTeam = api.teams.createTeam.useMutation({
@@ -84,13 +88,17 @@ export default function CreateTeamForm() {
 
     const {
         setValue,
-        watch,
-        formState: { dirtyFields },
+        formState: { touchedFields },
     } = formObj;
+    const title = useWatch({ control: formObj.control, name: 'title' });
 
     useEffect(() => {
-        if (!dirtyFields.name) setValue('name', slugify(watch('title')));
-    }, [watch('title')]);
+        if (touchedFields.name) return;
+        setValue('name', slugify(title ?? ''), {
+            shouldDirty: false,
+            shouldTouch: false,
+        });
+    }, [setValue, title, touchedFields.name]);
 
     return (
         <>
