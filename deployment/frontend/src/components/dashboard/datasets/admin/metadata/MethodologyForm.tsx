@@ -7,11 +7,7 @@ import { type DatasetFormType } from '@/schema/dataset.schema';
 import { SimpleEditor } from './RTE/SimpleEditor';
 import { Input } from '@/components/_shared/SimpleInput';
 
-export function MethodologyForm({
-    formObj,
-}: {
-    formObj: UseFormReturn<DatasetFormType>;
-}) {
+export function MethodologyForm({ formObj }: { formObj: UseFormReturn<DatasetFormType> }) {
     const {
         register,
         watch,
@@ -28,10 +24,7 @@ export function MethodologyForm({
             }
         >
             <Disclosure.Panel className="flex flex-col gap-y-8 pb-12 pt-5">
-                <InputGroup
-                    label="Methodology"
-                    className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
-                >
+                <InputGroup label="Methodology" className="min-h-[320px]">
                     <SimpleEditor
                         formObj={formObj}
                         name="methodology"

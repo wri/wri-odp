@@ -37,10 +37,7 @@ export function TileCacheForm({
                     type="text"
                     maxWidth="max-w-[70rem]"
                 />
-                <ErrorDisplay
-                    name={`resources.${index}.title`}
-                    errors={errors}
-                />
+                <ErrorDisplay name={`resources.${index}.title`} errors={errors} />
             </InputGroup>
             <InputGroup label="Description" className="whitespace-nowrap">
                 <TextArea
@@ -55,11 +52,7 @@ export function TileCacheForm({
                     }
                 />
             </InputGroup>
-            <InputGroup
-                label="Cache Type"
-                className="whitespace-nowrap"
-                required
-            >
+            <InputGroup label="Cache Type" className="whitespace-nowrap" required>
                 <SimpleSelect
                     name={`resources.${index}.cache_type`}
                     id="cache_type"
@@ -71,21 +64,12 @@ export function TileCacheForm({
                         { label: 'Vector', value: 'vector' },
                     ]}
                 />
-                <ErrorDisplay
-                    name={`resources.${index}.cache_type`}
-                    errors={errors}
-                />
+                <ErrorDisplay name={`resources.${index}.cache_type`} errors={errors} />
             </InputGroup>
             <InputGroup
-                label={
-                    <span className="flex items-center gap-x-1">
-                        Dataset API
-                        <DefaultTooltip content="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
-                            <InformationCircleIcon className="h-5 w-5" />
-                        </DefaultTooltip>
-                    </span>
-                }
-                className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                label="Dataset API"
+                info="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section"
+                className="min-h-[320px]"
             >
                 <SimpleEditor
                     formObj={formObj}

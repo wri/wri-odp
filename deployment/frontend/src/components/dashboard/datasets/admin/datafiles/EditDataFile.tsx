@@ -9,10 +9,7 @@ import {
 import { type UseFormReturn } from 'react-hook-form';
 import { DataFileAccordion } from './DatafileAccordion';
 import { match, P } from 'ts-pattern';
-import {
-    type DatasetFormType,
-    type ResourceFormType,
-} from '@/schema/dataset.schema';
+import { type DatasetFormType, type ResourceFormType } from '@/schema/dataset.schema';
 import { convertBytes } from '@/utils/convertBytes';
 import { Tab } from '@headlessui/react';
 import { Fragment, useState } from 'react';
@@ -37,11 +34,7 @@ import { TileCacheForm } from './sections/TileCacheForm';
 import { GeeAssetForm } from './sections/GeeAssetForm';
 import { DataApiDatasetForm } from './sections/DataApiDatasetForm';
 import { RectangleGroupIcon } from '@heroicons/react/24/outline';
-import {
-    getResourceOrdinal,
-    isDataFileResource,
-    isLayerResource,
-} from '@/utils/datasetResources';
+import { getResourceOrdinal, isDataFileResource, isLayerResource } from '@/utils/datasetResources';
 
 export function EditDataFile({
     remove,
@@ -88,9 +81,7 @@ export function EditDataFile({
                                             {datafile.name}
                                         </span>
                                         <span className="font-['Acumin Pro SemiCondensed'] mt-0.5 text-right text-xs font-normal leading-tight text-neutral-600">
-                                            {datafile.size
-                                                ? convertBytes(datafile.size)
-                                                : 'N/A'}
+                                            {datafile.size ? convertBytes(datafile.size) : 'N/A'}
                                         </span>
                                     </div>
                                     <button
@@ -170,30 +161,23 @@ export function EditDataFile({
                                     </button>
                                 </>
                             ))
-                            .with(
-                                P.union(
-                                    'layer',
-                                    'layer-raw',
-                                    'reference-layer'
-                                ),
-                                () => (
-                                    <>
-                                        <div className="flex items-center gap-x-2">
-                                            <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
-                                            <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
-                                                {field.title}
-                                            </span>
-                                        </div>
-                                        <button
-                                            aria-label="remove"
-                                            type="button"
-                                            onClick={() => remove()}
-                                        >
-                                            <MinusCircleIcon className="h-6 w-6 text-red-500" />
-                                        </button>
-                                    </>
-                                )
-                            )
+                            .with(P.union('layer', 'layer-raw', 'reference-layer'), () => (
+                                <>
+                                    <div className="flex items-center gap-x-2">
+                                        <GlobeAsiaAustraliaIcon className="h-6 w-6 text-blue-800" />
+                                        <span className="font-['Acumin Pro SemiCondensed'] text-lg font-light text-black">
+                                            {field.title}
+                                        </span>
+                                    </div>
+                                    <button
+                                        aria-label="remove"
+                                        type="button"
+                                        onClick={() => remove()}
+                                    >
+                                        <MinusCircleIcon className="h-6 w-6 text-red-500" />
+                                    </button>
+                                </>
+                            ))
                             .otherwise(() => (
                                 <>
                                     <div className="flex items-center gap-x-2"></div>
@@ -215,9 +199,7 @@ export function EditDataFile({
                             .with('upload', () => (
                                 <PaperClipIcon className="h-6 w-6 text-blue-800" />
                             ))
-                            .with('link', () => (
-                                <LinkIcon className="h-6 w-6 text-blue-800" />
-                            ))
+                            .with('link', () => <LinkIcon className="h-6 w-6 text-blue-800" />)
                             .with('tile-cache', () => (
                                 <Squares2X2Icon className="h-6 w-6 text-blue-800" />
                             ))
@@ -267,10 +249,7 @@ export function EditDataFile({
                     ) : datafile.type === 'gee-asset' ? (
                         <GeeAssetForm formObj={formObj} index={index} />
                     ) : datafile.type === 'data-api-dataset' ? (
-                        <DataApiDatasetForm
-                            formObj={formObj}
-                            index={index}
-                        />
+                        <DataApiDatasetForm formObj={formObj} index={index} />
                     ) : datafile.type === 'tile-cache' ? (
                         <TileCacheForm formObj={formObj} index={index} />
                     ) : (
@@ -290,11 +269,7 @@ export function EditDataFile({
                                                             ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                             : 'text-black'
                                                     )}
-                                                    aria-current={
-                                                        selected
-                                                            ? 'page'
-                                                            : undefined
-                                                    }
+                                                    aria-current={selected ? 'page' : undefined}
                                                 >
                                                     Metadata
                                                 </div>
@@ -309,38 +284,29 @@ export function EditDataFile({
                                                             ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
                                                             : 'text-black'
                                                     )}
-                                                    aria-current={
-                                                        selected
-                                                            ? 'page'
-                                                            : undefined
-                                                    }
+                                                    aria-current={selected ? 'page' : undefined}
                                                 >
                                                     Add and View Charts
                                                 </div>
                                             )}
                                         </Tab>
-                                        {datafile.schema &&
-                                            datafile.schema.length > 0 && (
-                                                <Tab as={Fragment}>
-                                                    {({ selected }) => (
-                                                        <div
-                                                            className={classNames(
-                                                                'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
-                                                                selected
-                                                                    ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
-                                                                    : 'text-black'
-                                                            )}
-                                                            aria-current={
-                                                                selected
-                                                                    ? 'page'
-                                                                    : undefined
-                                                            }
-                                                        >
-                                                            Data Dictionary
-                                                        </div>
-                                                    )}
-                                                </Tab>
-                                            )}
+                                        {datafile.schema && datafile.schema.length > 0 && (
+                                            <Tab as={Fragment}>
+                                                {({ selected }) => (
+                                                    <div
+                                                        className={classNames(
+                                                            'sm:px-8 border-b-2 sm:border-none text-black text-[17px] font-normal font-acumin whitespace-nowrap cursor-pointer',
+                                                            selected
+                                                                ? 'border-blue-800 sm:border-solid text-blue-800 sm:border-b-2 -mb-px'
+                                                                : 'text-black'
+                                                        )}
+                                                        aria-current={selected ? 'page' : undefined}
+                                                    >
+                                                        Data Dictionary
+                                                    </div>
+                                                )}
+                                            </Tab>
+                                        )}
                                         {[
                                             'xls',
                                             'xlsx',
@@ -350,10 +316,7 @@ export function EditDataFile({
                                             'csv',
                                             'tsv',
                                             'tab',
-                                        ].includes(
-                                            datafile.format?.toLowerCase() ??
-                                                'none'
-                                        ) &&
+                                        ].includes(datafile.format?.toLowerCase() ?? 'none') &&
                                             datafile.url_type === 'upload' && (
                                                 <Tab as={Fragment}>
                                                     {({ selected }) => (
@@ -365,17 +328,11 @@ export function EditDataFile({
                                                                     : 'text-black'
                                                             )}
                                                             aria-current={
-                                                                selected
-                                                                    ? 'page'
-                                                                    : undefined
+                                                                selected ? 'page' : undefined
                                                             }
                                                         >
                                                             Datapusher{' '}
-                                                            <DatapusherStatus
-                                                                datafile={
-                                                                    datafile
-                                                                }
-                                                            />
+                                                            <DatapusherStatus datafile={datafile} />
                                                         </div>
                                                     )}
                                                 </Tab>
@@ -392,9 +349,7 @@ export function EditDataFile({
                                             >
                                                 <Input
                                                     placeholder="Some name"
-                                                    {...register(
-                                                        `resources.${index}.title`
-                                                    )}
+                                                    {...register(`resources.${index}.title`)}
                                                     type="text"
                                                     maxWidth="max-w-[55rem]"
                                                 />
@@ -409,9 +364,7 @@ export function EditDataFile({
                                             >
                                                 <TextArea
                                                     placeholder="Describe this downloadable file"
-                                                    {...register(
-                                                        `resources.${index}.description`
-                                                    )}
+                                                    {...register(`resources.${index}.description`)}
                                                     type="text"
                                                     icon={
                                                         <DefaultTooltip content="Describe what this downloadable file contains so users know what to expect before adding it to their download. Avoid repeating dataset-level information. For example, explain if a ZIP archive contains multiple data tables, documentation or supporting resources.">
@@ -433,15 +386,9 @@ export function EditDataFile({
                                                 </div>
                                             </InputGroup>
                                             <InputGroup
-                                                label={
-                                                    <span className="flex items-center gap-x-1">
-                                                        Dataset API
-                                                        <DefaultTooltip content="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
-                                                            <InformationCircleIcon className="h-5 w-5" />
-                                                        </DefaultTooltip>
-                                                    </span>
-                                                }
-                                                className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                                                label="Dataset API"
+                                                info="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section"
+                                                className="min-h-[320px]"
                                             >
                                                 <SimpleEditor
                                                     formObj={formObj}
@@ -450,10 +397,7 @@ export function EditDataFile({
                                                     defaultValue=""
                                                 />
                                             </InputGroup>
-                                            <DatafileLocation
-                                                formObj={formObj}
-                                                index={index}
-                                            />
+                                            <DatafileLocation formObj={formObj} index={index} />
                                         </div>
                                     </Tab.Panel>
                                     <Tab.Panel>
@@ -463,15 +407,14 @@ export function EditDataFile({
                                             dataset={dataset}
                                         />
                                     </Tab.Panel>
-                                    {datafile.schema &&
-                                        datafile.schema.length > 0 && (
-                                            <Tab.Panel>
-                                                <DataDictionaryTable
-                                                    formObj={formObj}
-                                                    resourceIndex={index}
-                                                />
-                                            </Tab.Panel>
-                                        )}
+                                    {datafile.schema && datafile.schema.length > 0 && (
+                                        <Tab.Panel>
+                                            <DataDictionaryTable
+                                                formObj={formObj}
+                                                resourceIndex={index}
+                                            />
+                                        </Tab.Panel>
+                                    )}
                                     {[
                                         'xls',
                                         'xlsx',
@@ -481,25 +424,17 @@ export function EditDataFile({
                                         'csv',
                                         'tsv',
                                         'tab',
-                                    ].includes(
-                                        datafile.format?.toLowerCase() ?? 'none'
-                                    ) &&
+                                    ].includes(datafile.format?.toLowerCase() ?? 'none') &&
                                         datafile.url_type === 'upload' && (
                                             <Tab.Panel>
-                                                <Datapusher
-                                                    datafile={datafile}
-                                                />
+                                                <Datapusher datafile={datafile} />
                                             </Tab.Panel>
                                         )}
                                 </Tab.Panels>
                             </div>
                         </Tab.Group>
                     )}
-                    <div
-                        className={classNames(
-                            'w-full mx-auto sm:px-6 xxl:px-0 max-w-[1380px]'
-                        )}
-                    >
+                    <div className={classNames('w-full mx-auto sm:px-6 xxl:px-0 max-w-[1380px]')}>
                         {errorMessage && (
                             <div className="py-4">
                                 <ErrorAlert text={errorMessage} />
