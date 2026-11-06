@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { slugify } from '@/utils/slugify';
 import ApplicationForm from './ApplicationForm';
@@ -57,13 +57,13 @@ export default function CreateApplicationForm() {
 
     const {
         setValue,
-        watch,
         formState: { dirtyFields },
     } = formObj;
+    const title = useWatch({ control: formObj.control, name: 'title' });
 
     useEffect(() => {
-        if (!dirtyFields.name) setValue('name', slugify(watch('title')));
-    }, [watch('title')]);
+        if (!dirtyFields.name) setValue('name', slugify(title ?? ''));
+    }, [dirtyFields.name, setValue, title]);
 
     return (
         <>
