@@ -29,6 +29,10 @@ export default function CreateApplicationForm() {
     const router = useRouter();
     const formObj = useForm<ApplicationFormType>({
         resolver: zodResolver(ApplicationSchema),
+        defaultValues: {
+            title: '',
+            name: '',
+        },
     });
 
     const createApplication = api.applications.createApplication.useMutation({

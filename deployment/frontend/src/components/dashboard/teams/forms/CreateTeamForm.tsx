@@ -61,6 +61,10 @@ export default function CreateTeamForm() {
     });
     const formObj = useForm<TeamFormType>({
         resolver: zodResolver(TeamSchemaRefine),
+        defaultValues: {
+            title: '',
+            name: '',
+        },
     });
 
     const createTeam = api.teams.createTeam.useMutation({

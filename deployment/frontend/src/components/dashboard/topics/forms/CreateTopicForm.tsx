@@ -22,6 +22,10 @@ export default function CreateTopicForm() {
     const router = useRouter();
     const formObj = useForm<TopicFormType>({
         resolver: zodResolver(TopicSchema),
+        defaultValues: {
+            title: '',
+            name: '',
+        },
     });
 
     const createTopic = api.topics.createTopic.useMutation({
