@@ -1,8 +1,4 @@
-import {
-    Bars3BottomLeftIcon,
-    MinusCircleIcon,
-    PlusCircleIcon,
-} from '@heroicons/react/24/outline';
+import { Bars3BottomLeftIcon, MinusCircleIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Disclosure } from '@headlessui/react';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { MetadataAccordion } from './MetadataAccordion';
@@ -17,11 +13,7 @@ import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { Input } from '@/components/_shared/SimpleInput';
 import { languageOptions, updateFrequencyOptions } from '../formOptions';
 
-export function AdditionalMetadataForm({
-    formObj,
-}: {
-    formObj: UseFormReturn<DatasetFormType>;
-}) {
+export function AdditionalMetadataForm({ formObj }: { formObj: UseFormReturn<DatasetFormType> }) {
     const {
         control,
         register,
@@ -65,16 +57,13 @@ export function AdditionalMetadataForm({
                                     Error loading Topics, please refresh the page
                                 </span>
                             ))
-                            .with(
-                                { isSuccess: true, data: P.select() },
-                                (data) => (
-                                    <TopicsSelect
-                                        userTopics={data.userTopics}
-                                        topicHierarchy={data.hierarchy}
-                                        formObj={formObj}
-                                    />
-                                )
-                            )
+                            .with({ isSuccess: true, data: P.select() }, (data) => (
+                                <TopicsSelect
+                                    userTopics={data.userTopics}
+                                    topicHierarchy={data.hierarchy}
+                                    formObj={formObj}
+                                />
+                            ))
                             .otherwise(() => (
                                 <span className="flex items-center text-sm text-red-600">
                                     Error loading Topics, please refresh the page
@@ -82,7 +71,10 @@ export function AdditionalMetadataForm({
                             ))}
                     </InputGroup>
 
-                    <InputGroup label="Application">
+                    <InputGroup
+                        label="Application"
+                        info="Associate this dataset with a WRI Application by linking to its respective page on the Data Explorer. This differs from the ‘Application Links’ field at the top of the page, which is a direct link to another product."
+                    >
                         {match(possibleApplications)
                             .with({ isLoading: true }, () => (
                                 <span className="flex items-center text-sm gap-x-2">
@@ -95,22 +87,19 @@ export function AdditionalMetadataForm({
                                     Error loading Applications, please refresh the page
                                 </span>
                             ))
-                            .with(
-                                { isSuccess: true, data: P.select() },
-                                (data) => (
-                                    <MulText
-                                        name="applications"
-                                        formObj={formObj}
-                                        options={data.map((app) => ({
-                                            label: app.title,
-                                            value: app.name,
-                                        }))}
-                                        title="Application"
-                                        tooltip="Remove application"
-                                        removeItemAriaLabel="Remove application"
-                                    />
-                                )
-                            )
+                            .with({ isSuccess: true, data: P.select() }, (data) => (
+                                <MulText
+                                    name="applications"
+                                    formObj={formObj}
+                                    options={data.map((app) => ({
+                                        label: app.title,
+                                        value: app.name,
+                                    }))}
+                                    title="Application"
+                                    tooltip="Remove application"
+                                    removeItemAriaLabel="Remove application"
+                                />
+                            ))
                             .otherwise(() => (
                                 <span className="flex items-center text-sm text-red-600">
                                     Error loading Applications, please refresh the page
@@ -131,20 +120,17 @@ export function AdditionalMetadataForm({
                                     Error loading keywords, please refresh the page
                                 </span>
                             ))
-                            .with(
-                                { isSuccess: true, data: P.select() },
-                                (data) => (
-                                    <MulText
-                                        name="tags"
-                                        formObj={formObj}
-                                        options={data}
-                                        title="Keywords"
-                                        tooltip="Remove keyword"
-                                        removeItemAriaLabel="Remove keyword"
-                                        allowsCreationOfItems
-                                    />
-                                )
-                            )
+                            .with({ isSuccess: true, data: P.select() }, (data) => (
+                                <MulText
+                                    name="tags"
+                                    formObj={formObj}
+                                    options={data}
+                                    title="Keywords"
+                                    tooltip="Remove keyword"
+                                    removeItemAriaLabel="Remove keyword"
+                                    allowsCreationOfItems
+                                />
+                            ))
                             .otherwise(() => (
                                 <span className="flex items-center text-sm text-red-600">
                                     Error loading keywords, please refresh the page
@@ -154,7 +140,10 @@ export function AdditionalMetadataForm({
                 </div>
 
                 <div className="flex flex-col justify-start gap-y-4">
-                    <InputGroup label="Authors">
+                    <InputGroup
+                        label="Authors"
+                        info="Author names will appear as a list of links to filtered search results. Email addresses are not required in order to display an author name."
+                    >
                         <div className="flex flex-col gap-y-3 w-full">
                             {authorFields.map((field, index) => (
                                 <div

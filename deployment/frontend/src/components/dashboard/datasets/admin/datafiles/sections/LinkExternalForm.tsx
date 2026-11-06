@@ -38,10 +38,7 @@ export function LinkExternalForm({
                     type="text"
                     maxWidth="max-w-[70rem]"
                 />
-                <ErrorDisplay
-                    name={`resources.${index}.title`}
-                    errors={errors}
-                />
+                <ErrorDisplay name={`resources.${index}.title`} errors={errors} />
             </InputGroup>
             <InputGroup label="Description" className="whitespace-nowrap">
                 <TextArea
@@ -57,10 +54,7 @@ export function LinkExternalForm({
                 />
             </InputGroup>
             <InputGroup label="Format" className="whitespace-nowrap">
-                <FormatInput
-                    formObj={formObj}
-                    name={`resources.${index}.format`}
-                />
+                <FormatInput formObj={formObj} name={`resources.${index}.format`} />
             </InputGroup>
             <div className="relative flex justify-start">
                 <div className="flex h-6 items-center">
@@ -76,22 +70,15 @@ export function LinkExternalForm({
                         htmlFor="not_downloadable"
                         className="flex items-center gap-x-2 font-acumin text-lg font-light text-zinc-800"
                     >
-                        This is not a directly downloadable link (i.e. directs
-                        to another URL where further steps may be needed to
-                        access the Data File)
+                        This is not a directly downloadable link (i.e. directs to another URL where
+                        further steps may be needed to access the Data File)
                     </label>
                 </div>
             </div>
             <InputGroup
-                label={
-                    <span className="flex items-center gap-x-1">
-                        Dataset API
-                        <DefaultTooltip content="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
-                            <InformationCircleIcon className="h-5 w-5" />
-                        </DefaultTooltip>
-                    </span>
-                }
-                className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                label="Dataset API"
+                info="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section"
+                className="min-h-[320px]"
             >
                 <SimpleEditor
                     formObj={formObj}

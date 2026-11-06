@@ -1,23 +1,13 @@
-import {
-    ClockIcon,
-    InformationCircleIcon,
-    MinusCircleIcon,
-    PlusCircleIcon,
-} from '@heroicons/react/24/outline';
+import { ClockIcon, MinusCircleIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 import { Disclosure } from '@headlessui/react';
 import { MetadataAccordion } from './MetadataAccordion';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { type UseFormReturn, useFieldArray } from 'react-hook-form';
-import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { Input } from '@/components/_shared/SimpleInput';
 
-export function VersioningForm({
-    formObj,
-}: {
-    formObj: UseFormReturn<DatasetFormType>;
-}) {
+export function VersioningForm({ formObj }: { formObj: UseFormReturn<DatasetFormType> }) {
     const {
         control,
         register,
@@ -40,16 +30,6 @@ export function VersioningForm({
         >
             <Disclosure.Panel className="py-5 flex flex-col gap-y-4">
                 <div className="mb-2 flex flex-col gap-y-4">
-                    <div className="flex items-center gap-x-1">
-                        <span className="text-lg font-light text-zinc-800">Release notes</span>
-                        <DefaultTooltip content="Release notes describe to users what has changed since the last version.">
-                            <InformationCircleIcon
-                                className="h-5 w-5 text-neutral-500"
-                                aria-hidden="true"
-                            />
-                        </DefaultTooltip>
-                    </div>
-
                     {fields.map((field, index) => (
                         <div key={field.id} className="rounded-md border border-neutral-200 p-4">
                             <div className="grid grid-cols-1 gap-3 md:grid-cols-[220px_1fr_auto] md:items-start">

@@ -1,6 +1,5 @@
 import {
     AdjustmentsHorizontalIcon,
-    InformationCircleIcon,
     MinusCircleIcon,
     PlusCircleIcon,
 } from '@heroicons/react/24/outline';
@@ -9,7 +8,6 @@ import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { MetadataAccordion } from './MetadataAccordion';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { type UseFormReturn, useFieldArray } from 'react-hook-form';
-import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { Input } from '@/components/_shared/SimpleInput';
 import { SimpleEditor } from './RTE/SimpleEditor';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
@@ -24,11 +22,7 @@ const yearOptions = Array.from({ length: currentYear - 1900 + 1 }, (_, index) =>
     String(currentYear - index)
 );
 
-export function KeyDetailsForm({
-    formObj,
-}: {
-    formObj: UseFormReturn<DatasetFormType>;
-}) {
+export function KeyDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFormType> }) {
     const {
         control,
         register,
@@ -72,23 +66,20 @@ export function KeyDetailsForm({
                                     Error loading Teams, please refresh the page
                                 </span>
                             ))
-                            .with(
-                                { isSuccess: true, data: P.select() },
-                                (data) => (
-                                    <SimpleSelect
-                                        formObj={formObj}
-                                        name="team"
-                                        id="team"
-                                        options={data.map((team) => ({
-                                            label: team.title ?? team.name,
-                                            value: team.name,
-                                            id: team.id,
-                                            visibility: team.visibility ?? 'public',
-                                        }))}
-                                        placeholder="Select a Team"
-                                    />
-                                )
-                            )
+                            .with({ isSuccess: true, data: P.select() }, (data) => (
+                                <SimpleSelect
+                                    formObj={formObj}
+                                    name="team"
+                                    id="team"
+                                    options={data.map((team) => ({
+                                        label: team.title ?? team.name,
+                                        value: team.name,
+                                        id: team.id,
+                                        visibility: team.visibility ?? 'public',
+                                    }))}
+                                    placeholder="Select a Team"
+                                />
+                            ))
                             .otherwise(() => (
                                 <span className="flex items-center text-sm text-red-600">
                                     Error loading Teams, please refresh the page
@@ -131,7 +122,10 @@ export function KeyDetailsForm({
                         <ErrorDisplay name="temporal_coverage_end" errors={errors} />
                     </InputGroup>
 
-                    <InputGroup label="Dataset type">
+                    <InputGroup
+                        label="Dataset type"
+                        info="Choose the most relevant category to convey to the user what this dataset may contain. If more than one type applies, select ‘Data Package’."
+                    >
                         <SimpleSelect
                             id="dataset_type_info"
                             formObj={formObj}
@@ -158,7 +152,11 @@ export function KeyDetailsForm({
                         info={
                             <span>
                                 License definitions and additional information can be found at{' '}
-                                <a href="http://opendefinition.org" target="_blank" rel="noreferrer">
+                                <a
+                                    href="http://opendefinition.org"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
                                     opendefinition.org
                                 </a>
                                 . The data license you select also applies to the contents of any
@@ -219,17 +217,12 @@ export function KeyDetailsForm({
                             )}
                         </div>
                     </InputGroup>
+                </div>
 
+                <div className="flex flex-col justify-start gap-y-4 lg:col-span-2">
                     <InputGroup
-                        label={
-                            <span className="relative flex items-center gap-x-1">
-                                Caution
-                                <DefaultTooltip content="Describe any quality issues or limitations that data users should know about.">
-                                    <InformationCircleIcon className="h-5 w-5" />
-                                </DefaultTooltip>
-                            </span>
-                        }
-                        className="mb-2 flex min-h-[280px] flex-col items-start whitespace-nowrap sm:flex-col"
+                        label="Caution"
+                        info="Describe any quality issues or limitations that data users should know about."
                     >
                         <SimpleEditor
                             formObj={formObj}

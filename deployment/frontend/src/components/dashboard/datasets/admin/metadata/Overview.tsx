@@ -83,20 +83,8 @@ export function OverviewForm({
 
                     <InputGroup
                         required
-                        label={
-                            <div className="flex items-center gap-x-1">
-                                <span>
-                                    Caption <span className="text-red-500">*</span>
-                                </span>
-                                <DefaultTooltip content="This caption will appear in search results and Dataset thumbnails. Maximum: 200 characters.">
-                                    <InformationCircleIcon
-                                        className="h-5 w-5 text-neutral-500"
-                                        aria-hidden="true"
-                                    />
-                                </DefaultTooltip>
-                            </div>
-                        }
-                        className="mb-2 flex flex-col items-start whitespace-nowrap sm:flex-col"
+                        label="Caption"
+                        info="This caption will appear in search results and Dataset thumbnails. Maximum: 200 characters."
                     >
                         <TextArea
                             aria-label="Caption"
@@ -104,7 +92,7 @@ export function OverviewForm({
                             type="text"
                             maxLength={200}
                             {...register('short_description')}
-                            className="h-44 col-span-full"
+                            className="h-44"
                         />
                         <ErrorDisplay name="short_description" errors={errors} />
                     </InputGroup>
@@ -177,14 +165,13 @@ export function OverviewForm({
                         info={
                             <ul>
                                 <li>
-                                    Public Datasets are visible to any user,
-                                    including public and anonymous.
+                                    Public Datasets are visible to any user, including public and
+                                    anonymous.
                                 </li>
+                                <li>Private Datasets are only visible to Team members.</li>
                                 <li>
-                                    Private Datasets are only visible to Team members.
-                                </li>
-                                <li>
-                                    Internal Use Datasets are visible to any Data Explorer user with a login.
+                                    Internal Use Datasets are visible to any Data Explorer user with
+                                    a login.
                                 </li>
                             </ul>
                         }

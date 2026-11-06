@@ -31,7 +31,7 @@ export function AdditionalReadingForm({ formObj }: { formObj: UseFormReturn<Data
             <Disclosure.Panel className="py-5">
                 <InputGroup
                     label="Articles & other links"
-                    info="Add external references related to this dataset. Choose a category for each link: Publication (research or report where the dataset is used), Documentation (guides or manuals on how to use the data), Source code (GitHub repositories or reproducibility packages), or Announcement (launch, update, or sunsetting notices)."
+                    info="Add links to helpful supplemental documents such as blog posts and papers. These will appear below the description."
                 >
                     <div className="flex flex-col gap-y-3 w-full">
                         {fields.map((field, index) => (

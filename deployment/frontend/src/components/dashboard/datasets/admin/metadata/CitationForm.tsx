@@ -7,11 +7,7 @@ import { type DatasetFormType } from '@/schema/dataset.schema';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 
-export function CitationForm({
-    formObj,
-}: {
-    formObj: UseFormReturn<DatasetFormType>;
-}) {
+export function CitationForm({ formObj }: { formObj: UseFormReturn<DatasetFormType> }) {
     const { register } = formObj;
 
     return (
