@@ -52,13 +52,17 @@ export default function CreateTopicForm() {
 
     const {
         setValue,
-        formState: { dirtyFields },
+        formState: { touchedFields },
     } = formObj;
     const title = useWatch({ control: formObj.control, name: 'title' });
 
     useEffect(() => {
-        if (!dirtyFields.name) setValue('name', slugify(title ?? ''));
-    }, [dirtyFields.name, setValue, title]);
+        if (touchedFields.name) return;
+        setValue('name', slugify(title ?? ''), {
+            shouldDirty: false,
+            shouldTouch: false,
+        });
+    }, [setValue, title, touchedFields.name]);
 
     return (
         <>
