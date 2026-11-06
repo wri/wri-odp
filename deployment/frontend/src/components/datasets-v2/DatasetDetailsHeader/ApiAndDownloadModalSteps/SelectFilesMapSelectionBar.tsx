@@ -82,7 +82,9 @@ export default function SelectFilesMapSelectionBar({
                 }}
             >
                 {selectedCount > 0
-                    ? `Estimated size: ${formatFileSize(selectedTotalBytes)}`
+                    ? selectedTotalBytes > 0
+                        ? `Estimated size: ${formatFileSize(selectedTotalBytes)}`
+                        : null
                     : 'Select at least one tile to download'}
             </div>
         </div>

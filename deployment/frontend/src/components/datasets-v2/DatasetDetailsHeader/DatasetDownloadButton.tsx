@@ -16,7 +16,13 @@ import ReviewDetailsAndTermsStep, {
     type ReviewDetailsAndTermsFormData,
 } from './ApiAndDownloadModalSteps/ReviewDetailsAndTermsStep';
 import SelectFilesStep from './ApiAndDownloadModalSteps/SelectFilesStep';
-import { formatFileSize, getResourceFormatLabel } from './download-utils';
+import {
+    formatFileSize,
+    getDataApiTileGfwUrls,
+    getResourceFormatLabel,
+    isDataApiResource,
+    isDirectDownloadResource,
+} from './download-utils';
 import styles from './modalStepLayout.module.scss';
 import type { DatasetDownloadButtonProps } from './types';
 import { useScrollTopOnStepChange } from './useScrollTopOnStepChange';
@@ -35,6 +41,22 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeStep, setActiveStep] = useState<DownloadStep>(firstStep);
     const [selectedResourceIds, setSelectedResourceIds] = useState<string[]>([]);
+    const [selectedTilesByResourceId, setSelectedTilesByResourceId] = useState<
+        Record<string, string[]>
+    >({});
+    const [deliveryEmail, setDeliveryEmail] = useState<string | undefined>(undefined);
+
+    const selectTilesForResource = (resourceId: string, tiles: string[] | null) => {
+        setSelectedTilesByResourceId((current) => {
+            const next = { ...current };
+            if (tiles === null) {
+                delete next[resourceId];
+            } else {
+                next[resourceId] = tiles;
+            }
+            return next;
+        });
+    };
     const requestDownload = api.dataset.downloadZippedResources.useMutation();
     const createDownloadEvent = api.downloadEvents.createEvents.useMutation();
 
@@ -51,11 +73,17 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
     const selectedFormats = Array.from(
         new Set(selectedResources.map((resource) => getResourceFormatLabel(resource)))
     );
+    // Data API tile sets are delivered by email through the server-side ZIP flow.
+    const hasServerDeliveredResources = selectedResources.some(
+        (resource) => !resource.not_downloadable && !isDirectDownloadResource(resource)
+    );
 
     const closeModal = () => {
         setIsModalOpen(false);
         setActiveStep(firstStep);
         setSelectedResourceIds([]);
+        setSelectedTilesByResourceId({});
+        setDeliveryEmail(undefined);
     };
 
     const toggleResourceSelection = (resourceId: string) => {
@@ -69,17 +97,28 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
     };
 
     const submitReviewDetails = async (formData: ReviewDetailsAndTermsFormData) => {
+        setDeliveryEmail(formData.email.trim() || undefined);
+
         if (!formData.email.trim()) {
             setActiveStep('confirmation');
             return;
         }
 
-        const resourceIds = selectedResources.map((resource) => resource.id).filter(Boolean);
-        const keys = selectedResources
-            .map((resource) => resource.key ?? resource.url)
-            .filter(Boolean) as string[];
+        const resourceIds = selectedResources
+            .filter((resource) => !isDataApiResource(resource))
+            .map((resource) => resource.id)
+            .filter(Boolean);
+        const keys = selectedResources.flatMap((resource) => {
+            if (isDataApiResource(resource)) {
+                return getDataApiTileGfwUrls(
+                    resource,
+                    selectedTilesByResourceId[resource.id]
+                );
+            }
+            return [resource.key ?? resource.url].filter(Boolean) as string[];
+        });
 
-        if (resourceIds.length === 0 || keys.length === 0) {
+        if (resourceIds.length === 0 && keys.length === 0) {
             toast('Please select at least one file to download.', { type: 'error' });
             return;
         }
@@ -169,7 +208,9 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                     <SelectFilesStep
                         dataset={dataset}
                         selectedResourceIds={selectedResourceIds}
+                        selectedTilesByResourceId={selectedTilesByResourceId}
                         onToggleResource={toggleResourceSelection}
+                        onSelectTiles={selectTilesForResource}
                         onBack={() => {
                             if (hasCautions) {
                                 setActiveStep('caution');
@@ -184,6 +225,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                 return (
                     <ReviewDetailsAndTermsStep
                         dataset={dataset}
+                        downloadMultipleFiles={hasServerDeliveredResources}
                         onBack={() => setActiveStep('files')}
                         onContinue={submitReviewDetails}
                         isSubmitting={requestDownload.isLoading || createDownloadEvent.isLoading}
@@ -192,9 +234,19 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
             case 'confirmation':
                 return (
                     <ConfirmationStep
-                        selectedResources={selectedResources}
+                        selectedResources={selectedResources.map((resource) =>
+                            isDataApiResource(resource)
+                                ? {
+                                      ...resource,
+                                      data_api_tiles:
+                                          selectedTilesByResourceId[resource.id] ??
+                                          resource.data_api_tiles,
+                                  }
+                                : resource
+                        )}
                         totalSelectedBytes={totalSelectedBytes}
                         datasetName={dataset.name}
+                        deliveryEmail={deliveryEmail}
                         onBack={() => setActiveStep('terms')}
                         onClose={closeModal}
                     />
@@ -210,6 +262,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                 onClick={() => {
                     setActiveStep(firstStep);
                     setSelectedResourceIds([]);
+                    setSelectedTilesByResourceId({});
                     setIsModalOpen(true);
                 }}
             >
