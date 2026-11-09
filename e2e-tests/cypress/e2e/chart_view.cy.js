@@ -45,7 +45,6 @@ describe("Chart view", () => {
       "test-maintainer-2@example.com",
     );
 
-    cy.contains("Methodology").click();
     cy.get("input[name=technical_notes]").type("https://google.com");
 
     cy.contains("Next: Data Files").click();

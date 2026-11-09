@@ -70,12 +70,10 @@ describe("Create dataset", () => {
       "test-maintainer-2@example.com",
     );
 
-    cy.contains("Additional reading").click();
     cy.contains("Add link").click();
     cy.get('input[name="additional_reading.0.title"]').type("Related Article");
     cy.get('input[name="additional_reading.0.url"]').type("https://google.com");
 
-    cy.contains("Methodology").click();
     cy.get("input[name=technical_notes]").type("https://google.com");
 
     cy.contains("Next: Data Files").click();
@@ -157,7 +155,6 @@ describe("Create dataset", () => {
     },
     () => {
       cy.visit("/dashboard/datasets/" + dataset + "/edit");
-      cy.contains("Additional reading").click();
       cy.get('input[name="additional_reading.0.url"]').should(
         "have.value",
         "https://google.com",
@@ -169,7 +166,6 @@ describe("Create dataset", () => {
       cy.contains("Successfully edited", { timeout: 30000 });
 
       cy.visit("/dashboard/datasets/" + dataset + "/edit");
-      cy.contains("Additional reading").click();
       cy.get('input[name="additional_reading.0.url"]').should("not.exist");
     },
   );
@@ -196,7 +192,6 @@ describe("Create dataset", () => {
         "test-maintainer-3@example.com",
       );
 
-      cy.contains("Methodology").click();
       cy.get("input[name=technical_notes]").clear().type("https://google.com.br");
 
       cy.contains("Data Files", { timeout: 20000 }).click();
