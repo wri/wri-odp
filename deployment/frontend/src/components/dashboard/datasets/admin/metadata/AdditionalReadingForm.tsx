@@ -4,14 +4,10 @@ import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { MetadataAccordion } from './MetadataAccordion';
 import { type UseFormReturn, useFieldArray } from 'react-hook-form';
 import { type DatasetFormType } from '@/schema/dataset.schema';
-import { Input } from '@/components/_shared/SimpleInput';
+import { Input, Select } from '@/components/_shared/SimpleInput';
 import { additionalReadingTagOptions } from '../formOptions';
 
-export function AdditionalReadingForm({
-    formObj,
-}: {
-    formObj: UseFormReturn<DatasetFormType>;
-}) {
+export function AdditionalReadingForm({ formObj }: { formObj: UseFormReturn<DatasetFormType> }) {
     const {
         control,
         register,
@@ -33,12 +29,15 @@ export function AdditionalReadingForm({
             }
         >
             <Disclosure.Panel className="py-5">
-                <InputGroup label="Articles & other links">
+                <InputGroup
+                    label="Articles & other links"
+                    info="Add external references related to this dataset. Choose a category for each link: Publication (research or report where the dataset is used), Documentation (guides or manuals on how to use the data), Source code (GitHub repositories or reproducibility packages), or Announcement (launch, update, or sunsetting notices)."
+                >
                     <div className="flex flex-col gap-y-3 w-full">
                         {fields.map((field, index) => (
                             <div
                                 key={field.id}
-                                className="grid grid-cols-1 gap-3 md:grid-cols-[1.2fr_0.8fr_1.2fr_auto]"
+                                className="grid grid-cols-1 items-start gap-3 md:grid-cols-[1.2fr_1fr_1.2fr_auto]"
                             >
                                 <div>
                                     <Input
@@ -52,16 +51,16 @@ export function AdditionalReadingForm({
                                     />
                                 </div>
                                 <div>
-                                    <select
+                                    <Select
                                         {...register(`additional_reading.${index}.tag`)}
-                                        className="w-full rounded-sm border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900"
+                                        aria-label="Link category"
                                     >
                                         {additionalReadingTagOptions.map((option) => (
                                             <option key={option.value} value={option.value}>
                                                 {option.label}
                                             </option>
                                         ))}
-                                    </select>
+                                    </Select>
                                     <ErrorDisplay
                                         name={`additional_reading.${index}.tag`}
                                         errors={errors}
@@ -69,7 +68,7 @@ export function AdditionalReadingForm({
                                 </div>
                                 <div>
                                     <Input
-                                        placeholder="https://example.com/article"
+                                        placeholder="https://example.com/link"
                                         {...register(`additional_reading.${index}.url`)}
                                         type="text"
                                     />
@@ -81,7 +80,7 @@ export function AdditionalReadingForm({
                                 <button
                                     type="button"
                                     onClick={() => remove(index)}
-                                    className="inline-flex items-center justify-center text-red-600"
+                                    className="inline-flex items-center justify-center text-red-600 mt-3"
                                     aria-label="Remove additional reading item"
                                 >
                                     <MinusCircleIcon className="h-5 w-5" />
@@ -94,7 +93,7 @@ export function AdditionalReadingForm({
                             onClick={() =>
                                 append({
                                     title: '',
-                                    tag: 'article',
+                                    tag: 'publication',
                                     url: '',
                                 })
                             }
