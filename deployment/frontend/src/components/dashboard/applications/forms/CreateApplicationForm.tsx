@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { slugify } from '@/utils/slugify';
 import ApplicationForm from './ApplicationForm';
@@ -29,6 +29,10 @@ export default function CreateApplicationForm() {
     const router = useRouter();
     const formObj = useForm<ApplicationFormType>({
         resolver: zodResolver(ApplicationSchema),
+        defaultValues: {
+            title: '',
+            name: '',
+        },
     });
 
     const createApplication = api.applications.createApplication.useMutation({
@@ -57,13 +61,17 @@ export default function CreateApplicationForm() {
 
     const {
         setValue,
-        watch,
-        formState: { dirtyFields },
+        formState: { touchedFields },
     } = formObj;
+    const title = useWatch({ control: formObj.control, name: 'title' });
 
     useEffect(() => {
-        if (!dirtyFields.name) setValue('name', slugify(watch('title')));
-    }, [watch('title')]);
+        if (touchedFields.name) return;
+        setValue('name', slugify(title ?? ''), {
+            shouldDirty: false,
+            shouldTouch: false,
+        });
+    }, [setValue, title, touchedFields.name]);
 
     return (
         <>
