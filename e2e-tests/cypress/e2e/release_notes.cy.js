@@ -42,8 +42,6 @@ describe("Release notes", () => {
         .parent()
         .find(".tiptap.ProseMirror")
         .type("RICH TEXT EDITOR");
-
-      cy.contains("Methodology").click();
       cy.get("input[name=technical_notes]").type("https://google.com");
 
       cy.contains("Add data maintainer").click();

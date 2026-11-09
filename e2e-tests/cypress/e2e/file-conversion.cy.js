@@ -37,7 +37,6 @@ describe("Data Files", () => {
 
     cy.get("#visibility_type").click();
     cy.contains('[role="option"]', "Public").click();
-    cy.contains("Methodology").click();
     cy.get("input[name=technical_notes]").type("https://google.com");
 
     cy.contains("Add data maintainer").click();
