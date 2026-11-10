@@ -21,7 +21,7 @@ export type ReviewDetailsAndTermsFormData = {
 };
 
 export type ReviewDetailsAndTermsFieldErrors = Partial<
-    Record<'email' | 'country' | 'affiliation' | 'useCase', string>
+    Record<'email' | 'country' | 'affiliation' | 'useCase' | 'firstName' | 'lastName', string>
 >;
 
 export const affiliationOptions: SelectOption[] = [
@@ -74,8 +74,14 @@ export const validateReviewDetailsAndTermsForm = (
 ): ReviewDetailsAndTermsFieldErrors => {
     const errors: ReviewDetailsAndTermsFieldErrors = {};
     const requireEmail = options?.requireEmail ?? true;
+    const wantsContact = formData.subscribeUpdates || formData.contactForResearch;
 
-    if (requireEmail && (!formData.email.trim() || !formData.email.includes('@'))) {
+    if (
+        (requireEmail || wantsContact) &&
+        (!formData.email.trim() || !formData.email.includes('@'))
+    ) {
+        errors.email = 'Enter a valid email.';
+    } else if (formData.email.trim() && !formData.email.includes('@')) {
         errors.email = 'Enter a valid email.';
     }
 
@@ -93,6 +99,17 @@ export const validateReviewDetailsAndTermsForm = (
 
     if (!formData.useCase.trim()) {
         errors.useCase = 'Required.';
+    }
+
+    // Contact details are only collected when the user opts in to updates or research.
+    if (wantsContact) {
+        if (!formData.firstName.trim()) {
+            errors.firstName = 'First name is required.';
+        }
+
+        if (!formData.lastName.trim()) {
+            errors.lastName = 'Last name is required.';
+        }
     }
 
     return errors;

@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
     getThemedColor,
     getThemedFontSize,
@@ -6,9 +5,7 @@ import {
     getThemedSpacing,
     TextInput,
 } from '@worldresources/wri-design-systems';
-import { useForm, useWatch } from 'react-hook-form';
-import { contactDetailsFormSchema, type ContactDetailsFormData } from './contactDetailsForm.utils';
-import { FieldErrorDisplay } from '../../utils/ErrorDisplay';
+import type { ContactDetailsFormData } from './contactDetailsForm.utils';
 
 export type ContactDetailsFieldErrors = Partial<Record<keyof ContactDetailsFormData, string>>;
 
@@ -25,20 +22,6 @@ function ContactDetailsForm({
     onChange,
     requireEmail = false,
 }: ContactDetailsFormProps) {
-    const {
-        formState: { errors },
-        control,
-    } = useForm<ContactDetailsFormData>({
-        resolver: zodResolver(contactDetailsFormSchema),
-        defaultValues: formData,
-        mode: 'onChange',
-    });
-
-    // Use useWatch to make inputs reactive to formData changes
-    const formValues = useWatch<ContactDetailsFormData>({
-        control,
-    });
-
     return (
         <div
             style={{
@@ -118,12 +101,9 @@ function ContactDetailsForm({
                             </span>
                         </div>
                         <TextInput
-                            value={formValues.firstName ?? ''}
+                            value={formData.firstName}
                             onChange={(e) => onChange({ ...formData, firstName: e.target.value })}
-                            errorMessage={fieldErrors.firstName ?? errors.firstName?.message}
-                        />
-                        <FieldErrorDisplay
-                            error={fieldErrors.firstName ?? errors.firstName?.message}
+                            errorMessage={fieldErrors.firstName}
                         />
                     </div>
 
@@ -159,12 +139,9 @@ function ContactDetailsForm({
                             </span>
                         </div>
                         <TextInput
-                            value={formValues.lastName ?? ''}
+                            value={formData.lastName}
                             onChange={(e) => onChange({ ...formData, lastName: e.target.value })}
-                            errorMessage={fieldErrors.lastName ?? errors.lastName?.message}
-                        />
-                        <FieldErrorDisplay
-                            error={fieldErrors.lastName ?? errors.lastName?.message}
+                            errorMessage={fieldErrors.lastName}
                         />
                     </div>
                 </div>
@@ -209,14 +186,11 @@ function ContactDetailsForm({
                             </span>
                         </div>
                         <TextInput
-                            value={formValues.organization ?? ''}
+                            value={formData.organization ?? ''}
                             onChange={(e) =>
                                 onChange({ ...formData, organization: e.target.value })
                             }
-                            errorMessage={fieldErrors.organization ?? errors.organization?.message}
-                        />
-                        <FieldErrorDisplay
-                            error={fieldErrors.organization ?? errors.organization?.message}
+                            errorMessage={fieldErrors.organization}
                         />
                     </div>
 
@@ -252,12 +226,9 @@ function ContactDetailsForm({
                             </span>
                         </div>
                         <TextInput
-                            value={formValues.jobTitle ?? ''}
+                            value={formData.jobTitle ?? ''}
                             onChange={(e) => onChange({ ...formData, jobTitle: e.target.value })}
-                            errorMessage={fieldErrors.jobTitle ?? errors.jobTitle?.message}
-                        />
-                        <FieldErrorDisplay
-                            error={fieldErrors.jobTitle ?? errors.jobTitle?.message}
+                            errorMessage={fieldErrors.jobTitle}
                         />
                     </div>
                 </div>
@@ -298,11 +269,10 @@ function ContactDetailsForm({
                     </div>
                     <TextInput
                         type="email"
-                        value={formValues.email ?? ''}
+                        value={formData.email}
                         onChange={(e) => onChange({ ...formData, email: e.target.value })}
-                        errorMessage={fieldErrors.email ?? errors.email?.message}
+                        errorMessage={fieldErrors.email}
                     />
-                    <FieldErrorDisplay error={fieldErrors.email ?? errors.email?.message} />
                 </div>
             </div>
         </div>
