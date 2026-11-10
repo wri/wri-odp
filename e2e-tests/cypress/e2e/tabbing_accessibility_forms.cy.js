@@ -59,7 +59,6 @@ describe("Create dataset via tabbing", () => {
       .parent()
       .find(".tiptap.ProseMirror")
       .type("RICH TEXT EDITOR");
-    cy.contains("Methodology").click();
     cy.get("input[name=technical_notes]").type("https://example.com/technical-notes");
 
     cy.contains("Add data maintainer").click();

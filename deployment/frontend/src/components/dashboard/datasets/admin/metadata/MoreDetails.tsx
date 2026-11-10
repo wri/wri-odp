@@ -1,9 +1,4 @@
-import {
-    InformationCircleIcon,
-    MinusCircleIcon,
-    PlusCircleIcon,
-    SquaresPlusIcon,
-} from '@heroicons/react/24/outline';
+import { MinusCircleIcon, PlusCircleIcon, SquaresPlusIcon } from '@heroicons/react/24/outline';
 import { Disclosure } from '@headlessui/react';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { MetadataAccordion } from './MetadataAccordion';
@@ -38,7 +33,6 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                 <div className="flex flex-col justify-start gap-y-4">
                     <InputGroup
                         label="Additional reading"
-                        className="mb-2 flex flex-col items-start whitespace-nowrap sm:flex-col"
                         info="Add external references related to this dataset. Choose a category for each link: Publication (research or report where the dataset is used), Documentation (guides or manuals on how to use the data), Source code (GitHub repositories or reproducibility packages), or Announcement (launch, update, or sunsetting notices)."
                     >
                         <div className="flex flex-col gap-y-3 w-full">
@@ -116,8 +110,8 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                     </InputGroup>
                     <InputGroup
                         label="Cautions"
-                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
                         info="Describe any quality issues or limitations that data users should know about"
+                        className="min-h-[320px]"
                     >
                         <SimpleEditor
                             formObj={formObj}
@@ -126,10 +120,7 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                             defaultValue=""
                         />
                     </InputGroup>
-                    <InputGroup
-                        label="Methodology"
-                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
-                    >
+                    <InputGroup label="Methodology" className="min-h-[320px]">
                         <SimpleEditor
                             formObj={formObj}
                             name="methodology"
@@ -138,19 +129,10 @@ export function MoreDetailsForm({ formObj }: { formObj: UseFormReturn<DatasetFor
                         />
                     </InputGroup>
                     <InputGroup
-                        label={
-                            <span className="relative flex items-center gap-x-1">
-                                Dataset API
-                                <DefaultTooltip
-                                    contentClassName="max-w-sm whitespace-normal lg:max-w-xl"
-                                    side="right"
-                                    content="This field will end up next to the API tab in the Dataset page, you can use it to provide code samples that are useful for this particular data, the string {% DATASET_URL %} will get replaced with the actual url for this particular Dataset"
-                                >
-                                    <InformationCircleIcon className="h-5 w-5" />
-                                </DefaultTooltip>
-                            </span>
-                        }
-                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                        label="Dataset API"
+                        info="This field will end up next to the API tab in the Dataset page, you can use it to provide code samples that are useful for this particular data, the string {% DATASET_URL %} will get replaced with the actual url for this particular Dataset"
+                        contentClassName="max-w-sm whitespace-normal lg:max-w-xl"
+                        className="min-h-[320px]"
                     >
                         <SimpleEditor
                             formObj={formObj}

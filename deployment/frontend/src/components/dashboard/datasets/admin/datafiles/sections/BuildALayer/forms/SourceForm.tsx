@@ -1,13 +1,6 @@
-import {
-    type UseFormReturn,
-    useFieldArray,
-    useFormContext,
-} from 'react-hook-form';
+import { type UseFormReturn, useFieldArray, useFormContext } from 'react-hook-form';
 import { Button } from '@/components/_shared/Button';
-import {
-    ArrowPathIcon,
-    InformationCircleIcon,
-} from '@heroicons/react/24/outline';
+import { ArrowPathIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { Input } from '@/components/_shared/SimpleInput';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
@@ -90,10 +83,7 @@ export default function SourceForm({
                             Convert to raw object
                         </Button>
                     </DefaultTooltip>
-                    <Button
-                        onClick={() => setTemplateModalOpen(true)}
-                        type="button"
-                    >
+                    <Button onClick={() => setTemplateModalOpen(true)} type="button">
                         Use Template
                     </Button>
                 </div>
@@ -104,22 +94,14 @@ export default function SourceForm({
                             className="sm:grid-cols-1 gap-x-2"
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
-                            <Input
-                                {...register('name')}
-                                type="text"
-                                aria-label="layer name"
-                            />
+                            <Input {...register('name')} type="text" aria-label="layer name" />
                         </InputGroup>
                         <InputGroup
                             label="Slug of layer"
                             className="sm:grid-cols-1 gap-x-2"
                             labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                         >
-                            <Input
-                                {...register('slug')}
-                                type="text"
-                                aria-label="slug of layer"
-                            />
+                            <Input {...register('slug')} type="text" aria-label="slug of layer" />
                         </InputGroup>
                         <InputGroup
                             label="Description of Layer"
@@ -196,9 +178,7 @@ export default function SourceForm({
                                     labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                 >
                                     <Input
-                                        {...register(
-                                            'layerConfig.timelineLabel'
-                                        )}
+                                        {...register('layerConfig.timelineLabel')}
                                         aria-label="timeline label"
                                         type="text"
                                         icon={
@@ -239,27 +219,17 @@ export default function SourceForm({
                             />
                         </InputGroup>
                         {watch('layerConfig.type')?.value === 'raster' &&
-                            watch('layerConfig.source.provider.type')?.value ===
-                                'wms' && (
+                            watch('layerConfig.source.provider.type')?.value === 'wms' && (
                                 <InputGroup
                                     label="Tiles of your data"
                                     className="sm:grid-cols-1 gap-x-2"
                                     labelClassName="xxl:text-sm col-span-full sm:max-w-none whitespace-nowrap sm:text-left"
                                 >
-                                    <Input
-                                        {...register(
-                                            'layerConfig.source.tiles'
-                                        )}
-                                        type="text"
-                                    />
-                                    <ErrorDisplay
-                                        errors={errors}
-                                        name="tiles"
-                                    />
+                                    <Input {...register('layerConfig.source.tiles')} type="text" />
+                                    <ErrorDisplay errors={errors} name="tiles" />
                                 </InputGroup>
                             )}
-                        {watch('layerConfig.source.provider.type')?.value ===
-                            'gee' && (
+                        {watch('layerConfig.source.provider.type')?.value === 'gee' && (
                             <InputGroup
                                 label="GEE ID"
                                 className="sm:grid-cols-1 gap-x-2"
@@ -269,8 +239,7 @@ export default function SourceForm({
                                 <ErrorDisplay errors={errors} name="id" />
                             </InputGroup>
                         )}
-                        {watch('layerConfig.source.provider.type')?.value ===
-                            'carto' && (
+                        {watch('layerConfig.source.provider.type')?.value === 'carto' && (
                             <>
                                 <InputGroup
                                     label="Account"
@@ -279,17 +248,12 @@ export default function SourceForm({
                                 >
                                     <Input
                                         aria-label="account"
-                                        {...register(
-                                            'layerConfig.source.provider.account'
-                                        )}
+                                        {...register('layerConfig.source.provider.account')}
                                         type="text"
                                         defaultValue="wri-rw"
                                     />
                                     {/* TODO Parse SQL and show errors*/}
-                                    <ErrorDisplay
-                                        errors={errors}
-                                        name="provider.account"
-                                    />
+                                    <ErrorDisplay errors={errors} name="provider.account" />
                                 </InputGroup>
                                 <InputGroup
                                     label="SQL Query"
@@ -305,10 +269,7 @@ export default function SourceForm({
                                         defaultValue=""
                                     />
                                     {/* TODO Parse SQL and show errors*/}
-                                    <ErrorDisplay
-                                        errors={errors}
-                                        name="provider.options.sql"
-                                    />
+                                    <ErrorDisplay errors={errors} name="provider.options.sql" />
                                 </InputGroup>
                                 <InputGroup
                                     label="Columns URL"
@@ -343,9 +304,7 @@ export default function SourceForm({
                                                 <ArrowPathIcon
                                                     className={classNames(
                                                         'h-4 w-4 text-white',
-                                                        columns.isLoading
-                                                            ? 'animate-spin'
-                                                            : ''
+                                                        columns.isLoading ? 'animate-spin' : ''
                                                     )}
                                                 />
                                             </Button>
@@ -362,8 +321,7 @@ export default function SourceForm({
                             <Input
                                 aria-label="min zoom"
                                 {...register('layerConfig.source.minzoom', {
-                                    setValueAs: (v) =>
-                                        v === '' ? undefined : parseInt(v),
+                                    setValueAs: (v) => (v === '' ? undefined : parseInt(v)),
                                 })}
                                 icon={
                                     <DefaultTooltip content="Min zoom in which content will appera">
@@ -381,8 +339,7 @@ export default function SourceForm({
                         >
                             <Input
                                 {...register('layerConfig.source.maxzoom', {
-                                    setValueAs: (v) =>
-                                        v === '' ? undefined : parseInt(v),
+                                    setValueAs: (v) => (v === '' ? undefined : parseInt(v)),
                                 })}
                                 aria-label="max zoom"
                                 icon={
@@ -395,15 +352,9 @@ export default function SourceForm({
                             <ErrorDisplay errors={errors} name="zoom" />
                         </InputGroup>
                         <InputGroup
-                            label={
-                                <span className="flex items-center gap-x-1">
-                                    Dataset API
-                                    <DefaultTooltip content="This field will end up next to the API tab in the Dataset page, you can use it to provide code samples that are useful for this particular data">
-                                        <InformationCircleIcon className="h-5 w-5" />
-                                    </DefaultTooltip>
-                                </span>
-                            }
-                            className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                            label="Dataset API"
+                            info="This field will end up next to the API tab in the Dataset page, you can use it to provide code samples that are useful for this particular data"
+                            className="min-h-[320px]"
                         >
                             <SimpleEditor
                                 formObj={_formObj}
@@ -426,13 +377,8 @@ export default function SourceForm({
                         <DatafileLocation formObj={_formObj} index={_index} />
                     </div>
                 </ScrollArea>
-                <Button
-                    form="layerForm"
-                    type="submit"
-                    className="mt-4 ml-auto w-fit"
-                >
-                    {formObj.watch('layerConfig.source.provider.type').value ===
-                    'carto'
+                <Button form="layerForm" type="submit" className="mt-4 ml-auto w-fit">
+                    {formObj.watch('layerConfig.source.provider.type').value === 'carto'
                         ? 'Next: Render'
                         : 'Next: Legend'}
                 </Button>

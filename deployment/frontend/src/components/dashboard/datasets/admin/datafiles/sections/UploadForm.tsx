@@ -2,12 +2,7 @@ import { ErrorDisplay, InputGroup } from '@/components/_shared/InputGroup';
 import { Input } from '@/components/_shared/SimpleInput';
 import { TextArea } from '@/components/_shared/SimpleTextArea';
 
-
-import {
-    InformationCircleIcon,
-    MinusCircleIcon,
-    PaperClipIcon,
-} from '@heroicons/react/24/outline';
+import { InformationCircleIcon, MinusCircleIcon, PaperClipIcon } from '@heroicons/react/24/outline';
 import { type DatasetFormType } from '@/schema/dataset.schema';
 import { type UseFormReturn } from 'react-hook-form';
 import { convertBytes } from '@/utils/convertBytes';
@@ -40,9 +35,7 @@ export function UploadForm({
             <div className="flex w-full justify-between bg-slate-100 px-6 py-3">
                 <div className="flex items-center gap-x-2">
                     <PaperClipIcon className="h-6 w-6 text-blue-800" />
-                    <span className="text-lg font-light text-black">
-                        {datafile.name}
-                    </span>
+                    <span className="text-lg font-light text-black">{datafile.name}</span>
                     <span className="text-right font-acumin text-xs font-normal leading-tight text-neutral-500">
                         {datafile.size ? convertBytes(datafile.size) : 'N/A'}
                     </span>
@@ -73,10 +66,7 @@ export function UploadForm({
                     type="text"
                     maxWidth="max-w-[70rem]"
                 />
-                <ErrorDisplay
-                    name={`resources.${index}.title`}
-                    errors={errors}
-                />
+                <ErrorDisplay name={`resources.${index}.title`} errors={errors} />
             </InputGroup>
             <InputGroup label="Description" className="whitespace-nowrap">
                 <TextArea
@@ -92,21 +82,12 @@ export function UploadForm({
                 />
             </InputGroup>
             <InputGroup label="Format" className="whitespace-nowrap">
-                <FormatInput
-                    formObj={formObj}
-                    name={`resources.${index}.format`}
-                />
+                <FormatInput formObj={formObj} name={`resources.${index}.format`} />
             </InputGroup>
             <InputGroup
-                label={
-                    <span className="flex items-center gap-x-1">
-                        Dataset API
-                        <DefaultTooltip content="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section">
-                            <InformationCircleIcon className="h-5 w-5" />
-                        </DefaultTooltip>
-                    </span>
-                }
-                className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                label="Dataset API"
+                info="This field will end up in the Data File API section, you can use it to provide code samples that are useful for this particular data, note: using the string {% DATAFILE_URL %} will get replaced to the actual url in the public section"
+                className="min-h-[320px]"
             >
                 <SimpleEditor
                     formObj={formObj}

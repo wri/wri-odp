@@ -20,7 +20,7 @@ import { slugify } from '@/utils/slugify';
 import { Tab } from '@headlessui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { v4 as uuidv4 } from 'uuid';
@@ -116,15 +116,18 @@ export default function CreateDatasetForm() {
 
     const watchedTitle = formObj.watch('title');
 
-    const {
-        setValue,
-        trigger,
-        formState: { dirtyFields },
-    } = formObj;
+    const { setValue, trigger } = formObj;
+
+    // Tracks the last slug we generated so we can tell it apart from a manual edit.
+    const autoName = useRef('');
 
     useEffect(() => {
-        if (!dirtyFields.name) setValue('name', slugify(watchedTitle));
-    }, [dirtyFields.name, setValue, watchedTitle]);
+        const currentName = formObj.getValues('name');
+        if (currentName && currentName !== autoName.current) return;
+        const nextName = slugify(watchedTitle ?? '');
+        autoName.current = nextName;
+        setValue('name', nextName);
+    }, [formObj, setValue, watchedTitle]);
 
     return (
         <>

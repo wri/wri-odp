@@ -34,7 +34,6 @@ function fillPublicDatasetWizard(name, team) {
     .parent()
     .find(".tiptap.ProseMirror")
     .type("RICH TEXT EDITOR");
-  cy.contains("Methodology").click();
   cy.get("input[name=technical_notes]").type("https://google.com");
   cy.get("textarea[name=short_description]").type("test");
 

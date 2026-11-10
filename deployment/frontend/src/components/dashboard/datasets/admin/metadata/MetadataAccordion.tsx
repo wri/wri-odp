@@ -7,7 +7,7 @@ interface MetadataAccordion {
     defaultOpen?: boolean;
 }
 
-export function MetadataAccordion({ label, children, defaultOpen = false }: MetadataAccordion) {
+export function MetadataAccordion({ label, children, defaultOpen = true }: MetadataAccordion) {
     return (
         <Disclosure
             defaultOpen={defaultOpen}

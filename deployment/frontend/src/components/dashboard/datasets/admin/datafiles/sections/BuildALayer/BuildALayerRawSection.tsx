@@ -6,10 +6,7 @@ import { Button } from '@/components/_shared/Button';
 import { Legends } from './preview/Legends';
 import { getInteractiveLayers } from '@/utils/queryHooks';
 import Tooltip from './preview/Tooltip';
-import {
-    type LngLat,
-    type MapGeoJSONFeature,
-} from 'react-map-gl/dist/esm/types';
+import { type LngLat, type MapGeoJSONFeature } from 'react-map-gl/dist/esm/types';
 import { type APILayerSpec } from '@/interfaces/layer.interface';
 import LayerManagerPreview from './preview/LayerManagerPreview';
 import { Accordion } from './Accordion';
@@ -20,11 +17,7 @@ import { TextArea } from '@/components/_shared/SimpleTextArea';
 import { convertLayerObjToForm, getApiSpecFromRawObj } from './convertObjects';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/components/_shared/Popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/_shared/Popover';
 import Image from 'next/image';
 import { SimpleEditor } from '../../../metadata/RTE/SimpleEditor';
 
@@ -44,9 +37,7 @@ export function BuildALayerRaw({
 
     const getLayerObj = () => {
         try {
-            const apiSpec = getApiSpecFromRawObj(
-                getValues(`resources.${index}.layerObjRaw`)
-            );
+            const apiSpec = getApiSpecFromRawObj(getValues(`resources.${index}.layerObjRaw`));
             return getValues(`resources.${index}.layerObjRaw`)
                 ? {
                       ...apiSpec,
@@ -62,10 +53,7 @@ export function BuildALayerRaw({
         if (layerObj) {
             setValue(`resources.${index}.type`, 'layer');
             setValue(`resources.${index}.layerObjRaw`, null);
-            setValue(
-                `resources.${index}.layerObj`,
-                convertLayerObjToForm(layerObj)
-            );
+            setValue(`resources.${index}.layerObj`, convertLayerObjToForm(layerObj));
         }
     };
 
@@ -80,10 +68,7 @@ export function BuildALayerRaw({
                 <div className="pt-4 pr-4 flex flex-col gap-y-2">
                     <div className="flex items-center justify-end">
                         <DefaultTooltip content="This button will try to convert the layer config typed out directly as JSON into a form that can be edited by users that do not know the mapbox spec, there is the possiblity of data being lost">
-                            <Button
-                                onClick={() => convertToForm()}
-                                type="button"
-                            >
+                            <Button onClick={() => convertToForm()} type="button">
                                 Convert to form
                             </Button>
                         </DefaultTooltip>
@@ -100,10 +85,7 @@ export function BuildALayerRaw({
                             type="text"
                             maxWidth="max-w-[70rem]"
                         />
-                        <ErrorDisplay
-                            name={`resources.${index}.title`}
-                            errors={errors}
-                        />
+                        <ErrorDisplay name={`resources.${index}.title`} errors={errors} />
                     </InputGroup>
                     <InputGroup
                         label="Description"
@@ -118,15 +100,9 @@ export function BuildALayerRaw({
                         />
                     </InputGroup>
                     <InputGroup
-                        label={
-                            <span className="flex items-center gap-x-1">
-                                Dataset API
-                                <DefaultTooltip content="This field will end up next to the API tab in the dataset page, you can use it to provide code samples that are useful for this particular data">
-                                    <InformationCircleIcon className="h-5 w-5" />
-                                </DefaultTooltip>
-                            </span>
-                        }
-                        className="mb-2 flex min-h-[320px] flex-col items-start whitespace-nowrap sm:flex-col"
+                        label="Dataset API"
+                        info="This field will end up next to the API tab in the dataset page, you can use it to provide code samples that are useful for this particular data"
+                        className="min-h-[320px]"
                     >
                         <SimpleEditor
                             formObj={formObj}
@@ -169,9 +145,8 @@ export function BuildALayerRaw({
                             >
                                 layer-manager docs
                             </a>{' '}
-                            and on top of that, if the layer is from a vector
-                            provider, you will probably need to refresh on the
-                            mapbox{' '}
+                            and on top of that, if the layer is from a vector provider, you will
+                            probably need to refresh on the mapbox{' '}
                             <a
                                 href="https://docs.mapbox.com/style-spec/reference/expressions/"
                                 target="_blank"
@@ -198,8 +173,8 @@ export function BuildALayerRaw({
                                     <InformationCircleIcon className="h-5 w-5 text-gray-500" />
                                     <PopoverContent className="p-4 bg-white shadow-lg rounded-lg max-w-sm w-full">
                                         <p className="text-md font-semibold">
-                                            The type of legend to be displayed
-                                            for the layer. The options are:
+                                            The type of legend to be displayed for the layer. The
+                                            options are:
                                         </p>
                                         <ul className="text-sm">
                                             <li>
@@ -267,42 +242,32 @@ export function BuildALayerRaw({
                                     <InformationCircleIcon className="h-5 w-5 text-gray-500" />
                                     <PopoverContent className="p-4 bg-white shadow-lg rounded-lg max-w-sm lg:max-w-md w-full">
                                         <p className="text-md font-semibold">
-                                            This allow you to configure the
-                                            tooltip that appears on top when a
-                                            user clicks on a feature of a layer,
-                                            its an object called output that
-                                            contains an array of interaction
-                                            objects
+                                            This allow you to configure the tooltip that appears on
+                                            top when a user clicks on a feature of a layer, its an
+                                            object called output that contains an array of
+                                            interaction objects
                                         </p>
                                         <ul className="text-sm flex flex-col gap-y-2 mt-4">
                                             <li>
-                                                column: The column that you want
-                                                to show the data, needs to be
-                                                spelled exactly like in the
-                                                database
+                                                column: The column that you want to show the data,
+                                                needs to be spelled exactly like in the database
                                             </li>
                                             <li>
-                                                prefix: Allows you to add a
-                                                prefix to tooltip displaying
-                                                this item
+                                                prefix: Allows you to add a prefix to tooltip
+                                                displaying this item
                                             </li>
                                             <li>
-                                                property: Allows you to give a
-                                                title to this item, for example
-                                                instead of showing the column
-                                                name country_index you could
-                                                show 'Country Index'
+                                                property: Allows you to give a title to this item,
+                                                for example instead of showing the column name
+                                                country_index you could show 'Country Index'
                                             </li>
                                             <li>
-                                                suffix: Allows you to add a
-                                                prefix to the tooltip displaying
-                                                this item e.g: tonnes, degrees
-                                                etc
+                                                suffix: Allows you to add a prefix to the tooltip
+                                                displaying this item e.g: tonnes, degrees etc
                                             </li>
                                             <li>
-                                                type: Allows you to define the
-                                                type for this column, e.g:
-                                                datetime/number/year etc
+                                                type: Allows you to define the type for this column,
+                                                e.g: datetime/number/year etc
                                             </li>
                                         </ul>
                                     </PopoverContent>
@@ -318,10 +283,7 @@ export function BuildALayerRaw({
                     </Accordion>
                 </div>
                 <div>
-                    <PreviewMap
-                        layerFormObj={preview ?? null}
-                        updatePreview={updatePreview}
-                    />
+                    <PreviewMap layerFormObj={preview ?? null} updatePreview={updatePreview} />
                 </div>
             </div>
         </>
@@ -343,9 +305,7 @@ function PreviewMap({
 
     const [isReady, setReady] = useState(false);
     const mapRef = useRef<MapRef | null>(null);
-    const interactiveLayerIds = layerFormObj
-        ? getInteractiveLayers([layerFormObj])
-        : [];
+    const interactiveLayerIds = layerFormObj ? getInteractiveLayers([layerFormObj]) : [];
     const [coordinates, setCoordinates] = useState<{
         longitude: number;
         latitude: number;
@@ -382,16 +342,14 @@ function PreviewMap({
             if (feature && interactionConfig?.output) {
                 //  TODO: output is supposed to be an array
                 //  @ts-ignore
-                layerInfo.properties = interactionConfig.output.map(
-                    (c: any) => {
-                        return {
-                            config: c,
-                            //  TODO: c.column is supposed to be a string
-                            //  @ts-ignore
-                            value: feature.properties[c.column],
-                        };
-                    }
-                );
+                layerInfo.properties = interactionConfig.output.map((c: any) => {
+                    return {
+                        config: c,
+                        //  TODO: c.column is supposed to be a string
+                        //  @ts-ignore
+                        value: feature.properties[c.column],
+                    };
+                });
             }
 
             layersInfo.push(layerInfo);
@@ -413,8 +371,7 @@ function PreviewMap({
             <ReactMapGL
                 {...viewState}
                 ref={(_map) => {
-                    if (_map)
-                        mapRef.current = _map.getMap() as unknown as MapRef;
+                    if (_map) mapRef.current = _map.getMap() as unknown as MapRef;
                 }}
                 mapStyle="mapbox://styles/mapbox/light-v9"
                 dragRotate={false}
@@ -430,17 +387,9 @@ function PreviewMap({
                     height: '450px',
                 }}
             >
-                {isReady && layerFormObj && (
-                    <LayerManagerPreview layers={[layerFormObj]} />
-                )}
-                <Tooltip
-                    layersInfo={layersInfo}
-                    coordinates={coordinates}
-                    close={close}
-                />
-                {layerFormObj && layerFormObj.legendConfig && (
-                    <Legends layerObj={layerFormObj} />
-                )}
+                {isReady && layerFormObj && <LayerManagerPreview layers={[layerFormObj]} />}
+                <Tooltip layersInfo={layersInfo} coordinates={coordinates} close={close} />
+                {layerFormObj && layerFormObj.legendConfig && <Legends layerObj={layerFormObj} />}
             </ReactMapGL>
         </div>
     );
