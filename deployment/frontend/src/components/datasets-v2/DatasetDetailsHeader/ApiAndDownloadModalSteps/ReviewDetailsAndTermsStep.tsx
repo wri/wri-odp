@@ -492,6 +492,10 @@ function ReviewDetailsAndTermsStep({
                                 email: contactData.email,
                             }));
                         }}
+                        fieldErrors={{
+                            firstName: fieldErrors.firstName,
+                            lastName: fieldErrors.lastName,
+                        }}
                         requireEmail={downloadMultipleFiles}
                     />
                 )}
