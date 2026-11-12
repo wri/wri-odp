@@ -16,6 +16,7 @@ import ReviewDetailsAndTermsStep, {
     type ReviewDetailsAndTermsFormData,
 } from './ApiAndDownloadModalSteps/ReviewDetailsAndTermsStep';
 import SelectFilesStep from './ApiAndDownloadModalSteps/SelectFilesStep';
+import { useDataApiTiles } from './ApiAndDownloadModalSteps/useDataApiTiles';
 import {
     formatFileSize,
     getDataApiTileGfwUrls,
@@ -59,6 +60,12 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
     };
     const requestDownload = api.dataset.downloadZippedResources.useMutation();
     const createDownloadEvent = api.downloadEvents.createEvents.useMutation();
+
+    // Data API resources are often saved without their tiles; resolve them on
+    // demand so the tile picker works and the ZIP can be built.
+    const { tilesByResourceId, loadingResourceIds } = useDataApiTiles(dataset.resources, {
+        enabled: isModalOpen,
+    });
 
     useScrollTopOnStepChange(activeStep);
 
@@ -110,8 +117,9 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
             .filter(Boolean);
         const keys = selectedResources.flatMap((resource) => {
             if (isDataApiResource(resource)) {
+                const tiles = tilesByResourceId[resource.id];
                 return getDataApiTileGfwUrls(
-                    resource,
+                    tiles ? { ...resource, data_api_tiles: tiles } : resource,
                     selectedTilesByResourceId[resource.id]
                 );
             }
@@ -209,6 +217,8 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                         dataset={dataset}
                         selectedResourceIds={selectedResourceIds}
                         selectedTilesByResourceId={selectedTilesByResourceId}
+                        tilesByResourceId={tilesByResourceId}
+                        resolvingResourceIds={loadingResourceIds}
                         onToggleResource={toggleResourceSelection}
                         onSelectTiles={selectTilesForResource}
                         onBack={() => {
@@ -240,6 +250,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                                       ...resource,
                                       data_api_tiles:
                                           selectedTilesByResourceId[resource.id] ??
+                                          tilesByResourceId[resource.id] ??
                                           resource.data_api_tiles,
                                   }
                                 : resource
