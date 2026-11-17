@@ -34,7 +34,7 @@ def test_search_queries(mail_user):
         "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
         "groups": [{"id": group_dict["id"]}],
         "technical_notes": "http://example.com/technical_notes.pdf",
-        "tag_string": "economy,mental health,government",
+        "tag_string": "Economy,Health,Governance",
         # 'temporal_coverage_start': '2007',
         # 'temporal_coverage_end': '2011',
         "update_frequency": "annually",
