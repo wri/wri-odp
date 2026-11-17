@@ -149,6 +149,7 @@ jobs:
           PR_NUMBER: ${{ inputs.pr_number }}
           FRONTEND_SHA_TAG: ${{ github.sha }}-test
           NEXT_PUBLIC_MAPBOX_TOKEN: ${{ vars.NEXT_PUBLIC_MAPBOX_TOKEN }}
+          GFW_DATA_API_ORIGIN: ${{ vars.GFW_DATA_API_ORIGIN }}
         run: |
           if [ -n "$PR_NUMBER" ]; then
             FRONTEND_TAG="${BRANCH}-${PR_NUMBER}-test"
@@ -167,6 +168,7 @@ jobs:
             --build-arg NEXT_PUBLIC_DISABLE_HOTJAR="disabled" \
             --build-arg NEXT_PUBLIC_HOTJAR_ID="dummy-hotjar-id" \
             --build-arg NEXT_PUBLIC_MAPBOX_TOKEN="${NEXT_PUBLIC_MAPBOX_TOKEN:-pk.dummy_mapbox_token_for_ci}" \
+            --build-arg GFW_DATA_API_ORIGIN="${GFW_DATA_API_ORIGIN}" \
             --build-arg OSANO_URL="YOUR_OSANO_URL/osano.js" \
             --build-arg NEXT_PUBLIC_DEPLOYMENT_TYPE="${{ inputs.branch_name || github.ref_name }}" \
             --build-arg SYS_ADMIN_API_KEY="${{ env.SYS_ADMIN_API_KEY }}" \

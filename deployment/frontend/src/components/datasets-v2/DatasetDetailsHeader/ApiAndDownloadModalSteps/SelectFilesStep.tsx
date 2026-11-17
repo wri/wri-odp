@@ -17,10 +17,13 @@ import {
     formatDate,
     formatFileSize,
     getResourceFormatLabel,
+    getStoredDataApiTiles,
+    isCopyLinkResource,
     isDataApiResource,
     isDownloadableResource,
     tileToBbox,
 } from '../download-utils';
+import CopyLinkResourcesSection from './CopyLinkResourcesSection';
 import { type LocationSearchFormType, type TileGeojson } from './SelectFilesMap';
 
 const SelectFilesMap = dynamic(() => import('./SelectFilesMap'), {
@@ -31,6 +34,10 @@ type SelectFilesStepProps = {
     dataset: WriDataset;
     selectedResourceIds: string[];
     selectedTilesByResourceId: Record<string, string[]>;
+    /** Tiles resolved on demand, keyed by data API resource id. */
+    tilesByResourceId?: Record<string, string[]>;
+    /** Data API resources whose tiles are still being resolved. */
+    resolvingResourceIds?: string[];
     onToggleResource: (resourceId: string) => void;
     onSelectTiles: (resourceId: string, tiles: string[] | null) => void;
     onBack: () => void;
@@ -41,6 +48,8 @@ function SelectFilesStep({
     dataset,
     selectedResourceIds,
     selectedTilesByResourceId,
+    tilesByResourceId = {},
+    resolvingResourceIds = [],
     onToggleResource,
     onSelectTiles,
     onBack,
@@ -48,7 +57,13 @@ function SelectFilesStep({
 }: SelectFilesStepProps) {
     const datafiles = dataset?.resources;
     const selectableResources = (datafiles ?? []).filter(isDownloadableResource);
+    const copyLinkResources = (datafiles ?? []).filter(isCopyLinkResource);
     const dataApiResources = selectableResources.filter(isDataApiResource);
+    // Tiles persisted on the resource, overridden by tiles resolved on demand for
+    // resources saved without them.
+    const getTiles = (resource: Resource): string[] =>
+        tilesByResourceId[resource.id] ?? getStoredDataApiTiles(resource);
+    const isResolvingTiles = (resource: Resource) => resolvingResourceIds.includes(resource.id);
     const geoSpatialResources = selectableResources
         .filter((resource) => resource.spatial_type !== 'global')
         .filter((resource) => (resource.spatial_address ?? resource.spatial_geom) != null);
@@ -144,38 +159,38 @@ function SelectFilesStep({
         const result: Record<string, TileGeojson[]> = {};
         for (const resource of dataApiResources) {
             const selectedTiles = new Set(selectedTilesByResourceId[resource.id] ?? []);
-            result[resource.id] = (resource.data_api_tiles ?? [])
-                .filter((tile): tile is string => typeof tile === 'string')
-                .map((tile, index) => {
-                    const bbox = tileToBbox(tile);
-                    return {
-                        // Mapbox <Source> needs a valid GeoJSON Feature.
-                        type: 'Feature' as const,
-                        id: `${resource.id}:${index}`,
-                        datafile: resource,
-                        name: tile.split('/').pop() ?? tile,
-                        selected: selectedTiles.has(tile),
-                        ...(bbox
-                            ? {
-                                  geometry: {
-                                      type: 'Polygon' as const,
-                                      coordinates: [
-                                          [
-                                              [bbox[0], bbox[1]],
-                                              [bbox[2], bbox[1]],
-                                              [bbox[2], bbox[3]],
-                                              [bbox[0], bbox[3]],
-                                              [bbox[0], bbox[1]],
-                                          ],
+            result[resource.id] = (
+                tilesByResourceId[resource.id] ?? getStoredDataApiTiles(resource)
+            ).map((tile, index) => {
+                const bbox = tileToBbox(tile);
+                return {
+                    // Mapbox <Source> needs a valid GeoJSON Feature.
+                    type: 'Feature' as const,
+                    id: `${resource.id}:${index}`,
+                    datafile: resource,
+                    name: tile.split('/').pop() ?? tile,
+                    selected: selectedTiles.has(tile),
+                    ...(bbox
+                        ? {
+                              geometry: {
+                                  type: 'Polygon' as const,
+                                  coordinates: [
+                                      [
+                                          [bbox[0], bbox[1]],
+                                          [bbox[2], bbox[1]],
+                                          [bbox[2], bbox[3]],
+                                          [bbox[0], bbox[3]],
+                                          [bbox[0], bbox[1]],
                                       ],
-                                  },
-                              }
-                            : {}),
-                    };
-                });
+                                  ],
+                              },
+                          }
+                        : {}),
+                };
+            });
         }
         return result;
-    }, [dataApiResources, selectedTilesByResourceId]);
+    }, [dataApiResources, selectedTilesByResourceId, tilesByResourceId]);
 
     const handleDataApiResourceButton = (resource: Resource) => {
         const isSelected = selectedResourceIds.includes(resource.id);
@@ -186,22 +201,14 @@ function SelectFilesStep({
             return;
         }
 
-        onSelectTiles(
-            resource.id,
-            (resource.data_api_tiles ?? []).filter(
-                (tile): tile is string => typeof tile === 'string'
-            )
-        );
+        onSelectTiles(resource.id, getTiles(resource));
     };
 
     // SelectFilesMap passes the clicked tile's geojson back; the tile is
     // identified by the pseudo id `${resourceId}:${tileIndex}`.
     const toggleTileByMap = (resource: Resource, geojson: TileGeojson) => {
         const index = Number(geojson.id.split(':')[1]);
-        const tiles = (resource.data_api_tiles ?? []).filter(
-            (tile): tile is string => typeof tile === 'string'
-        );
-        const tile = tiles[index];
+        const tile = getTiles(resource)[index];
         if (tile === undefined) return;
 
         const selected = new Set(selectedTilesByResourceId[resource.id] ?? []);
@@ -214,12 +221,7 @@ function SelectFilesStep({
     };
 
     const selectAllTiles = (resource: Resource) => {
-        onSelectTiles(
-            resource.id,
-            (resource.data_api_tiles ?? []).filter(
-                (tile): tile is string => typeof tile === 'string'
-            )
-        );
+        onSelectTiles(resource.id, getTiles(resource));
     };
 
     const clearAllTiles = (resource: Resource) => {
@@ -230,8 +232,7 @@ function SelectFilesStep({
     const selectTilesInArea = (resource: Resource, bbox: [number, number, number, number]) => {
         const [minLon, minLat, maxLon, maxLat] = bbox;
         const selected = new Set(selectedTilesByResourceId[resource.id] ?? []);
-        for (const tile of resource.data_api_tiles ?? []) {
-            if (typeof tile !== 'string') continue;
+        for (const tile of getTiles(resource)) {
             const tileBbox = tileToBbox(tile);
             if (!tileBbox) continue;
             const intersects =
@@ -334,6 +335,8 @@ function SelectFilesStep({
                 const isSelected = selectedResourceIds.includes(resource.id);
                 const tileGeojsons = tileGeojsonsByResourceId[resource.id] ?? [];
                 const selectedTileCount = tileGeojsons.filter((t) => t.selected).length;
+                const resolving = isResolvingTiles(resource);
+                const noTiles = !resolving && tileGeojsons.length === 0;
 
                 return (
                     <div
@@ -357,22 +360,32 @@ function SelectFilesStep({
                                 titleFontSize={getThemedFontSize(500)}
                                 badge={getResourceFormatLabel(resource)}
                                 description={
-                                    isSelected
-                                        ? selectedTileCount > 0
-                                            ? `${selectedTileCount} of ${tileGeojsons.length} tiles selected`
-                                            : 'No tiles selected yet — pick them on the map or list below.'
-                                        : resource.description ?? resource.name ?? ''
+                                    resolving
+                                        ? 'Loading tiles…'
+                                        : noTiles
+                                          ? 'Tiles are not available for this data resource.'
+                                          : isSelected
+                                            ? selectedTileCount > 0
+                                                ? `${selectedTileCount} of ${tileGeojsons.length} tiles selected`
+                                                : 'No tiles selected yet — pick them on the map or list below.'
+                                            : (resource.description ?? resource.name ?? '')
                                 }
                                 createdAt={formatDate(resource.created)}
                                 updatedAt={formatDate(
                                     resource.metadata_modified ?? resource.last_modified
                                 )}
+                                warningMessage={
+                                    noTiles
+                                        ? 'The tiles for this resource could not be loaded from the GFW Data API.'
+                                        : undefined
+                                }
                                 borderless
                                 rightContent={
                                     <Button
                                         variant={isSelected ? 'negative' : 'secondary'}
                                         size="default"
                                         leftIcon={isSelected ? <TrashIcon /> : <PlusIcon />}
+                                        disabled={!isSelected && (resolving || noTiles)}
                                         onClick={() => handleDataApiResourceButton(resource)}
                                     >
                                         {isSelected ? 'Remove' : 'Add'}
@@ -381,7 +394,7 @@ function SelectFilesStep({
                             />
                         </div>
 
-                        {isSelected && (
+                        {isSelected && !noTiles && (
                             <SelectFilesMap
                                 geojsons={tileGeojsons}
                                 formObj={formObj}
@@ -389,9 +402,7 @@ function SelectFilesStep({
                                 onToggleTile={(geojson) => toggleTileByMap(resource, geojson)}
                                 onSelectAllTiles={() => selectAllTiles(resource)}
                                 onClearAllTiles={() => clearAllTiles(resource)}
-                                onSelectTilesInArea={(bbox) =>
-                                    selectTilesInArea(resource, bbox)
-                                }
+                                onSelectTilesInArea={(bbox) => selectTilesInArea(resource, bbox)}
                             />
                         )}
                     </div>
@@ -465,6 +476,9 @@ function SelectFilesStep({
                         );
                     })}
             </div>
+
+            {/* Copy-only resources (GEE assets, tile caches) */}
+            <CopyLinkResourcesSection resources={copyLinkResources} />
 
             {/* Button group */}
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>

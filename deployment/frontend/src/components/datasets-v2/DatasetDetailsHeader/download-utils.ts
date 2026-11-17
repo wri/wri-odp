@@ -29,22 +29,76 @@ export function formatDate(value?: string | null): string {
 
 type ResourceLike = {
     type?: string | null;
+    url_type?: string | null;
     data_api_tiles?: unknown[] | null;
+    data_api_dataset_id?: string | null;
+    asset_id?: string | null;
     format?: string | null;
     key?: string | null;
     url?: string | null;
 };
 
+/**
+ * `package_show` keeps the resource type in `type` (lifted from extras), while
+ * pending datasets and older records may only carry it in `url_type`.
+ */
+function hasResourceType(resource: ResourceLike, type: string): boolean {
+    return resource.type === type || resource.url_type === type;
+}
+
+/**
+ * A GFW data API raster tile set. Tiles may not be persisted on the resource
+ * (`data_api_tiles` empty) even though the dataset/version/asset are set, so the
+ * tiles must not be required here — otherwise the whole resource disappears from
+ * the download modal.
+ */
 export function isDataApiResource(resource: ResourceLike): boolean {
-    return resource.type === 'data-api-dataset' && (resource.data_api_tiles?.length ?? 0) > 0;
+    return hasResourceType(resource, 'data-api-dataset');
+}
+
+/**
+ * A Google Earth Engine asset. These are not downloadable: users copy the asset
+ * id and use it inside the Earth Engine Code Editor.
+ */
+export function isGeeAssetResource(resource: ResourceLike): boolean {
+    return hasResourceType(resource, 'gee-asset');
+}
+
+/**
+ * A tile cache link. Like GEE assets these are not downloadable — users copy the
+ * URL and consume the tiles from their own application.
+ */
+export function isTileCacheResource(resource: ResourceLike): boolean {
+    return hasResourceType(resource, 'tile-cache');
+}
+
+/** Resources that can only be copied (not included in a download). */
+export function isCopyLinkResource(resource: ResourceLike): boolean {
+    return isGeeAssetResource(resource) || isTileCacheResource(resource);
+}
+
+export function getStoredDataApiTiles(resource: ResourceLike): string[] {
+    return (resource.data_api_tiles ?? []).filter(
+        (tile): tile is string => typeof tile === 'string'
+    );
+}
+
+/** Value shown/copied for a copy-only resource: the GEE asset id or tile cache URL. */
+export function getCopyLinkValue(resource: ResourceLike): string {
+    return resource.asset_id ?? resource.url ?? '';
 }
 
 /**
  * A resource can be listed for download when it has an S3 key, a direct URL, or
- * a set of GFW data API tiles. Data API resources have neither `key` nor `url`,
- * so they must be checked explicitly.
+ * is a GFW data API tile set. Data API resources have neither `key` nor `url`,
+ * so they must be checked explicitly. Copy-only resources (GEE assets and tile
+ * caches) are never downloadable, even when they carry a `url`.
  */
 export function isDownloadableResource(resource: ResourceLike): boolean {
+    if (isCopyLinkResource(resource)) {
+        return false;
+    }
+
     return Boolean(resource.key) || Boolean(resource.url) || isDataApiResource(resource);
 }
 
@@ -57,12 +111,51 @@ export function isDirectDownloadResource(resource: ResourceLike): boolean {
     return Boolean(resource.key) || Boolean(resource.url);
 }
 
+/**
+ * `format` is often saved as an empty string rather than null, so `??` alone
+ * renders an empty badge. Fall back to the URL extension and finally to 'FILE'
+ * (S3-backed upload) or 'LINK' (external URL).
+ */
+function getFormatFromUrl(url?: string | null): string | null {
+    if (!url) return null;
+
+    let pathname: string;
+    try {
+        pathname = new URL(url).pathname;
+    } catch {
+        pathname = url;
+    }
+
+    // Require a leading letter so numeric DOI suffixes (e.g. `zenodo.13890401`)
+    // are not mistaken for file extensions.
+    const match = /\.([a-z][a-z0-9]{0,7})$/i.exec(pathname);
+    return match?.[1] ? match[1].toUpperCase() : null;
+}
+
 export function getResourceFormatLabel(resource: ResourceLike): string {
     if (isDataApiResource(resource)) {
         return 'Raster Tile Set';
     }
 
-    return resource.format ?? 'FILE';
+    if (isGeeAssetResource(resource)) {
+        return 'Google Earth Engine asset';
+    }
+
+    if (isTileCacheResource(resource)) {
+        return 'Tile cache';
+    }
+
+    const format = resource.format?.trim();
+    if (format) {
+        return format;
+    }
+
+    const derived = getFormatFromUrl(resource.url);
+    if (derived) {
+        return derived;
+    }
+
+    return resource.key ? 'FILE' : 'LINK';
 }
 
 /**
@@ -117,7 +210,20 @@ export function tileToBbox(tilePath: string): [number, number, number, number] |
     return [lon, lat - tileSizeDeg, lon + tileSizeDeg, lat];
 }
 
-/** Expands a data API resource into one direct GFW URL per tile. */
+/**
+ * Tile paths embed the dataset version
+ * (`/vsis3/.../<dataset>/<version>/raster/...`), so it can be recovered when the
+ * resource was saved without `data_api_version`.
+ */
+export function getVersionFromTilePath(tilePath: string): string | null {
+    const match = /\/[^/]+\/(v\d[^/]*)\/raster\//.exec(tilePath);
+    return match?.[1] ?? null;
+}
+
+/**
+ * Expands a data API resource into one direct GFW URL per tile. The version is
+ * taken from the resource, falling back to the version embedded in the tiles.
+ */
 export function getDataApiTileGfwUrls(
     resource: {
         data_api_tiles?: unknown[] | null;
@@ -127,14 +233,21 @@ export function getDataApiTileGfwUrls(
     selectedTiles?: string[]
 ): string[] {
     const datasetId = resource.data_api_dataset_id;
-    const version = resource.data_api_version;
-    if (!datasetId || !version) return [];
+    if (!datasetId) return [];
 
     const selected = selectedTiles ? new Set(selectedTiles) : null;
 
-    return (resource.data_api_tiles ?? [])
+    const tiles = (resource.data_api_tiles ?? [])
         .filter((tile): tile is string => typeof tile === 'string')
-        .filter((tile) => !selected || selected.has(tile))
-        .map((tile) => tileToGfwDownloadUrl(tile, datasetId, version))
+        .filter((tile) => !selected || selected.has(tile));
+
+    return tiles
+        .map((tile) => {
+            const version = resource.data_api_version?.trim()
+                ? resource.data_api_version
+                : getVersionFromTilePath(tile);
+            if (!version) return null;
+            return tileToGfwDownloadUrl(tile, datasetId, version);
+        })
         .filter((url): url is string => url !== null);
 }

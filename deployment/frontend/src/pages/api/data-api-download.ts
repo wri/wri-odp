@@ -3,7 +3,7 @@ import { env } from '@/env.mjs';
 import { Readable } from 'stream';
 import type { ReadableStream as NodeWebReadableStream } from 'stream/web';
 
-const GFW_DATA_API_ORIGIN = 'https://data-api.globalforestwatch.org';
+const GFW_DATA_API_ORIGIN = process.env.GFW_DATA_API_ORIGIN;
 
 function isSafeDownloadRedirect(location: string): boolean {
     try {
