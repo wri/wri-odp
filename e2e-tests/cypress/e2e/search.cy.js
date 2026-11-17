@@ -52,7 +52,7 @@ describe("Search page", () => {
         groups: [{ name: i < 7 ? groups[0] : groups[1] }],
         featured_dataset: i < 7 ? true : false,
         application: i < 7 ? "Application 1" : "Application 2",
-        tags: i < 7 ? [{ name: "tags 1" }] : [{ name: "tags 2" }],
+        tags: i < 7 ? [{ name: "Economy" }] : [{ name: "Health" }],
         temporal_coverage_start: i < 7 ? 2005 : 2010,
         temporal_coverage_end: i < 7 ? 2010 : 2012,
         update_frequency: i < 7 ? "annually" : "daily",

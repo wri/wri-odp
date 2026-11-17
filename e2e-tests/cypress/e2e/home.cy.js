@@ -54,7 +54,7 @@ describe("Home page", () => {
           cy.createDatasetAPI(i < 7 ? orgs[0] : orgs[1], name, true, {
             groups: [{ name: topic1 }, { name: topic2 }],
             featured_dataset: true,
-            tags: i < 7 ? [{ name: "tags 1" }] : [{ name: "tags 2" }],
+            tags: i < 7 ? [{ name: "Economy" }] : [{ name: "Health" }],
             temporal_coverage_start: i < 7 ? 2005 : 2010,
             temporal_coverage_end: i < 7 ? 2010 : 2012,
             update_frequency: i < 7 ? "annually" : "daily",

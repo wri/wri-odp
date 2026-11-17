@@ -1,9 +1,23 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
     approvedTags,
     filterApprovedTags,
     normalizeApprovedTag,
 } from '../src/utils/approvedTags';
+
+// The backend validates keywords against its own copy of the list, so the two
+// files must stay identical or the UI will offer keywords the API rejects.
+// The path is only reachable from a full repo checkout (not from the frontend
+// Docker build context), so the check is skipped when the file is absent.
+const backendApprovedTagsPath = join(
+    __dirname,
+    '../../../ckan-backend-dev/src/ckanext-wri/ckanext/wri/schema/approved_tags.json'
+);
+const backendApprovedTags: string[] | null = existsSync(backendApprovedTagsPath)
+    ? (JSON.parse(readFileSync(backendApprovedTagsPath, 'utf-8')) as string[])
+    : null;
 
 describe('approvedTags', () => {
     it('exposes the full approved keyword list', () => {
@@ -23,6 +37,14 @@ describe('approvedTags', () => {
         expect(approvedTags).toContain('Water, Sanitation, and Hygiene');
         expect(approvedTags).toContain('Escazú Agreement');
         expect(approvedTags).toContain('Köppen Climate Classification');
+    });
+
+    it('stays in sync with the backend approved_tags.json', () => {
+        if (!backendApprovedTags) {
+            // Frontend-only checkout: nothing to compare against.
+            return;
+        }
+        expect(approvedTags).toEqual(backendApprovedTags);
     });
 });
 

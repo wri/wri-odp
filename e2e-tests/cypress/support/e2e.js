@@ -371,7 +371,7 @@ Cypress.Commands.add(
         approval_status: "approved",
         is_approved: "true",
         draft: "false",
-        tags: [{ display_name: "subscriable", name: "subscriable" }],
+        tags: [{ display_name: "Economy", name: "Economy" }],
         technical_notes: "http://example.com/technical_notes.pdf",
         ...otherFields,
       },
