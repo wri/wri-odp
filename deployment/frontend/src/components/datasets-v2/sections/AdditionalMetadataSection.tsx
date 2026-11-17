@@ -6,6 +6,7 @@ import {
 import Link from 'next/link';
 import { type WriDataset } from '@/schema/ckan.schema';
 import { hasValue, toDisplay, unique } from '../utils/text';
+import { getApprovedKeywordEntries } from '../utils/keywords';
 
 type SearchFilter = {
     title: string;
@@ -84,7 +85,7 @@ export function hasAdditionalMetadata(dataset: WriDataset): boolean {
     const applicationCount =
         (dataset.applications ?? []).length +
         (dataset.groups ?? []).filter((group) => group.type === 'application').length;
-    const keywordCount = (dataset.tags ?? []).length;
+    const keywordCount = getApprovedKeywordEntries(dataset.tags).length;
     const authorNames = getAuthorNames(dataset);
 
     return (
@@ -170,14 +171,7 @@ export default function AdditionalMetadataSection({ dataset }: Props) {
             .map((group) => toDisplay(group.display_name ?? group.title ?? group.name)) ?? []),
     ]);
 
-    const keywordEntries = unique((dataset.tags ?? []).map((tag) => tag.name)).map((tagName) => {
-        const tag = (dataset.tags ?? []).find((t) => t.name === tagName);
-
-        return {
-            label: toDisplay(tag?.display_name ?? tagName) ?? tagName,
-            value: tagName,
-        };
-    });
+    const keywordEntries = getApprovedKeywordEntries(dataset.tags);
 
     const authorEntries = unique(authorNames).map((name) => ({
         label: toDisplay(name) ?? name,
