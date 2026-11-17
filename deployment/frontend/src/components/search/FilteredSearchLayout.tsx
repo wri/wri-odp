@@ -23,6 +23,7 @@ import { useSession } from 'next-auth/react';
 import TemporalCoverageFacet from './TemporalCoverageFacet';
 import MetadataModifiedFacet from './MetadataModifiedFacet';
 import { updateFrequencyLabels, visibilityTypeLabels } from '@/utils/constants';
+import { normalizeApprovedTag } from '@/utils/approvedTags';
 import Tags from './Tag';
 import React from 'react';
 
@@ -144,6 +145,22 @@ export default function FilteredSearchLayout({
             };
           }
         );
+      } else if (key === 'tags') {
+        /*
+         * Only approved keywords are offered as filters. Solr indexes tags
+         * case-insensitively, so spellings that differ only by capitalisation
+         * are already a single facet.
+         */
+        // @ts-ignore
+        searchFacets[key].items = searchFacets[key].items
+          .map((item) => {
+            const approved = normalizeApprovedTag(item.name);
+            return approved ? { ...item, display_name: approved } : null;
+          })
+          .filter((item) => item !== null)
+          .sort((a, b) =>
+            a.display_name.localeCompare(b.display_name, undefined, { sensitivity: 'base' })
+          );
       }
     }
   }

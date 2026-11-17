@@ -8,7 +8,6 @@ import { teamRouter } from './routers/teams';
 import { applicationRouter } from './routers/applications';
 import { uploadsRouter } from './routers/uploads';
 import { authRouter } from './routers/auth.router';
-import { tagsRouter } from './routers/tags';
 import { rwRouter } from './routers/rw';
 import { dataApiRouter } from './routers/dataApi';
 import { datastoreRouter } from './routers/datastore';
@@ -32,7 +31,6 @@ export const appRouter = createTRPCRouter({
     applications: applicationRouter,
     uploads: uploadsRouter,
     teams: teamRouter,
-    tags: tagsRouter,
     notification: notificationRouter,
     rw: rwRouter,
     dataApi: dataApiRouter,

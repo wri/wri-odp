@@ -12,6 +12,7 @@ import { TopicsSelect } from '../TopicsSelect';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { Input } from '@/components/_shared/SimpleInput';
 import { languageOptions, updateFrequencyOptions } from '../formOptions';
+import { approvedTags } from '@/utils/approvedTags';
 
 export function AdditionalMetadataForm({ formObj }: { formObj: UseFormReturn<DatasetFormType> }) {
     const {
@@ -20,7 +21,6 @@ export function AdditionalMetadataForm({ formObj }: { formObj: UseFormReturn<Dat
         formState: { errors },
     } = formObj;
 
-    const possibleTags = api.tags.getAllTags.useQuery();
     const possibleApplications = api.applications.getAllApplications.useQuery();
     const topicHierarchy = api.topics.getTopicsHierarchy.useQuery();
 
@@ -108,34 +108,14 @@ export function AdditionalMetadataForm({ formObj }: { formObj: UseFormReturn<Dat
                     </InputGroup>
 
                     <InputGroup label="Keywords">
-                        {match(possibleTags)
-                            .with({ isLoading: true }, () => (
-                                <span className="flex items-center text-sm gap-x-2">
-                                    <Spinner />
-                                    <span className="mt-1">Loading keywords...</span>
-                                </span>
-                            ))
-                            .with({ isError: true }, () => (
-                                <span className="flex items-center text-sm text-red-600">
-                                    Error loading keywords, please refresh the page
-                                </span>
-                            ))
-                            .with({ isSuccess: true, data: P.select() }, (data) => (
-                                <MulText
-                                    name="tags"
-                                    formObj={formObj}
-                                    options={data}
-                                    title="Keywords"
-                                    tooltip="Remove keyword"
-                                    removeItemAriaLabel="Remove keyword"
-                                    allowsCreationOfItems
-                                />
-                            ))
-                            .otherwise(() => (
-                                <span className="flex items-center text-sm text-red-600">
-                                    Error loading keywords, please refresh the page
-                                </span>
-                            ))}
+                        <MulText
+                            name="tags"
+                            formObj={formObj}
+                            options={approvedTags}
+                            title="Keywords"
+                            tooltip="Remove keyword"
+                            removeItemAriaLabel="Remove keyword"
+                        />
                     </InputGroup>
                 </div>
 

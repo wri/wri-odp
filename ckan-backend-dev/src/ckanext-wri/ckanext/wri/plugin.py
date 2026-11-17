@@ -229,6 +229,7 @@ class WriPlugin(plugins.SingletonPlugin):
             "additional_reading_json_object": wri_validators.additional_reading_json_object,
             "url_or_email_validator": wri_validators.url_or_email_validator,
             "title_validator": wri_validators.title_validator,
+            "approved_tags_validator": wri_validators.approved_tags_validator,
         }
 
     # IFacets

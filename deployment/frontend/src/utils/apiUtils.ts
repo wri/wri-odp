@@ -378,6 +378,9 @@ export async function getAllDatasetFq({
         const _facetFields = (facetFields ?? []).filter((f) => f !== 'metadata_modified');
         if (_facetFields.length > 0) {
             params.set('facet.field', `["${_facetFields.join('","')}"]`);
+            // CKAN defaults to 50 facet values per field, which silently drops
+            // valid options (e.g. approved keywords). Ask for all of them.
+            params.set('facet.limit', '-1');
         }
 
         if (sortBy) {
@@ -2675,7 +2678,10 @@ export function advance_search_query(filters: Filter[]) {
             if (coordinates) extLocationQ = coordinates.reverse().join(',');
             if (address) extAddressQ = address;
         } else {
-            keyFq = keyFilters.map((kf) => `"${kf.value}"`).join(' OR ');
+            keyFq = keyFilters
+                .flatMap((kf) => kf.variants ?? [kf.value])
+                .map((v) => `"${v}"`)
+                .join(' OR ');
         }
 
         if (keyFq) fq[key] = keyFq;

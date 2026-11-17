@@ -464,6 +464,8 @@ def old_package_update(context: Context, data_dict: DataDict) -> ActionResult.Pa
         raise NotFound(_("Package was not found."))
     context["package"] = pkg
 
+    wri_validators.validate_approved_tags(context, data_dict)
+
     # Override for authors/maintainers validation/formatting
     data_dict = stringify_actor_objects(data_dict)
 
@@ -753,7 +755,7 @@ def approve_pending_dataset(context: Context, data_dict: DataDict):
     try:
         pending_dataset = stringify_actor_objects(pending_dataset)
         dataset = tk.get_action("package_update")(
-            {"ignore_auth": True}, pending_dataset
+            {"ignore_auth": True, "for_approval": True}, pending_dataset
         )
     except Exception as err:
         raise err

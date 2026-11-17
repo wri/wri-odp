@@ -29,6 +29,14 @@ attribute with the form `ckan-X.Y` -->
 
 <types>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+    <!-- Exact match, but case-insensitive: used for tags so that
+         "Water Quality" and "water quality" are the same value. -->
+    <fieldType name="string_ci" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+        <analyzer>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+        </analyzer>
+    </fieldType>
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
     <fieldtype name="binary" class="solr.BinaryField"/>
     <fieldType name="int" class="solr.IntPointField" omitNorms="true" positionIncrementGap="0"/>
@@ -130,7 +138,7 @@ attribute with the form `ckan-X.Y` -->
     <field name="maintainer_email" type="text_general" indexed="true" stored="true" />
     <field name="license" type="string" indexed="true" stored="true" />
     <field name="license_id" type="string" indexed="true" stored="true" />
-    <field name="tags" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="tags" type="string_ci" indexed="true" stored="true" multiValued="true"/>
     <field name="groups" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="organization" type="string" indexed="true" stored="true" multiValued="false"/>
 

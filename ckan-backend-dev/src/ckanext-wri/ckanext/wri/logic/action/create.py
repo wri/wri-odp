@@ -648,6 +648,8 @@ def old_package_create(
     user = context["user"]
     context["for_create"] = True
 
+    wri_validators.validate_approved_tags(context, data_dict)
+
     # Override for authors/maintainers validation/formatting
     data_dict = stringify_actor_objects(data_dict)
 

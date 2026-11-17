@@ -1,8 +1,9 @@
 import datetime
-from typing import Any
+from typing import Any, Optional
 import pycountry
 import logging
 import json
+import os
 import re
 from urllib.parse import urlparse
 import string
@@ -437,6 +438,8 @@ def dataset_cross_fields(context: Context, data_dict: dict):
             _validate_agents_list(authors, context, "author")
         except Invalid as e:
             raise tk.ValidationError({"authors": str(e)})
+
+    validate_approved_tags(context, data_dict)
     
     maintainers = data_dict.get("maintainers", None)
     if maintainers is None:
@@ -470,3 +473,101 @@ def title_validator(value, context):
     if isinstance(value, str) and len(value.strip()) < 2:
         raise Invalid("Title is required (minimum of 2 characters)")
     return value
+
+_APPROVED_TAGS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "schema",
+    "approved_tags.json",
+)
+_approved_tags_cache: Optional[set] = None
+
+
+def _approved_tags() -> set:
+    """Load the approved keyword list once and cache it (lower-cased)."""
+    global _approved_tags_cache
+    if _approved_tags_cache is None:
+        with open(_APPROVED_TAGS_PATH, encoding="utf-8") as f:
+            _approved_tags_cache = {tag.strip().lower() for tag in json.load(f)}
+    return _approved_tags_cache
+
+
+def _tag_names(value: Any) -> list:
+    """Normalize the tag formats accepted by the API into a list of names."""
+    if isinstance(value, str):
+        return value.split(",")
+    if isinstance(value, (list, tuple)):
+        names = []
+        for item in value:
+            if isinstance(item, dict):
+                names.append(item.get("name") or "")
+            elif isinstance(item, str):
+                names.append(item)
+            else:
+                raise Invalid("Tags must be strings or objects with a name")
+        return names
+    raise Invalid("Tags must be a list or a comma separated string")
+
+
+def approved_tags_validator(value: Any, context: Context):
+    """
+    Reject keywords that are not part of the approved WRI keyword list.
+
+    Accepts the CKAN tag formats used across the API: a list of strings, a list
+    of ``{"name": ...}`` dicts, or a comma separated string.
+    """
+    if value is None or value == missing:
+        return value
+
+    approved = _approved_tags()
+    rejected = sorted(
+        {
+            name.strip()
+            for name in _tag_names(value)
+            if name and name.strip() and name.strip().lower() not in approved
+        }
+    )
+    if rejected:
+        raise Invalid(
+            "Keywords must be selected from the approved list. "
+            "Not approved: %s" % ", ".join(rejected)
+        )
+
+    return value
+
+
+def _invalid_message(error: Invalid) -> str:
+    """Strip the ``Invalid: '<msg>'`` wrapper so API errors read cleanly."""
+    message = str(error)
+    if message.startswith("Invalid: "):
+        message = message[len("Invalid: "):]
+    return message.strip().strip("'")
+
+
+def validate_approved_tags(context: Context, data_dict: dict):
+    """
+    Action-level guard so keywords stay within the approved list on every write
+    path (package_create/update/patch and their ``old_`` counterparts).
+
+    Harvested datasets and the approval of already-submitted datasets are
+    exempt: their keywords come from external sources or predate this rule.
+    """
+    import ckan.plugins.toolkit as tk
+
+    if (
+        context.get("for_harvest")
+        or context.get("for_approval")
+        or data_dict.get("type") == "harvest"
+    ):
+        return True
+
+    for key in ("tags", "tag_string"):
+        if key not in data_dict:
+            continue
+        try:
+            approved_tags_validator(data_dict.get(key), context)
+        except Invalid as e:
+            # CKAN rewrites the "tags" key of a ValidationError expecting a list
+            # of tag dicts, so report the error against the schema field name.
+            raise tk.ValidationError({"tag_string": _invalid_message(e)})
+
+    return True
