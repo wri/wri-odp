@@ -210,7 +210,7 @@ def test_pending_diff_show(mail_user):
         "language": "en",
         "project": "American Cities Climate Challenge: Renewables Accelerator (U.S. Energy)",
         "technical_notes": "http://example.com/technical_notes.pdf",
-        "tag_string": "economy,mental health,government",
+        "tag_string": "Economy,Health,Governance",
         "temporal_coverage_start": "2007",
         "temporal_coverage_end": "2011",
         "update_frequency": "annually",

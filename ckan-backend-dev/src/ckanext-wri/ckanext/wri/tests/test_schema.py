@@ -55,7 +55,7 @@ def test_package_create(mail_user):
             {"id": group_dict["id"]}
         ],
         "technical_notes": "http://example.com/technical_notes.pdf",
-        "tag_string": "economy,mental health,government",
+        "tag_string": "Economy,Health,Governance",
         "temporal_coverage_start": "2007",
         "temporal_coverage_end": "2011",
         "update_frequency": "annually",

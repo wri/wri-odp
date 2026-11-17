@@ -185,6 +185,9 @@ class WRIHarvesterBase(HarvesterBase):
                 "api_version": api_version,
                 "schema": schema,
                 "ignore_auth": True,
+                # Harvested keywords come from external sources, so they are
+                # exempt from the approved keyword list.
+                "for_harvest": True,
             }
 
             if self.config and self.config.get("clean_tags", False):

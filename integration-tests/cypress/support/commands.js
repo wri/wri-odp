@@ -193,7 +193,7 @@ Cypress.Commands.add('createDatasetAPI', (organization, name, isSubscribable) =>
       author: "datopian",
       url: "Source not specified",
       license_id : "notspecified",
-      tags: [{"display_name": "subscriable", "name": "subscriable"}]
+      tags: [{"display_name": "Economy", "name": "Economy"}]
     },
   })
 

@@ -27,6 +27,7 @@ import {
     visibilityOptions,
 } from './formOptions';
 import { datasetFormatLabels, datasetTypeLabels } from '@/utils/datasetMetadata';
+import { filterApprovedTags } from '@/utils/approvedTags';
 import { api } from '@/utils/api';
 import notify from '@/utils/notify';
 import { LoaderButton } from '@/components/_shared/Button';
@@ -135,7 +136,7 @@ export default function EditDatasetForm({ dataset }: { dataset: WriDataset }) {
             rw_id: dataset.rw_id,
             //author_email: dataset?.author_email ? dataset.author_email : null,
             rw_dataset: dataset.rw_id ? !!dataset.rw_id : !!dataset.rw_dataset,
-            tags: dataset.tags ? dataset.tags.map((tag) => tag.name) : [],
+            tags: dataset.tags ? filterApprovedTags(dataset.tags.map((tag) => tag.name)) : [],
             temporal_coverage_start: dataset.temporal_coverage_start
                 ? Number(dataset.temporal_coverage_start)
                 : null,

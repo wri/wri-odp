@@ -78,3 +78,37 @@ def test_agents_json_object(value, expected):
             validators.agents_json_object(value, context)
     else:
         assert validators.agents_json_object(value, context) == expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (None, None),
+        ("", ""),
+        ("Economy,Health", "Economy,Health"),
+        ("economy, health", "economy, health"),
+        (["Economy", "Health"], ["Economy", "Health"]),
+        ([{"name": "Economy"}, {"name": "Health"}], [{"name": "Economy"}, {"name": "Health"}]),
+        ("Economy,Not A Real Keyword", Invalid),
+        (["Economy", "Not A Real Keyword"], Invalid),
+        ([{"name": "Not A Real Keyword"}], Invalid),
+        (123, Invalid),
+    ],
+)
+def test_approved_tags_validator(value, expected):
+    context = {}
+    if expected is Invalid:
+        with pytest.raises(expected):
+            validators.approved_tags_validator(value, context)
+    else:
+        assert validators.approved_tags_validator(value, context) == expected
+
+
+def test_approved_tags_validator_lists_rejected_keywords():
+    with pytest.raises(Invalid) as excinfo:
+        validators.approved_tags_validator("Economy,Foo,Bar", {})
+
+    message = str(excinfo.value)
+    assert "Foo" in message
+    assert "Bar" in message
+    assert "Economy" not in message

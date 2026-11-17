@@ -25,13 +25,20 @@ interface MulTextProps<T extends FieldValues> {
     title: string;
     tooltip?: string;
     removeItemAriaLabel?: string;
-    allowsCreationOfItems?: boolean;
 }
 
 type Option = string | { label: string; value: string };
 
 function isString(option: Option): option is string {
     return typeof option === 'string';
+}
+
+function optionValue(option: Option): string {
+    return isString(option) ? option : option.value;
+}
+
+function optionLabel(option: Option): string {
+    return isString(option) ? option : option.label;
 }
 
 export default function MulText<T extends FieldValues>({
@@ -41,21 +48,26 @@ export default function MulText<T extends FieldValues>({
     title,
     tooltip = 'Remove item',
     removeItemAriaLabel,
-    allowsCreationOfItems = false,
 }: MulTextProps<T>) {
     const { control } = formObj;
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLButtonElement>(null);
-    const [selected, setSelected] = useState<string[]>([]);
     const [query, setQuery] = useState('');
 
-    const filteredOptions =
+    const labelsByValue = new Map(
+        options.map((option) => [optionValue(option), optionLabel(option)])
+    );
+
+    const filteredValues =
         query === ''
-            ? options
-            : options.filter((_item) => {
-                  const item = isString(_item) ? _item : _item.label;
-                  return item.toLowerCase().includes(query.toLowerCase());
-              });
+            ? options.map(optionValue)
+            : options
+                  .filter((option) =>
+                      optionLabel(option)
+                          .toLowerCase()
+                          .includes(query.toLowerCase())
+                  )
+                  .map(optionValue);
 
     return (
         <Controller
@@ -161,11 +173,12 @@ export default function MulText<T extends FieldValues>({
                         style={{ width: ref.current?.offsetWidth ?? 'auto' }}
                         className="w-full md:w-[28rem] lg:w-[20rem] xl:w-[28rem] bg-white p-0"
                     >
-                        <Combobox
+                        <Combobox<string, true, 'div'>
                             as="div"
                             className="shadow-lg p-2"
                             value={value}
                             onChange={(e) => onChange(e)}
+                            virtual={{ options: filteredValues }}
                             multiple
                         >
                             <span className="font-light text-black">
@@ -182,30 +195,10 @@ export default function MulText<T extends FieldValues>({
                             </div>
                             <Combobox.Options
                                 static
-                                className="overflow-auto rounded-md bg-white py-1 text-base focus:outline-none sm:text-sm"
+                                className="max-h-72 overflow-auto rounded-md bg-white py-1 text-base focus:outline-none sm:text-sm"
                             >
-                                {allowsCreationOfItems && query.length > 0 && (
+                                {({ option }: { option: string }) => (
                                     <Combobox.Option
-                                        value={query}
-                                        className={({ active }) =>
-                                            classNames(
-                                                active
-                                                    ? 'bg-blue-800 text-white'
-                                                    : 'text-gray-900',
-                                                'relative cursor-default select-none py-2 pl-3 pr-9'
-                                            )
-                                        }
-                                    >
-                                        Create "{query}"
-                                    </Combobox.Option>
-                                )}
-                                {filteredOptions.map((option: Option) => (
-                                    <Combobox.Option
-                                        key={
-                                            isString(option)
-                                                ? option
-                                                : option.value
-                                        }
                                         className={({ active }) =>
                                             classNames(
                                                 active
@@ -214,11 +207,7 @@ export default function MulText<T extends FieldValues>({
                                                 'relative group cursor-default select-none py-2 pl-3 pr-9'
                                             )
                                         }
-                                        value={
-                                            isString(option)
-                                                ? option
-                                                : option.value
-                                        }
+                                        value={option}
                                     >
                                         {({ selected }) => (
                                             <>
@@ -231,14 +220,13 @@ export default function MulText<T extends FieldValues>({
                                                                 : 'opacity-0'
                                                         )}
                                                     />
-                                                    {isString(option)
-                                                        ? option
-                                                        : option.label}
+                                                    {labelsByValue.get(option) ??
+                                                        option}
                                                 </span>
                                             </>
                                         )}
                                     </Combobox.Option>
-                                ))}
+                                )}
                             </Combobox.Options>
                         </Combobox>
                     </PopoverContent>
