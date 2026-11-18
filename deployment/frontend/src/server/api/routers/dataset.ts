@@ -1,3 +1,4 @@
+import { filterApprovedTags, normalizeApprovedTag } from '@/utils/approvedTags';
 import { z } from 'zod';
 import {
   createTRPCRouter,
@@ -461,13 +462,14 @@ export const DatasetRouter = createTRPCRouter({
             draft: true,
             approval_status: 'pending',
             tags: input.tags
-              ? input.tags.map((tag) => {
+              ? filterApprovedTags(input.tags).map((tag) => {
                 const ptag = datasetDetails?.tags?.find(
                   (x) => x.name === tag
                 );
                 return {
                   ...ptag,
                   name: tag,
+                  display_name: normalizeApprovedTag(tag) || tag,
                 };
               })
               : [],
