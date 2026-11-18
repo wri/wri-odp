@@ -90,17 +90,23 @@ grafana:
           folder: WRI ODP
           interval: 1m
           rules:
+            # KeepLast: a failed Loki query keeps the previous state. execErrState
+            # Error pages Slack as DatasourceError while still using this text,
+            # so a timeout looks like an HTTP 5xx incident.
+            # Threshold: more than 10 5xx lines in every 2m window, for 5m.
+            # A single 5xx or a short bot burst ages out before `for` elapses.
             - uid: wri-ingress-http-5xx
               title: Ingress HTTP 5xx detected
               condition: C
               noDataState: OK
-              execErrState: Error
-              for: 0s
+              execErrState: KeepLast
+              for: 5m
               annotations:
-                summary: HTTP 5xx detected on ingress
+                summary: Sustained HTTP 5xx on ingress
                 description: >-
-                  One or more HTTP 5xx responses were logged by nginx-ingress
-                  in the last 2 minutes. Dashboard: https://odp-grafana.wri.org/d/wri-http-errors
+                  nginx-ingress logged more than 10 HTTP 5xx responses in each
+                  2 minute window for 5 minutes.
+                  Dashboard: https://odp-grafana.wri.org/d/wri-http-errors
               labels:
                 severity: warning
                 alertname: IngressHttp5xx
@@ -115,6 +121,7 @@ grafana:
                     refId: A
                     expr: >-
                       sum(count_over_time({namespace="nginx-ingress"}
+                      |~ `" 5[0-9]{2} `
                       | regexp `"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^"]+" (?P<status>5[0-9]{2}) `
                       [2m]))
                     queryType: instant
@@ -144,7 +151,7 @@ grafana:
                     conditions:
                       - evaluator:
                           type: gt
-                          params: [0]
+                          params: [10]
                         operator:
                           type: and
                         query:
@@ -256,6 +263,12 @@ alertmanager:
         - match:
             alertname: KubeSchedulerDown
           receiver: 'null'
+        # Requests would not fit if the largest node failed. That is scheduling
+        # headroom, not pods running out of memory, and it sits firing on a
+        # small cluster. Not an outage.
+        - match:
+            alertname: KubeMemoryOvercommit
+          receiver: 'null'
         # This CronJob fails every hour and the Job object is then deleted, so
         # KubeJobFailed fires and auto-resolves on a loop. Not a service outage.
         - match_re:
@@ -297,13 +310,18 @@ nodeExporter:
 kubeStateMetrics:
   enabled: true
 
-# Drop default rules that cannot be true on EKS. kube-scheduler is part of the
-# managed control plane and is not a scrape target, so KubeSchedulerDown
-# (absent(up{job="kube-scheduler"})) pages critical with nothing to fix.
-# The Alertmanager null route above is the backstop if this chart key is ignored.
+# Drop default rules that are not actionable on this cluster.
+# kube-scheduler is part of the managed control plane and is not a scrape
+# target, so KubeSchedulerDown (absent(up{job="kube-scheduler"})) pages
+# critical with nothing to fix.
+# KubeMemoryOvercommit compares memory requests with capacity after losing
+# the largest node. It is not memory pressure, and a small overcommit is
+# expected. The Alertmanager null routes above are the backstop if a chart
+# key is ignored.
 defaultRules:
   disabled:
     KubeSchedulerDown: true
+    KubeMemoryOvercommit: true
 
 # Prometheus Operator
 prometheusOperator:

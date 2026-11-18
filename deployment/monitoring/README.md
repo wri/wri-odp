@@ -187,12 +187,13 @@ Alertmanager is included in the stack. Alerts are pre-configured in the template
 - High memory usage (>85% of limit)
 - Pod crash looping (excludes Job/CronJob pods)
 - `KubeSchedulerDown` is dropped (EKS does not scrape kube-scheduler)
+- `KubeMemoryOvercommit` is dropped (memory **requests** would not fit after losing the largest node; not pod memory pressure)
 - `KubeJobFailed` for `update-fe-cronjob-secret` is routed to the null receiver (hourly fail/resolve loop)
 - High error rate (>5% 5xx responses) — requires nginx Prometheus metrics (not currently scraped)
 - Pod not ready for >10 minutes (excludes completed Job/CronJob pods in `Succeeded` phase)
-- **Ingress HTTP 5xx** — Grafana + Loki access-log alert → Alertmanager → Slack (any 5xx in last 2m)
+- **Ingress HTTP 5xx** — Grafana + Loki access-log alert → Alertmanager → Slack (more than 10 HTTP 5xxs in each 2m window, for 5m)
 
-### Slack alert on every 5xx window
+### Slack alert on sustained ingress 5xx
 
 Nginx on this cluster does **not** expose `nginx_ingress_controller_requests` (only Go runtime metrics), so 5xx Slack alerts are based on **Loki access logs** instead.
 
@@ -204,7 +205,7 @@ Apply live (Grafana API):
 
 Or bake into the monitoring Helm values (after `./monitoring-values.sh`) and `helm upgrade` the prometheus stack — see `grafana.alerting` in `template.yaml`.
 
-**Noise warning:** this fires when *any* 5xx appears in a 2‑minute window (bots, bad `map=` URLs, `&` search, etc.), not once per request. Evaluation is ~1m; Slack repeat for this alert is 30m.
+The rule fires only when a 2-minute window has more than 10 HTTP 5xx responses and that stays true for 5 minutes. One 5xx, a short bot burst, or a failed Loki query does not page. A query error keeps the previous state (`execErrState: KeepLast`) instead of notifying as `DatasourceError`. Evaluation is ~1m; Slack repeat for this alert is 30m.
 
 Slack notifications include a **cluster** label (from `CLUSTER_NAME`) so alerts from `ckan-dev` and `ckan-prod` are distinguishable.
 

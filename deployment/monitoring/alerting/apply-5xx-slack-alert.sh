@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Create a Grafana alert that fires when nginx ingress logs any HTTP 5xx,
-# and routes it to the existing Alertmanager → Slack pipeline.
+# Create a Grafana alert that fires when nginx ingress logs a sustained
+# HTTP 5xx rate (more than 10 per 2m window, for 5m), and route it to the
+# existing Alertmanager → Slack pipeline. A Loki query error does not page.
 #
 # Usage:
 #   ./deployment/monitoring/alerting/apply-5xx-slack-alert.sh
@@ -99,11 +100,11 @@ rule = {
   "folderUID": os.environ["FOLDER_UID"],
   "condition": "C",
   "noDataState": "OK",
-  "execErrState": "Error",
-  "for": "0s",
+  "execErrState": "KeepLast",
+  "for": "5m",
   "annotations": {
-    "summary": "HTTP 5xx detected on ingress",
-    "description": "One or more HTTP 5xx responses were logged by nginx-ingress in the last 2 minutes. Dashboard: https://odp-grafana.wri.org/d/wri-http-errors",
+    "summary": "Sustained HTTP 5xx on ingress",
+    "description": "nginx-ingress logged more than 10 HTTP 5xx responses in each 2 minute window for 5 minutes. Dashboard: https://odp-grafana.wri.org/d/wri-http-errors",
     "dashboard_url": "https://odp-grafana.wri.org/d/wri-http-errors",
   },
   "labels": {
@@ -118,7 +119,7 @@ rule = {
       "datasourceUid": os.environ["LOKI_UID"],
       "model": {
         "refId": "A",
-        "expr": 'sum(count_over_time({namespace="nginx-ingress"} | regexp `"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^"]+" (?P<status>5[0-9]{2}) ` [2m]))',
+        "expr": 'sum(count_over_time({namespace="nginx-ingress"} |~ `" 5[0-9]{2} ` | regexp `"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^"]+" (?P<status>5[0-9]{2}) ` [2m]))',
         "queryType": "instant",
         "instant": True,
         "editorMode": "code",
@@ -146,7 +147,7 @@ rule = {
         "expression": "B",
         "conditions": [
           {
-            "evaluator": {"type": "gt", "params": [0]},
+            "evaluator": {"type": "gt", "params": [10]},
             "operator": {"type": "and"},
             "query": {"params": ["C"]},
             "reducer": {"type": "last", "params": []},
@@ -178,4 +179,5 @@ PY
 echo ""
 echo "Done. Check Grafana → Alerting → Alert rules → \"Ingress HTTP 5xx detected\""
 echo "Slack path: Grafana → Alertmanager → Slack (existing webhook)."
-echo "Evaluates ~every 1m on any 5xx in the last 2m (not per-request)."
+echo "Evaluates ~every 1m. Fires only after more than 10 HTTP 5xxs in each 2m window for 5m."
+echo "A Loki query error keeps the previous state and does not page."
