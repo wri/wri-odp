@@ -10,6 +10,7 @@ import { api } from '@/utils/api';
 import { ErrorAlert } from '../_shared/Alerts';
 import Spinner from '../_shared/Spinner';
 import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 function TopicCard({
     topic,
@@ -26,11 +27,10 @@ function TopicCard({
         >
             <div className="relative aspect-square h-72 w-full bg-white">
                 <Image
-                    src={`${
-                        topicDetails[topic.id]?.img_url
-                            ? topicDetails[topic.id]?.img_url
-                            : '/images/placeholders/topics/topicsdefault.png'
-                    }`}
+                    src={getSafeImageSrc(
+                        topicDetails[topic.id]?.img_url,
+                        '/images/placeholders/topics/topicsdefault.png'
+                    )}
                     alt={`Topic - ${topic.title}`}
                     fill
                     className="object-cover"

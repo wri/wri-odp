@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import { type WriUser } from '@/schema/ckan.schema';
 import Chip from '../_shared/Chip';
 import { visibilityTypeLabels } from '@/utils/constants';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 async function getCascadingUserCapacity(
     utils: ReturnType<typeof api.useUtils>,
@@ -102,11 +103,10 @@ export default function TeamHeaderCard({
                         <Image
                             alt="Team name"
                             fill={true}
-                            src={`${
-                                teamsDetails[team.id]?.img_url
-                                    ? teamsDetails[team.id]?.img_url
-                                    : '/images/placeholders/teams/teamsdefault.png'
-                            }`}
+                            src={getSafeImageSrc(
+                                teamsDetails[team.id]?.img_url,
+                                '/images/placeholders/teams/teamsdefault.png'
+                            )}
                             className="object-cover"
                         />
                     </div>

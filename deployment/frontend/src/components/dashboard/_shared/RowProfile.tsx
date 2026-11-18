@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { DefaultTooltip } from '@/components/_shared/Tooltip';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 export interface IRowProfile {
     title?: string;
@@ -32,12 +33,11 @@ export default function RowProfile({
                     } `}
                 >
                     <Image
-                        src={
-                            profile?.image_display_url
-                                ? profile.image_display_url
-                                : (defaultImg ??
-                                  '/images/placeholders/user/userdefault.png')
-                        }
+                        src={getSafeImageSrc(
+                            profile?.image_display_url,
+                            defaultImg ??
+                                '/images/placeholders/user/userdefault.png'
+                        )}
                         alt=""
                         className="rounded-md object-cover"
                         fill
@@ -80,12 +80,11 @@ export function RowProfilev2({
                     className={`relative ${imgStyle ? imgStyle : 'w-10 h-10'} `}
                 >
                     <Image
-                        src={
-                            profile?.image_display_url
-                                ? profile.image_display_url
-                                : (defaultImg ??
-                                  '/images/placeholders/user/userdefault.png')
-                        }
+                        src={getSafeImageSrc(
+                            profile?.image_display_url,
+                            defaultImg ??
+                                '/images/placeholders/user/userdefault.png'
+                        )}
                         alt=""
                         className="rounded-md"
                         fill

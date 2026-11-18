@@ -17,6 +17,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@headlessui/react';
 import Image from 'next/image';
 import type { Application } from '@/schema/ckan.schema';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 function ApplicationProfile({ application }: { application: Application }) {
     return (
@@ -25,11 +26,10 @@ function ApplicationProfile({ application }: { application: Application }) {
                 <div className="flex gap-x-4">
                     <div className="relative rounded-md w-16 h-16 bg-[#F9F9F9]">
                         <Image
-                            src={
-                                application?.image_display_url
-                                    ? application.image_display_url
-                                    : '/images/placeholders/applications/applicationsdefault.png'
-                            }
+                            src={getSafeImageSrc(
+                                application?.image_display_url,
+                                '/images/placeholders/applications/applicationsdefault.png'
+                            )}
                             alt=""
                             className="rounded-md object-cover"
                             fill

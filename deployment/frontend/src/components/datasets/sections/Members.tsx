@@ -8,6 +8,7 @@ import {
 } from '@/components/_shared/Table';
 import { type RouterOutput } from '@/server/api/root';
 import Image from 'next/image';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 type DatasetMembers = RouterOutput['dataset']['getDatasetCollaborators'];
 
@@ -49,11 +50,10 @@ export function Members({ members }: { members: DatasetMembers }) {
                                         <Image
                                             fill
                                             className="absolute inset-0 h-full w-full object-cover rounded-full"
-                                            src={
-                                                (user?.image_display_url as string)
-                                                    ? user?.image_display_url
-                                                    : `https://gravatar.com/avatar/${user?.email_hash}?s=270&d=identicon`
-                                            }
+                                            src={getSafeImageSrc(
+                                                user?.image_display_url as string,
+                                                `https://gravatar.com/avatar/${user?.email_hash}?s=270&d=identicon`
+                                            )}
                                             alt=""
                                         />
                                     </div>

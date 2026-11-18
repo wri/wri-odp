@@ -50,6 +50,7 @@ const config = {
             's3.amazonaws.com',
             'picsum.photos',
             'placeimg.com',
+            'dummyimage.com',
         ],
     },
     pageExtensions: ['tsx', 'mdx', 'ts', 'md'],
