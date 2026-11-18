@@ -22,6 +22,7 @@ import { Dialog } from '@headlessui/react';
 import SimpleSelect from '@/components/_shared/SimpleSelect';
 import { ErrorAlert } from '@/components/_shared/Alerts';
 import Image from 'next/image';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 export default function Issues({
     issues,
@@ -223,11 +224,10 @@ function IssueCard({
                                 <Image
                                     fill
                                     className="flex-none rounded-full bg-gray-50"
-                                    src={
-                                        comment.user?.image_display_url
-                                            ? comment.user?.image_display_url
-                                            : `https://gravatar.com/avatar/${comment.user?.email_hash}?s=270&d=identicon`
-                                    }
+                                    src={getSafeImageSrc(
+                                        comment.user?.image_display_url,
+                                        `https://gravatar.com/avatar/${comment.user?.email_hash}?s=270&d=identicon`
+                                    )}
                                     alt=""
                                 />
                             </div>

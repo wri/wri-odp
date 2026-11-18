@@ -4,6 +4,7 @@ import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
 import { type Group } from '@portaljs/ckan';
 import { api } from '@/utils/api';
 import Link from 'next/link';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 //write a typeguard to check if the topic is a GroupTree
 function isGroupTree(topic: GroupTree | Group): topic is GroupTree {
@@ -25,11 +26,10 @@ export default function TopicCard({
         >
             <div className="relative w-full h-56 2xl:h-64">
                 <Image
-                    src={`${
-                        topicDetails[topic.id]?.img_url
-                            ? topicDetails[topic.id]?.img_url
-                            : '/images/placeholders/topics/topicsdefault.png'
-                    }`}
+                    src={getSafeImageSrc(
+                        topicDetails[topic.id]?.img_url,
+                        '/images/placeholders/topics/topicsdefault.png'
+                    )}
                     alt={`Topic - ${topic.title}`}
                     fill
                     className="object-cover"

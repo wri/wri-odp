@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react';
 import { api } from '@/utils/api';
 import { PencilSquareIcon } from '@heroicons/react/24/outline';
 import EditCard from './EditCard';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 export function Hero({
     topics,
@@ -49,11 +50,10 @@ export function Hero({
                         <Image
                             alt="Topic name"
                             fill={true}
-                            src={`${
-                                topicsDetails[topic.id]?.img_url
-                                    ? topicsDetails[topic.id]?.img_url
-                                    : '/images/placeholders/topics/topicsdefault.png'
-                            }`}
+                            src={getSafeImageSrc(
+                                topicsDetails[topic.id]?.img_url,
+                                '/images/placeholders/topics/topicsdefault.png'
+                            )}
                             className="object-cover"
                         />
                     </div>

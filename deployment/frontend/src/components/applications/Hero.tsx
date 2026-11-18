@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react';
 import {
     ArrowUpRightIcon,
 } from '@heroicons/react/24/solid';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 export function Hero({ application }: { application: Application }) {
     const { data: session } = useSession();
@@ -18,11 +19,10 @@ export function Hero({ application }: { application: Application }) {
                 <Image
                     alt="Application name"
                     fill={true}
-                    src={`${
-                        application.image_display_url !== ''
-                            ? application?.image_display_url
-                            : '/images/placeholders/applications/applicationsdefault.png'
-                    }`}
+                    src={getSafeImageSrc(
+                        application.image_display_url,
+                        '/images/placeholders/applications/applicationsdefault.png'
+                    )}
                     className="object-cover"
                 />
                 <div className="absolute bottom-0 z-10 flex lg:h-[68px] lg:w-60 px-4 py-4 items-center justify-center rounded-t-[3px] bg-white">

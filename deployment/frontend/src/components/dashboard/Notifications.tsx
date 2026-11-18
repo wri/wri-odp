@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { DefaultTooltip } from '../_shared/Tooltip';
 import { api } from '@/utils/api';
 import Spinner from '../_shared/Spinner';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 import { type NotificationType } from '@/schema/notification.schema';
 
 function Notification({ items }: { items: NotificationType }) {
@@ -23,21 +24,15 @@ function Notification({ items }: { items: NotificationType }) {
                 )}
 
                 <div className="relative w-10 h-10">
-                    {items.sender_image ? (
-                        <Image
-                            src={`${items.sender_image}`}
-                            fill
-                            alt=""
-                            className="rounded-md object-cover"
-                        />
-                    ) : (
-                        <Image
-                            src={`https://gravatar.com/avatar/${items?.sender_emailHash}?s=270&d=identicon`}
-                            alt="Gravatar"
-                            fill
-                            className="rounded-md object-cover"
-                        />
-                    )}
+                    <Image
+                        src={getSafeImageSrc(
+                            items.sender_image,
+                            `https://gravatar.com/avatar/${items?.sender_emailHash}?s=270&d=identicon`
+                        )}
+                        fill
+                        alt=""
+                        className="rounded-md object-cover"
+                    />
                 </div>
             </div>
             <div className="flex flex-col">

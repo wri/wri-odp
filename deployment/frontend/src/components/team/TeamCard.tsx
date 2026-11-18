@@ -6,6 +6,7 @@ import { type Organization } from '@portaljs/ckan';
 import Link from 'next/link';
 import { visibilityTypeLabels } from '@/utils/constants';
 import Chip from '@/components/_shared/Chip';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 //write a typeguard to check if the topic is a GroupTree
 function isGroupTree(org: GroupTree | Organization): org is GroupTree {
@@ -27,11 +28,10 @@ export default function TeamCard({
         >
             <div className="relative w-full h-56 2xl:h-64">
                 <Image
-                    src={`${
-                        teamsDetails[team.id]?.img_url
-                            ? teamsDetails[team.id]?.img_url
-                            : '/images/placeholders/teams/teamdefault.png'
-                    }`}
+                    src={getSafeImageSrc(
+                        teamsDetails[team.id]?.img_url,
+                        '/images/placeholders/teams/teamdefault.png'
+                    )}
                     alt={`Team - ${team.title}`}
                     fill
                     className="object-cover"

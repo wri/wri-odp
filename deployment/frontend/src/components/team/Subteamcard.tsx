@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
 import { visibilityTypeLabels } from '@/utils/constants';
 import Chip from '@/components/_shared/Chip';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 interface SubtopicProps {
     title: string;
@@ -25,11 +26,10 @@ export default function Subteamcard({
         >
             <div className="relative w-full md:w-56 h-44">
                 <Image
-                    src={`${
-                        teamsDetails[team.id]?.img_url
-                            ? teamsDetails[team.id]?.img_url
-                            : '/images/placeholders/teams/teamdefault.png'
-                    }`}
+                    src={getSafeImageSrc(
+                        teamsDetails[team.id]?.img_url,
+                        '/images/placeholders/teams/teamdefault.png'
+                    )}
                     alt="highlight"
                     fill
                     className="object-cover"

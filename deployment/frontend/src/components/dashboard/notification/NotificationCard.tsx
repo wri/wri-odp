@@ -4,6 +4,7 @@ import { type NotificationType } from '@/schema/notification.schema';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 const DefaultTooltip = dynamic(() => import('@/components/_shared/Tooltip'), {
     ssr: false,
@@ -58,21 +59,15 @@ function Card({
                 <div className="flex flex-row gap-x-4 hover:bg-slate-100  rounded-md">
                     <div className="flex gap-x-4">
                         <div className={`relative w-8 h-8 mt-2 `}>
-                            {rowProfile.sender_image ? (
-                                <Image
-                                    src={`${rowProfile.sender_image}`}
-                                    fill
-                                    alt=""
-                                    className="rounded-md object-cover"
-                                />
-                            ) : (
-                                <Image
-                                    src={`https://gravatar.com/avatar/${rowProfile?.sender_emailHash}?s=270&d=identicon`}
-                                    alt="Gravatar"
-                                    fill
-                                    className="rounded-md object-cover"
-                                />
-                            )}
+                            <Image
+                                src={getSafeImageSrc(
+                                    rowProfile.sender_image,
+                                    `https://gravatar.com/avatar/${rowProfile?.sender_emailHash}?s=270&d=identicon`
+                                )}
+                                fill
+                                alt=""
+                                className="rounded-md object-cover"
+                            />
                         </div>
                     </div>
                     <div className={`flex flex-col `}>

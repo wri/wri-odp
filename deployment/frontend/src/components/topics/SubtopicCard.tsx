@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { type GroupTree, type GroupsmDetails } from '@/schema/ckan.schema';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 interface SubtopicProps {
     title: string;
@@ -23,11 +24,10 @@ export default function SubtopicCard({
         >
             <div className="relative w-full md:w-56 h-44">
                 <Image
-                    src={`${
-                        topicsDetails[topic.id]?.img_url
-                            ? topicsDetails[topic.id]?.img_url
-                            : '/images/placeholders/topics/topicsdefault.png'
-                    }`}
+                    src={getSafeImageSrc(
+                        topicsDetails[topic.id]?.img_url,
+                        '/images/placeholders/topics/topicsdefault.png'
+                    )}
                     alt="higlight"
                     fill
                     className="object-cover"

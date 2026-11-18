@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { type Application } from '@/schema/ckan.schema';
 import Link from 'next/link';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 
 export default function ApplicationCard({
     application,
@@ -16,11 +17,10 @@ export default function ApplicationCard({
         >
             <div className="relative aspect-square h-72 w-full bg-white">
                 <Image
-                    src={`${
-                        application.image_display_url !== ''
-                            ? application?.image_display_url
-                            : '/images/placeholders/applications/applicationsdefault.png'
-                    }`}
+                    src={getSafeImageSrc(
+                        application.image_display_url,
+                        '/images/placeholders/applications/applicationsdefault.png'
+                    )}
                     alt={`Application - ${application.title}`}
                     fill
                     className="object-cover"

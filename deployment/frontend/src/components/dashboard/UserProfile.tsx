@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { api } from '@/utils/api';
+import { getSafeImageSrc } from '@/utils/imageHosts';
 import Spinner from '../_shared/Spinner';
 
 export default function UserProfile() {
@@ -15,25 +16,15 @@ export default function UserProfile() {
     return (
         <div className="w-full flex flex-col justify-center items-center font-acumin gap-y-2 text-white pb-6 pt-10">
             <div className="relative w-24 h-24 rounded-full overflow-hidden">
-                {data?.userdetails?.imageUrl ? (
-                    <Image
-                        src={`${
-                            data?.userdetails?.imageUrl
-                                ? data?.userdetails?.imageUrl
-                                : '/images/placeholders/user/userdefault.png'
-                        }`}
-                        fill
-                        className=" object-cover"
-                        alt=""
-                    />
-                ) : (
-                    <Image
-                        src={`https://gravatar.com/avatar/${data?.userdetails?.email_hash}?s=270&d=identicon`}
-                        alt="Gravatar"
-                        sizes="(max-width: 638px) 208px, 244px"
-                        fill
-                    />
-                )}
+                <Image
+                    src={getSafeImageSrc(
+                        data?.userdetails?.imageUrl,
+                        `https://gravatar.com/avatar/${data?.userdetails?.email_hash}?s=270&d=identicon`
+                    )}
+                    fill
+                    className=" object-cover"
+                    alt=""
+                />
             </div>
             <div className="text-[1.438rem] leading-[1.725rem] font-semibold ">
                 {data?.userdetails?.name}
