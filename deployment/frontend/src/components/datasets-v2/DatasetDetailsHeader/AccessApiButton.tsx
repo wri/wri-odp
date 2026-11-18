@@ -129,7 +129,7 @@ export default function AccessApiButton({
                 open={isModalOpen || isAccessApiModalOpen}
                 onClose={closeModal}
                 size="xlarge"
-                header="Download data"
+                header="Access data via API"
                 content={
                     <div
                         className={styles.modalStepLayout}

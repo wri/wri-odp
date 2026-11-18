@@ -14,6 +14,8 @@ type SelectFilesMapSelectionBarProps = {
     selectedTotalBytes: number;
     onSelectAll: () => void;
     onClearAll: () => void;
+    /** Shown when nothing is selected; defaults to the download wording. */
+    emptyMessage?: string;
 };
 
 export default function SelectFilesMapSelectionBar({
@@ -22,6 +24,7 @@ export default function SelectFilesMapSelectionBar({
     selectedTotalBytes,
     onSelectAll,
     onClearAll,
+    emptyMessage = 'Select at least one tile to download',
 }: SelectFilesMapSelectionBarProps) {
     return (
         <div
@@ -85,7 +88,7 @@ export default function SelectFilesMapSelectionBar({
                     ? selectedTotalBytes > 0
                         ? `Estimated size: ${formatFileSize(selectedTotalBytes)}`
                         : null
-                    : 'Select at least one tile to download'}
+                    : emptyMessage}
             </div>
         </div>
     );
