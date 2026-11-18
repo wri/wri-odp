@@ -90,17 +90,23 @@ grafana:
           folder: WRI ODP
           interval: 1m
           rules:
+            # KeepLast: a failed Loki query keeps the previous state. execErrState
+            # Error pages Slack as DatasourceError while still using this text,
+            # so a timeout looks like an HTTP 5xx incident.
+            # Threshold: more than 10 5xx lines in every 2m window, for 5m.
+            # A single 5xx or a short bot burst ages out before `for` elapses.
             - uid: wri-ingress-http-5xx
               title: Ingress HTTP 5xx detected
               condition: C
               noDataState: OK
-              execErrState: Error
-              for: 0s
+              execErrState: KeepLast
+              for: 5m
               annotations:
-                summary: HTTP 5xx detected on ingress
+                summary: Sustained HTTP 5xx on ingress
                 description: >-
-                  One or more HTTP 5xx responses were logged by nginx-ingress
-                  in the last 2 minutes. Dashboard: https://odp-grafana.wri.org/d/wri-http-errors
+                  nginx-ingress logged more than 10 HTTP 5xx responses in each
+                  2 minute window for 5 minutes.
+                  Dashboard: https://odp-grafana.wri.org/d/wri-http-errors
               labels:
                 severity: warning
                 alertname: IngressHttp5xx
@@ -144,7 +150,7 @@ grafana:
                     conditions:
                       - evaluator:
                           type: gt
-                          params: [0]
+                          params: [10]
                         operator:
                           type: and
                         query:
