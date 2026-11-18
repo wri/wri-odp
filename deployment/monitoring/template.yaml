@@ -262,6 +262,12 @@ alertmanager:
         - match:
             alertname: KubeSchedulerDown
           receiver: 'null'
+        # Requests would not fit if the largest node failed. That is scheduling
+        # headroom, not pods running out of memory, and it sits firing on a
+        # small cluster. Not an outage.
+        - match:
+            alertname: KubeMemoryOvercommit
+          receiver: 'null'
         # This CronJob fails every hour and the Job object is then deleted, so
         # KubeJobFailed fires and auto-resolves on a loop. Not a service outage.
         - match_re:
@@ -303,13 +309,18 @@ nodeExporter:
 kubeStateMetrics:
   enabled: true
 
-# Drop default rules that cannot be true on EKS. kube-scheduler is part of the
-# managed control plane and is not a scrape target, so KubeSchedulerDown
-# (absent(up{job="kube-scheduler"})) pages critical with nothing to fix.
-# The Alertmanager null route above is the backstop if this chart key is ignored.
+# Drop default rules that are not actionable on this cluster.
+# kube-scheduler is part of the managed control plane and is not a scrape
+# target, so KubeSchedulerDown (absent(up{job="kube-scheduler"})) pages
+# critical with nothing to fix.
+# KubeMemoryOvercommit compares memory requests with capacity after losing
+# the largest node. It is not memory pressure, and a small overcommit is
+# expected. The Alertmanager null routes above are the backstop if a chart
+# key is ignored.
 defaultRules:
   disabled:
     KubeSchedulerDown: true
+    KubeMemoryOvercommit: true
 
 # Prometheus Operator
 prometheusOperator:

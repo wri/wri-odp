@@ -187,6 +187,7 @@ Alertmanager is included in the stack. Alerts are pre-configured in the template
 - High memory usage (>85% of limit)
 - Pod crash looping (excludes Job/CronJob pods)
 - `KubeSchedulerDown` is dropped (EKS does not scrape kube-scheduler)
+- `KubeMemoryOvercommit` is dropped (memory **requests** would not fit after losing the largest node; not pod memory pressure)
 - `KubeJobFailed` for `update-fe-cronjob-secret` is routed to the null receiver (hourly fail/resolve loop)
 - High error rate (>5% 5xx responses) — requires nginx Prometheus metrics (not currently scraped)
 - Pod not ready for >10 minutes (excludes completed Job/CronJob pods in `Succeeded` phase)
