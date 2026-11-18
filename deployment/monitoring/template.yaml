@@ -121,6 +121,7 @@ grafana:
                     refId: A
                     expr: >-
                       sum(count_over_time({namespace="nginx-ingress"}
+                      |~ `" 5[0-9]{2} `
                       | regexp `"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^"]+" (?P<status>5[0-9]{2}) `
                       [2m]))
                     queryType: instant

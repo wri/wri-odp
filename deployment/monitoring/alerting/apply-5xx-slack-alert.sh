@@ -119,7 +119,7 @@ rule = {
       "datasourceUid": os.environ["LOKI_UID"],
       "model": {
         "refId": "A",
-        "expr": 'sum(count_over_time({namespace="nginx-ingress"} | regexp `"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^"]+" (?P<status>5[0-9]{2}) ` [2m]))',
+        "expr": 'sum(count_over_time({namespace="nginx-ingress"} |~ `" 5[0-9]{2} ` | regexp `"(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS) [^"]+" (?P<status>5[0-9]{2}) ` [2m]))',
         "queryType": "instant",
         "instant": True,
         "editorMode": "code",
