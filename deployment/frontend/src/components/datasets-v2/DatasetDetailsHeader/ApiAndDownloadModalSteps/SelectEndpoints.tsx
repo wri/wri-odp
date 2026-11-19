@@ -4,6 +4,7 @@ import {
     getThemedFontSize,
     getThemedRadius,
     getThemedSpacing,
+    InlineMessage,
     TabBar,
     Tag,
 } from '@worldresources/wri-design-systems';
@@ -46,7 +47,7 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
     const [expandedByIndex, setExpandedByIndex] = useState<Record<number, boolean>>({});
     const [selectedTabByIndex, setSelectedTabByIndex] = useState<Record<number, CodeTab>>({});
     const [isMapOpen, setIsMapOpen] = useState(false);
-    const [selectedMapResourceId, setSelectedMapResourceId] = useState<string | null>(null);
+    const [selectedMapResourceIds, setSelectedMapResourceIds] = useState<string[]>([]);
     const [selectedMapTab, setSelectedMapTab] = useState<CodeTab>('javascript');
 
     const { data } = useFields({
@@ -92,12 +93,12 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
             return {
                 ...spatialGeom,
                 address: resource.spatial_address,
-                selected: selectedMapResourceId === resource.id,
+                selected: selectedMapResourceIds.includes(resource.id),
                 id: resource.id,
                 datafile: resource,
             };
         });
-    }, [geoSpatialResources, selectedMapResourceId]);
+    }, [geoSpatialResources, selectedMapResourceIds]);
 
     const showMapCard = Boolean(dataset.is_approved && geojsons.length > 0);
     const hasLocationFilter =
@@ -116,9 +117,9 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
         {
             enabled: showMapCard && hasLocationFilter,
             onSuccess: (resources) => {
-                const firstResult = resources?.[0];
-                if (firstResult) {
-                    setSelectedMapResourceId(firstResult.id);
+                const resultIds = (resources ?? []).map((resource) => resource.id);
+                if (resultIds.length > 0) {
+                    setSelectedMapResourceIds(resultIds);
                 }
                 formObj.reset();
             },
@@ -126,7 +127,11 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
     );
 
     const toggleResourceByMap = (resource: Resource) => {
-        setSelectedMapResourceId((current) => (current === resource.id ? null : resource.id));
+        setSelectedMapResourceIds((current) =>
+            current.includes(resource.id)
+                ? current.filter((id) => id !== resource.id)
+                : [...current, resource.id]
+        );
     };
 
     const handleMapCardButton = () => {
@@ -135,12 +140,14 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
             return;
         }
 
-        setSelectedMapResourceId(null);
+        setSelectedMapResourceIds([]);
         setIsMapOpen(false);
     };
 
-    const selectedMapEndpoint =
-        endpoints.find((endpoint) => endpoint.resource?.id === selectedMapResourceId) ?? null;
+    const selectedMapEndpoints = endpoints.filter(
+        (endpoint) =>
+            endpoint.resource != null && selectedMapResourceIds.includes(endpoint.resource.id)
+    );
     const nonResourceEndpoints = endpoints.filter((endpoint) => !endpoint.resource);
 
     const mapCardDescription =
@@ -261,10 +268,30 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
 
                     {isMapOpen && (
                         <>
+                            <div style={{ padding: getThemedSpacing(400) }}>
+                                <InlineMessage
+                                    variant="warning"
+                                    size="full-width"
+                                    actionButtonVariant="primary"
+                                    label="Global Forest Watch API token required"
+                                    caption="A Global Forest Watch API token is required to access this endpoint. Create a free token to continue."
+                                    actionLabel="Create access token"
+                                    isButtonRight
+                                    onActionClick={() =>
+                                        window.open(
+                                            'https://data-api.globalforestwatch.org/',
+                                            '_blank',
+                                            'noopener,noreferrer'
+                                        )
+                                    }
+                                />
+                            </div>
+
                             <SelectFilesMap
                                 geojsons={geojsons}
                                 formObj={formObj}
                                 onToggleResource={toggleResourceByMap}
+                                emptySelectionMessage="Select at least one tile to generate an endpoint"
                             />
 
                             <div
@@ -287,96 +314,117 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
                                     }}
                                 >
                                     <Squares2X2Icon width={16} height={16} />
-                                    {selectedMapEndpoint
-                                        ? `Selected tile: "${
-                                              selectedMapEndpoint.resource?.name ??
-                                              selectedMapEndpoint.resource?.title ??
-                                              selectedMapEndpoint.resource?.id ??
-                                              ''
-                                          }"`
-                                        : 'No tile selected'}
+                                    {selectedMapEndpoints.length > 0
+                                        ? `${selectedMapEndpoints.length} ${
+                                              selectedMapEndpoints.length === 1 ? 'tile' : 'tiles'
+                                          } selected`
+                                        : 'No tiles selected'}
                                 </div>
-                                {!selectedMapEndpoint && (
+                                {selectedMapEndpoints.length === 0 && (
                                     <div
                                         style={{
                                             fontWeight: 400,
                                             color: getThemedColor('neutral', 700),
                                         }}
                                     >
-                                        Select a tile above to generate an endpoint.
+                                        Select one or more tiles above to generate endpoints.
                                     </div>
                                 )}
-                                {selectedMapEndpoint && (
+                                {selectedMapEndpoints.length > 0 && (
                                     <>
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: getThemedSpacing(200),
-                                            }}
-                                        >
+                                        <TabBar
+                                            variant="transparent"
+                                            tabs={[
+                                                {
+                                                    label: 'Javascript',
+                                                    value: 'javascript',
+                                                },
+                                                { label: 'Python', value: 'python' },
+                                                { label: 'R', value: 'r' },
+                                            ]}
+                                            onTabClick={(value) =>
+                                                setSelectedMapTab(value as CodeTab)
+                                            }
+                                        />
+
+                                        {selectedMapEndpoints.map((endpoint) => (
                                             <div
+                                                key={endpoint.url}
                                                 style={{
-                                                    flex: 1,
-                                                    border: `1px solid ${getThemedColor('neutral', 300)}`,
-                                                    borderRadius: getThemedRadius(200),
-                                                    background: getThemedColor('neutral', 100),
-                                                    padding: `${getThemedSpacing(200)} ${getThemedSpacing(300)}`,
-                                                    fontSize: getThemedFontSize(400),
-                                                    color: getThemedColor('neutral', 600),
-                                                    overflow: 'hidden',
-                                                    whiteSpace: 'nowrap',
-                                                    textOverflow: 'ellipsis',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: getThemedSpacing(200),
                                                 }}
                                             >
-                                                {selectedMapEndpoint.url}
+                                                <div
+                                                    style={{
+                                                        fontSize: getThemedFontSize(400),
+                                                        fontWeight: 700,
+                                                        color: getThemedColor('neutral', 900),
+                                                    }}
+                                                >
+                                                    {endpoint.resource?.name ??
+                                                        endpoint.resource?.title ??
+                                                        endpoint.resource?.id ??
+                                                        ''}
+                                                </div>
+                                                <div
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: getThemedSpacing(200),
+                                                    }}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            flex: 1,
+                                                            border: `1px solid ${getThemedColor('neutral', 300)}`,
+                                                            borderRadius: getThemedRadius(200),
+                                                            background: getThemedColor(
+                                                                'neutral',
+                                                                100
+                                                            ),
+                                                            padding: `${getThemedSpacing(200)} ${getThemedSpacing(300)}`,
+                                                            fontSize: getThemedFontSize(400),
+                                                            color: getThemedColor('neutral', 600),
+                                                            overflow: 'hidden',
+                                                            whiteSpace: 'nowrap',
+                                                            textOverflow: 'ellipsis',
+                                                        }}
+                                                    >
+                                                        {endpoint.url}
+                                                    </div>
+                                                    <Button
+                                                        variant="secondary"
+                                                        size="default"
+                                                        leftIcon={<ClipboardDocumentIcon />}
+                                                        onClick={() => copyEndpoint(endpoint.url)}
+                                                    >
+                                                        Copy
+                                                    </Button>
+                                                </div>
+
+                                                <div
+                                                    style={{
+                                                        background: getThemedColor('neutral', 200),
+                                                        borderRadius: getThemedRadius(300),
+                                                        padding: getThemedSpacing(400),
+                                                        fontSize: getThemedFontSize(400),
+                                                        color: getThemedColor('neutral', 800),
+                                                        lineHeight: '1.55',
+                                                        whiteSpace: 'pre-wrap',
+                                                    }}
+                                                >
+                                                    {getSnippetByEndpoint({
+                                                        endpoint,
+                                                        tab: selectedMapTab,
+                                                        ckanBaseUrl,
+                                                    })}
+                                                </div>
                                             </div>
-                                            <Button
-                                                variant="secondary"
-                                                size="default"
-                                                leftIcon={<ClipboardDocumentIcon />}
-                                                onClick={() =>
-                                                    copyEndpoint(selectedMapEndpoint.url)
-                                                }
-                                            >
-                                                Copy
-                                            </Button>
-                                        </div>
+                                        ))}
 
                                         <div>
-                                            <TabBar
-                                                variant="transparent"
-                                                tabs={[
-                                                    {
-                                                        label: 'Javascript',
-                                                        value: 'javascript',
-                                                    },
-                                                    { label: 'Python', value: 'python' },
-                                                    { label: 'R', value: 'r' },
-                                                ]}
-                                                onTabClick={(value) =>
-                                                    setSelectedMapTab(value as CodeTab)
-                                                }
-                                            />
-
-                                            <div
-                                                style={{
-                                                    background: getThemedColor('neutral', 200),
-                                                    borderRadius: getThemedRadius(300),
-                                                    padding: getThemedSpacing(400),
-                                                    fontSize: getThemedFontSize(400),
-                                                    color: getThemedColor('neutral', 800),
-                                                    lineHeight: '1.55',
-                                                    whiteSpace: 'pre-wrap',
-                                                    marginBottom: getThemedSpacing(200),
-                                                }}
-                                            >
-                                                {getSnippetByEndpoint({
-                                                    endpoint: selectedMapEndpoint,
-                                                    tab: selectedMapTab,
-                                                    ckanBaseUrl,
-                                                })}
-                                            </div>
                                             <Button
                                                 variant="secondary"
                                                 size="default"

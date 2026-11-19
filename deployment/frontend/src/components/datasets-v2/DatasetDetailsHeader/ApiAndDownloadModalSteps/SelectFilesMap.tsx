@@ -60,6 +60,8 @@ type SelectFilesMapProps = {
     // When provided, drawing an area selects the tiles intersecting it
     // instead of running the resource location search.
     onSelectTilesInArea?: (bbox: [number, number, number, number]) => void;
+    /** Copy shown in the selection bar when no tile is selected. */
+    emptySelectionMessage?: string;
 };
 
 type ViewMode = 'map' | 'list';
@@ -72,6 +74,7 @@ export default function SelectFilesMap({
     onSelectAllTiles,
     onClearAllTiles,
     onSelectTilesInArea,
+    emptySelectionMessage,
 }: SelectFilesMapProps) {
     const { setValue } = formObj;
     const [cursor, setCursor] = useState('grab');
@@ -454,7 +457,9 @@ export default function SelectFilesMap({
 
                             return (
                                 <div
-                                    key={resource.id}
+                                    // Tile geojsons share their resource id, so the
+                                    // geojson id (unique per tile) is the key.
+                                    key={geojson.id}
                                     style={{
                                         display: 'flex',
                                         alignItems: 'center',
@@ -513,6 +518,7 @@ export default function SelectFilesMap({
                     selectedTotalBytes={selectedTotalBytes}
                     onSelectAll={handleSelectAll}
                     onClearAll={handleClearAll}
+                    emptyMessage={emptySelectionMessage}
                 />
             </div>
         </>
