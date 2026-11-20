@@ -112,3 +112,52 @@ def test_approved_tags_validator_lists_rejected_keywords():
     assert "Foo" in message
     assert "Bar" in message
     assert "Economy" not in message
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("", ""),
+        ("Economy", "Economy"),
+        ("Economy, raster", "Economy"),
+        ("raster", ""),
+        ([], []),
+        (["Economy"], ["Economy"]),
+        (["Economy", "raster"], ["Economy"]),
+        ([{"name": "Economy"}, {"name": "raster"}], [{"name": "Economy"}]),
+    ],
+)
+def test_filter_approved_tags(value, expected):
+    assert validators.filter_approved_tags(value) == expected
+
+
+def test_filter_approved_tags_keeps_tag_dicts_untouched():
+    tag = {"name": "Economy", "display_name": "Economy", "state": "active"}
+    assert validators.filter_approved_tags([tag, {"name": "raster"}]) == [tag]
+
+
+def test_validate_approved_tags_drops_legacy_tags_instead_of_failing():
+    # The UI submits the whole dataset dict, which still carries legacy
+    # keywords stored before the approved list existed.
+    data_dict = {
+        "title": "Dataset",
+        "tags": [{"name": "Economy"}, {"name": "raster"}],
+    }
+
+    assert validators.validate_approved_tags({}, data_dict) is True
+    assert data_dict["tags"] == [{"name": "Economy"}]
+
+
+def test_validate_approved_tags_rejects_unapproved_tag_string():
+    data_dict = {"title": "Dataset", "tag_string": "Economy, raster"}
+
+    with pytest.raises(validators.ValidationError) as excinfo:
+        validators.validate_approved_tags({}, data_dict)
+
+    assert "raster" in str(excinfo.value)
+
+
+def test_validate_approved_tags_allows_approved_tag_string():
+    data_dict = {"title": "Dataset", "tag_string": "Economy, Air Quality"}
+
+    assert validators.validate_approved_tags({}, data_dict) is True
