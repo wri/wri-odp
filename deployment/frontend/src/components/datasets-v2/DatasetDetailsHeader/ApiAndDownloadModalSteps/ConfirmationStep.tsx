@@ -22,6 +22,8 @@ import {
     formatDate,
     formatFileSize,
     getResourceFormatLabel,
+    getResourceSize,
+    isDataApiResource,
     isDirectDownloadResource,
 } from '../download-utils';
 import { useDirectDownload } from './useDirectDownload';
@@ -29,6 +31,8 @@ import { useDirectDownload } from './useDirectDownload';
 type ConfirmationStepProps = {
     selectedResources: Resource[];
     totalSelectedBytes: number;
+    /** Bytes read from the file for resources CKAN saved without a size. */
+    resolvedSizeByResourceId?: Record<string, number>;
     datasetName: string;
     deliveryEmail?: string;
     onBack: () => void;
@@ -37,7 +41,8 @@ type ConfirmationStepProps = {
 
 function ConfirmationStep({
     selectedResources,
-    totalSelectedBytes: _totalSelectedBytes,
+    totalSelectedBytes,
+    resolvedSizeByResourceId = {},
     datasetName,
     deliveryEmail,
     onBack,
@@ -52,8 +57,13 @@ function ConfirmationStep({
         (resource) => !resource.not_downloadable && !isDirectDownloadResource(resource)
     );
     const selectedCount = directResources.length;
-    const totalDirectBytes = directResources.reduce(
-        (acc, resource) => acc + Number(resource.size ?? 0),
+    // CKAN often has no size for imported links: fall back to the size read from
+    // the file itself so the summary does not report 0 bytes.
+    const getBytes = (resource: Resource) =>
+        getResourceSize(resource) ?? resolvedSizeByResourceId[resource.id] ?? 0;
+    // The selected totals are estimated upstream (see DatasetDownloadButton).
+    const serverDeliveredBytes = serverDeliveredResources.reduce(
+        (acc, resource) => acc + getBytes(resource),
         0
     );
     const { download } = useDirectDownload(datasetName);
@@ -129,11 +139,10 @@ function ConfirmationStep({
                 <DownloadStartedBanner
                     variant="direct"
                     fileCount={selectedCount}
-                    fileSize={formatFileSize(totalDirectBytes)}
+                    fileSize={formatFileSize(totalSelectedBytes)}
                     onRetry={() => void download(directResources)}
                 />
             )}
-
             {serverDeliveredResources.length > 0 && deliveryEmail && (
                 <DownloadStartedBanner
                     variant="email"
@@ -142,10 +151,9 @@ function ConfirmationStep({
                         0
                     )}
                     fileSize={formatFileSize(
-                        serverDeliveredResources.reduce(
-                            (acc, resource) => acc + Number(resource.size ?? 0),
-                            0
-                        )
+                        serverDeliveredResources.some(isDataApiResource)
+                            ? totalSelectedBytes
+                            : serverDeliveredBytes
                     )}
                     email={deliveryEmail}
                 />
@@ -182,7 +190,7 @@ function ConfirmationStep({
                                             marginLeft: getThemedSpacing(400),
                                         }}
                                     >
-                                        {formatFileSize(Number(resource.size ?? 0))}
+                                        {formatFileSize(getBytes(resource))}
                                     </span>
                                 }
                             />
@@ -235,7 +243,7 @@ function ConfirmationStep({
                                 color: getThemedColor('neutral', 900),
                             }}
                         >
-                            {formatFileSize(totalDirectBytes)}
+                            {formatFileSize(totalSelectedBytes)}
                         </span>
                     </div>
                 </>

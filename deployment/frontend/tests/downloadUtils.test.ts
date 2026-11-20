@@ -1,8 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
+    estimateSelectedTilesBytes,
+    estimateSelectedTilesSize,
+    estimateTileBytes,
+    formatFileSize,
     getCopyLinkValue,
     getDataApiTileGfwUrls,
     getResourceFormatLabel,
+    getResourceSize,
+    getResourceSizeProbeUrl,
     getVersionFromTilePath,
     isCopyLinkResource,
     isDataApiResource,
@@ -158,5 +164,145 @@ describe('download-utils tile helpers', () => {
 
     it('returns no URLs without a dataset id', () => {
         expect(getDataApiTileGfwUrls({ data_api_tiles: [TILE] })).toEqual([]);
+    });
+});
+
+describe('download-utils size estimation', () => {
+    // Shape of a single feature of the GFW `tiles_info` GeoJSON.
+    // Note `pixelxsize` is reported in metres and `width`/`height` are the size
+    // of the whole 10 degree tile, not of a single pixel block.
+    const DEFLATE_TILE = {
+        properties: {
+            name: '/vsis3/gfw-data-lake/umd_tree_cover_density_2000/v1.8/raster/epsg-4326/10/40000/percent/geotiff/30S_110W.tif',
+            width: 40000,
+            height: 40000,
+            pixelxsize: 0.00025,
+            pixelysize: 0.00025,
+            compression: 'DEFLATE',
+            bands: [{ data_type: 'uint8', nbits: null }],
+        },
+    };
+
+    it('ignores missing or zero resource sizes', () => {
+        expect(getResourceSize({ size: null })).toBeUndefined();
+        expect(getResourceSize({ size: 0 })).toBeUndefined();
+        expect(getResourceSize({})).toBeUndefined();
+        expect(getResourceSize({ size: 2048 })).toBe(2048);
+    });
+
+    it('probes link URLs CKAN saved without a size', () => {
+        const url = 'https://lcl.wridata.org/concessions/gfw_wood_fiber_v2025.zip';
+
+        // The reported case: a link resource imported with `size: null`.
+        expect(getResourceSizeProbeUrl({ type: 'link', url })).toBe(url);
+        expect(getResourceSizeProbeUrl({ url })).toBe(url);
+
+        // A CKAN size is already authoritative.
+        expect(getResourceSizeProbeUrl({ url, size: 986583 })).toBeNull();
+        expect(getResourceSizeProbeUrl({ url, size: 0 })).toBe(url);
+
+        // Tiles are sized from `tiles_info`, copy-links are not downloaded and
+        // S3 keys cannot be probed from the server.
+        expect(getResourceSizeProbeUrl({ url, type: 'data-api-dataset' })).toBeNull();
+        expect(getResourceSizeProbeUrl({ url, type: 'gee-asset' })).toBeNull();
+        expect(getResourceSizeProbeUrl({ url, type: 'tile-cache' })).toBeNull();
+        expect(getResourceSizeProbeUrl({ url, key: 'resources/file.zip' })).toBeNull();
+        expect(getResourceSizeProbeUrl({ url: 'not-a-url' })).toBeNull();
+        expect(getResourceSizeProbeUrl({})).toBeNull();
+    });
+
+    it('estimates a compressed tile from its pixel size and band type', () => {
+        // 10 degrees at 0.00025 deg/px -> 40000x40000 uint8 px, DEFLATE (~5%).
+        const estimate = estimateTileBytes(DEFLATE_TILE.properties);
+
+        expect(estimate).toBeGreaterThan(60 * 1024 * 1024);
+        expect(estimate).toBeLessThan(90 * 1024 * 1024);
+    });
+
+    it('estimates tiles whose pixel size is reported in metres', () => {
+        // `umd_tree_cover_density_2000` reports a 110 m pixel size.
+        const estimate = estimateTileBytes({ ...DEFLATE_TILE.properties, pixelxsize: 110 });
+
+        expect(estimate).toBeGreaterThan(60 * 1024 * 1024);
+        expect(estimate).toBeLessThan(90 * 1024 * 1024);
+    });
+
+    it('estimates tiles whose pixel size is reported as zero on one axis', () => {
+        const estimate = estimateTileBytes({ ...DEFLATE_TILE.properties, pixelxsize: 0 });
+
+        expect(estimate).toBeGreaterThan(60 * 1024 * 1024);
+    });
+
+    it('estimates more bytes for higher bit depth bands', () => {
+        const floatTile = {
+            ...DEFLATE_TILE.properties,
+            bands: [{ data_type: 'float32', nbits: null }],
+        };
+
+        expect(estimateTileBytes(floatTile)).toBeGreaterThan(
+            estimateTileBytes(DEFLATE_TILE.properties) * 3
+        );
+    });
+
+    it('accepts both numpy and GTiff band type names', () => {
+        const bytes = (data_type: string) =>
+            estimateTileBytes({
+                ...DEFLATE_TILE.properties,
+                bands: [{ data_type, nbits: null }],
+            });
+
+        expect(bytes('uint8')).toBe(bytes('Byte'));
+        expect(bytes('uint16')).toBe(bytes('UInt16'));
+        expect(bytes('int32')).toBe(bytes('Int32'));
+        expect(bytes('float64')).toBe(bytes('Float64'));
+        expect(bytes('uint16')).toBeCloseTo(bytes('uint8') * 2, -4);
+    });
+
+    it('never reports less than a minimal tile', () => {
+        expect(estimateTileBytes(null)).toBe(0);
+        // No band or compression info: 256x256 px at the default 10% ratio.
+        expect(estimateTileBytes({ compression: null, bands: null })).toBeGreaterThan(0);
+        expect(estimateTileBytes({ compression: null, bands: null })).toBeLessThan(16 * 1024);
+        // An unknown band type is treated as a single byte per pixel.
+        expect(
+            estimateTileBytes({ ...DEFLATE_TILE.properties, bands: [{ data_type: null }] })
+        ).toBe(estimateTileBytes(DEFLATE_TILE.properties));
+    });
+
+    it('only adds up the selected tiles', () => {
+        const otherTile = {
+            properties: { ...DEFLATE_TILE.properties, name: '/tiles/30S_120W.tif' },
+        };
+        const features = [DEFLATE_TILE, otherTile];
+        const single = estimateTileBytes(DEFLATE_TILE.properties);
+
+        expect(estimateSelectedTilesBytes(features, new Set())).toBe(0);
+        expect(estimateSelectedTilesBytes(features, new Set([DEFLATE_TILE.properties.name]))).toBe(
+            single
+        );
+        expect(estimateSelectedTilesBytes(features, new Set())).toBe(0);
+        expect(
+            estimateSelectedTilesBytes(
+                features,
+                new Set([DEFLATE_TILE.properties.name, otherTile.properties.name])
+            )
+        ).toBe(single * 2);
+    });
+
+    it('falls back to the resource size per selected tile', () => {
+        expect(estimateSelectedTilesSize({ size: 10_000 }, ['a', 'b'])).toBe(20_000);
+        expect(estimateSelectedTilesSize({}, ['a'])).toBe(0);
+        expect(estimateSelectedTilesSize({ size: 10_000 }, [])).toBe(0);
+        // `tiles_info` wins over the resource size when available.
+        expect(
+            estimateSelectedTilesSize({ size: 1 }, [DEFLATE_TILE.properties.name], [DEFLATE_TILE])
+        ).toBe(estimateTileBytes(DEFLATE_TILE.properties));
+    });
+
+    it('formats gigabyte sizes', () => {
+        expect(formatFileSize(512)).toBe('512 B');
+        expect(formatFileSize(2048)).toBe('2.0 KB');
+        expect(formatFileSize(2 * 1024 * 1024)).toBe('2.0 MB');
+        expect(formatFileSize(3 * 1024 * 1024 * 1024)).toBe('3.00 GB');
     });
 });

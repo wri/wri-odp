@@ -3,6 +3,32 @@ import { z } from 'zod';
 
 const GFW_DATA_API_ORIGIN = 'https://data-api.globalforestwatch.org';
 
+// A whole download response can take a while to send its first byte.
+const SIZE_PROBE_TIMEOUT_MS = 10_000;
+
+/**
+ * Bytes of a remote file, read from the `Content-Length` of a `HEAD` request.
+ * Resources imported from an external URL are saved with `size: null`, so this
+ * is the only way to report a real download size for them. Files whose server
+ * omits `Content-Length` (chunked transfers) resolve to `null`.
+ */
+async function fetchContentLength(url: string): Promise<number | null> {
+    try {
+        const res = await fetch(url, {
+            method: 'HEAD',
+            redirect: 'follow',
+            signal: AbortSignal.timeout(SIZE_PROBE_TIMEOUT_MS),
+        });
+        if (!res.ok) return null;
+
+        const contentLength = Number(res.headers.get('content-length'));
+        return Number.isFinite(contentLength) && contentLength > 0 ? contentLength : null;
+    } catch {
+        // A failing probe must never break the download modal.
+        return null;
+    }
+}
+
 async function fetchTilesInfo(assetId: string): Promise<string[]> {
     const res = await fetch(
         `${GFW_DATA_API_ORIGIN}/asset/${encodeURIComponent(assetId)}/tiles_info`,
@@ -17,6 +43,32 @@ async function fetchTilesInfo(assetId: string): Promise<string[]> {
         }>;
     };
     return (geojson.features ?? []).map((f) => f.properties?.name ?? '').filter(Boolean);
+}
+
+type TilesInfoFeature = {
+    properties?: {
+        name?: string;
+        width?: number | null;
+        height?: number | null;
+        pixelxsize?: number | null;
+        pixelysize?: number | null;
+        compression?: string | null;
+        bands?: Array<{ data_type?: string | null; nbits?: number | null }> | null;
+    };
+};
+
+async function fetchTilesInfoFeatures(assetId: string): Promise<TilesInfoFeature[]> {
+    const res = await fetch(
+        `${GFW_DATA_API_ORIGIN}/asset/${encodeURIComponent(assetId)}/tiles_info`,
+        { redirect: 'follow' }
+    );
+    if (!res.ok) {
+        throw new Error(`tiles_info failed: ${res.status} ${res.statusText}`);
+    }
+    const geojson = (await res.json()) as { features?: TilesInfoFeature[] };
+    return (geojson.features ?? [])
+        .filter((feature) => Boolean(feature.properties?.name))
+        .map((feature) => ({ properties: feature.properties }));
 }
 
 type DataApiAsset = {
@@ -106,4 +158,48 @@ export const dataApiRouter = createTRPCRouter({
 
             return { assetId, tiles: await fetchTilesInfo(assetId) };
         }),
+
+    /**
+     * Per-tile GeoTIFF metadata (compression, pixel size, band type) of a GFW
+     * data API asset, used to estimate the download size of the selected tiles
+     * since data API resources are not sized by CKAN.
+     */
+    getTilesInfoFeatures: publicProcedure
+        .input(
+            z.object({
+                datasetId: z.string(),
+                version: z.string().nullish(),
+                assetId: z.string().nullish(),
+            })
+        )
+        .query(async ({ input }) => {
+            // A stored asset id can be stale (asset re-created on a new version),
+            // so fall back to discovering the asset when it yields no features.
+            const storedAssetId = input.assetId?.trim();
+            if (storedAssetId) {
+                try {
+                    const features = await fetchTilesInfoFeatures(storedAssetId);
+                    if (features.length > 0) {
+                        return { assetId: storedAssetId, features };
+                    }
+                } catch {
+                    // fall through to asset discovery
+                }
+            }
+
+            const assetId = await findRasterTileSetAssetId(input.datasetId, input.version);
+            if (!assetId || assetId === storedAssetId) {
+                return { assetId: null, features: [] as TilesInfoFeature[] };
+            }
+
+            return { assetId, features: await fetchTilesInfoFeatures(assetId) };
+        }),
+
+    /**
+     * Size in bytes of a remote file, read from its `Content-Length` header.
+     * Used for resources CKAN stored with `size: null` (imported links).
+     */
+    getResourceSize: publicProcedure
+        .input(z.object({ url: z.string().url() }))
+        .query(async ({ input }) => fetchContentLength(input.url)),
 });
