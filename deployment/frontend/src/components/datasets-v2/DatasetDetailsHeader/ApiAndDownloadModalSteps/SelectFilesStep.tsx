@@ -14,9 +14,11 @@ import { useForm } from 'react-hook-form';
 import { api } from '@/utils/api';
 import FileCard from './FileCard';
 import {
+    estimateSelectedTilesSize,
     formatDate,
     formatFileSize,
     getResourceFormatLabel,
+    getResourceSize,
     getStoredDataApiTiles,
     isCopyLinkResource,
     isDataApiResource,
@@ -25,6 +27,7 @@ import {
 } from '../download-utils';
 import CopyLinkResourcesSection from './CopyLinkResourcesSection';
 import { type LocationSearchFormType, type TileGeojson } from './SelectFilesMap';
+import { type TileInfoFeature } from './useDataApiTiles';
 
 const SelectFilesMap = dynamic(() => import('./SelectFilesMap'), {
     ssr: false,
@@ -36,6 +39,10 @@ type SelectFilesStepProps = {
     selectedTilesByResourceId: Record<string, string[]>;
     /** Tiles resolved on demand, keyed by data API resource id. */
     tilesByResourceId?: Record<string, string[]>;
+    /** Per-tile GeoTIFF metadata, keyed by data API resource id. */
+    tileInfoByResourceId?: Record<string, TileInfoFeature[]>;
+    /** Bytes read from the file for resources CKAN saved without a size. */
+    resolvedSizeByResourceId?: Record<string, number>;
     /** Data API resources whose tiles are still being resolved. */
     resolvingResourceIds?: string[];
     onToggleResource: (resourceId: string) => void;
@@ -49,6 +56,8 @@ function SelectFilesStep({
     selectedResourceIds,
     selectedTilesByResourceId,
     tilesByResourceId = {},
+    tileInfoByResourceId = {},
+    resolvedSizeByResourceId = {},
     resolvingResourceIds = [],
     onToggleResource,
     onSelectTiles,
@@ -64,6 +73,10 @@ function SelectFilesStep({
     const getTiles = (resource: Resource): string[] =>
         tilesByResourceId[resource.id] ?? getStoredDataApiTiles(resource);
     const isResolvingTiles = (resource: Resource) => resolvingResourceIds.includes(resource.id);
+    // Imported links are saved with `size: null`, so fall back to the size read
+    // from the file itself (see `useDataApiTiles`).
+    const getResourceBytes = (resource: Resource): number | undefined =>
+        getResourceSize(resource) ?? resolvedSizeByResourceId[resource.id];
     const geoSpatialResources = selectableResources
         .filter((resource) => resource.spatial_type !== 'global')
         .filter((resource) => (resource.spatial_address ?? resource.spatial_geom) != null);
@@ -159,9 +172,12 @@ function SelectFilesStep({
         const result: Record<string, TileGeojson[]> = {};
         for (const resource of dataApiResources) {
             const selectedTiles = new Set(selectedTilesByResourceId[resource.id] ?? []);
-            result[resource.id] = (
-                tilesByResourceId[resource.id] ?? getStoredDataApiTiles(resource)
-            ).map((tile, index) => {
+            const tiles = tilesByResourceId[resource.id] ?? getStoredDataApiTiles(resource);
+            // CKAN does not size data API resources; `tiles_info` does. Without it
+            // the CKAN `size` is used (the size of a single tile).
+            const resourceSize = getResourceSize(resource);
+            const tileInfo = tileInfoByResourceId[resource.id];
+            result[resource.id] = tiles.map((tile, index) => {
                 const bbox = tileToBbox(tile);
                 return {
                     // Mapbox <Source> needs a valid GeoJSON Feature.
@@ -170,6 +186,9 @@ function SelectFilesStep({
                     datafile: resource,
                     name: tile.split('/').pop() ?? tile,
                     selected: selectedTiles.has(tile),
+                    size: tileInfo?.length
+                        ? estimateSelectedTilesSize(resource, [tile], tileInfo)
+                        : resourceSize,
                     ...(bbox
                         ? {
                               geometry: {
@@ -190,7 +209,7 @@ function SelectFilesStep({
             });
         }
         return result;
-    }, [dataApiResources, selectedTilesByResourceId, tilesByResourceId]);
+    }, [dataApiResources, selectedTilesByResourceId, tilesByResourceId, tileInfoByResourceId]);
 
     const handleDataApiResourceButton = (resource: Resource) => {
         const isSelected = selectedResourceIds.includes(resource.id);
@@ -437,8 +456,8 @@ function SelectFilesStep({
                                 }
                                 description={resource.description ?? resource.name ?? ''}
                                 extraInfo={
-                                    resource.size
-                                        ? `Size: ${formatFileSize(resource.size)}`
+                                    getResourceBytes(resource)
+                                        ? `Size: ${formatFileSize(getResourceBytes(resource))}`
                                         : undefined
                                 }
                                 createdAt={formatDate(resource.created)}

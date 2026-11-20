@@ -18,9 +18,12 @@ import ReviewDetailsAndTermsStep, {
 import SelectFilesStep from './ApiAndDownloadModalSteps/SelectFilesStep';
 import { useDataApiTiles } from './ApiAndDownloadModalSteps/useDataApiTiles';
 import {
+    estimateSelectedTilesSize,
     formatFileSize,
     getDataApiTileGfwUrls,
     getResourceFormatLabel,
+    getResourceSize,
+    getStoredDataApiTiles,
     isDataApiResource,
     isDirectDownloadResource,
 } from './download-utils';
@@ -63,9 +66,12 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
 
     // Data API resources are often saved without their tiles; resolve them on
     // demand so the tile picker works and the ZIP can be built.
-    const { tilesByResourceId, loadingResourceIds } = useDataApiTiles(dataset.resources, {
-        enabled: isModalOpen,
-    });
+    const {
+        tilesByResourceId,
+        tileInfoByResourceId,
+        resolvedSizeByResourceId,
+        loadingResourceIds,
+    } = useDataApiTiles(dataset.resources, { enabled: isModalOpen });
 
     useScrollTopOnStepChange(activeStep);
 
@@ -73,10 +79,21 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
         selectedResourceIds.includes(resource.id)
     );
     const selectedCount = selectedResources.length;
-    const totalSelectedBytes = selectedResources.reduce(
-        (sum, resource) => sum + Number(resource.size ?? 0),
-        0
-    );
+    const totalSelectedBytes = selectedResources.reduce((sum, resource) => {
+        // Data API resources have no CKAN size: their tiles are sized per tile.
+        if (isDataApiResource(resource)) {
+            const tiles =
+                selectedTilesByResourceId[resource.id] ??
+                tilesByResourceId[resource.id] ??
+                getStoredDataApiTiles(resource);
+            return (
+                sum + estimateSelectedTilesSize(resource, tiles, tileInfoByResourceId[resource.id])
+            );
+        }
+
+        // CKAN has no size for imported links: use the size read from the file.
+        return sum + (getResourceSize(resource) ?? resolvedSizeByResourceId[resource.id] ?? 0);
+    }, 0);
     const selectedFormats = Array.from(
         new Set(selectedResources.map((resource) => getResourceFormatLabel(resource)))
     );
@@ -218,6 +235,8 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                         selectedResourceIds={selectedResourceIds}
                         selectedTilesByResourceId={selectedTilesByResourceId}
                         tilesByResourceId={tilesByResourceId}
+                        tileInfoByResourceId={tileInfoByResourceId}
+                        resolvedSizeByResourceId={resolvedSizeByResourceId}
                         resolvingResourceIds={loadingResourceIds}
                         onToggleResource={toggleResourceSelection}
                         onSelectTiles={selectTilesForResource}
@@ -256,6 +275,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                                 : resource
                         )}
                         totalSelectedBytes={totalSelectedBytes}
+                        resolvedSizeByResourceId={resolvedSizeByResourceId}
                         datasetName={dataset.name}
                         deliveryEmail={deliveryEmail}
                         onBack={() => setActiveStep('terms')}
@@ -353,18 +373,21 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                                                 </div>
                                                 {selectedFormats.length > 0 && (
                                                     <>
-                                                        <div
-                                                            style={{
-                                                                fontSize: getThemedFontSize(300),
-                                                                color: getThemedColor(
-                                                                    'neutral',
-                                                                    700
-                                                                ),
-                                                            }}
-                                                        >
-                                                            Estimated size:{' '}
-                                                            {formatFileSize(totalSelectedBytes)}
-                                                        </div>
+                                                        {totalSelectedBytes > 0 && (
+                                                            <div
+                                                                style={{
+                                                                    fontSize:
+                                                                        getThemedFontSize(300),
+                                                                    color: getThemedColor(
+                                                                        'neutral',
+                                                                        700
+                                                                    ),
+                                                                }}
+                                                            >
+                                                                Estimated size:{' '}
+                                                                {formatFileSize(totalSelectedBytes)}
+                                                            </div>
+                                                        )}
                                                         <div
                                                             style={{
                                                                 fontSize: getThemedFontSize(300),

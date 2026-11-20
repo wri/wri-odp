@@ -31,6 +31,8 @@ export type TileGeojson = {
     filtered?: boolean;
     // Display name for list rows; falls back to the resource name when absent.
     name?: string;
+    // Estimated bytes of this tile; `datafile.size` is the whole resource size.
+    size?: number;
     [key: string]: unknown;
 };
 
@@ -136,7 +138,10 @@ export default function SelectFilesMap({
     const selectedTotalBytes = useMemo(
         () =>
             selectedGeojsons.reduce(
-                (total, geojson) => total + Number(geojson.datafile.size ?? 0),
+                (total, geojson) =>
+                    // A tile's own size (data API tile sets); otherwise the whole
+                    // resource size for resources selected as a single feature.
+                    total + Number(geojson.size ?? geojson.datafile.size ?? 0),
                 0
             ),
         [selectedGeojsons]
