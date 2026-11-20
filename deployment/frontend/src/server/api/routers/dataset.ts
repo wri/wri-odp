@@ -702,6 +702,7 @@ export const DatasetRouter = createTRPCRouter({
             dataset: {
               id: responseData.id,
               approval_status: 'pending',
+              tags: responseData.tags || [],
             },
             session: ctx.session,
           });

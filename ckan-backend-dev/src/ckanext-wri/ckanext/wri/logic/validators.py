@@ -543,10 +543,47 @@ def _invalid_message(error: Invalid) -> str:
     return message.strip().strip("'")
 
 
+def filter_approved_tags(value: Any) -> Any:
+    """
+    Drop the keywords that are not part of the approved list, keeping the rest
+    untouched (and in their original ordering).
+
+    Mirrors ``filterApprovedTags`` in the frontend, which is what the form does
+    when a dataset is opened for editing: legacy keywords coming from the
+    database are ignored instead of blocking the save.
+    """
+    approved = _approved_tags()
+
+    if isinstance(value, str):
+        names = [name.strip() for name in value.split(",")]
+        return ", ".join(
+            name for name in names if name and name.lower() in approved
+        )
+
+    if isinstance(value, (list, tuple)):
+        kept = []
+        for item in value:
+            if isinstance(item, dict):
+                name = (item.get("name") or "").strip()
+            else:
+                name = str(item).strip()
+            if name and name.lower() in approved:
+                kept.append(item)
+        return kept
+
+    return value
+
+
 def validate_approved_tags(context: Context, data_dict: dict):
     """
     Action-level guard so keywords stay within the approved list on every write
     path (package_create/update/patch and their ``old_`` counterparts).
+
+    ``tag_string`` is the form field, so keywords that are not approved are
+    rejected there. ``tags`` is the CKAN resource representation: it is
+    sanitized in place, because clients (and the UI) often send back the whole
+    dataset dict, including legacy keywords stored before the list existed.
+    Sanitizing instead of rejecting keeps those datasets editable.
 
     Harvested datasets and the approval of already-submitted datasets are
     exempt: their keywords come from external sources or predate this rule.
@@ -560,14 +597,13 @@ def validate_approved_tags(context: Context, data_dict: dict):
     ):
         return True
 
-    for key in ("tags", "tag_string"):
-        if key not in data_dict:
-            continue
+    if "tag_string" in data_dict:
         try:
-            approved_tags_validator(data_dict.get(key), context)
+            approved_tags_validator(data_dict.get("tag_string"), context)
         except Invalid as e:
-            # CKAN rewrites the "tags" key of a ValidationError expecting a list
-            # of tag dicts, so report the error against the schema field name.
             raise tk.ValidationError({"tag_string": _invalid_message(e)})
+
+    if "tags" in data_dict:
+        data_dict["tags"] = filter_approved_tags(data_dict.get("tags"))
 
     return True
