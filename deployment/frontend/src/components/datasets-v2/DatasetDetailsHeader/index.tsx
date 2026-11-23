@@ -10,6 +10,7 @@ import type { DatasetDetailsHeaderProps } from './types';
 import useStickyHeader from './useStickyHeader';
 import DatasetDetailsHeaderContent from './DatasetDetailsHeaderContent';
 import DatasetDetailsHeaderSticky from './DatasetDetailsHeaderSticky';
+import DatasetDetailsHeaderActions from './DatasetDetailsHeaderActions';
 import { normalizeOpenInItems } from './utils';
 
 function DatasetDetailsHeader({
@@ -51,24 +52,33 @@ function DatasetDetailsHeader({
                     </div>
                 </Button>
 
-                <Button
-                    variant="borderless"
-                    size="default"
-                    onClick={() => {
-                        void navigator.clipboard.writeText(copyLink);
-                    }}
-                    rightIcon={<CopyIcon />}
-                >
-                    <div
-                        style={{
-                            color: getThemedColor('neutral', 700),
-                            fontWeight: 400,
-                            fontSize: getThemedFontSize(300),
-                        }}
-                    >
-                        Copy Link
-                    </div>
-                </Button>
+                <div className="flex items-center gap-2 sm:gap-4 px-2">
+                    {dataset && (
+                        <DatasetDetailsHeaderActions
+                            dataset={dataset}
+                            extraItems={
+                                <Button
+                                    variant="borderless"
+                                    size="default"
+                                    onClick={() => {
+                                        void navigator.clipboard.writeText(copyLink);
+                                    }}
+                                    rightIcon={<CopyIcon />}
+                                >
+                                    <div
+                                        style={{
+                                            color: getThemedColor('neutral', 700),
+                                            fontWeight: 400,
+                                            fontSize: getThemedFontSize(300),
+                                        }}
+                                    >
+                                        Copy Link
+                                    </div>
+                                </Button>
+                            }
+                        />
+                    )}
+                </div>
             </div>
 
             <div
@@ -79,21 +89,21 @@ function DatasetDetailsHeader({
                 }}
             />
 
-            {!isSticky ? (
+            {!isSticky && dataset ? (
                 <DatasetDetailsHeaderContent
                     dataset={dataset}
                     datasetTitle={datasetTitle}
                     datasetDescription={datasetDescription}
                     openInItems={openInItems}
                 />
-            ) : (
+            ) : dataset ? (
                 <DatasetDetailsHeaderSticky
                     dataset={dataset}
                     datasetTitle={datasetTitle}
                     openInItems={openInItems}
                     sectionItems={sectionItems}
                 />
-            )}
+            ) : null}
         </>
     );
 }

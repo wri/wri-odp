@@ -249,7 +249,7 @@ function LegendsWri() {
             <Modal
                 open={Boolean(selectedLayerForDetails)}
                 onClose={() => setSelectedLayerForDetails(null)}
-                size="small"
+                size="medium"
                 header="Layer details"
                 content={
                     <div
