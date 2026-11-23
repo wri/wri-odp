@@ -6,13 +6,12 @@ import {
     getThemedColor,
     getThemedFontSize,
     getThemedSpacing,
-    type ListItemProps,
 } from '@worldresources/wri-design-systems';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type SyntheticEvent } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 import { Layer, Map, type MapLayerMouseEvent, type MapRef, Marker, Source } from 'react-map-gl';
 import { useQuery } from 'react-query';
+import { type MapSearchResultOption } from './MapSearchResults';
 import SelectFilesMapHeader from './SelectFilesMapHeader';
 import SelectFilesMapSelectionBar from './SelectFilesMapSelectionBar';
 import { useMapGeocoderSearch } from './useMapGeocoderSearch';
@@ -40,7 +39,8 @@ type MarkerCoords = [number, number];
 
 type GeoCoderResultEvent = {
     result: {
-        bbox: [number, number, number, number];
+        // Mapbox only returns a bbox for some place types, so it can be absent.
+        bbox: [number, number, number, number] | null;
         center: [number, number];
         place_name: string;
     };
@@ -67,6 +67,47 @@ type SelectFilesMapProps = {
 };
 
 type ViewMode = 'map' | 'list';
+
+type DrawFeature = {
+    geometry?: {
+        coordinates?: number[][][];
+    };
+};
+
+/**
+ * Reduces a drawn feature's outer ring to `[minLon, minLat, maxLon, maxLat]`.
+ *
+ * The rectangle mode emits its ring as `[minX,minY] [maxX,minY] [maxX,maxY]
+ * [minX,maxY] [minX,minY]`, so the extremes cannot be read by position: a
+ * rectangle drawn right-to-left or top-to-bottom (or a polygon edited in
+ * `simple_select`) puts them in a different order. Deriving them from every
+ * vertex keeps the extent correct whichever direction it was drawn in.
+ */
+function ringToBbox(feature: DrawFeature): [number, number, number, number] | null {
+    const ring = feature.geometry?.coordinates?.[0];
+    if (!ring || ring.length < 3) return null;
+
+    let minLon = Infinity;
+    let minLat = Infinity;
+    let maxLon = -Infinity;
+    let maxLat = -Infinity;
+
+    for (const point of ring) {
+        const lng = point?.[0];
+        const lat = point?.[1];
+        if (typeof lng !== 'number' || typeof lat !== 'number') continue;
+        if (!Number.isFinite(lng) || !Number.isFinite(lat)) continue;
+        if (lng < minLon) minLon = lng;
+        if (lng > maxLon) maxLon = lng;
+        if (lat < minLat) minLat = lat;
+        if (lat > maxLat) maxLat = lat;
+    }
+
+    if (!Number.isFinite(minLon) || !Number.isFinite(minLat)) return null;
+    if (minLon === maxLon || minLat === maxLat) return null;
+
+    return [minLon, minLat, maxLon, maxLat];
+}
 
 export default function SelectFilesMap({
     geojsons,
@@ -147,7 +188,12 @@ export default function SelectFilesMap({
         [selectedGeojsons]
     );
 
-    const { mapSearchResults, mapSearchOptions, isLoadingMapSearch } = useMapGeocoderSearch({
+    const {
+        mapSearchResults,
+        mapSearchOptions,
+        isLoadingMapSearch,
+        isQueryLongEnough: isMapSearchQueryValid,
+    } = useMapGeocoderSearch({
         query: mapSearchQuery,
         accessToken,
         enabled: viewMode === 'map',
@@ -181,20 +227,33 @@ export default function SelectFilesMap({
 
     const handleGeocoderResult = useCallback(
         (event: GeoCoderResultEvent) => {
-            setValue('bbox', [
-                [event.result.bbox[0], event.result.bbox[1]],
-                [event.result.bbox[2], event.result.bbox[3]],
-            ]);
-            setValue('point', event.result.center);
+            const { bbox, center, place_name: placeName } = event.result;
 
-            if (event.result.place_name.split(',').length <= 2) {
-                setValue('location', event.result.place_name);
+            if (!Array.isArray(bbox) || bbox.length !== 4) {
+                // No bbox to frame: center the map on the result instead of
+                // calling `fitBounds` with a malformed extent (which throws and
+                // leaves the map where it was).
+                setValue('bbox', null);
+                setValue('point', center);
+                setValue('location', placeName);
+                mapRef.current?.flyTo({ center, zoom: 5 });
+                return;
+            }
+
+            setValue('bbox', [
+                [bbox[0], bbox[1]],
+                [bbox[2], bbox[3]],
+            ]);
+            setValue('point', center);
+
+            if (placeName.split(',').length <= 2) {
+                setValue('location', placeName);
             }
 
             mapRef.current?.fitBounds(
                 [
-                    [event.result.bbox[0], event.result.bbox[1]],
-                    [event.result.bbox[2], event.result.bbox[3]],
+                    [bbox[0], bbox[1]],
+                    [bbox[2], bbox[3]],
                 ],
                 {
                     padding: 24,
@@ -206,39 +265,55 @@ export default function SelectFilesMap({
     );
 
     const handleMapSearchSelect = useCallback(
-        (selectedOption: ListItemProps | SyntheticEvent<HTMLInputElement>) => {
-            if (!('label' in selectedOption)) {
-                return;
-            }
-
-            const optionId = selectedOption.id;
-            if (!optionId) {
-                return;
-            }
-
-            const selectedResult = mapSearchResults.find((result) => result.id === optionId);
+        (selectedOption: MapSearchResultOption) => {
+            const selectedResult = mapSearchResults.find(
+                (result) => result.id === selectedOption.id
+            );
             if (!selectedResult) {
                 return;
             }
 
+            // Keeps the input in sync with the picked place; must happen before
+            // the form update, which may re-render the map through its parent.
             setMapSearchQuery(selectedResult.label);
 
-            if (selectedResult.bbox) {
-                handleGeocoderResult({
-                    result: {
-                        bbox: selectedResult.bbox,
-                        center: selectedResult.center,
-                        place_name: selectedResult.label,
-                    },
-                });
-                return;
-            }
+            // Frames the place on the map (`fitBounds` with its extent, or
+            // `flyTo` its centre when Mapbox returns no bbox) and stores the
+            // location in the shared form.
+            handleGeocoderResult({
+                result: {
+                    bbox: selectedResult.bbox,
+                    center: selectedResult.center,
+                    place_name: selectedResult.label,
+                },
+            });
 
-            setValue('point', selectedResult.center);
-            setValue('location', selectedResult.label);
-            mapRef.current?.flyTo({ center: selectedResult.center, zoom: 5 });
+            // `fitBounds` needs a laid-out container: if the map was hidden
+            // (e.g. the list tab) it reports a zero-size viewport and would
+            // collapse the camera, so re-frame on the next frame as well.
+            window.requestAnimationFrame(() => {
+                const map = mapRef.current;
+                if (!map) {
+                    return;
+                }
+
+                map.resize();
+
+                if (selectedResult.bbox) {
+                    map.fitBounds(
+                        [
+                            [selectedResult.bbox[0], selectedResult.bbox[1]],
+                            [selectedResult.bbox[2], selectedResult.bbox[3]],
+                        ],
+                        { padding: 24, animate: false }
+                    );
+                    return;
+                }
+
+                map.flyTo({ center: selectedResult.center, zoom: 5 });
+            });
         },
-        [handleGeocoderResult, mapSearchResults, setValue]
+        [handleGeocoderResult, mapSearchResults]
     );
 
     const handleMapSearchClear = useCallback(() => {
@@ -302,50 +377,34 @@ export default function SelectFilesMap({
 
     const onUpdate = useCallback(
         (event: { features: object[]; action?: string }) => {
-            for (const feature of event.features) {
-                const typedFeature = feature as {
-                    geometry?: {
-                        coordinates?: number[][][];
-                    };
-                };
-                const coordinates = typedFeature.geometry?.coordinates?.[0];
+            // The draw control fires this on create and on edit; only the last
+            // drawn shape matters, since `create` deletes the previous one.
+            const lastFeature = event.features[event.features.length - 1] as
+                DrawFeature | undefined;
+            const bbox = lastFeature ? ringToBbox(lastFeature) : null;
 
-                if (coordinates?.length === 5) {
-                    const [, , minLng, , maxLat] = coordinates as [
-                        number[],
-                        number[],
-                        number[],
-                        number[],
-                        number[],
-                    ];
-
-                    if (onSelectTilesInArea) {
-                        // Area-select mode: pick every tile intersecting the
-                        // drawn rectangle.
-                        let minLon = Infinity;
-                        let minLat = Infinity;
-                        let maxLon = -Infinity;
-                        let maxLat = -Infinity;
-                        for (const [lng, lat] of coordinates) {
-                            if (lng === undefined || lat === undefined) continue;
-                            if (lng < minLon) minLon = lng;
-                            if (lng > maxLon) maxLon = lng;
-                            if (lat < minLat) minLat = lat;
-                            if (lat > maxLat) maxLat = lat;
-                        }
-                        if (Number.isFinite(minLon) && Number.isFinite(minLat)) {
-                            onSelectTilesInArea([minLon, minLat, maxLon, maxLat]);
-                        }
-                        return;
-                    }
-
-                    setValue('point', null);
-                    setValue('location', '');
-                    setValue('bbox', [minLng, maxLat]);
-                } else {
-                    setValue('bbox', null);
-                }
+            if (!bbox) {
+                setValue('bbox', null);
+                return;
             }
+
+            if (onSelectTilesInArea) {
+                // Area-select mode: pick every tile intersecting the drawn
+                // rectangle. `[minLon, minLat, maxLon, maxLat]`.
+                onSelectTilesInArea(bbox);
+                return;
+            }
+
+            // Resource location search: CKAN expects `bbox=minx,miny,maxx,maxy`,
+            // so all four corners must be sent. Sending a partial extent makes
+            // the filter match every resource instead of the ones in the area.
+            const [minLon, minLat, maxLon, maxLat] = bbox;
+            setValue('point', null);
+            setValue('location', '');
+            setValue('bbox', [
+                [minLon, minLat],
+                [maxLon, maxLat],
+            ]);
         },
         [onSelectTilesInArea, setValue]
     );
@@ -361,7 +420,11 @@ export default function SelectFilesMap({
 
     return (
         <>
-            <div style={{ position: 'relative', isolation: 'isolate' }}>
+            {/* `zIndex` is what keeps the floating search results above the map:
+             * the map wrapper below is a sibling that also establishes a
+             * positioned box, so without a positive `zIndex` here the panel
+             * paints underneath it. */}
+            <div style={{ position: 'relative', zIndex: 1 }}>
                 <SelectFilesMapHeader
                     viewMode={viewMode}
                     onViewModeChange={setViewMode}
@@ -371,6 +434,7 @@ export default function SelectFilesMap({
                     onMapSearchSelect={handleMapSearchSelect}
                     onMapSearchClear={handleMapSearchClear}
                     isLoadingMapSearch={isLoadingMapSearch}
+                    isMapSearchQueryValid={isMapSearchQueryValid}
                     listSearchQuery={searchQuery}
                     onListSearchQueryChange={setSearchQuery}
                 />
@@ -381,7 +445,6 @@ export default function SelectFilesMap({
                     position: 'relative',
                     minHeight: 360,
                     paddingBottom: getThemedSpacing(900),
-                    zIndex: 0,
                 }}
             >
                 {viewMode === 'map' ? (

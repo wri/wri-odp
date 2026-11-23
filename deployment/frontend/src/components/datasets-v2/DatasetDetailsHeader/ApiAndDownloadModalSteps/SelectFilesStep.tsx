@@ -97,6 +97,10 @@ function SelectFilesStep({
     const watchedBbox = formObj.watch('bbox');
     const watchedPoint = formObj.watch('point');
     const watchedLocation = formObj.watch('location');
+    // The area search adds resources to the selection but keeps the entered
+    // location in the form: the same `formObj` is shared with the map, which
+    // delivers the selected location as `bbox`/`point`/`location`, so resetting
+    // it here would swallow the user's search and re-trigger the query.
     const hasLocationFilter =
         Boolean(watchedLocation?.trim()) ||
         Boolean(watchedPoint && watchedPoint.length > 0) ||
@@ -122,7 +126,6 @@ function SelectFilesStep({
             enabled: hasLocationFilter,
             onSuccess: (resources) => {
                 addResourcesToSelection(resources ?? []);
-                formObj.reset();
             },
         }
     );
@@ -248,21 +251,39 @@ function SelectFilesStep({
     };
 
     // Adds every tile of the resource whose bbox intersects the drawn area.
+    // Selection accumulates over what was already picked, so drawing a second
+    // rectangle adds to the selection instead of replacing it.
     const selectTilesInArea = (resource: Resource, bbox: [number, number, number, number]) => {
         const [minLon, minLat, maxLon, maxLat] = bbox;
+        const tiles = getTiles(resource);
         const selected = new Set(selectedTilesByResourceId[resource.id] ?? []);
-        for (const tile of getTiles(resource)) {
+        let matched = 0;
+
+        for (const tile of tiles) {
             const tileBbox = tileToBbox(tile);
             if (!tileBbox) continue;
-            const intersects =
-                tileBbox[2] > minLon &&
-                tileBbox[0] < maxLon &&
-                tileBbox[3] > minLat &&
-                tileBbox[1] < maxLat;
-            if (intersects) {
+
+            // Standard AABB overlap test: the two boxes overlap unless one is
+            // entirely to the left/right/above/below the other.
+            const [tileMinLon, tileMinLat, tileMaxLon, tileMaxLat] = tileBbox;
+            const overlaps =
+                tileMaxLon > minLon &&
+                tileMinLon < maxLon &&
+                tileMaxLat > minLat &&
+                tileMinLat < maxLat;
+
+            if (overlaps) {
                 selected.add(tile);
+                matched += 1;
             }
         }
+
+        // Nothing inside the drawn area and nothing picked before: leave the
+        // resource untouched rather than clearing it to an empty selection.
+        if (matched === 0 && selected.size === 0) {
+            return;
+        }
+
         onSelectTiles(resource.id, selected.size === 0 ? null : Array.from(selected));
     };
 
@@ -307,7 +328,7 @@ function SelectFilesStep({
                     style={{
                         border: `1px solid ${getThemedColor('neutral', 300)}`,
                         borderRadius: getThemedRadius(400),
-                        overflow: 'hidden',
+                        overflow: 'visible',
                     }}
                 >
                     <div
@@ -363,7 +384,10 @@ function SelectFilesStep({
                         style={{
                             border: `1px solid ${getThemedColor('neutral', 300)}`,
                             borderRadius: getThemedRadius(400),
-                            overflow: 'hidden',
+                            // `visible` so the map header's floating search
+                            // results are not cut off at the card edge; the map
+                            // and the tile list each clip their own content.
+                            overflow: 'visible',
                         }}
                     >
                         <div

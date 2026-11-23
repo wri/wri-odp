@@ -198,7 +198,7 @@ function SelectEndpoints({ dataset, onBack, onClose }: SelectEndpointsProps) {
                     style={{
                         border: `1px solid ${getThemedColor('neutral', 300)}`,
                         borderRadius: getThemedRadius(300),
-                        overflow: 'hidden',
+                        overflow: 'visible',
                     }}
                 >
                     <div

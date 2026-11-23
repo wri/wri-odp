@@ -9,6 +9,25 @@ export type GeocoderSearchResult = {
     center: [number, number];
 };
 
+/**
+ * Minimum query length before hitting the geocoder; single letters return noisy
+ * matches and would fire a request on nearly every keystroke.
+ */
+export const MAP_SEARCH_MIN_QUERY_LENGTH = 2;
+
+/**
+ * Lowercases and strips diacritics so `"bogota"` matches `"Bogotá"` and
+ * `"sao paulo"` matches `"São Paulo"` — the geocoder resolves them by fuzzy
+ * matching, but any literal comparison on our side needs the same normal form.
+ */
+export function normalizeSearchText(value: string): string {
+    return value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+}
+
 type UseMapGeocoderSearchParams = {
     query: string;
     accessToken: string;
@@ -16,19 +35,25 @@ type UseMapGeocoderSearchParams = {
 };
 
 export function useMapGeocoderSearch({ query, accessToken, enabled }: UseMapGeocoderSearchParams) {
+    const normalizedQuery = query.trim();
+    const isQueryLongEnough = normalizedQuery.length >= MAP_SEARCH_MIN_QUERY_LENGTH;
+
     const { data: mapSearchResults = [], isLoading: isLoadingMapSearch } = useQuery<
         GeocoderSearchResult[],
         unknown
     >(
-        ['map-search', query],
+        // The query is normalized (lowercased, trimmed) so typing case changes
+        // reuses the cached results instead of refetching.
+        ['map-search', normalizeSearchText(normalizedQuery)],
         async (): Promise<GeocoderSearchResult[]> => {
-            const normalizedQuery = query.trim();
-            if (normalizedQuery.length < 2) {
+            if (normalizedQuery.length < MAP_SEARCH_MIN_QUERY_LENGTH) {
                 return [];
             }
 
             const response = await fetch(
-                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(normalizedQuery)}.json?access_token=${accessToken}&limit=8&types=country,region,place,locality`
+                // `language` keeps `place_name` in one language so suggestions do
+                // not mix translations of the same place.
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(normalizedQuery)}.json?access_token=${accessToken}&limit=8&language=en&types=country,region,place,locality`
             );
             const json = (await response.json()) as {
                 features?: Array<{
@@ -63,7 +88,7 @@ export function useMapGeocoderSearch({ query, accessToken, enabled }: UseMapGeoc
                 });
         },
         {
-            enabled,
+            enabled: enabled && isQueryLongEnough,
             keepPreviousData: true,
         }
     );
@@ -73,6 +98,8 @@ export function useMapGeocoderSearch({ query, accessToken, enabled }: UseMapGeoc
             mapSearchResults.map((result) => ({
                 id: result.id,
                 label: result.label,
+                // Filtering hint only: the dropdown renders `mapSearchResults`
+                // directly, so a literal mismatch can never hide a suggestion.
                 searchLabel: result.label,
                 variant: 'select',
             })),
@@ -83,5 +110,6 @@ export function useMapGeocoderSearch({ query, accessToken, enabled }: UseMapGeoc
         mapSearchResults,
         mapSearchOptions,
         isLoadingMapSearch,
+        isQueryLongEnough,
     };
 }

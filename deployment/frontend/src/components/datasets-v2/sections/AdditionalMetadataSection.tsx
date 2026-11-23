@@ -5,6 +5,7 @@ import {
 } from '@worldresources/wri-design-systems';
 import Link from 'next/link';
 import { type WriDataset } from '@/schema/ckan.schema';
+import { updateFrequencyLabels } from '@/utils/constants';
 import { hasValue, toDisplay, unique } from '../utils/text';
 import { getApprovedKeywordEntries } from '../utils/keywords';
 
@@ -27,6 +28,15 @@ const languageLabels: Record<string, string> = {
     fr: 'French',
     pt: 'Portuguese',
 };
+
+function formatUpdateFrequency(value?: string | null): string | undefined {
+    if (!hasValue(value)) {
+        return undefined;
+    }
+
+    const label = updateFrequencyLabels[value as keyof typeof updateFrequencyLabels];
+    return label ?? value.replace(/_/g, ' ');
+}
 
 type MetadataItem = {
     label: string;
@@ -64,7 +74,7 @@ function getAdditionalMetadataItems(dataset: WriDataset): MetadataItem[] {
         { label: 'Project', value: dataset.project },
         {
             label: 'Update frequency',
-            value: dataset.update_frequency?.replace(/_/g, ' '),
+            value: formatUpdateFrequency(dataset.update_frequency),
         },
         {
             label: 'Language',
@@ -135,8 +145,12 @@ function MetadataRow({
                     color: getThemedColor('secondary', 800),
                     fontSize: getThemedFontSize(400),
                     lineHeight: '24px',
-                    textDecorationLine: 'underline',
-                    textDecorationStyle: 'dotted',
+                    ...(links
+                        ? {
+                              textDecorationLine: 'underline',
+                              textDecorationStyle: 'dotted',
+                          }
+                        : {}),
                 }}
             >
                 {links
