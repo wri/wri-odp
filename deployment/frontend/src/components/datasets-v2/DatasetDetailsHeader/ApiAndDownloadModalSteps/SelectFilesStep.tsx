@@ -19,13 +19,14 @@ import {
     formatFileSize,
     getResourceFormatLabel,
     getResourceSize,
+    getResourceTitle,
     getStoredDataApiTiles,
+    getNotDirectlyDownloadableMessage,
     isCopyLinkResource,
     isDataApiResource,
-    isDownloadableResource,
+    isSelectableResource,
     tileToBbox,
 } from '../download-utils';
-import CopyLinkResourcesSection from './CopyLinkResourcesSection';
 import { type LocationSearchFormType, type TileGeojson } from './SelectFilesMap';
 import { type TileInfoFeature } from './useDataApiTiles';
 
@@ -65,8 +66,7 @@ function SelectFilesStep({
     onContinue,
 }: SelectFilesStepProps) {
     const datafiles = dataset?.resources;
-    const selectableResources = (datafiles ?? []).filter(isDownloadableResource);
-    const copyLinkResources = (datafiles ?? []).filter(isCopyLinkResource);
+    const selectableResources = (datafiles ?? []).filter(isSelectableResource);
     const dataApiResources = selectableResources.filter(isDataApiResource);
     // Tiles persisted on the resource, overridden by tiles resolved on demand for
     // resources saved without them.
@@ -78,6 +78,8 @@ function SelectFilesStep({
     const getResourceBytes = (resource: Resource): number | undefined =>
         getResourceSize(resource) ?? resolvedSizeByResourceId[resource.id];
     const geoSpatialResources = selectableResources
+        // Copy-only resources have no downloadable geometry to frame on the map.
+        .filter((resource) => !isCopyLinkResource(resource))
         .filter((resource) => resource.spatial_type !== 'global')
         .filter((resource) => (resource.spatial_address ?? resource.spatial_geom) != null);
     const datasetDisplayName = dataset.title ?? dataset.name;
@@ -468,13 +470,14 @@ function SelectFilesStep({
                     )
                     .map((resource) => {
                         const isExternallyHosted = Boolean(resource.not_downloadable);
+                        const isCopyOnly = isCopyLinkResource(resource);
 
                         return (
                             <FileCard
                                 key={resource.id}
-                                title={resource.title ?? resource.name ?? 'Selected file'}
+                                title={getResourceTitle(resource)}
                                 badge={
-                                    isExternallyHosted
+                                    isExternallyHosted && !isCopyOnly
                                         ? 'Hosted Externally'
                                         : getResourceFormatLabel(resource)
                                 }
@@ -488,11 +491,7 @@ function SelectFilesStep({
                                 updatedAt={formatDate(
                                     resource.metadata_modified ?? resource.last_modified
                                 )}
-                                warningMessage={
-                                    isExternallyHosted
-                                        ? 'This resource is hosted externally. A link to the file will be included in your download bundle.'
-                                        : undefined
-                                }
+                                warningMessage={getNotDirectlyDownloadableMessage(resource)}
                                 rightContent={
                                     <Button
                                         variant={
@@ -519,9 +518,6 @@ function SelectFilesStep({
                         );
                     })}
             </div>
-
-            {/* Copy-only resources (GEE assets, tile caches) */}
-            <CopyLinkResourcesSection resources={copyLinkResources} />
 
             {/* Button group */}
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>

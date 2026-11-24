@@ -9,7 +9,7 @@ import { ChevronDownIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/20/
 import type { DatasetDetailsHeaderContentProps } from './types';
 import DatasetDownloadButton from './DatasetDownloadButton';
 import AccessApiButton from './AccessApiButton';
-import { formatDate } from './download-utils';
+import { formatDate, hasDownloadableResources } from './download-utils';
 
 export default function DatasetDetailsHeaderContent({
     dataset,
@@ -73,7 +73,7 @@ export default function DatasetDetailsHeaderContent({
                     marginTop: getThemedSpacing(400),
                 }}
             >
-                {dataset?.resources?.length > 0 && (
+                {dataset?.resources && hasDownloadableResources(dataset.resources) && (
                     <DatasetDownloadButton dataset={dataset} size="default" />
                 )}
                 <AccessApiButton dataset={dataset} />

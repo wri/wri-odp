@@ -23,8 +23,10 @@ import {
     formatFileSize,
     getResourceFormatLabel,
     getResourceSize,
+    getResourceTitle,
     isDataApiResource,
-    isDirectDownloadResource,
+    isEmailDeliveredResource,
+    isExternallyDeliveredResource,
 } from '../download-utils';
 import { useDirectDownload } from './useDirectDownload';
 
@@ -33,7 +35,6 @@ type ConfirmationStepProps = {
     totalSelectedBytes: number;
     /** Bytes read from the file for resources CKAN saved without a size. */
     resolvedSizeByResourceId?: Record<string, number>;
-    datasetName: string;
     deliveryEmail?: string;
     onBack: () => void;
     onClose: () => void;
@@ -43,19 +44,21 @@ function ConfirmationStep({
     selectedResources,
     totalSelectedBytes,
     resolvedSizeByResourceId = {},
-    datasetName,
     deliveryEmail,
     onBack,
     onClose,
 }: ConfirmationStepProps) {
-    // Data API tile sets are too large to zip in the browser, so they are
-    // delivered by email through the server-side ZIP flow instead.
+    // Only Data API tile sets are delivered by email through the server-side ZIP
+    // flow. Everything downloadable (DX S3 uploads and non-DX/external URLs) is
+    // fetched in the browser, one file per resource, with no ZIP.
+    // Hosted-externally links are excluded: their data lives in another
+    // repository, so they are never part of the download (they would only fail
+    // here and be listed twice).
     const directResources = selectedResources.filter(
-        (resource) => !resource.not_downloadable && isDirectDownloadResource(resource)
+        (resource) =>
+            !isExternallyDeliveredResource(resource) && !isEmailDeliveredResource(resource)
     );
-    const serverDeliveredResources = selectedResources.filter(
-        (resource) => !resource.not_downloadable && !isDirectDownloadResource(resource)
-    );
+    const serverDeliveredResources = selectedResources.filter(isEmailDeliveredResource);
     const selectedCount = directResources.length;
     // CKAN often has no size for imported links: fall back to the size read from
     // the file itself so the summary does not report 0 bytes.
@@ -66,10 +69,10 @@ function ConfirmationStep({
         (acc, resource) => acc + getBytes(resource),
         0
     );
-    const { download } = useDirectDownload(datasetName);
-    const externallyHostedResources = selectedResources.filter(
-        (resource) => Boolean(resource.not_downloadable) && Boolean(resource.url)
-    );
+    const { download } = useDirectDownload();
+    // Resources that never enter the download bundle: GEE assets, tile caches and
+    // hosted-externally links. Their asset id / URL is revealed in this step.
+    const externallyHostedResources = selectedResources.filter(isExternallyDeliveredResource);
 
     useEffect(() => {
         if (directResources.length === 0) {
@@ -176,7 +179,7 @@ function ConfirmationStep({
                     {directResources.map((resource) => (
                         <div key={resource.id} style={{ marginBottom: getThemedSpacing(200) }}>
                             <FileCard
-                                title={resource.title ?? resource.name ?? 'Selected file'}
+                                title={getResourceTitle(resource)}
                                 badge={getResourceFormatLabel(resource)}
                                 description={getResourceDescription(resource)}
                                 createdAt={formatDate(resource.created)}
@@ -264,7 +267,7 @@ function ConfirmationStep({
                     {serverDeliveredResources.map((resource) => (
                         <div key={resource.id} style={{ marginBottom: getThemedSpacing(200) }}>
                             <FileCard
-                                title={resource.title ?? resource.name ?? 'Selected file'}
+                                title={getResourceTitle(resource)}
                                 badge={getResourceFormatLabel(resource)}
                                 description={getResourceDescription(resource)}
                                 extraInfo={

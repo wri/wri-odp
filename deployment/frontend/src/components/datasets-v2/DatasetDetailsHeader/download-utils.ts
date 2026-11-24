@@ -34,6 +34,8 @@ export function formatDate(value?: string | null): string {
 }
 
 type ResourceLike = {
+    title?: string | null;
+    name?: string | null;
     type?: string | null;
     url_type?: string | null;
     data_api_tiles?: unknown[] | null;
@@ -43,6 +45,7 @@ type ResourceLike = {
     key?: string | null;
     url?: string | null;
     size?: number | null;
+    not_downloadable?: boolean | null;
 };
 
 /**
@@ -50,7 +53,10 @@ type ResourceLike = {
  * pending datasets and older records may only carry it in `url_type`.
  */
 function hasResourceType(resource: ResourceLike, type: string): boolean {
-    return resource.type === type || resource.url_type === type;
+    const expected = type.toLowerCase();
+    const candidates = [resource.type, resource.url_type];
+
+    return candidates.some((value) => value?.trim().toLowerCase() === expected);
 }
 
 /**
@@ -72,8 +78,26 @@ export function isGeeAssetResource(resource: ResourceLike): boolean {
 }
 
 /**
- * A tile cache link. Like GEE assets these are not downloadable — users copy the
- * URL and consume the tiles from their own application.
+ * A resource whose green badge reads "layer" (`format: 'Layer'`). These are
+ * **not** tile caches and must never reach the download modal at all: they are
+ * served by the layer data-files flow, so the modal would offer a download that
+ * cannot work.
+ *
+ * `format` is the only marker honoured here — `type: 'tile-cache'` is a real
+ * tile cache (see `isTileCacheResource`) and must keep its copy-only behaviour.
+ */
+export function isLayerResource(resource: ResourceLike): boolean {
+    return resource.format?.trim().toLowerCase() === 'layer';
+}
+
+/**
+ * A tile cache link. Like GEE assets these are not downloadable — the link is
+ * shown on the confirmation step and users copy the tile URL to consume the
+ * tiles from their own application.
+ *
+ * CKAN created tile caches with `type: 'tile-cache'` (see the legacy
+ * `TilecacheCard`). Resources tagged `format: 'Layer'` are excluded: they are a
+ * separate concept handled by `isLayerResource`.
  */
 export function isTileCacheResource(resource: ResourceLike): boolean {
     return hasResourceType(resource, 'tile-cache');
@@ -84,14 +108,108 @@ export function isCopyLinkResource(resource: ResourceLike): boolean {
     return isGeeAssetResource(resource) || isTileCacheResource(resource);
 }
 
+/**
+ * True when the URL points at something that can be fetched as a file, as
+ * opposed to a landing page (wiki, registry, catalogue) that merely documents
+ * where the data lives.
+ */
+function isDirectFileUrl(url?: string | null): boolean {
+    if (!url) return false;
+    return getFormatFromUrl(url) !== null;
+}
+
+/**
+ * A resource whose data lives somewhere else, so it can never be fetched in the
+ * browser. Its link is revealed on the last step instead of being downloaded —
+ * matching the legacy data-files page, which excludes these from the download
+ * selection.
+ *
+ * Two markers are honoured:
+ * - `not_downloadable: true` — CKAN's explicit flag.
+ * - a plain `link` with no `format` whose URL is not a file. These are saved as
+ *   `type: 'link'`, `format: ''` and used to render the generic "link" badge
+ *   (e.g. a Confluence page describing the data). Resources that do point at a
+ *   file (`data.zip`, `layer.tif`) keep downloading normally, so the check is
+ *   restricted to the URL shape rather than every format-less link.
+ */
+export function isHostedExternallyResource(resource: ResourceLike): boolean {
+    if (resource.not_downloadable) {
+        return true;
+    }
+
+    if (isCopyLinkResource(resource) || isDataApiResource(resource)) {
+        return false;
+    }
+
+    if (resource.format?.trim()) {
+        return false;
+    }
+
+    const isPlainLink = !resource.key && hasResourceType(resource, 'link');
+    return isPlainLink && !isDirectFileUrl(resource.url);
+}
+
+/**
+ * A resource that is never part of a download bundle: GEE assets and tile
+ * caches (copy-only) and hosted-externally links. These are listed in the
+ * "Resources hosted online" section of the confirmation step.
+ */
+export function isExternallyDeliveredResource(resource: ResourceLike): boolean {
+    return isCopyLinkResource(resource) || isHostedExternallyResource(resource);
+}
+
+/**
+ * Copy-only and hosted-externally resources share one explanation: the data is
+ * not part of the download bundle, it is revealed on the last step as a link or
+ * an asset id. Centralised so the three cases cannot drift apart.
+ */
+export const NOT_DIRECTLY_DOWNLOADABLE_MESSAGE =
+    'This resource is not directly downloadable. Access to the data will be provided in the last step as a link or asset ID.';
+
+/**
+ * Inline message shown on the select-files card, or `undefined` when the
+ * resource downloads normally.
+ */
+export function getNotDirectlyDownloadableMessage(resource: ResourceLike): string | undefined {
+    if (isExternallyDeliveredResource(resource)) {
+        return NOT_DIRECTLY_DOWNLOADABLE_MESSAGE;
+    }
+
+    return undefined;
+}
+
+/**
+ * Data API tile sets are the only resources delivered by email: the server packs
+ * them into a ZIP (they are too large to build in the browser) and sends the
+ * download link. Everything else — DX S3 uploads, non-DX external URLs and
+ * hosted-externally links — is downloaded directly in the browser, one file per
+ * resource, with no ZIP and no email.
+ */
+export function isEmailDeliveredResource(resource: ResourceLike): boolean {
+    return isDataApiResource(resource);
+}
+
+/** True when at least one selected resource must be delivered by email. */
+export function needsEmailDelivery(resources: ResourceLike[]): boolean {
+    return resources.some(isEmailDeliveredResource);
+}
+
 export function getStoredDataApiTiles(resource: ResourceLike): string[] {
     return (resource.data_api_tiles ?? []).filter(
         (tile): tile is string => typeof tile === 'string'
     );
 }
 
-/** Value shown/copied for a copy-only resource: the GEE asset id or tile cache URL. */
+/**
+ * Value shown/copied for a copy-only resource: the GEE asset id, or the tile
+ * URL for a tile cache (the `url` is the cache link; `asset_id` is only the GEE
+ * identifier, so it must not win here).
+ */
 export function getCopyLinkValue(resource: ResourceLike): string {
+    if (isTileCacheResource(resource)) {
+        return resource.url ?? '';
+    }
+
     return resource.asset_id ?? resource.url ?? '';
 }
 
@@ -288,14 +406,51 @@ export function estimateSelectedTilesSize(
  * A resource can be listed for download when it has an S3 key, a direct URL, or
  * is a GFW data API tile set. Data API resources have neither `key` nor `url`,
  * so they must be checked explicitly. Copy-only resources (GEE assets and tile
- * caches) are never downloadable, even when they carry a `url`.
+ * caches) and hosted-externally links are never downloadable, even when they
+ * carry a `url`: the link merely points at where the data lives.
  */
 export function isDownloadableResource(resource: ResourceLike): boolean {
-    if (isCopyLinkResource(resource)) {
+    if (isCopyLinkResource(resource) || isHostedExternallyResource(resource)) {
         return false;
     }
 
     return Boolean(resource.key) || Boolean(resource.url) || isDataApiResource(resource);
+}
+
+/**
+ * A resource the user can pick in the file step. Copy-only resources (GEE
+ * assets and tile caches) are selectable so they can be added to the bundle;
+ * their asset id / tile URL is only revealed on the last step, never in the
+ * selection step. Hosted-externally links are selectable for the same reason:
+ * they belong in the "Resources hosted online" list.
+ *
+ * Layer resources (`format: 'Layer'`) are excluded outright: they are not data
+ * files to download, so they must not appear in the modal at all.
+ */
+export function isSelectableResource(resource: ResourceLike): boolean {
+    if (isLayerResource(resource)) {
+        return false;
+    }
+
+    if (isCopyLinkResource(resource)) {
+        return Boolean(getCopyLinkValue(resource));
+    }
+
+    if (isHostedExternallyResource(resource)) {
+        return Boolean(resource.url);
+    }
+
+    return isDownloadableResource(resource);
+}
+
+/**
+ * Whether the dataset has anything the download modal can offer. Layers are
+ * filtered out of the modal, so a dataset made only of layers (e.g. a map layer
+ * dataset) must not show the download button at all — otherwise the user lands on
+ * an empty "Select files" step.
+ */
+export function hasDownloadableResources(resources: ResourceLike[]): boolean {
+    return resources.some(isSelectableResource);
 }
 
 /**
@@ -305,6 +460,29 @@ export function isDownloadableResource(resource: ResourceLike): boolean {
  */
 export function isDirectDownloadResource(resource: ResourceLike): boolean {
     return Boolean(resource.key) || Boolean(resource.url);
+}
+
+/**
+ * Display name for a resource. `name` is not a reliable fallback for tile
+ * caches without a title: CKAN stores the Resource Watch id there (a UUID),
+ * which would leak into the card title.
+ */
+export function getResourceTitle(resource: ResourceLike): string {
+    const title = resource.title?.trim();
+    if (title) {
+        return title;
+    }
+
+    if (isTileCacheResource(resource)) {
+        return 'Tile cache';
+    }
+
+    const name = resource.name?.trim();
+    if (name) {
+        return name;
+    }
+
+    return 'Selected file';
 }
 
 /**
@@ -338,7 +516,14 @@ export function getResourceFormatLabel(resource: ResourceLike): string {
     }
 
     if (isTileCacheResource(resource)) {
-        return 'Tile cache';
+        return 'Tile Cache';
+    }
+
+    // CKAN stores `type: 'link'` with an empty format for external links, which
+    // would otherwise fall through to the generic 'LINK' label. Name the actual
+    // situation so the badge does not look like a downloadable link.
+    if (isHostedExternallyResource(resource)) {
+        return 'Hosted Externally';
     }
 
     const format = resource.format?.trim();

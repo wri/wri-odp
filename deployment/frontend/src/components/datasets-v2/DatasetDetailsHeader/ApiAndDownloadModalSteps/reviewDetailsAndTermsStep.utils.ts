@@ -76,10 +76,10 @@ export const validateReviewDetailsAndTermsForm = (
     const requireEmail = options?.requireEmail ?? true;
     const wantsContact = formData.subscribeUpdates || formData.contactForResearch;
 
-    if (
-        (requireEmail || wantsContact) &&
-        (!formData.email.trim() || !formData.email.includes('@'))
-    ) {
+    // The email input is only rendered when the selection needs email delivery
+    // (Data API tile sets). Anywhere else it is hidden, so it must not be
+    // required — otherwise the form would be impossible to submit.
+    if (requireEmail && (!formData.email.trim() || !formData.email.includes('@'))) {
         errors.email = 'Enter a valid email.';
     } else if (formData.email.trim() && !formData.email.includes('@')) {
         errors.email = 'Enter a valid email.';

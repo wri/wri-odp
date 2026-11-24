@@ -24,8 +24,10 @@ import {
     getResourceFormatLabel,
     getResourceSize,
     getStoredDataApiTiles,
+    isCopyLinkResource,
     isDataApiResource,
-    isDirectDownloadResource,
+    isEmailDeliveredResource,
+    needsEmailDelivery,
 } from './download-utils';
 import styles from './modalStepLayout.module.scss';
 import type { DatasetDownloadButtonProps } from './types';
@@ -97,10 +99,10 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
     const selectedFormats = Array.from(
         new Set(selectedResources.map((resource) => getResourceFormatLabel(resource)))
     );
-    // Data API tile sets are delivered by email through the server-side ZIP flow.
-    const hasServerDeliveredResources = selectedResources.some(
-        (resource) => !resource.not_downloadable && !isDirectDownloadResource(resource)
-    );
+    // Only Data API tile sets are packed into a server-side ZIP and emailed.
+    // Everything else (DX S3 uploads, non-DX URLs, hosted-externally links) is
+    // downloaded directly in the browser, so only those require delivery details.
+    const hasServerDeliveredResources = needsEmailDelivery(selectedResources);
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -123,26 +125,76 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
     const submitReviewDetails = async (formData: ReviewDetailsAndTermsFormData) => {
         setDeliveryEmail(formData.email.trim() || undefined);
 
+        // Only Data API tile sets are delivered by email through the server-side
+        // ZIP flow. Any other selection is downloaded in the browser on the next
+        // step, so no request is made and no email is sent.
+        if (!hasServerDeliveredResources) {
+            if (!formData.email.trim()) {
+                setActiveStep('confirmation');
+                return;
+            }
+
+            // The user opted in to updates / research contact: record it, then
+            // continue to the in-browser download.
+            try {
+                await createDownloadEvent.mutateAsync({
+                    email: formData.email,
+                    affiliation: {
+                        label: formData.affiliation?.label ?? '',
+                        value: formData.affiliation?.value ?? '',
+                    },
+                    otherAffiliation: formData.otherAffiliation,
+                    organization: formData.organization,
+                    jobTitle: formData.jobTitle,
+                    country: {
+                        label: formData.country?.label ?? '',
+                        value: formData.country?.value ?? '',
+                    },
+                    resources: selectedResources
+                        .filter((resource) => !isCopyLinkResource(resource))
+                        .map((resource) => resource.id)
+                        .filter(Boolean),
+                    package_id: dataset.id,
+                    package_name: dataset.name,
+                    acceptTerms: formData.subscribeUpdates || formData.contactForResearch,
+                    typeOfForm: 'email-download',
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                });
+            } catch {
+                // The opt-in is secondary: never block the browser download on it.
+            }
+
+            setActiveStep('confirmation');
+            return;
+        }
+
         if (!formData.email.trim()) {
             setActiveStep('confirmation');
             return;
         }
 
         const resourceIds = selectedResources
-            .filter((resource) => !isDataApiResource(resource))
+            .filter(isEmailDeliveredResource)
             .map((resource) => resource.id)
             .filter(Boolean);
         const keys = selectedResources.flatMap((resource) => {
-            if (isDataApiResource(resource)) {
-                const tiles = tilesByResourceId[resource.id];
-                return getDataApiTileGfwUrls(
-                    tiles ? { ...resource, data_api_tiles: tiles } : resource,
-                    selectedTilesByResourceId[resource.id]
-                );
+            // Only Data API tile sets go to the server ZIP; copy-only resources
+            // (GEE assets / tile caches) are never downloaded, and S3 / external
+            // files are downloaded in the browser.
+            if (!isEmailDeliveredResource(resource)) {
+                return [];
             }
-            return [resource.key ?? resource.url].filter(Boolean) as string[];
+
+            const tiles = tilesByResourceId[resource.id];
+            return getDataApiTileGfwUrls(
+                tiles ? { ...resource, data_api_tiles: tiles } : resource,
+                selectedTilesByResourceId[resource.id]
+            );
         });
 
+        // Every selected resource reaching this point is a Data API tile set, so a
+        // missing key means the tiles could not be resolved — nothing to email.
         if (resourceIds.length === 0 && keys.length === 0) {
             toast('Please select at least one file to download.', { type: 'error' });
             return;
@@ -182,7 +234,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                 type: 'success',
             });
             setActiveStep('confirmation');
-        } catch (error) {
+        } catch {
             toast('Failed to request file', { type: 'error' });
         }
     };
@@ -276,7 +328,6 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                         )}
                         totalSelectedBytes={totalSelectedBytes}
                         resolvedSizeByResourceId={resolvedSizeByResourceId}
-                        datasetName={dataset.name}
                         deliveryEmail={deliveryEmail}
                         onBack={() => setActiveStep('terms')}
                         onClose={closeModal}
