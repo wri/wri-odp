@@ -11,6 +11,7 @@ import { ChevronDownIcon, EllipsisVerticalIcon } from '@heroicons/react/20/solid
 import { type WriDataset } from '@/schema/ckan.schema';
 import DatasetDownloadButton from './DatasetDownloadButton';
 import AccessApiButton from './AccessApiButton';
+import { hasDownloadableResources } from './download-utils';
 import type { DatasetDetailsHeaderMenuItem } from './types';
 
 type SectionItem = {
@@ -121,7 +122,7 @@ function DatasetDetailsHeaderSticky({ dataset, datasetTitle, openInItems, sectio
             </h1>
 
             <div className="flex gap-1 sm:gap-4">
-                {dataset?.resources?.length > 0 && (
+                {dataset?.resources && hasDownloadableResources(dataset.resources) && (
                     <DatasetDownloadButton dataset={dataset} size="small" />
                 )}
                 <AccessApiButton
