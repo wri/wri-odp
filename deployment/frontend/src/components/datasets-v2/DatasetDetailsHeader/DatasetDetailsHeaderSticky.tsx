@@ -13,10 +13,7 @@ import DatasetDownloadButton from './DatasetDownloadButton';
 import AccessApiButton from './AccessApiButton';
 import { hasDownloadableResources } from './download-utils';
 import type { DatasetDetailsHeaderMenuItem } from './types';
-import {
-    constrainedHeaderContainerClassName,
-    DATASET_HEADER_BACKGROUND_COLOR,
-} from './DatasetDetailsHeaderContent';
+import { constrainedHeaderContainerClassName } from './DatasetDetailsHeaderContent';
 
 type SectionItem = {
     label: string;
@@ -115,7 +112,7 @@ function DatasetDetailsHeaderSticky({
             ref={stickyHeaderRef}
             className="w-full font-acumin"
             style={{
-                backgroundColor: DATASET_HEADER_BACKGROUND_COLOR,
+                backgroundColor: getThemedColor('secondary', 100),
                 padding: hasMap
                     ? `${getThemedSpacing(300)} ${getThemedSpacing(600)}`
                     : `${getThemedSpacing(300)} 0`,

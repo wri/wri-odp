@@ -16,10 +16,6 @@ import { formatDate, hasDownloadableResources } from './download-utils';
 // the header background keeps spanning the full width.
 export const constrainedHeaderContainerClassName = 'mx-auto w-full max-w-4xl';
 
-// Brand background for the dataset detail headers. Hardcoded to the WRI palette
-// value because the design system resolves `secondary.100` to a different tone.
-export const DATASET_HEADER_BACKGROUND_COLOR = '#F9FCF8';
-
 export default function DatasetDetailsHeaderContent({
     dataset,
     datasetTitle,
@@ -117,7 +113,7 @@ export default function DatasetDetailsHeaderContent({
     );
 
     return (
-        <div className="w-full" style={{ backgroundColor: DATASET_HEADER_BACKGROUND_COLOR }}>
+        <div className="w-full" style={{ backgroundColor: getThemedColor('secondary', 100) }}>
             <div
                 className="font-acumin"
                 style={{
