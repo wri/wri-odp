@@ -8,6 +8,15 @@ export type DatasetDetailsHeaderProps = {
     datasetName: string;
     dataset?: WriDataset;
     sectionItems: DatasetSectionItem[];
+    /** When false, the header content is centered and capped while backgrounds stay full width. */
+    hasMap?: boolean;
+    /**
+     * When provided, the condensed header is controlled by the caller instead of
+     * the internal scroll sentinel. Used by the detail page to render the
+     * condensed header as a sibling of the header block, so its sticky
+     * containing block spans the whole page column.
+     */
+    isSticky?: boolean;
 };
 
 export type DatasetDetailsHeaderActionsProps = {
@@ -46,6 +55,8 @@ export type DatasetDetailsHeaderContentProps = {
     datasetTitle: string;
     datasetDescription: string;
     openInItems: DatasetDetailsHeaderMenuItem[];
+    /** When false, the header content is centered and capped while backgrounds stay full width. */
+    hasMap?: boolean;
 };
 
 export type DatasetDetailsHeaderStickyProps = {
@@ -53,6 +64,8 @@ export type DatasetDetailsHeaderStickyProps = {
     datasetTitle: string;
     openInItems: DatasetDetailsHeaderMenuItem[];
     sectionItems: DatasetSectionItem[];
+    /** When false, the sticky content is centered and capped while the bar stays full width. */
+    hasMap?: boolean;
 };
 
 export type DatasetDownloadButtonProps = {

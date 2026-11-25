@@ -73,6 +73,10 @@ export const initializeStore = (preloadedState: Partial<InitialState> = {}) => {
                 ...getDefaultInitialState().mapView.viewState,
                 ...preloadedState?.mapView?.viewState,
             },
+            // `preloadedState.mapView` comes from the `map` URL param and may not
+            // include `bounds`, so always fall back to the default shape to keep
+            // consumers from reading `undefined.bbox`.
+            bounds: preloadedState?.mapView?.bounds ?? getDefaultInitialState().mapView.bounds,
         },
     };
 
