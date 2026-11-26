@@ -49,12 +49,13 @@ export const useIsEmbeddingMap = () => {
 };
 
 export const useToggleLayergroups = () => {
-    const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } =
-        useStore((store: AppStoreState) => ({
+    const { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups } = useStore(
+        (store: AppStoreState) => ({
             tempLayerAsLayerobj: store.tempLayerAsLayerobj,
             prevLayerGroups: store.prevLayerGroups,
             setToggleLayergroups: store.toggleActiveLayerGroup,
-        }));
+        })
+    );
     return { tempLayerAsLayerobj, prevLayerGroups, setToggleLayergroups };
 };
 
@@ -180,10 +181,16 @@ export const useLayerStates = () => {
 };
 
 export const useBounds = () => {
-    const { bounds, setBounds } = useStore((store: AppStoreState) => ({
-        bounds: store.mapView.bounds,
-        setBounds: store.setBounds,
-    }));
+    // `bounds` only changes when `setBounds` is called. Subscribing with `shallow`
+    // stops consumers from re-rendering on every store write (e.g. the `onMove`
+    // handler that creates a new `mapView` object on each map frame).
+    const { bounds, setBounds } = useStore(
+        (store: AppStoreState) => ({
+            bounds: store.mapView.bounds,
+            setBounds: store.setBounds,
+        }),
+        shallow
+    );
 
     return { bounds, setBounds };
 };

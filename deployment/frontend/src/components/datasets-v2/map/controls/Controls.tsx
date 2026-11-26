@@ -6,13 +6,7 @@ import { PlusIcon, MinusIcon, Cog6ToothIcon, ShareIcon } from '@heroicons/react/
 import ExportModal from './ExportModal';
 import SettingsModal from './SettingsModal';
 
-export default function Controls({
-    mapRef,
-    mapContainerRef,
-}: {
-    mapRef: MutableRefObject<MapRef | null>;
-    mapContainerRef: MutableRefObject<HTMLDivElement | null>;
-}) {
+export default function Controls({ mapRef }: { mapRef: MutableRefObject<MapRef | null> }) {
     const [openSettingsModal, setOpenSettingsModal] = useState(false);
     const [openExportModal, setOpenExportModal] = useState(false);
 
@@ -59,7 +53,7 @@ export default function Controls({
                     float: 'right',
                 }}
             >
-                <Search mapContainerRef={mapContainerRef} />
+                <Search mapRef={mapRef} />
                 <Toolbar items={mapControlItems} vertical showExpandedToggle={false} />
             </div>
         </>

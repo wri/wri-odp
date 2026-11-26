@@ -7,15 +7,21 @@ import {
 } from '@worldresources/wri-design-systems';
 import { ChevronDownIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
 import type { DatasetDetailsHeaderContentProps } from './types';
+export type { DatasetDetailsHeaderContentProps } from './types';
 import DatasetDownloadButton from './DatasetDownloadButton';
 import AccessApiButton from './AccessApiButton';
 import { formatDate, hasDownloadableResources } from './download-utils';
+
+// Used when the dataset has no map so the content is capped and centered while
+// the header background keeps spanning the full width.
+export const constrainedHeaderContainerClassName = 'mx-auto w-full max-w-4xl';
 
 export default function DatasetDetailsHeaderContent({
     dataset,
     datasetTitle,
     datasetDescription,
     openInItems,
+    hasMap = true,
 }: DatasetDetailsHeaderContentProps) {
     const hasSingleOpenInOption = openInItems.length === 1;
     const singleOpenInItem = hasSingleOpenInOption ? openInItems[0] : undefined;
@@ -27,15 +33,8 @@ export default function DatasetDetailsHeaderContent({
         window.open(value, '_blank', 'noopener,noreferrer');
     };
 
-    return (
-        <div
-            className="font-acumin"
-            style={{
-                backgroundColor: getThemedColor('secondary', 100),
-                padding: `${getThemedSpacing(800)} ${getThemedSpacing(600)} ${getThemedSpacing(900)} ${getThemedSpacing(600)}`,
-                borderBottom: `1px solid ${getThemedColor('neutral', 300)}`,
-            }}
-        >
+    const content = (
+        <>
             <h1
                 style={{
                     fontSize: getThemedFontSize(900),
@@ -109,6 +108,31 @@ export default function DatasetDetailsHeaderContent({
                         }
                     />
                 ) : null}
+            </div>
+        </>
+    );
+
+    return (
+        <div className="w-full" style={{ backgroundColor: getThemedColor('secondary', 100) }}>
+            <div
+                className="font-acumin"
+                style={{
+                    padding: hasMap
+                        ? `${getThemedSpacing(800)} ${getThemedSpacing(600)} ${getThemedSpacing(900)} ${getThemedSpacing(600)}`
+                        : `${getThemedSpacing(800)} 0 ${getThemedSpacing(900)} 0`,
+                    borderBottom: `1px solid ${getThemedColor('neutral', 300)}`,
+                }}
+            >
+                {hasMap ? (
+                    content
+                ) : (
+                    <div
+                        className={constrainedHeaderContainerClassName}
+                        style={{ padding: `0 ${getThemedSpacing(700)}` }}
+                    >
+                        {content}
+                    </div>
+                )}
             </div>
         </div>
     );

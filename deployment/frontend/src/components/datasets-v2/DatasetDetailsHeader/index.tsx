@@ -7,11 +7,11 @@ import {
 import { ChevronLeftIcon, CopyIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/router';
 import type { DatasetDetailsHeaderProps } from './types';
-import useStickyHeader from './useStickyHeader';
 import DatasetDetailsHeaderContent from './DatasetDetailsHeaderContent';
 import DatasetDetailsHeaderSticky from './DatasetDetailsHeaderSticky';
 import DatasetDetailsHeaderActions from './DatasetDetailsHeaderActions';
 import { normalizeOpenInItems } from './utils';
+import { constrainedHeaderContainerClassName } from './DatasetDetailsHeaderContent';
 
 function DatasetDetailsHeader({
     datasetTitle,
@@ -19,12 +19,25 @@ function DatasetDetailsHeader({
     datasetName,
     dataset,
     sectionItems,
+    hasMap = true,
+    isSticky: controlledSticky,
 }: DatasetDetailsHeaderProps) {
     const router = useRouter();
-    const { headerRef, isSticky } = useStickyHeader();
 
     const copyLink = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL?.replace(/\/+$/, '') ?? ''}/datasets-v2/${dataset?.name ?? datasetName}`;
     const openInItems = normalizeOpenInItems(dataset);
+
+    if (controlledSticky && dataset) {
+        return (
+            <DatasetDetailsHeaderSticky
+                dataset={dataset}
+                datasetTitle={datasetTitle}
+                openInItems={openInItems}
+                sectionItems={sectionItems}
+                hasMap={hasMap}
+            />
+        );
+    }
 
     return (
         <>
@@ -33,75 +46,65 @@ function DatasetDetailsHeader({
                     backgroundColor: getThemedColor('secondary', 100),
                     paddingTop: getThemedSpacing(800),
                 }}
-                className="flex justify-between items-center px-2"
+                className="flex justify-between items-center"
             >
-                <Button
-                    variant="borderless"
-                    size="default"
-                    onClick={() => void router.push('/search')}
-                    leftIcon={<ChevronLeftIcon />}
-                >
-                    <div
-                        style={{
-                            color: getThemedColor('neutral', 700),
-                            fontWeight: 400,
-                            fontSize: getThemedFontSize(300),
-                        }}
-                    >
-                        Back to datasets
-                    </div>
-                </Button>
+                <div className={hasMap ? 'w-full' : constrainedHeaderContainerClassName}>
+                    <div className="flex justify-between items-center">
+                        <Button
+                            variant="borderless"
+                            size="default"
+                            onClick={() => void router.push('/search')}
+                            leftIcon={<ChevronLeftIcon />}
+                        >
+                            <div
+                                style={{
+                                    color: getThemedColor('neutral', 700),
+                                    fontWeight: 400,
+                                    fontSize: getThemedFontSize(300),
+                                }}
+                            >
+                                Back to datasets
+                            </div>
+                        </Button>
 
-                <div className="flex items-center gap-2 sm:gap-4 px-2">
-                    {dataset && (
-                        <DatasetDetailsHeaderActions
-                            dataset={dataset}
-                            extraItems={
-                                <Button
-                                    variant="borderless"
-                                    size="default"
-                                    onClick={() => {
-                                        void navigator.clipboard.writeText(copyLink);
-                                    }}
-                                    rightIcon={<CopyIcon />}
-                                >
-                                    <div
-                                        style={{
-                                            color: getThemedColor('neutral', 700),
-                                            fontWeight: 400,
-                                            fontSize: getThemedFontSize(300),
-                                        }}
-                                    >
-                                        Copy Link
-                                    </div>
-                                </Button>
-                            }
-                        />
-                    )}
+                        <div className="flex items-center gap-2 sm:gap-4 px-2">
+                            {dataset && (
+                                <DatasetDetailsHeaderActions
+                                    dataset={dataset}
+                                    extraItems={
+                                        <Button
+                                            variant="borderless"
+                                            size="default"
+                                            onClick={() => {
+                                                void navigator.clipboard.writeText(copyLink);
+                                            }}
+                                            rightIcon={<CopyIcon />}
+                                        >
+                                            <div
+                                                style={{
+                                                    color: getThemedColor('neutral', 700),
+                                                    fontWeight: 400,
+                                                    fontSize: getThemedFontSize(300),
+                                                }}
+                                            >
+                                                Copy Link
+                                            </div>
+                                        </Button>
+                                    }
+                                />
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div
-                ref={headerRef}
-                style={{
-                    position: 'absolute',
-                    top: '70px',
-                }}
-            />
-
-            {!isSticky && dataset ? (
+            {dataset ? (
                 <DatasetDetailsHeaderContent
                     dataset={dataset}
                     datasetTitle={datasetTitle}
                     datasetDescription={datasetDescription}
                     openInItems={openInItems}
-                />
-            ) : dataset ? (
-                <DatasetDetailsHeaderSticky
-                    dataset={dataset}
-                    datasetTitle={datasetTitle}
-                    openInItems={openInItems}
-                    sectionItems={sectionItems}
+                    hasMap={hasMap}
                 />
             ) : null}
         </>

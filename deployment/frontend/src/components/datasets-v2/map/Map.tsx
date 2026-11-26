@@ -98,9 +98,7 @@ export default function Map({
                         />
                         <Basemap mapRef={mapRef} />
                         <Labels mapRef={mapRef} />
-                        {showControls && (
-                            <Controls mapRef={mapRef} mapContainerRef={mapContainerRef} />
-                        )}
+                        {showControls && <Controls mapRef={mapRef} />}
 
                         {!isDrawing && <MapTooltip ref={mapTooltipRef} mapRef={mapRef} />}
 

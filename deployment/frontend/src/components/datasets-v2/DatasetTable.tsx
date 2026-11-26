@@ -157,7 +157,7 @@ function DatasetTable({
                 {rows.map(({ icon: Icon, label, value }) => (
                     <div
                         key={label}
-                        className="grid grid-cols-[24px_1fr] gap-x-4 gap-y-2 py-5 sm:grid-cols-[24px_220px_1fr] sm:items-center sm:gap-x-6"
+                        className="grid grid-cols-[24px_1fr] gap-x-4 gap-y-2 py-3 sm:grid-cols-[24px_180px_1fr] sm:items-center sm:gap-x-4"
                     >
                         <Icon
                             className="h-6 w-6"

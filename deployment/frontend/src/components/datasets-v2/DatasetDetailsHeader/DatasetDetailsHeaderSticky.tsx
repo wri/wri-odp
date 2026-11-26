@@ -13,6 +13,7 @@ import DatasetDownloadButton from './DatasetDownloadButton';
 import AccessApiButton from './AccessApiButton';
 import { hasDownloadableResources } from './download-utils';
 import type { DatasetDetailsHeaderMenuItem } from './types';
+import { constrainedHeaderContainerClassName } from './DatasetDetailsHeaderContent';
 
 type SectionItem = {
     label: string;
@@ -24,14 +25,22 @@ type Props = {
     datasetTitle: string;
     openInItems: DatasetDetailsHeaderMenuItem[];
     sectionItems: SectionItem[];
+    hasMap?: boolean;
 };
 
-function DatasetDetailsHeaderSticky({ dataset, datasetTitle, openInItems, sectionItems }: Props) {
+function DatasetDetailsHeaderSticky({
+    dataset,
+    datasetTitle,
+    openInItems,
+    sectionItems,
+    hasMap = true,
+}: Props) {
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
     const [isAccessApiModalOpen, setIsAccessApiModalOpen] = useState(false);
     const [selectedSectionLabel, setSelectedSectionLabel] = useState(
         sectionItems[0]?.label ?? 'Section'
     );
+
     const stickyOpenInItems = openInItems.map((item) => ({
         label: `Open in (${item.label})`,
         value: item.value,
@@ -101,64 +110,77 @@ function DatasetDetailsHeaderSticky({ dataset, datasetTitle, openInItems, sectio
     return (
         <div
             ref={stickyHeaderRef}
-            className="sticky z-50 top-12 left-0 right-0 font-acumin"
+            className="w-full font-acumin"
             style={{
-                backgroundColor: getThemedColor('neutral', 100),
-                padding: `${getThemedSpacing(300)} ${getThemedSpacing(600)}`,
+                backgroundColor: getThemedColor('secondary', 100),
+                padding: hasMap
+                    ? `${getThemedSpacing(300)} ${getThemedSpacing(600)}`
+                    : `${getThemedSpacing(300)} 0`,
                 borderBottom: `1px solid ${getThemedColor('neutral', 300)}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
             }}
         >
-            <h1
+            <div
+                className={hasMap ? 'w-full' : constrainedHeaderContainerClassName}
                 style={{
-                    fontSize: getThemedFontSize(500),
-                    color: getThemedColor('neutral', 800),
-                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    ...(hasMap ? {} : { padding: `0 ${getThemedSpacing(700)}` }),
                 }}
             >
-                {datasetTitle}
-            </h1>
+                <h1
+                    style={{
+                        fontSize: getThemedFontSize(500),
+                        color: getThemedColor('neutral', 800),
+                        fontWeight: 700,
+                    }}
+                >
+                    {datasetTitle}
+                </h1>
 
-            <div className="flex gap-1 sm:gap-4">
-                {dataset?.resources && hasDownloadableResources(dataset.resources) && (
-                    <DatasetDownloadButton dataset={dataset} size="small" />
-                )}
-                <AccessApiButton
-                    dataset={dataset}
-                    hideButton
-                    isAccessApiModalOpen={isAccessApiModalOpen}
-                />
-                <Menu
-                    label="Section"
-                    items={sectionItems}
-                    onSelect={onSectionSelect}
-                    hideArrow
-                    customTrigger={
-                        <Button variant="secondary" size="small" rightIcon={<ChevronDownIcon />}>
-                            <span style={{ fontSize: getThemedFontSize(200), fontWeight: 400 }}>
-                                Section:
-                            </span>
-                            <span
-                                className="hidden sm:inline"
-                                style={{ fontSize: getThemedFontSize(200), fontWeight: 700 }}
-                            >
-                                {selectedSectionLabel}
-                            </span>
-                        </Button>
-                    }
-                />
-
-                {openInItemsAndAccessApi.length > 0 && (
-                    <Menu
-                        label="Open in"
-                        items={openInItemsAndAccessApi}
-                        onSelect={onOpenInSelect}
-                        hideArrow
-                        customTrigger={<EllipsisVerticalIcon height={24} />}
+                <div className="flex gap-1 sm:gap-4">
+                    {dataset?.resources && hasDownloadableResources(dataset.resources) && (
+                        <DatasetDownloadButton dataset={dataset} size="small" />
+                    )}
+                    <AccessApiButton
+                        dataset={dataset}
+                        hideButton
+                        isAccessApiModalOpen={isAccessApiModalOpen}
                     />
-                )}
+                    <Menu
+                        label="Section"
+                        items={sectionItems}
+                        onSelect={onSectionSelect}
+                        hideArrow
+                        customTrigger={
+                            <Button
+                                variant="secondary"
+                                size="small"
+                                rightIcon={<ChevronDownIcon />}
+                            >
+                                <span style={{ fontSize: getThemedFontSize(200), fontWeight: 400 }}>
+                                    Section:
+                                </span>
+                                <span
+                                    className="hidden sm:inline"
+                                    style={{ fontSize: getThemedFontSize(200), fontWeight: 700 }}
+                                >
+                                    {selectedSectionLabel}
+                                </span>
+                            </Button>
+                        }
+                    />
+
+                    {openInItemsAndAccessApi.length > 0 && (
+                        <Menu
+                            label="Open in"
+                            items={openInItemsAndAccessApi}
+                            onSelect={onOpenInSelect}
+                            hideArrow
+                            customTrigger={<EllipsisVerticalIcon height={24} />}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

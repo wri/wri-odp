@@ -49,20 +49,26 @@ export default function Navigation() {
                 }}
                 logo={
                     <Link href="/">
-                        <Image
-                            src="/images/WRI_logo_4c.png"
-                            alt="Logo"
-                            width={220}
-                            height={250}
-                            className="hidden sm:block"
-                        />
-                        <Image
-                            src="/images/WRI_logo_4c.png"
-                            alt="Logo"
-                            width={150}
-                            height={250}
-                            className="block sm:hidden"
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+                            <Image
+                                src="/images/WRI_logo_4c_no_text.png"
+                                alt="Logo"
+                                width={110}
+                                height={125}
+                                className="hidden sm:block"
+                            />
+                            <Image
+                                src="/images/WRI_logo_4c_no_text.png"
+                                alt="Logo"
+                                width={75}
+                                height={125}
+                                className="block sm:hidden"
+                            />
+                            <div style={{ height: '30px', borderLeft: '1px solid dimgray' }} />
+                            <div style={{ paddingLeft: '12px', color: 'dimgray' }}>
+                                Data Explorer
+                            </div>
+                        </div>
                     </Link>
                 }
                 navigationSection={[
