@@ -4,8 +4,8 @@ import {
     getThemedColor,
     getThemedFontSize,
     getThemedSpacing,
-    InlineMessage,
 } from '@worldresources/wri-design-systems';
+import CautionInlineMessage from '../../CautionInlineMessage';
 
 type ReviewCautionProps = {
     onBack: () => void;
@@ -51,16 +51,7 @@ function ReviewCaution({ dataset, onBack, onContinue }: ReviewCautionProps) {
                 Before downloading this dataset, please review the following information.
             </div>
             <div style={{ margin: `${getThemedSpacing(500)} 0` }}>
-                <InlineMessage
-                    variant="warning"
-                    label="Caution for using this dataset"
-                    size="full-width"
-                    caption={
-                        <div style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-                            {cautionText}
-                        </div>
-                    }
-                />
+                <CautionInlineMessage text={cautionText} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Button

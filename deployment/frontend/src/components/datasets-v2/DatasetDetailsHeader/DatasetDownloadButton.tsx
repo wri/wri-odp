@@ -10,6 +10,7 @@ import {
     Panel,
 } from '@worldresources/wri-design-systems';
 import { NumberIcon } from './NumberIcon';
+import { AccessApiModalContent } from './AccessApiButton';
 import ConfirmationStep from './ApiAndDownloadModalSteps/ConfirmationStep';
 import ReviewCautionStep from './ApiAndDownloadModalSteps/ReviewCautionStep';
 import ReviewDetailsAndTermsStep, {
@@ -37,20 +38,31 @@ import { toast } from 'react-toastify';
 
 type DownloadStep = 'caution' | 'files' | 'terms' | 'confirmation';
 
-export default function DatasetDownloadButton({ dataset, size }: DatasetDownloadButtonProps) {
+export default function DatasetDownloadButton({
+    dataset,
+    size,
+    isOpen,
+    onClose,
+    onOpen,
+}: DatasetDownloadButtonProps) {
     const hasCautions = Boolean(dataset.cautions?.trim());
     const stepOrder: DownloadStep[] = hasCautions
         ? ['caution', 'files', 'terms', 'confirmation']
         : ['files', 'terms', 'confirmation'];
     const firstStep = stepOrder[0]!;
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeStep, setActiveStep] = useState<DownloadStep>(firstStep);
+    const [isApiFlowOpen, setIsApiFlowOpen] = useState(false);
     const [selectedResourceIds, setSelectedResourceIds] = useState<string[]>([]);
     const [selectedTilesByResourceId, setSelectedTilesByResourceId] = useState<
         Record<string, string[]>
     >({});
     const [deliveryEmail, setDeliveryEmail] = useState<string | undefined>(undefined);
+
+    const closeModal = () => {
+        setIsApiFlowOpen(false);
+        onClose();
+    };
 
     const selectTilesForResource = (resourceId: string, tiles: string[] | null) => {
         setSelectedTilesByResourceId((current) => {
@@ -73,7 +85,7 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
         tileInfoByResourceId,
         resolvedSizeByResourceId,
         loadingResourceIds,
-    } = useDataApiTiles(dataset.resources, { enabled: isModalOpen });
+    } = useDataApiTiles(dataset.resources, { enabled: isOpen && !isApiFlowOpen });
 
     useScrollTopOnStepChange(activeStep);
 
@@ -103,14 +115,6 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
     // Everything else (DX S3 uploads, non-DX URLs, hosted-externally links) is
     // downloaded directly in the browser, so only those require delivery details.
     const hasServerDeliveredResources = needsEmailDelivery(selectedResources);
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setActiveStep(firstStep);
-        setSelectedResourceIds([]);
-        setSelectedTilesByResourceId({});
-        setDeliveryEmail(undefined);
-    };
 
     const toggleResourceSelection = (resourceId: string) => {
         setSelectedResourceIds((currentSelection) => {
@@ -331,10 +335,12 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                         deliveryEmail={deliveryEmail}
                         onBack={() => setActiveStep('terms')}
                         onClose={closeModal}
+                        onOpenAccessApi={() => setIsApiFlowOpen(true)}
                     />
                 );
         }
     })();
+
     return (
         <>
             <Button
@@ -342,89 +348,113 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                 size={size}
                 leftIcon={<ArrowDownTrayIcon />}
                 onClick={() => {
+                    setIsApiFlowOpen(false);
                     setActiveStep(firstStep);
                     setSelectedResourceIds([]);
                     setSelectedTilesByResourceId({});
-                    setIsModalOpen(true);
+                    setDeliveryEmail(undefined);
+                    onOpen();
                 }}
             >
                 Download
             </Button>
 
             <Modal
-                open={isModalOpen}
+                open={isOpen}
                 onClose={closeModal}
                 size="xlarge"
-                header="Download data"
+                header={isApiFlowOpen ? 'Access data via API' : 'Download data'}
                 content={
-                    <div
-                        className={styles.modalStepLayout}
-                        style={{
-                            padding: getThemedSpacing(600),
-                            gap: getThemedSpacing(1000),
-                        }}
-                    >
-                        <div className={styles.modalStepSidebar}>
-                            <div>
-                                <List items={items} />
-                                <div style={{ marginTop: getThemedSpacing(400) }}>
-                                    <Panel
-                                        width="full"
-                                        content={
-                                            <div
-                                                style={{
-                                                    padding: `${getThemedSpacing(300)} ${getThemedSpacing(300)} ${getThemedSpacing(200)}`,
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    gap: getThemedSpacing(50),
-                                                }}
-                                            >
+                    isApiFlowOpen ? (
+                        <AccessApiModalContent dataset={dataset} onClose={closeModal} />
+                    ) : (
+                        <div
+                            className={styles.modalStepLayout}
+                            style={{
+                                padding: getThemedSpacing(600),
+                                gap: getThemedSpacing(1000),
+                            }}
+                        >
+                            <div className={styles.modalStepSidebar}>
+                                <div>
+                                    <List items={items} />
+                                    <div style={{ marginTop: getThemedSpacing(400) }}>
+                                        <Panel
+                                            width="full"
+                                            content={
                                                 <div
                                                     style={{
-                                                        fontSize: getThemedFontSize(300),
-                                                        fontWeight: 700,
-                                                        color: getThemedColor('neutral', 900),
+                                                        padding: `${getThemedSpacing(300)} ${getThemedSpacing(300)} ${getThemedSpacing(200)}`,
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        gap: getThemedSpacing(50),
                                                     }}
                                                 >
-                                                    Download summary
-                                                </div>
-                                                <div
-                                                    style={{
-                                                        fontSize: getThemedFontSize(500),
-                                                        color:
-                                                            selectedCount === 0
-                                                                ? getThemedColor('neutral', 700)
-                                                                : getThemedColor('secondary', 900),
-                                                    }}
-                                                >
-                                                    {selectedCount === 0 ? (
+                                                    <div
+                                                        style={{
+                                                            fontSize: getThemedFontSize(300),
+                                                            fontWeight: 700,
+                                                            color: getThemedColor('neutral', 900),
+                                                        }}
+                                                    >
+                                                        Download summary
+                                                    </div>
+                                                    <div
+                                                        style={{
+                                                            fontSize: getThemedFontSize(500),
+                                                            color:
+                                                                selectedCount === 0
+                                                                    ? getThemedColor('neutral', 700)
+                                                                    : getThemedColor(
+                                                                          'secondary',
+                                                                          900
+                                                                      ),
+                                                        }}
+                                                    >
+                                                        {selectedCount === 0 ? (
+                                                            <>
+                                                                <div>No files added yet.</div>
+                                                                <div
+                                                                    style={{
+                                                                        fontSize:
+                                                                            getThemedFontSize(300),
+                                                                    }}
+                                                                >
+                                                                    Files you add will show here.
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <span
+                                                                    style={{
+                                                                        fontWeight: 700,
+                                                                    }}
+                                                                >
+                                                                    {selectedCount}
+                                                                </span>
+                                                                {' files added'}
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                    {selectedFormats.length > 0 && (
                                                         <>
-                                                            <div>No files added yet.</div>
-                                                            <div
-                                                                style={{
-                                                                    fontSize:
-                                                                        getThemedFontSize(300),
-                                                                }}
-                                                            >
-                                                                Files you add will show here.
-                                                            </div>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span
-                                                                style={{
-                                                                    fontWeight: 700,
-                                                                }}
-                                                            >
-                                                                {selectedCount}
-                                                            </span>
-                                                            {' files added'}
-                                                        </>
-                                                    )}
-                                                </div>
-                                                {selectedFormats.length > 0 && (
-                                                    <>
-                                                        {totalSelectedBytes > 0 && (
+                                                            {totalSelectedBytes > 0 && (
+                                                                <div
+                                                                    style={{
+                                                                        fontSize:
+                                                                            getThemedFontSize(300),
+                                                                        color: getThemedColor(
+                                                                            'neutral',
+                                                                            700
+                                                                        ),
+                                                                    }}
+                                                                >
+                                                                    Estimated size:{' '}
+                                                                    {formatFileSize(
+                                                                        totalSelectedBytes
+                                                                    )}
+                                                                </div>
+                                                            )}
                                                             <div
                                                                 style={{
                                                                     fontSize:
@@ -435,37 +465,26 @@ export default function DatasetDownloadButton({ dataset, size }: DatasetDownload
                                                                     ),
                                                                 }}
                                                             >
-                                                                Estimated size:{' '}
-                                                                {formatFileSize(totalSelectedBytes)}
+                                                                Formats:{' '}
+                                                                {selectedFormats.join(', ')}
                                                             </div>
-                                                        )}
-                                                        <div
-                                                            style={{
-                                                                fontSize: getThemedFontSize(300),
-                                                                color: getThemedColor(
-                                                                    'neutral',
-                                                                    700
-                                                                ),
-                                                            }}
-                                                        >
-                                                            Formats: {selectedFormats.join(', ')}
-                                                        </div>
-                                                    </>
-                                                )}
-                                            </div>
-                                        }
-                                    />
+                                                        </>
+                                                    )}
+                                                </div>
+                                            }
+                                        />
+                                    </div>
                                 </div>
                             </div>
+                            <div
+                                id="main-content"
+                                className={styles.modalStepMain}
+                                style={{ paddingBottom: getThemedSpacing(1000) }}
+                            >
+                                {currentStep}
+                            </div>
                         </div>
-                        <div
-                            id="main-content"
-                            className={styles.modalStepMain}
-                            style={{ paddingBottom: getThemedSpacing(1000) }}
-                        >
-                            {currentStep}
-                        </div>
-                    </div>
+                    )
                 }
             />
         </>

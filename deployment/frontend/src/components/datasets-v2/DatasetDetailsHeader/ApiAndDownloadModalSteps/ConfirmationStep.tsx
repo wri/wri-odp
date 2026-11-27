@@ -38,6 +38,7 @@ type ConfirmationStepProps = {
     deliveryEmail?: string;
     onBack: () => void;
     onClose: () => void;
+    onOpenAccessApi: () => void;
 };
 
 function ConfirmationStep({
@@ -47,6 +48,7 @@ function ConfirmationStep({
     deliveryEmail,
     onBack,
     onClose,
+    onOpenAccessApi,
 }: ConfirmationStepProps) {
     // Only Data API tile sets are delivered by email through the server-side ZIP
     // flow. Everything downloadable (DX S3 uploads and non-DX/external URLs) is
@@ -96,10 +98,7 @@ function ConfirmationStep({
             title: 'Access via API',
             description: 'Integrate this data into your tools and workflows.',
             action: 'View API options',
-            onClick: () => {
-                onClose();
-                window.dispatchEvent(new Event('open-access-api-modal'));
-            },
+            onClick: onOpenAccessApi,
         },
         {
             icon: <ChatBubbleLeftEllipsisIcon width={16} height={16} />,

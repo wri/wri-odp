@@ -36,7 +36,7 @@ function DatasetDetailsHeaderSticky({
     hasMap = true,
 }: Props) {
     const stickyHeaderRef = useRef<HTMLDivElement>(null);
-    const [isAccessApiModalOpen, setIsAccessApiModalOpen] = useState(false);
+    const [activeModal, setActiveModal] = useState<'download' | 'api' | null>(null);
     const [selectedSectionLabel, setSelectedSectionLabel] = useState(
         sectionItems[0]?.label ?? 'Section'
     );
@@ -49,7 +49,7 @@ function DatasetDetailsHeaderSticky({
 
     const onOpenInSelect = (value: string) => {
         if (value === 'access-api') {
-            setIsAccessApiModalOpen(true);
+            setActiveModal('api');
             return;
         }
 
@@ -140,12 +140,26 @@ function DatasetDetailsHeaderSticky({
 
                 <div className="flex gap-1 sm:gap-4">
                     {dataset?.resources && hasDownloadableResources(dataset.resources) && (
-                        <DatasetDownloadButton dataset={dataset} size="small" />
+                        <DatasetDownloadButton
+                            dataset={dataset}
+                            size="small"
+                            isOpen={activeModal === 'download'}
+                            onClose={() =>
+                                setActiveModal((current) =>
+                                    current === 'download' ? null : current
+                                )
+                            }
+                            onOpen={() => setActiveModal('download')}
+                        />
                     )}
                     <AccessApiButton
                         dataset={dataset}
                         hideButton
-                        isAccessApiModalOpen={isAccessApiModalOpen}
+                        isOpen={activeModal === 'api'}
+                        onClose={() =>
+                            setActiveModal((current) => (current === 'api' ? null : current))
+                        }
+                        onOpen={() => setActiveModal('api')}
                     />
                     <Menu
                         label="Section"

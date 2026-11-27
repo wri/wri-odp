@@ -71,10 +71,15 @@ export type DatasetDetailsHeaderStickyProps = {
 export type DatasetDownloadButtonProps = {
     dataset: WriDataset;
     size: 'default' | 'small';
+    isOpen: boolean;
+    onClose: () => void;
+    onOpen: () => void;
 };
 
 export type AccessApiButtonProps = {
     dataset: WriDataset;
     hideButton?: boolean;
-    isAccessApiModalOpen?: boolean;
+    isOpen: boolean;
+    onClose: () => void;
+    onOpen: () => void;
 };
