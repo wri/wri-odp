@@ -19,7 +19,7 @@ import { api } from '@/utils/api';
 import '@/styles/globals.scss';
 import '@/styles/rte.scss';
 import ReactToastContainer from '@/components/_shared/ReactToastContainer';
-import { DefaultSeo } from 'next-seo';
+import { DefaultSeo, LogoJsonLd } from 'next-seo';
 import { type LayerState } from '@/interfaces/state.interface';
 import { env } from '@/env.mjs';
 import NProgress from 'nprogress';
@@ -181,9 +181,15 @@ const MyApp: AppType<{ session: Session | null }> = ({
         },
     });
 
+    const siteOrigin = env.NEXT_PUBLIC_NEXTAUTH_URL.replace(/\/+$/, '');
+
     return (
         <QueryClientProvider client={queryClient}>
             <ChakraProvider value={system}>
+                <LogoJsonLd
+                    url={siteOrigin}
+                    logo={`${siteOrigin}/images/WRI_logo_thumbnail.png`}
+                />
                 <DefaultSeo
                     titleTemplate="%s - WRI Data Explorer"
                     openGraph={{
