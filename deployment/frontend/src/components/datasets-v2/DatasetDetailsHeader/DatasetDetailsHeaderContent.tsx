@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
     Button,
     getThemedColor,
@@ -25,6 +26,7 @@ export default function DatasetDetailsHeaderContent({
 }: DatasetDetailsHeaderContentProps) {
     const hasSingleOpenInOption = openInItems.length === 1;
     const singleOpenInItem = hasSingleOpenInOption ? openInItems[0] : undefined;
+    const [activeModal, setActiveModal] = useState<'download' | 'api' | null>(null);
     const openInTriggerLabel = hasSingleOpenInOption
         ? `Open in (${singleOpenInItem?.label ?? 'app'})`
         : 'Open in app';
@@ -73,9 +75,24 @@ export default function DatasetDetailsHeaderContent({
                 }}
             >
                 {dataset?.resources && hasDownloadableResources(dataset.resources) && (
-                    <DatasetDownloadButton dataset={dataset} size="default" />
+                    <DatasetDownloadButton
+                        dataset={dataset}
+                        size="default"
+                        isOpen={activeModal === 'download'}
+                        onClose={() =>
+                            setActiveModal((current) => (current === 'download' ? null : current))
+                        }
+                        onOpen={() => setActiveModal('download')}
+                    />
                 )}
-                <AccessApiButton dataset={dataset} />
+                <AccessApiButton
+                    dataset={dataset}
+                    isOpen={activeModal === 'api'}
+                    onClose={() =>
+                        setActiveModal((current) => (current === 'api' ? null : current))
+                    }
+                    onOpen={() => setActiveModal('api')}
+                />
 
                 {hasSingleOpenInOption && singleOpenInItem?.value ? (
                     <Button

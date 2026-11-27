@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CheckIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 import { Button, getThemedSpacing, List, Modal } from '@worldresources/wri-design-systems';
 import { NumberIcon } from './NumberIcon';
@@ -10,40 +10,18 @@ import type { AccessApiButtonProps } from './types';
 import { useScrollTopOnStepChange } from './useScrollTopOnStepChange';
 
 type ApiStep = 'caution' | 'terms' | 'endpoints';
-const OPEN_ACCESS_API_MODAL_EVENT = 'open-access-api-modal';
 
-export default function AccessApiButton({
-    dataset,
-    hideButton,
-    isAccessApiModalOpen = false,
-}: AccessApiButtonProps) {
+type AccessApiModalContentProps = Pick<AccessApiButtonProps, 'dataset' | 'onClose'>;
+
+export function AccessApiModalContent({ dataset, onClose }: AccessApiModalContentProps) {
     const hasCautions = Boolean(dataset.cautions?.trim());
     const stepOrder: ApiStep[] = hasCautions
         ? ['caution', 'terms', 'endpoints']
         : ['terms', 'endpoints'];
     const firstStep = stepOrder[0]!;
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeStep, setActiveStep] = useState<ApiStep>(firstStep);
     useScrollTopOnStepChange(activeStep);
-
-    useEffect(() => {
-        const handleOpenAccessApiModal = () => {
-            setActiveStep(firstStep);
-            setIsModalOpen(true);
-        };
-
-        window.addEventListener(OPEN_ACCESS_API_MODAL_EVENT, handleOpenAccessApiModal);
-
-        return () => {
-            window.removeEventListener(OPEN_ACCESS_API_MODAL_EVENT, handleOpenAccessApiModal);
-        };
-    }, [firstStep]);
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setActiveStep(firstStep);
-    };
 
     const activeStepIndex = stepOrder.indexOf(activeStep);
     const items = stepOrder.map((step, index) => {
@@ -80,7 +58,7 @@ export default function AccessApiButton({
                 return (
                     <ReviewCautionStep
                         dataset={dataset}
-                        onBack={closeModal}
+                        onBack={onClose}
                         onContinue={() => setActiveStep('terms')}
                     />
                 );
@@ -93,7 +71,7 @@ export default function AccessApiButton({
                                 setActiveStep('caution');
                                 return;
                             }
-                            closeModal();
+                            onClose();
                         }}
                         onContinue={() => setActiveStep('endpoints')}
                     />
@@ -103,12 +81,43 @@ export default function AccessApiButton({
                     <SelectEndpoints
                         dataset={dataset}
                         onBack={() => setActiveStep('terms')}
-                        onClose={closeModal}
+                        onClose={onClose}
                     />
                 );
         }
     })();
 
+    return (
+        <div
+            className={styles.modalStepLayout}
+            style={{
+                padding: getThemedSpacing(600),
+                gap: getThemedSpacing(1000),
+            }}
+        >
+            <div className={styles.modalStepSidebar}>
+                <div>
+                    <List items={items} />
+                </div>
+            </div>
+            <div
+                id="main-content"
+                className={styles.modalStepMain}
+                style={{ paddingBottom: getThemedSpacing(1000) }}
+            >
+                {currentStep}
+            </div>
+        </div>
+    );
+}
+
+export default function AccessApiButton({
+    dataset,
+    hideButton,
+    isOpen,
+    onClose,
+    onOpen,
+}: AccessApiButtonProps) {
     return (
         <>
             {!hideButton && (
@@ -116,42 +125,18 @@ export default function AccessApiButton({
                     variant="secondary"
                     size="default"
                     leftIcon={<GlobeAltIcon />}
-                    onClick={() => {
-                        setActiveStep(firstStep);
-                        setIsModalOpen(true);
-                    }}
+                    onClick={onOpen}
                 >
                     Access API
                 </Button>
             )}
 
             <Modal
-                open={isModalOpen || isAccessApiModalOpen}
-                onClose={closeModal}
+                open={isOpen}
+                onClose={onClose}
                 size="xlarge"
                 header="Access data via API"
-                content={
-                    <div
-                        className={styles.modalStepLayout}
-                        style={{
-                            padding: getThemedSpacing(600),
-                            gap: getThemedSpacing(1000),
-                        }}
-                    >
-                        <div className={styles.modalStepSidebar}>
-                            <div>
-                                <List items={items} />
-                            </div>
-                        </div>
-                        <div
-                            id="main-content"
-                            className={styles.modalStepMain}
-                            style={{ paddingBottom: getThemedSpacing(1000) }}
-                        >
-                            {currentStep}
-                        </div>
-                    </div>
-                }
+                content={<AccessApiModalContent dataset={dataset} onClose={onClose} />}
             />
         </>
     );

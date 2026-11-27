@@ -1,12 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import {
-    getThemedFontSize,
-    getThemedSpacing,
-    InlineMessage,
-} from '@worldresources/wri-design-systems';
+import { getThemedFontSize, getThemedSpacing } from '@worldresources/wri-design-systems';
 import DatasetTable from './DatasetTable';
+import CautionInlineMessage from './CautionInlineMessage';
 import { type WriDataset } from '@/schema/ckan.schema';
 import Navigation from './Navigation';
 import DatasetV2Map from './DatasetMap';
@@ -20,7 +17,6 @@ import ContactDetailsSection, {
 } from './sections/ContactDetailsSection';
 import AdditionalReadingSection, {
     getAdditionalReadingLinks,
-    getPrimaryAdditionalReadingUrl,
     hasAdditionalReading,
 } from './sections/AdditionalReadingSection';
 import AdditionalMetadataSection, {
@@ -233,7 +229,6 @@ export default function DatasetV2Content({ dataset, diffFields = [] }: Props) {
     const useCasesContentHtml = stripCmsTypography(useCasesHtml);
     const releaseNotesContentHtml = stripCmsTypography(releaseNotesHtml);
     const additionalReadingLinks = getAdditionalReadingLinks(dataset);
-    const safeLearnMoreUrl = getPrimaryAdditionalReadingUrl(dataset);
 
     const cautionsText = stripHtmlToText(dataset.cautions);
     const relatedDatasets = getExtraValue([
@@ -413,24 +408,9 @@ export default function DatasetV2Content({ dataset, diffFields = [] }: Props) {
                         >
                             {hasValue(cautionsText) && (
                                 <div className={hl('cautions')}>
-                                    <InlineMessage
+                                    <CautionInlineMessage
+                                        text={cautionsText}
                                         icon={<ExclamationTriangleIcon width={18} height={18} />}
-                                        size="full-width"
-                                        variant="warning"
-                                        label="Caution for using this dataset"
-                                        caption={cautionsText}
-                                        actionLabel={safeLearnMoreUrl ? 'Read more' : undefined}
-                                        onActionClick={
-                                            safeLearnMoreUrl
-                                                ? () => {
-                                                      window.open(
-                                                          safeLearnMoreUrl,
-                                                          '_blank',
-                                                          'noopener,noreferrer'
-                                                      );
-                                                  }
-                                                : undefined
-                                        }
                                     />
                                 </div>
                             )}

@@ -200,7 +200,7 @@ export default function Search({ mapRef }: { mapRef: MutableRefObject<MapRef | n
 
             if (!bbox) return;
 
-            setBounds({ bbox, options: { zoom: 2 } });
+            setBounds({ bbox });
             // The panel is ours, so it closes locally; no popover can reopen it.
             setIsResultsOpen(false);
         },
